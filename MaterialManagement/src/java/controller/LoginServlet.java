@@ -17,21 +17,17 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Lấy dữ liệu từ form login
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        // Gọi DAO để kiểm tra đăng nhập
-        UserDAO userDAO = new UserDAO(); // UserDAO kế thừa DBConnect
+        UserDAO userDAO = new UserDAO(); 
         User user = userDAO.login(username, password);
 
         if (user != null) {
-            // Đăng nhập thành công
             HttpSession session = request.getSession();
             session.setAttribute("user", user); // Lưu thông tin user vào session
             response.sendRedirect("HomePage.jsp");  // Chuyển hướng tới trang chính
         } else {
-            // Đăng nhập thất bại
             request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
             request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
@@ -40,7 +36,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Điều hướng người dùng về trang login nếu truy cập bằng GET
         response.sendRedirect("Login.jsp");
     }
 
