@@ -6,6 +6,7 @@ package dal;
 
 import entity.DBContext;
 import entity.Material;
+import entity.MaterialDetails;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +19,52 @@ import java.util.List;
  * @author Admin
  */
 public class MaterialDAO extends DBContext{
+    
+    public MaterialDetails getMaterialById(int id) throws SQLException {
+        String sql = "SELECT m.*, c.category_name, c.description as category_description, " +
+                    "s.supplier_name, s.contact_info, s.address, s.phone_number, s.email " +
+                    "FROM Materials m " +
+                    "LEFT JOIN Categories c ON m.category_id = c.category_id " +
+                    "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id " +
+                    "WHERE m.material_id = ? AND m.disable = 0";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                Material material = new Material();
+                material.setMaterialId(rs.getInt("material_id"));
+                material.setMaterialCode(rs.getString("material_code"));
+                material.setMaterialName(rs.getString("material_name"));
+                String materialsUrl = rs.getString("materials_url");
+                if (materialsUrl == null || materialsUrl.trim().isEmpty()) {
+                    material.setMaterialsUrl("https://placehold.co/200x200?text=" + material.getMaterialCode());
+                } else {
+                    material.setMaterialsUrl(materialsUrl);
+                }
+                material.setMaterialStatus(rs.getString("material_status"));
+                material.setConditionPercentage(rs.getInt("condition_percentage"));
+                material.setPrice(rs.getBigDecimal("price"));
+                material.setQuantity(rs.getInt("quantity"));
+                material.setCategoryId(rs.getInt("category_id"));
+                material.setSupplierId(rs.getInt("supplier_id"));
+                material.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                material.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                material.setDisable(rs.getBoolean("disable"));
+                
+                MaterialDetails details = new MaterialDetails(material);
+                details.setCategoryName(rs.getString("category_name"));
+                details.setCategoryDescription(rs.getString("category_description"));
+                details.setSupplierName(rs.getString("supplier_name"));
+                details.setSupplierContact(rs.getString("contact_info"));
+                details.setSupplierAddress(rs.getString("address"));
+                details.setSupplierPhone(rs.getString("phone_number"));
+                details.setSupplierEmail(rs.getString("email"));
+                
+                return details;
+            }
+        }
+        return null;
+    }
     
     public int getTotalMaterials() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Materials WHERE disable = 0";
