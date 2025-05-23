@@ -105,21 +105,21 @@ CSS STRUCTURE:
 
 /* Theme Colors */
 :root {
-  --accent-color: #DEAD6F;
+  --accent-color: #0056D2;
   --dark-color: #222222;
   --light-dark-color: #727272;
   --light-color: #fff;
   --grey-color: #dbdbdb;
   --light-grey-color: #fafafa;
-  --primary-color: #6995B1;
+  --primary-color: #0d6efd;
   --light-primary-color: #eef1f3;
 }
 
 /* Fonts */
 :root {
-  --body-font: 'Chilanka', cursive;
-  --heading-font: 'Chilanka', cursive;
-  --secondary-font: 'Montserrat', sans-serif;
+  --body-font: 'Roboto', sans-serif;
+  --heading-font: 'Roboto', sans-serif;
+  --secondary-font: 'Roboto', sans-serif;
 }
 
 
@@ -135,7 +135,7 @@ body {
 
   --bs-light-rgb: 248, 248, 248;
 
-  --bs-font-sans-serif: 'Chilanka', cursive;
+  --bs-font-sans-serif: 'Roboto', cursive;
   --bs-body-font-family: var(--bs-font-sans-serif);
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
@@ -374,7 +374,7 @@ a {
 /* category style */
 iconify-icon.category-icon {
   color: #DEAD6F99;
-  font-size: 100px;
+  font-size: 200px;
   transition: all 0.3s ease-in;
 
 }
