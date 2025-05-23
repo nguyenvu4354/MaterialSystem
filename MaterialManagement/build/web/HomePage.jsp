@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-  <title>Waggy - Free eCommerce Pet Shop HTML Website Template</title>
+  <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+  <title>Computer accessories - Free eCommerce accesories Shop HTML Website Template</title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -170,8 +171,8 @@
 
         <div class="col-sm-4 col-lg-3 text-center text-sm-start">
           <div class="main-logo">
-            <a href="index.html">
-              <img src="images/logo.png" alt="logo" class="img-fluid">
+            <a href="HomePage.jsp">
+                <img src="images/loogo.jpg" alt="logo" class="img-fluid" width="300px">
             </a>
           </div>
         </div>
@@ -197,7 +198,7 @@
           </div>
           <div class="support-box text-end d-none d-xl-block">
             <span class="fs-6 secondary-font text-muted">Email</span>
-            <h5 class="mb-0">waggy@gmail.com</h5>
+            <h5 class="mb-0">accessoriess@gmail.com</h5>
           </div>
 
 
@@ -261,65 +262,65 @@
           <div class="offcanvas-body justify-content-between">
             <select class="filter-categories border-0 mb-0 me-5">
               <option>Shop by Category</option>
-              <option>Clothes</option>
-              <option>Food</option>
-              <option>Food</option>
-              <option>Toy</option>
+              <option>storage device</option>
+              <option>network equipment</option>
+              <option>accessory</option>
+              <option>Gaming</option>
             </select>
 
             <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
               <li class="nav-item">
-                <a href="index.html" class="nav-link active">Home</a>
+                <a href="HomePage.jsp" class="nav-link active">Home</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown"
                   aria-expanded="false">Pages</a>
                 <ul class="dropdown-menu" aria-labelledby="pages">
-                  <li><a href="index.html" class="dropdown-item">About Us</a></li>
-                  <li><a href="index.html" class="dropdown-item">Shop</a></li>
-                  <li><a href="index.html" class="dropdown-item">Single Product</a></li>
-                  <li><a href="index.html" class="dropdown-item">Cart</a></li>
-                  <li><a href="index.html" class="dropdown-item">Wishlist</a></li>
-                  <li><a href="index.html" class="dropdown-item">Checkout</a></li>
-                  <li><a href="index.html" class="dropdown-item">Blog</a></li>
-                  <li><a href="index.html" class="dropdown-item">Single Post</a></li>
-                  <li><a href="index.html" class="dropdown-item">Contact</a></li>
-                  <li><a href="index.html" class="dropdown-item">FAQs</a></li>
-                  <li><a href="index.html" class="dropdown-item">Account</a></li>
-                  <li><a href="index.html" class="dropdown-item">Thankyou</a></li>
-                  <li><a href="index.html" class="dropdown-item">Error 404</a></li>
-                  <li><a href="index.html" class="dropdown-item">Styles</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">About Us</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Shop</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Single Product</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Cart</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Wishlist</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Checkout</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Blog</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Single Post</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Contact</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">FAQs</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Account</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Thankyou</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Error 404</a></li>
+                  <li><a href="HomePage.jsp" class="dropdown-item">Styles</a></li>
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="index.html" class="nav-link">Shop</a>
+                <a href="HomePage.jsp" class="nav-link">Shop</a>
               </li>
               <li class="nav-item">
-                <a href="index.html" class="nav-link">Blog</a>
+                <a href="HomePage.jsp" class="nav-link">Blog</a>
               </li>
               <li class="nav-item">
-                <a href="index.html" class="nav-link">Contact</a>
+                <a href="HomePage.jsp" class="nav-link">Contact</a>
               </li>
               <li class="nav-item">
-                <a href="index.html" class="nav-link">Others</a>
+                <a href="HomePage.jsp" class="nav-link">Others</a>
               </li>
             </ul>
 
             <div class="d-none d-lg-flex align-items-end">
               <ul class="d-flex justify-content-end list-unstyled m-0">
                 <li>
-                  <a href="index.html" class="mx-3">
+                  <a href="HomePage.jsp" class="mx-3">
                     <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                   </a>
                 </li>
                 <li>
-                  <a href="index.html" class="mx-3">
+                  <a href="HomePage.jsp" class="mx-3">
                     <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
                   </a>
                 </li>
 
                 <li class="">
-                  <a href="index.html" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
+                  <a href="HomePage.jsp" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
                     aria-controls="offcanvasCart">
                     <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
                     <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
@@ -350,12 +351,11 @@
           <div class="swiper-slide py-5">
             <div class="row banner-content align-items-center">
               <div class="img-wrapper col-md-5">
-                <img src="images/banner-img.png" class="img-fluid">
+                  <img src="images/banner-img.jpg" class="img-fluid" width="900px" height="300px">
               </div>
               <div class="content-wrapper col-md-7 p-5 mb-5">
                 <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">your
-                    pets</span>
+                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">computer accessories</span>
                 </h2>
                 <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                   shop now
@@ -369,12 +369,12 @@
           <div class="swiper-slide py-5">
             <div class="row banner-content align-items-center">
               <div class="img-wrapper col-md-5">
-                <img src="images//banner-img3.png" class="img-fluid">
+                  <img src="images//banner-img3.jpg" class="img-fluid" height="300px">
               </div>
               <div class="content-wrapper col-md-7 p-5 mb-5">
                 <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">your
-                    pets</span>
+                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
+                    accessories</span>
                 </h2>
                 <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                   shop now
@@ -388,12 +388,13 @@
           <div class="swiper-slide py-5">
             <div class="row banner-content align-items-center">
               <div class="img-wrapper col-md-5">
-                <img src="images/banner-img4.png" class="img-fluid">
+                <img src="images/banner-img4.jpg" class="img-fluid">
               </div>
+                 
               <div class="content-wrapper col-md-7 p-5 mb-5">
                 <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">your
-                    pets</span>
+                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
+                    accessories</span>
                 </h2>
                 <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
                   shop now
@@ -417,32 +418,32 @@
       <div class="row my-5">
         <div class="col text-center">
           <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="ph:bowl-food"></iconify-icon>
-            <h5>Foodies</h5>
+            <iconify-icon class="category-icon" icon="mdi:usb-port"></iconify-icon>
+            <h5>USB & OTG</h5>
           </a>
         </div>
         <div class="col text-center">
           <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="ph:bird"></iconify-icon>
-            <h5>Bird Shop</h5>
+            <iconify-icon class="category-icon" icon="mdi:harddisk"></iconify-icon>
+            <h5>SSD</h5>
           </a>
         </div>
         <div class="col text-center">
           <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="ph:dog"></iconify-icon>
-            <h5>Dog Shop</h5>
+            <iconify-icon class="category-icon" icon="mdi:nas"></iconify-icon>
+            <h5>NAS</h5>
           </a>
         </div>
         <div class="col text-center">
           <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="ph:fish"></iconify-icon>
-            <h5>Fish Shop</h5>
+            <iconify-icon class="category-icon" icon="mdi:disc"></iconify-icon>
+            <h5>CD</h5>
           </a>
         </div>
         <div class="col text-center">
           <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="ph:cat"></iconify-icon>
-            <h5>Cat Shop</h5>
+            <iconify-icon class="category-icon" icon="mdi:harddisk"></iconify-icon>
+            <h5>portable hard drive</h5>
           </a>
         </div>
       </div>
@@ -453,7 +454,7 @@
     <div class="container pb-5">
 
       <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-        <h2 class="display-3 fw-normal">Pet Clothing</h2>
+        <h2 class="display-3 fw-normal">Accessories Clothing</h2>
         <div>
           <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
             shop now
@@ -471,10 +472,10 @@
               New
             </div>
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item1.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem1.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">LENOVO USB 21tb</h3>
                 </a>
 
                 <div class="card-text">
@@ -486,7 +487,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$1.02</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -508,10 +509,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item2.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem2.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">CLUBLU</h3>
                 </a>
 
                 <div class="card-text">
@@ -523,7 +524,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$2.300</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -544,10 +545,10 @@
               -10%
             </div>
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item3.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem3.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">ESSAGER USB</h3>
                 </a>
 
                 <div class="card-text">
@@ -559,7 +560,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$2.000</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -581,10 +582,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item4.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem4.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">USB BLUETOOTH</h3>
                 </a>
 
                 <div class="card-text">
@@ -596,7 +597,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$1.300</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -618,10 +619,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item7.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem7.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">SATA-USB</h3>
                 </a>
 
                 <div class="card-text">
@@ -633,7 +634,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$1.800</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -655,10 +656,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item8.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem8.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">PC-USB</h3>
                 </a>
 
                 <div class="card-text">
@@ -700,13 +701,13 @@
     <div class="container my-5 py-5">
 
       <div class="section-header d-md-flex justify-content-between align-items-center">
-        <h2 class="display-3 fw-normal">Pet Foodies</h2>
+        <h2 class="display-3 fw-normal">USB & OTG</h2>
         <div class="mb-4 mb-md-0">
           <p class="m-0">
             <button class="filter-button me-4  active" data-filter="*">ALL</button>
-            <button class="filter-button me-4 " data-filter=".cat">CAT</button>
-            <button class="filter-button me-4 " data-filter=".dog">DOG</button>
-            <button class="filter-button me-4 " data-filter=".bird">BIRD</button>
+            <button class="filter-button me-4 " data-filter=".cat">BEST SELLER</button>
+            <button class="filter-button me-4 " data-filter=".dog">LATEST</button>
+            <button class="filter-button me-4 " data-filter=".bird">POPULAR</button>
           </p>
         </div>
         <div>
@@ -725,10 +726,10 @@
             New
           </div> -->
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item9.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem9.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB KINGSTON DATA</h3>
               </a>
 
               <div class="card-text">
@@ -740,7 +741,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$1.200</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -763,10 +764,10 @@
             New
           </div>
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item10.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem10.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB LEXAR</h3>
               </a>
 
               <div class="card-text">
@@ -778,7 +779,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$1.600</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -801,10 +802,10 @@
             New
           </div> -->
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item11.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem11.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB drive</h3>
               </a>
 
               <div class="card-text">
@@ -816,7 +817,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$2.000</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -839,10 +840,10 @@
             Sold
           </div>
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item12.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem12.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">Ugreen</h3>
               </a>
 
               <div class="card-text">
@@ -854,7 +855,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$1.800</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -877,10 +878,10 @@
             New
           </div> -->
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item13.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem13.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB TO VGA</h3>
               </a>
 
               <div class="card-text">
@@ -892,7 +893,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$1.400</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -915,10 +916,10 @@
             New
           </div> -->
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item14.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem14.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB K3 KINGSTON</h3>
               </a>
 
               <div class="card-text">
@@ -930,7 +931,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$2.800</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -953,10 +954,10 @@
             Sale
           </div>
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item15.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem15.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">USB BLUETOOTH DONGLE</h3>
               </a>
 
               <div class="card-text">
@@ -968,7 +969,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$1.600</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -991,10 +992,10 @@
             New
           </div> -->
           <div class="card position-relative">
-            <a href="single-product.html"><img src="images/item16.jpg" class="img-fluid rounded-4" alt="image"></a>
+            <a href="single-product.html"><img src="images/iitem16.jpg" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                <h3 class="card-title pt-4 m-0">FLASH 2TB</h3>
               </a>
 
               <div class="card-text">
@@ -1006,7 +1007,7 @@
                   <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                   5.0</span>
 
-                <h3 class="secondary-font text-primary">$18.00</h3>
+                <h3 class="secondary-font text-primary">$2.800</h3>
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -1035,7 +1036,7 @@
     <div class="container">
       <div class="row flex-row-reverse banner-content align-items-center">
         <div class="img-wrapper col-12 col-md-6">
-          <img src="images/banner-img2.png" class="img-fluid">
+            <img src="images/banner-img2.jpg" class="img-fluid" width="500px" height="500px">
         </div>
         <div class="content-wrapper col-12 offset-md-1 col-md-5 p-5">
           <div class="secondary-font text-primary text-uppercase mb-3 fs-4">Upto 40% off</div>
@@ -1065,10 +1066,8 @@
                     <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
                   </div>
                   <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">At the core of our practice is the idea that cities are the
-                      incubators of our
-                      greatest achievements, and the best hope for a sustainable future.</p>
-                    <p class="text-black">- Joshima Lin</p>
+                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
+                        productivity and upgrade your setup.</p>
                   </div>
                 </div>
               </div>
@@ -1078,10 +1077,8 @@
                     <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
                   </div>
                   <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">At the core of our practice is the idea that cities are the
-                      incubators of our
-                      greatest achievements, and the best hope for a sustainable future.</p>
-                    <p class="text-black">- Joshima Lin</p>
+                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
+                        productivity and upgrade your setup.</p>
                   </div>
                 </div>
               </div>
@@ -1091,10 +1088,8 @@
                     <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
                   </div>
                   <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">At the core of our practice is the idea that cities are the
-                      incubators of our
-                      greatest achievements, and the best hope for a sustainable future.</p>
-                    <p class="text-black">- Joshima Lin</p>
+                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
+                        productivity and upgrade your setup.</p>
                   </div>
                 </div>
               </div>
@@ -1132,10 +1127,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item5.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem5.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">power cord</h3>
                 </a>
 
                 <div class="card-text">
@@ -1147,7 +1142,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$1.600</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -1169,10 +1164,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item6.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem6.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">cooling fan</h3>
                 </a>
 
                 <div class="card-text">
@@ -1184,7 +1179,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$2.300</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -1205,10 +1200,10 @@
               Sale
             </div>
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item7.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem17.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">COOL MOON</h3>
                 </a>
 
                 <div class="card-text">
@@ -1220,7 +1215,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$1.900</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -1242,10 +1237,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item8.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem18.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">RAM</h3>
                 </a>
 
                 <div class="card-text">
@@ -1279,10 +1274,10 @@
               -10%
             </div>
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item3.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem19.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">CPU</h3>
                 </a>
 
                 <div class="card-text">
@@ -1294,7 +1289,7 @@
                     <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                     5.0</span>
 
-                  <h3 class="secondary-font text-primary">$18.00</h3>
+                  <h3 class="secondary-font text-primary">$12.000</h3>
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
@@ -1316,10 +1311,10 @@
               New
             </div> -->
             <div class="card position-relative">
-              <a href="single-product.html"><img src="images/item4.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-product.html"><img src="images/iitem20.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
                 <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">Grey hoodie</h3>
+                  <h3 class="card-title pt-4 m-0">MODULE RELAY</h3>
                 </a>
 
                 <div class="card-text">
@@ -1404,21 +1399,20 @@
       <div class="row">
         <div class="col-md-4 my-4 my-md-0">
           <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0">20</h3>
-            <p class="secondary-font fs-6 m-0">Feb</p>
+            <h3 class="secondary-font text-primary m-0"></h3>
+            <p class="secondary-font fs-6 m-0"></p>
 
           </div>
           <div class="card position-relative">
-            <a href="single-post.html"><img src="images/blog1.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-post.html"><img src="images/bllog7.jpg" class="img-fluid rounded-4" alt="image" width="500px"></a>
             <div class="card-body p-0">
               <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">10 Reasons to be helpful towards any animals</h3>
+                <h3 class="card-title pt-4 pb-3 m-0">10 Must-Have Computer Accessories for Every Setup</h3>
               </a>
 
               <div class="card-text">
-                <p class="blog-paragraph fs-6">At the core of our practice is the idea that cities are the incubators of
-                  our greatest
-                  achievements, and the best hope for a sustainable future.</p>
+                <p class="blog-paragraph fs-6">From ergonomic keyboards to high-speed USB hubs, discover the top accessories
+                    that will boost your productivity and enhance your workspace..</p>
                 <a href="single-post.html" class="blog-read">read more</a>
               </div>
 
@@ -1427,21 +1421,20 @@
         </div>
         <div class="col-md-4 my-4 my-md-0">
           <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0">21</h3>
-            <p class="secondary-font fs-6 m-0">Feb</p>
+            <h3 class="secondary-font text-primary m-0"></h3>
+            <p class="secondary-font fs-6 m-0"></p>
 
           </div>
           <div class="card position-relative">
-            <a href="single-post.html"><img src="images/blog2.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-post.html"><img src="images/bllog6.jpg" class="img-fluid rounded-4" alt="image" width="800px"></a>
             <div class="card-body p-0">
               <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">How to know your pet is hungry</h3>
+                <h3 class="card-title pt-4 pb-3 m-0">Choose the Right Mouse for Your Needs
               </a>
 
               <div class="card-text">
-                <p class="blog-paragraph fs-6">At the core of our practice is the idea that cities are the incubators of
-                  our greatest
-                  achievements, and the best hope for a sustainable future.</p>
+                <p class="blog-paragraph fs-6">Whether you’re a gamer or a graphic designer, finding the perfect 
+                    mouse can make all the difference. Here’s how to pick the right one.</p>
                 <a href="single-post.html" class="blog-read">read more</a>
               </div>
 
@@ -1450,21 +1443,20 @@
         </div>
         <div class="col-md-4 my-4 my-md-0">
           <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0">22</h3>
-            <p class="secondary-font fs-6 m-0">Feb</p>
+            <h3 class="secondary-font text-primary m-0"></h3>
+            <p class="secondary-font fs-6 m-0"></p>
 
           </div>
           <div class="card position-relative">
-            <a href="single-post.html"><img src="images/blog3.jpg" class="img-fluid rounded-4" alt="image"></a>
+              <a href="single-post.html"><img src="images/bllog5.jpg" width="900px" height="1000px" class="img-fluid rounded-4" alt="image"></a>
             <div class="card-body p-0">
               <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">Best home for your pets</h3>
+                <h3 class="card-title pt-4 pb-3 m-0">Best Accessories to Organize Your PC Setup</h3>
               </a>
 
               <div class="card-text">
-                <p class="blog-paragraph fs-6">At the core of our practice is the idea that cities are the incubators of
-                  our greatest
-                  achievements, and the best hope for a sustainable future.</p>
+                <p class="blog-paragraph fs-6">A clutter-free desk boosts focus and comfort
+                    Explore smart accessories that keep your PC setup clean, efficient, and stylish.</p>
                 <a href="single-post.html" class="blog-read">read more</a>
               </div>
 
@@ -1534,7 +1526,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta1.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta1.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -1542,7 +1534,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta2.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta2.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -1550,7 +1542,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta3.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta3.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -1558,7 +1550,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta4.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta4.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -1566,7 +1558,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta5.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta5.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -1574,7 +1566,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta6.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img src="images/iinsta6.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
     </div>
@@ -1586,7 +1578,7 @@
 
         <div class="col-md-3">
           <div class="footer-menu">
-            <img src="images/logo.png" alt="logo">
+              <img src="images/loogo.jpg" alt="logo" width="300px" height="200px">
             <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
             <div class="social-links">
               <ul class="d-flex list-unstyled gap-2">
@@ -1686,7 +1678,7 @@
       <hr class="m-0">
       <div class="row mt-3">
         <div class="col-md-6 copyright">
-          <p class="secondary-font">� 2023 Waggy. All rights reserved.</p>
+          <p class="secondary-font">© 2023 Waggy. All rights reserved.</p>
         </div>
         <div class="col-md-6 text-md-end">
           <p class="secondary-font">Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
