@@ -117,4 +117,28 @@ public class MaterialDAO extends DBContext{
         }
         return materials;
     }
+    
+    public boolean updateMaterial(Material material) throws SQLException {
+        String sql = "UPDATE Materials SET material_code = ?, material_name = ?, materials_url = ?, "
+                + "material_status = ?, condition_percentage = ?, price = ?, quantity = ?, "
+                + "category_id = ?, supplier_id = ?, updated_at = ? "
+                + "WHERE material_id = ?";
+        
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, material.getMaterialCode());
+            st.setString(2, material.getMaterialName());
+            st.setString(3, material.getMaterialsUrl());
+            st.setString(4, material.getMaterialStatus());
+            st.setInt(5, material.getConditionPercentage());
+            st.setBigDecimal(6, material.getPrice());
+            st.setInt(7, material.getQuantity());
+            st.setInt(8, material.getCategoryId());
+            st.setObject(9, material.getSupplierId());
+            st.setObject(10, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            st.setInt(11, material.getMaterialId());
+            
+            int rowsAffected = st.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
 }
