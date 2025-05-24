@@ -21,6 +21,7 @@ public class DashboardMaterialServlet extends HttpServlet {
             // Get search parameters
             String searchTerm = request.getParameter("search");
             String status = request.getParameter("status");
+            String showDisabled = request.getParameter("showDisabled"); // New parameter
             
             // Pagination parameters
             int page = 1;
@@ -37,14 +38,16 @@ public class DashboardMaterialServlet extends HttpServlet {
             int totalMaterials = materialDAO.getTotalMaterialsWithFilter(searchTerm, status);
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             
-            // Get filtered materials
-            List<Material> materials = materialDAO.searchMaterials(searchTerm, status, page, pageSize);
+            // Get filtered materials (including disabled ones)
+            List<Material> materials = materialDAO.getAllMaterialsWithPagination(searchTerm, status, page, pageSize);
             
             // Set request attributes
             request.setAttribute("materials", materials);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("pageSize", pageSize);
+            request.setAttribute("searchTerm", searchTerm);
+            request.setAttribute("selectedStatus", status);
             
             // Forward to dashboard
             request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
