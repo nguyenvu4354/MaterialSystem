@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewmaterial"})
 public class ViewMaterialServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -21,7 +22,9 @@ public class ViewMaterialServlet extends HttpServlet {
             if (materialId != null && !materialId.trim().isEmpty()) {
                 MaterialDAO materialDAO = new MaterialDAO();
                 MaterialDetails materialDetails = materialDAO.getMaterialById(Integer.parseInt(materialId));
-                
+         
+                // ✅ In ra log để kiểm tra
+                System.out.println("MaterialDetails: " + materialDetails);
                 if (materialDetails != null) {
                     request.setAttribute("details", materialDetails);
                     request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
@@ -37,4 +40,4 @@ public class ViewMaterialServlet extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
-} 
+}
