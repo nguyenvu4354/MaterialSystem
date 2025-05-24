@@ -141,4 +141,103 @@ public class MaterialDAO extends DBContext{
             return rowsAffected > 0;
         }
     }
+    
+    public List<Material> searchMaterials(String searchTerm, String status, int page, int pageSize) throws SQLException {
+        List<Material> materials = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT m.*, c.category_name, s.supplier_name " +
+            "FROM Materials m " +
+            "LEFT JOIN Categories c ON m.category_id = c.category_id " +
+            "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id " +
+            "WHERE m.disable = 0"
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        // Add search condition if searchTerm is provided
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql.append(" AND (LOWER(m.material_name) LIKE ? OR LOWER(m.material_code) LIKE ?)");
+            String searchPattern = "%" + searchTerm.toLowerCase() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+        
+        // Add status condition if status is provided
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND m.material_status = ?");
+            params.add(status.toUpperCase());
+        }
+        
+        // Add ordering and pagination
+        sql.append(" ORDER BY m.material_id LIMIT ? OFFSET ?");
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+        
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                st.setObject(i + 1, params.get(i));
+            }
+            
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Material material = new Material();
+                material.setMaterialId(rs.getInt("material_id"));
+                material.setMaterialCode(rs.getString("material_code"));
+                material.setMaterialName(rs.getString("material_name"));
+                String materialsUrl = rs.getString("materials_url");
+                if (materialsUrl == null || materialsUrl.trim().isEmpty()) {
+                    material.setMaterialsUrl("https://placehold.co/48x48?text=" + material.getMaterialCode());
+                } else {
+                    material.setMaterialsUrl(materialsUrl);
+                }
+                material.setMaterialStatus(rs.getString("material_status"));
+                material.setConditionPercentage(rs.getInt("condition_percentage"));
+                material.setPrice(rs.getBigDecimal("price"));
+                material.setQuantity(rs.getInt("quantity"));
+                material.setCategoryId(rs.getInt("category_id"));
+                material.setSupplierId(rs.getInt("supplier_id"));
+                material.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                material.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                material.setDisable(rs.getBoolean("disable"));
+                materials.add(material);
+            }
+        }
+        return materials;
+    }
+    
+    public int getTotalMaterialsWithFilter(String searchTerm, String status) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM Materials WHERE disable = 0"
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        // Add search condition if searchTerm is provided
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql.append(" AND (LOWER(material_name) LIKE ? OR LOWER(material_code) LIKE ?)");
+            String searchPattern = "%" + searchTerm.toLowerCase() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+        
+        // Add status condition if status is provided
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND material_status = ?");
+            params.add(status.toUpperCase());
+        }
+        
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                st.setObject(i + 1, params.get(i));
+            }
+            
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 }

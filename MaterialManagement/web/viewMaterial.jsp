@@ -68,7 +68,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Material Management</a>
-            <a href="dashboard" class="btn btn-outline-light">
+            <a href="dashboardmaterial" class="btn btn-outline-light">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
@@ -195,7 +195,7 @@
             </div>
 
             <div class="mt-4">
-                <a href="editMaterial?id=${details.material.materialId}" class="btn btn-primary">
+                <a href="editmaterial?id=${details.material.materialId}" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Material
                 </a>
                 <a href="deleteMaterial?id=${details.material.materialId}" 

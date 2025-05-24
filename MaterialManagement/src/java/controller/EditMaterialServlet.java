@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editMaterial"})
+@WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
 public class EditMaterialServlet extends HttpServlet {
     
     @Override
@@ -26,12 +26,12 @@ public class EditMaterialServlet extends HttpServlet {
                 
                 if (materialDetails != null) {
                     request.setAttribute("details", materialDetails);
-                    request.getRequestDispatcher("editMaterial.jsp").forward(request, response);
+                    request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
                 } else {
-                    response.sendRedirect("dashboard");
+                    response.sendRedirect("dashboardmaterial");
                 }
             } else {
-                response.sendRedirect("dashboard");
+                response.sendRedirect("dashboardmaterial");
             }
         } catch (SQLException | NumberFormatException ex) {
             ex.printStackTrace();
@@ -44,13 +44,13 @@ public class EditMaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get all parameters from the form
+            // Lấy tham số paramater
             int materialId = Integer.parseInt(request.getParameter("materialId"));
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialsUrl = request.getParameter("materialsUrl");
             
-            // Handle empty or invalid URL
+            // Xử lý file ảnh
             if (materialsUrl == null || materialsUrl.trim().isEmpty()) {
                 materialsUrl = "https://placehold.co/200x200?text=" + materialCode;
             }
@@ -65,7 +65,7 @@ public class EditMaterialServlet extends HttpServlet {
                               ? Integer.parseInt(supplierIdStr) 
                               : null;
 
-            // Create Material object
+            // Tạo object
             Material material = new Material();
             material.setMaterialId(materialId);
             material.setMaterialCode(materialCode);
@@ -78,19 +78,19 @@ public class EditMaterialServlet extends HttpServlet {
             material.setCategoryId(categoryId);
             material.setSupplierId(supplierId);
 
-            // Update material
+            // Cập nhật material
             MaterialDAO materialDAO = new MaterialDAO();
             boolean success = materialDAO.updateMaterial(material);
 
             if (success) {
-                // Redirect to dashboard with success message
-                response.sendRedirect("dashboard?success=Material updated successfully");
+                // nếu thành công
+                response.sendRedirect("dashboardmaterial?success=Material updated successfully");
             } else {
-                // If update fails, go back to edit page with error message
+                // nếu thất bại
                 request.setAttribute("error", "Failed to update material");
                 MaterialDetails materialDetails = materialDAO.getMaterialById(materialId);
                 request.setAttribute("details", materialDetails);
-                request.getRequestDispatcher("editMaterial.jsp").forward(request, response);
+                request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
             }
         } catch (SQLException | NumberFormatException ex) {
             ex.printStackTrace();
@@ -98,17 +98,17 @@ public class EditMaterialServlet extends HttpServlet {
             request.setAttribute("error", errorMessage);
             
             try {
-                // Try to reload the material details for the form
+                // lấy thông tin
                 int materialId = Integer.parseInt(request.getParameter("materialId"));
                 MaterialDAO materialDAO = new MaterialDAO();
                 MaterialDetails materialDetails = materialDAO.getMaterialById(materialId);
                 request.setAttribute("details", materialDetails);
             } catch (Exception e) {
-                // If we can't reload the details, just log it
+                
                 e.printStackTrace();
             }
             
-            request.getRequestDispatcher("editMaterial.jsp").forward(request, response);
+            request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
         }
     }
 } 

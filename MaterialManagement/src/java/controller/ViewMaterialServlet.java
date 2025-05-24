@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewMaterial"})
+@WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewmaterial"})
 public class ViewMaterialServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -24,12 +24,12 @@ public class ViewMaterialServlet extends HttpServlet {
                 
                 if (materialDetails != null) {
                     request.setAttribute("details", materialDetails);
-                    request.getRequestDispatcher("viewMaterial.jsp").forward(request, response);
+                    request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
                 } else {
-                    response.sendRedirect("dashboard");
+                    response.sendRedirect("dashboardmaterial");
                 }
             } else {
-                response.sendRedirect("dashboard");
+                response.sendRedirect("dashboardmaterial");
             }
         } catch (SQLException | NumberFormatException ex) {
             ex.printStackTrace();

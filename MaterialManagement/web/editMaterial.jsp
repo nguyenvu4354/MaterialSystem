@@ -27,7 +27,7 @@
                     </div>
                 </c:if>
                 
-                <form action="editMaterial" method="POST" class="needs-validation" novalidate>
+                <form action="editmaterial" method="POST" class="needs-validation" novalidate>
                     <input type="hidden" name="materialId" value="${details.material.materialId}">
                     
                     <div class="row mb-3">
@@ -95,7 +95,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Save Changes
                         </button>
-                        <a href="dashboard" class="btn btn-secondary ms-2">
+                        <a href="dashboardmaterial" class="btn btn-secondary ms-2">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>

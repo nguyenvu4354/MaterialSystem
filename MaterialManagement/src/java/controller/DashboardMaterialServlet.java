@@ -11,14 +11,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import entity.Material;
 
-@WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboard"})
-public class DashboardServlet extends HttpServlet {
+@WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboardmaterial"})
+public class DashboardMaterialServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // 10 sản phẩm trên 1 trang
+            // Get search parameters
+            String searchTerm = request.getParameter("search");
+            String status = request.getParameter("status");
+            
+            // Pagination parameters
             int page = 1;
             int pageSize = 10;
             String pageStr = request.getParameter("page");
@@ -29,34 +33,26 @@ public class DashboardServlet extends HttpServlet {
 
             MaterialDAO materialDAO = new MaterialDAO();
             
-            // Tính thanh pagination
-            int totalMaterials = materialDAO.getTotalMaterials();
+            // Get total materials with filter
+            int totalMaterials = materialDAO.getTotalMaterialsWithFilter(searchTerm, status);
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             
-            // Lấy trang dữ liệu từ dao
-            List<Material> materials = materialDAO.getMaterialsWithPagination(page, pageSize);
+            // Get filtered materials
+            List<Material> materials = materialDAO.searchMaterials(searchTerm, status, page, pageSize);
             
-            // link ảnh
-            String contextPath = request.getContextPath();
-            request.setAttribute("contextPath", contextPath);
-            
-            
+            // Set request attributes
             request.setAttribute("materials", materials);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("pageSize", pageSize);
             
+            // Forward to dashboard
+            request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
             
-            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-            // check lỗi 
         } catch (SQLException ex) {
-            
             ex.printStackTrace();
-            request.setAttribute("error", "Database error occurred: " + ex.getMessage());
+            request.setAttribute("error", "Error occurred: " + ex.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
-        } catch (NumberFormatException ex) {
-            
-            response.sendRedirect("dashboard");
         }
     }
 
