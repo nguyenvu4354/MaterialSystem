@@ -21,7 +21,8 @@ public class DashboardMaterialServlet extends HttpServlet {
             // Get search parameters
             String searchTerm = request.getParameter("search");
             String status = request.getParameter("status");
-            String showDisabled = request.getParameter("showDisabled"); // New parameter
+            String showDisabled = request.getParameter("showDisabled");
+            String sortBy = request.getParameter("sortBy");
             
             // Pagination parameters
             int page = 1;
@@ -35,11 +36,11 @@ public class DashboardMaterialServlet extends HttpServlet {
             MaterialDAO materialDAO = new MaterialDAO();
             
             // Get total materials with filter
-            int totalMaterials = materialDAO.getTotalMaterialsWithFilter(searchTerm, status);
+            int totalMaterials = materialDAO.getTotalMaterialsWithFilter(searchTerm, status, showDisabled);
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             
-            // Get filtered materials (including disabled ones)
-            List<Material> materials = materialDAO.getAllMaterialsWithPagination(searchTerm, status, page, pageSize);
+            // Get filtered and sorted materials
+            List<Material> materials = materialDAO.getAllMaterialsWithPagination(searchTerm, status, showDisabled, sortBy, page, pageSize);
             
             // Set request attributes
             request.setAttribute("materials", materials);
@@ -48,6 +49,8 @@ public class DashboardMaterialServlet extends HttpServlet {
             request.setAttribute("pageSize", pageSize);
             request.setAttribute("searchTerm", searchTerm);
             request.setAttribute("selectedStatus", status);
+            request.setAttribute("showDisabled", showDisabled);
+            request.setAttribute("sortBy", sortBy);
             
             // Forward to dashboard
             request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
