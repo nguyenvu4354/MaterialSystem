@@ -36,7 +36,7 @@ public class AddMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get categories and suppliers for dropdowns
+           // lấy danh mục
             CategoryDAO categoryDAO = new CategoryDAO();
             SupplierDAO supplierDAO = new SupplierDAO();
             
@@ -58,44 +58,44 @@ public class AddMaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get the upload directory path
+            // up load file 
             String applicationPath = request.getServletContext().getRealPath("");
             String uploadPath = applicationPath + File.separator + UPLOAD_DIRECTORY;
 
-            // Create the upload directory if it doesn't exist
+            
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            // Get form parameters
+           
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
             
-            // Handle file upload and image URL
+            // up load file URL
             Part filePart = request.getPart("imageFile");
             String materialsUrl = request.getParameter("materialsUrl");
             
             if (filePart != null && filePart.getSize() > 0) {
-                // If file is uploaded, it takes precedence
+                
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
                 String filePath = uploadPath + File.separator + newFileName;
                 
-                // Save the file
+                
                 filePart.write(filePath);
                 
-                // Set the URL for the database
+                // Thêm tiền tố
                 materialsUrl = "material_images/" + newFileName;
             } else if (materialsUrl == null || materialsUrl.trim().isEmpty()) {
-                // If no file and no URL provided, use default placeholder
+               
                 materialsUrl = "https://placehold.co/200x200?text=" + materialCode;
             }
-            // If URL is provided and no file uploaded, use the URL as is
             
-            // Handle price with better error handling
+            
+            // Xử lý tiền
             BigDecimal price;
             try {
                 String priceStr = request.getParameter("price");
@@ -106,7 +106,7 @@ public class AddMaterialServlet extends HttpServlet {
                 if (price.compareTo(BigDecimal.ZERO) <= 0) {
                     throw new IllegalArgumentException("Price must be greater than $0");
                 }
-                // Ensure price has at most 2 decimal places
+                
                 price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid price format. Please enter a valid number");
@@ -114,7 +114,7 @@ public class AddMaterialServlet extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
             
-            // Handle optional supplier
+           
             String supplierIdStr = request.getParameter("supplierId");
             Integer supplierId = null;
             if (supplierIdStr != null && !supplierIdStr.trim().isEmpty()) {
@@ -135,14 +135,14 @@ public class AddMaterialServlet extends HttpServlet {
             material.setUpdatedAt(LocalDateTime.now());
             material.setDisable(false);
 
-            // Save to database
+            // Lên sql
             MaterialDAO materialDAO = new MaterialDAO();
             boolean success = materialDAO.createMaterial(material);
 
             if (success) {
                 response.sendRedirect("dashboardmaterial?success=Material added successfully");
             } else {
-                // If failed, get categories and suppliers again and show error
+                // Lỗi
                 CategoryDAO categoryDAO = new CategoryDAO();
                 SupplierDAO supplierDAO = new SupplierDAO();
                 
@@ -154,7 +154,7 @@ public class AddMaterialServlet extends HttpServlet {
         } catch (Exception ex) {
             ex.printStackTrace();
             try {
-                // Get categories and suppliers for form
+               
                 CategoryDAO categoryDAO = new CategoryDAO();
                 SupplierDAO supplierDAO = new SupplierDAO();
                 
