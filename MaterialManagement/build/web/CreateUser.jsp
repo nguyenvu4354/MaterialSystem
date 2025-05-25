@@ -15,7 +15,6 @@
 %>
 
 <html lang="en">
-
     <head>
         <title>Waggy - Create New User</title>
         <meta charset="utf-8">
