@@ -59,8 +59,10 @@
             <div class="container py-2">
                 <div class="row py-4 pb-0 pb-sm-4 align-items-center">
                     <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-                        <a href="HomePage.jsp">
-                            <img src="images/logo.png" alt="logo" class="img-fluid" width="300px">
+                        <a href="HomePage.jsp" class="text-decoration-none">
+                            <h2 class="mb-0 text-primary">
+                                <i class="fas fa-dollar-sign"></i> Material Management
+                            </h2>
                         </a>
                     </div>
                     <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
@@ -88,7 +90,7 @@
                 <div class="col-md-9 col-lg-10 px-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="text-primary fw-bold display-6 border-bottom pb-2">📦 Material List</h2>
-                        <a href="creatematerial" class="btn btn-primary">
+                        <a href="addmaterial" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Add New Material
                         </a>
                     </div>
@@ -107,6 +109,22 @@
                                     <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
                                     <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
                                     <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
+                                </select>
+                                <select name="showDisabled" class="form-select" style="width: auto;">
+                                    <option value="">All Materials</option>
+                                    <option value="true" ${showDisabled == 'true' ? 'selected' : ''}>Disabled Only</option>
+                                    <option value="false" ${showDisabled == 'false' ? 'selected' : ''}>Active Only</option>
+                                </select>
+                                <select name="sortBy" class="form-select" style="width: auto;">
+                                    <option value="">Sort By</option>
+                                    <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                    <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                                    <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
+                                    <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
+                                    <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
+                                    <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
+                                    <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
+                                    <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search"></i> Search
@@ -173,15 +191,15 @@
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&search=${searchTerm}&status=${selectedStatus}">Previous</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="dashboardmaterial?page=${i}&search=${searchTerm}&status=${selectedStatus}">${i}</a>
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&search=${searchTerm}&status=${selectedStatus}">Next</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">Next</a>
                                 </li>
                             </ul>
                         </nav>
