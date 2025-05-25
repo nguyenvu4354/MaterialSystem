@@ -120,9 +120,12 @@
                                                     <option value="active" ${user.status == 'active' ? "selected" : ""}>Active</option>
                                                     <option value="inactive" ${user.status == 'inactive' ? "selected" : ""}>Inactive</option>
                                                 </select>
+                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
                                             </form>
-                                                 <a href="UserDetail?userId=${user.userId}" class="btn btn-info btn-sm mt-2">View</a>
                                         </td>
+
                                     </tr>
                                 </c:forEach>
                             </tbody>
@@ -165,9 +168,9 @@
                             </ul>
                         </nav>
                     </div>
-                </div> <!-- end content -->
-            </div> <!-- end row -->
-        </div> <!-- end container-fluid -->
+                </div>
+            </div> 
+        </div> 
 
         <!-- Footer -->
         <footer class="footer py-4 bg-light mt-auto">
