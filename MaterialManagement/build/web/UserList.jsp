@@ -121,6 +121,7 @@
                                                     <option value="inactive" ${user.status == 'inactive' ? "selected" : ""}>Inactive</option>
                                                 </select>
                                             </form>
+                                                 <a href="UserDetail?userId=${user.userId}" class="btn btn-info btn-sm mt-2">View</a>
                                         </td>
                                     </tr>
                                 </c:forEach>

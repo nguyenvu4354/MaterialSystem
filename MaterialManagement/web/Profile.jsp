@@ -51,6 +51,7 @@
             String error = (String) request.getAttribute("error");
             Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
         %>
+        <!-- Success/Error/Validation Messages -->
         <% if (message != null) { %>
         <div class="alert alert-success text-center" role="alert">
             <%= message %>
