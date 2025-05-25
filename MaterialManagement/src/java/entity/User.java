@@ -13,7 +13,7 @@ public class User {
     private String address;
     private String userPicture;
     private int roleId;
-    private String roleName; // Giữ như yêu cầu
+    private String roleName; 
     private LocalDate dateOfBirth;
     private Gender gender;
     private String description;
@@ -29,10 +29,8 @@ public class User {
         active, inactive, deleted 
     }
 
-    // Constructors
     public User() {}
 
-    // Getters and Setters
     public int getUserId() {
         return userId;
     }

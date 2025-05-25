@@ -13,8 +13,8 @@ public class UserDAO extends DBContext {
 
     public User login(String username, String password) {
         String sql = "SELECT u.*, r.role_name FROM Users u "
-                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                + "WHERE u.username = ? AND u.password = ? AND u.status != 'deleted'";
+        + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+        + "WHERE u.username = ? AND u.password = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, password);
@@ -222,7 +222,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean updateStatusAndRole(int userId, User.Status status, int roleId) {
-        String sql = "UPDATE Users SET status = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'deleted'";
+        String sql = "UPDATE Users SET status = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'inactive'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status.name());
             ps.setInt(2, roleId);

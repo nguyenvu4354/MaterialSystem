@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User" %>
+<%@ page import="java.util.Map" %>
 <%
     User user = (User) session.getAttribute("user");
     if (user == null) {
@@ -12,11 +13,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>User Profile - Waggy</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>User Pr  ofile - Waggy</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="View and update your Waggy account profile.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
@@ -46,54 +45,80 @@
 
         <h2 class="text-center display-5 mb-4">Profile of: <span class="text-primary"><%= user.getUsername() %></span></h2>
 
+        <!-- Success/Error/Validation Messages -->
+        <%
+            String message = (String) request.getAttribute("message");
+            String error = (String) request.getAttribute("error");
+            Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+        %>
+        <% if (message != null) { %>
+        <div class="alert alert-success text-center" role="alert">
+            <%= message %>
+        </div>
+        <% } %>
+        <% if (error != null) { %>
+        <div class="alert alert-danger text-center" role="alert">
+            <%= error %>
+        </div>
+        <% } %>
+        <% if (errors != null && !errors.isEmpty()) { %>
+        <div class="alert alert-warning" role="alert">
+            <ul class="mb-0">
+                <% for (Map.Entry<String, String> entry : errors.entrySet()) { %>
+                <li><strong><%= entry.getKey() %>:</strong> <%= entry.getValue() %></li>
+                <% } %>
+            </ul>
+        </div>
+        <% } %>
+
         <div class="row justify-content-center">
             <div class="col-md-10 p-4 bg-white rounded shadow">
                 <div class="row">
                     <!-- Avatar -->
                     <div class="col-md-4 text-center">
                         <% if (user.getUserPicture() != null && !user.getUserPicture().isEmpty()) { %>
-                            <img src="images/profiles/<%= user.getUserPicture() %>" class="img-fluid rounded-circle mb-3" width="200" alt="Profile Picture"/>
+                        <img id="previewImage" src="images/profiles/<%= user.getUserPicture() %>"
+                             class="img-fluid rounded-circle mb-3" width="200" alt="Profile Picture"/>
                         <% } else { %>
-                            <p>No profile picture available.</p>
+                        <img id="previewImage" src="images/default-avatar.png"
+                             class="img-fluid rounded-circle mb-3" width="200" alt="Profile Picture"/>
                         <% } %>
+
                         <div class="mb-3">
                             <label class="form-label">Change Profile Picture</label>
-                            <input type="file" class="form-control" name="userPicture" form="profileForm" accept="image/*">
+                            <input type="file" class="form-control" name="userPicture" id="userPictureInput"
+                                   form="profileForm" accept="image/*" onchange="previewImage(event)">
                         </div>
                     </div>
 
                     <!-- Profile Form -->
                     <div class="col-md-8">
-                        <% String message = (String) request.getAttribute("message"); %>
-                        <% String error = (String) request.getAttribute("error"); %>
-
-                        <% if (message != null) { %>
-                            <p class="text-success"><%= message %></p>
-                        <% } %>
-                        <% if (error != null) { %>
-                            <p class="text-danger"><%= error %></p>
-                        <% } %>
-
                         <form id="profileForm" action="profile" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="fullName" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" value="<%= user.getFullName() != null ? user.getFullName() : "" %>">
+                                <input type="text" class="form-control" id="fullName" name="fullName"
+                                       value="<%= user.getFullName() != null ? user.getFullName() : "" %>">
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="<%= user.getEmail() != null ? user.getEmail() : "" %>">
+                                <input type="email" class="form-control" id="email" name="email"
+                                       value="<%= user.getEmail() != null ? user.getEmail() : "" %>">
                             </div>
                             <div class="mb-3">
                                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "" %>">
+                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
+                                       pattern="^\d{10,11}$" title="Phone number must be 10-11 digits"
+                                       value="<%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "" %>" required>
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="form-label">Address</label>
-                                <input type="text" class="form-control" id="address" name="address" value="<%= user.getAddress() != null ? user.getAddress() : "" %>">
+                                <input type="text" class="form-control" id="address" name="address"
+                                       value="<%= user.getAddress() != null ? user.getAddress() : "" %>">
                             </div>
                             <div class="mb-3">
                                 <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="<%= user.getDateOfBirth() != null ? user.getDateOfBirth() : "" %>">
+                                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
+                                       value="<%= user.getDateOfBirth() != null ? user.getDateOfBirth() : "" %>">
                             </div>
                             <div class="mb-3">
                                 <label for="gender" class="form-label">Gender</label>
@@ -119,8 +144,25 @@
     </div>
 </section>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
+
+<!-- Preview image script -->
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('previewImage');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 </body>
 </html>

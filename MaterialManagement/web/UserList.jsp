@@ -28,7 +28,7 @@
                             <span class="fs-6 text-muted">Admin</span>
                             <h5 class="mb-0">admin@accessories.com</h5>
                         </div>
-                        <a href="logout.jsp" class="btn btn-outline-dark btn-lg ms-4">
+                        <a href="logout" class="btn btn-outline-dark btn-lg ms-4">
                             Logout
                         </a>
                     </div>
@@ -46,13 +46,12 @@
 
                 <!-- Page Content -->
                 <div class="col-md-9 col-lg-10 px-md-4">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Admin Dashboard</h1>
-                    </div>
+
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>Danh sách người dùng</h2>
-                        <button type="button" class="btn btn-primary" onclick="window.location.href='CreateUser.jsp'">Create User</button>
+                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2">👤 User List</h2>
+
+                        <button type="button" class="btn btn-primary" onclick="window.location.href = 'CreateUser.jsp'">Create User</button>
                     </div>
 
                     <!-- Filter Form -->
@@ -67,8 +66,9 @@
 
                         <select name="roleId" class="form-select" style="max-width: 150px;">
                             <option value="">All Roles</option>
-                            <option value="1" ${roleIdFilter == 1 ? 'selected' : ''}>Admin</option>
-                            <option value="2" ${roleIdFilter == 2 ? 'selected' : ''}>User</option>
+                            <option value="2" ${roleIdFilter == 2 ? 'selected' : ''}>Warehouse Staff</option>
+                            <option value="3" ${roleIdFilter == 3 ? 'selected' : ''}>Director</option>
+                            <option value="4" ${roleIdFilter == 4 ? 'selected' : ''}>Employee</option>
                         </select>
 
                         <button type="submit" class="btn btn-primary">Search</button>
@@ -81,11 +81,11 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tên đăng nhập</th>
-                                    <th>Họ tên</th>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
                                     <th>Email</th>
-                                    <th>Vai trò</th>
-                                    <th>Trạng thái</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -99,8 +99,9 @@
                                         <td>
                                             <c:choose>
                                                 <c:when test="${user.roleId == 1}">Admin</c:when>
-                                                <c:when test="${user.roleId == 2}">User</c:when>
-                                                <c:when test="${user.roleId == 3}">Guest</c:when>
+                                                <c:when test="${user.roleId == 2}">Warehouse Staff</c:when>
+                                                <c:when test="${user.roleId == 3}">Director</c:when>
+                                                <c:when test="${user.roleId == 3}">Employee</c:when>
                                                 <c:otherwise>Unknown</c:otherwise>
                                             </c:choose>
                                         </td>
@@ -109,10 +110,12 @@
                                             <form method="post" action="UserList">
                                                 <input type="hidden" name="userId" value="${user.userId}"/>
                                                 <select name="roleId" class="form-select form-select-sm d-inline w-auto" onchange="autoSubmit(this.form)">
-                                                    <option value="1" ${user.roleId == 1 ? "selected" : ""}>Admin</option>
-                                                    <option value="2" ${user.roleId == 2 ? "selected" : ""}>User</option>
-                                                    <option value="3" ${user.roleId == 3 ? "selected" : ""}>Guest</option>
+                                                    <option value="1" disabled ${user.roleId == 1 ? "selected" : ""}>Warehouse Manager</option>
+                                                    <option value="2" ${user.roleId == 2 ? "selected" : ""}>Warehouse Staff</option>
+                                                    <option value="3" ${user.roleId == 3 ? "selected" : ""}>Director</option>
+                                                    <option value="4" ${user.roleId == 4 ? "selected" : ""}>Employee</option>
                                                 </select>
+
                                                 <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="autoSubmit(this.form)">
                                                     <option value="active" ${user.status == 'active' ? "selected" : ""}>Active</option>
                                                     <option value="inactive" ${user.status == 'inactive' ? "selected" : ""}>Inactive</option>
