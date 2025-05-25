@@ -201,8 +201,6 @@
             <h5 class="mb-0">accessoriess@gmail.com</h5>
           </div>
 
-
-
         </div>
       </div>
     </div>
@@ -306,7 +304,7 @@
               </li>
             </ul>
 
-            <div class="d-none d-lg-flex align-items-end">
+<!--            <div class="d-none d-lg-flex align-items-end">
               <ul class="d-flex justify-content-end list-unstyled m-0">
                 <li>
                   <a href="HomePage.jsp" class="mx-3">
@@ -330,7 +328,7 @@
                 </li>
               </ul>
 
-            </div>
+            </div>-->
 
           </div>
 
@@ -354,14 +352,8 @@
                   <img src="images/banner-img.jpg" class="img-fluid" width="900px" height="300px">
               </div>
               <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
                 <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">computer accessories</span>
                 </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
               </div>
 
             </div>
@@ -372,15 +364,10 @@
                   <img src="images//banner-img3.jpg" class="img-fluid" height="300px">
               </div>
               <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
                 <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
                     accessories</span>
                 </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
+               
               </div>
 
             </div>
@@ -392,15 +379,10 @@
               </div>
                  
               <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
                 <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
                     accessories</span>
                 </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
+               
               </div>
 
             </div>
@@ -454,13 +436,9 @@
     <div class="container pb-5">
 
       <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-        <h2 class="display-3 fw-normal">Accessories Clothing</h2>
+        <h2 class="display-3 fw-normal">Accessories</h2>
         <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
+
         </div>
       </div>
 
@@ -491,14 +469,13 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                     </a>
                   </div>
-
-
+                  
                 </div>
 
               </div>
@@ -528,7 +505,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -561,17 +538,15 @@
                     5.0</span>
 
                   <h3 class="secondary-font text-primary">$2.000</h3>
-
+                  
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                     </a>
                   </div>
-
-
                 </div>
 
               </div>
@@ -601,13 +576,12 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                     </a>
                   </div>
-
 
                 </div>
 
@@ -638,13 +612,12 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                     </a>
                   </div>
-
 
                 </div>
 
@@ -675,7 +648,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -711,11 +684,7 @@
           </p>
         </div>
         <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
+
         </div>
       </div>
 
@@ -745,13 +714,12 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                   </a>
                 </div>
-
 
               </div>
 
@@ -783,7 +751,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -821,7 +789,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -859,7 +827,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -897,7 +865,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -935,7 +903,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -973,7 +941,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1011,7 +979,7 @@
 
                 <div class="d-flex flex-wrap mt-3">
                   <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
+                    <h5 class="text-uppercase m-0">View Detail</h5>
                   </a>
                   <a href="#" class="btn-wishlist px-4 pt-3 ">
                     <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1039,14 +1007,10 @@
             <img src="images/banner-img2.jpg" class="img-fluid" width="500px" height="500px">
         </div>
         <div class="content-wrapper col-12 offset-md-1 col-md-5 p-5">
-          <div class="secondary-font text-primary text-uppercase mb-3 fs-4">Upto 40% off</div>
-          <h2 class="banner-title display-1 fw-normal">Clearance sale !!!
+          <div class="secondary-font text-primary text-uppercase mb-3 fs-4"></div>
+          <h2 class="banner-title display-1 fw-normal">modern products
           </h2>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
+
         </div>
 
       </div>
@@ -1109,14 +1073,8 @@
     <div class="container py-5 mb-5">
 
       <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-        <h2 class="display-3 fw-normal">Best selling products</h2>
-        <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
-        </div>
+        <h2 class="display-3 fw-normal">Best products</h2>
+
       </div>
 
       <div class=" swiper bestselling-swiper">
@@ -1146,7 +1104,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1183,7 +1141,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1219,7 +1177,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1256,7 +1214,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1293,7 +1251,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1330,7 +1288,7 @@
 
                   <div class="d-flex flex-wrap mt-3">
                     <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+                      <h5 class="text-uppercase m-0">View Detail</h5>
                     </a>
                     <a href="#" class="btn-wishlist px-4 pt-3 ">
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
@@ -1357,7 +1315,7 @@
     <div class="container ">
       <div class="row my-5 py-5">
         <div class="offset-md-3 col-md-6 my-5 ">
-          <h2 class="display-3 fw-normal text-center">Get 20% Off on <span class="text-primary">first Purchase</span>
+          <h2 class="display-3 fw-normal text-center">GOOD PRODUCTS AND HIGH QUALITY <span class="text-primary"></span>
           </h2>
          
             <img src="images/bllog21.jpg" alt="alt" width="700px"/>
@@ -1371,13 +1329,7 @@
       <div class="row mt-5">
         <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
           <h2 class="display-3 fw-normal">Latest Blog Post</h2>
-          <div>
-            <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-              Read all
-              <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                <use xlink:href="#arrow-right"></use>
-              </svg></a>
-          </div>
+
         </div>
       </div>
       <div class="row">
@@ -1419,7 +1371,6 @@
               <div class="card-text">
                 <p class="blog-paragraph fs-6">Whether you’re a gamer or a graphic designer, finding the perfect 
                     mouse can make all the difference. Here’s how to pick the right one.</p>
-                <a href="single-post.html" class="blog-read">read more</a>
               </div>
 
             </div>
