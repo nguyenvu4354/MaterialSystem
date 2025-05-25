@@ -21,7 +21,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.login(username, password);
+        User user = userDAO.login(username, password); // password sẽ được mã hóa MD5 bên trong DAO
 
         if (user != null) {
             if (user.getStatus() != null && user.getStatus().toString().equalsIgnoreCase("inactive")) {

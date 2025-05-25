@@ -13,8 +13,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>User Pr  ofile - Waggy</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>User Profile - Waggy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="View and update your Waggy account profile.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -45,13 +44,12 @@
 
         <h2 class="text-center display-5 mb-4">Profile of: <span class="text-primary"><%= user.getUsername() %></span></h2>
 
-        <!-- Success/Error/Validation Messages -->
+        <!-- Message displays -->
         <%
             String message = (String) request.getAttribute("message");
             String error = (String) request.getAttribute("error");
             Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
         %>
-        <!-- Success/Error/Validation Messages -->
         <% if (message != null) { %>
         <div class="alert alert-success text-center" role="alert">
             <%= message %>
@@ -84,7 +82,6 @@
                         <img id="previewImage" src="images/default-avatar.png"
                              class="img-fluid rounded-circle mb-3" width="200" alt="Profile Picture"/>
                         <% } %>
-
                         <div class="mb-3">
                             <label class="form-label">Change Profile Picture</label>
                             <input type="file" class="form-control" name="userPicture" id="userPictureInput"
@@ -108,7 +105,7 @@
                             <div class="mb-3">
                                 <label for="phoneNumber" class="form-label">Phone Number</label>
                                 <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
-                                       pattern="^\d{10,11}$" title="Phone number must be 10-11 digits"
+                                       pattern="^\\d{10,11}$" title="Phone number must be 10-11 digits"
                                        value="<%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "" %>" required>
                             </div>
                             <div class="mb-3">
@@ -150,7 +147,6 @@
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
 
-<!-- Preview image script -->
 <script>
     function previewImage(event) {
         const input = event.target;
