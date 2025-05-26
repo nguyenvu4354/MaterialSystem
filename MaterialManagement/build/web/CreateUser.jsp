@@ -15,14 +15,11 @@
 %>
 
 <html lang="en">
-
     <head>
         <title>Waggy - Create New User</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="apple-mobile-web-app-capable" content="yes">
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
@@ -41,9 +38,9 @@
                     <div class="offset-md-3 col-md-6 my-5 bg-white p-4 rounded shadow">
                         <h2 class="display-4 fw-normal text-center mb-4">Create New <span class="text-primary">User</span></h2>
 
-                        <% 
+                        <%
                           String message = (String) request.getAttribute("message");
-                          String error = (String) request.getAttribute("error"); 
+                          String error = (String) request.getAttribute("error");
                         %>
                         <% if (message != null) { %>
                         <div class="alert alert-success"><%= message %></div>
@@ -139,6 +136,7 @@
 
                             <div class="mb-3">
                                 <input class="form-control form-control-lg" type="file" name="userPicture" id="userPicture" accept="image/*">
+                                <img id="previewImage" src="#" alt="Image Preview" class="img-thumbnail mt-3" style="display:none; max-height: 200px;">
                             </div>
 
                             <div class="d-grid gap-2 mb-3">
@@ -147,9 +145,7 @@
                             <div class="d-grid gap-2 mb-3">
                                 <a href="UserList.jsp" class="btn btn-outline-secondary btn-lg rounded-1"> Back to User List</a>
                             </div>
-
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -161,6 +157,24 @@
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    </body>
 
+        <script>
+            document.getElementById("userPicture").addEventListener("change", function () {
+                const fileInput = this;
+                const previewImage = document.getElementById("previewImage");
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = "block";
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    previewImage.src = "#";
+                    previewImage.style.display = "none";
+                }
+            });
+        </script>
+    </body>
 </html>

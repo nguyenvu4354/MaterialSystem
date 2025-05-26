@@ -6,6 +6,8 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,27 +81,36 @@ public class ProfileServlet extends HttpServlet {
             // Handle image upload
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
+                // Lấy tên file gốc
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uploadPath = getServletContext().getRealPath("") + "images/profiles/";
+
+                // Đường dẫn lưu ảnh trong thư mục images/profiles của webapp
+                String uploadPath = getServletContext().getRealPath("/") + "images" + File.separator + "profiles" + File.separator;
+
                 Path uploadDir = Paths.get(uploadPath);
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
+
                 String filePath = uploadPath + fileName;
+                // Lưu file vào đường dẫn
                 filePart.write(filePath);
+
+                // Cập nhật tên file ảnh vào user
                 user.setUserPicture(fileName);
             }
 
-            // Update database
+            // Cập nhật user vào database
             boolean updated = userDAO.updateUser(user);
             if (updated) {
-                // Refresh user from DB
+                // Tải lại user mới nhất từ DB vào session
                 user = userDAO.getUserById(user.getUserId());
                 session.setAttribute("user", user);
                 request.setAttribute("message", "✔️ Cập nhật hồ sơ thành công!");
             } else {
                 request.setAttribute("error", "❌ Không thể cập nhật hồ sơ. Vui lòng thử lại.");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "❌ Lỗi khi cập nhật hồ sơ: " + e.getMessage());

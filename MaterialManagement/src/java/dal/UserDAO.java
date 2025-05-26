@@ -8,16 +8,34 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.security.MessageDigest;
 
 public class UserDAO extends DBContext {
 
+    public static String md5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : messageDigest) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public User login(String username, String password) {
         String sql = "SELECT u.*, r.role_name FROM Users u "
-        + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-        + "WHERE u.username = ? AND u.password = ?";
+                   + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                   + "WHERE u.username = ? AND u.password = ?";
+
+        String md5Password = md5(password);
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, md5Password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 User user = new User();
@@ -340,28 +358,18 @@ public class UserDAO extends DBContext {
     }
 
     public static void main(String[] args) {
+        String username = "john12";
+        String inputPassword = "123";  // mật khẩu người dùng nhập
+
         UserDAO userDAO = new UserDAO();
 
-        User testUser = new User();
-        testUser.setUsername("testuser123");
-        testUser.setPassword("5f4dcc3b5aa765d61d8327deb882cf99"); // Ví dụ hash MD5 của "password"
-        testUser.setFullName("Test User");
-        testUser.setEmail("testuser@example.com");
-        testUser.setPhoneNumber("0123456789");
-        testUser.setAddress("123 Test Street");
-        testUser.setUserPicture("default.png");
-        testUser.setRoleId(2); // Ví dụ role ID
-        testUser.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        testUser.setGender(User.Gender.male);
-        testUser.setDescription("This is a test user.");
-        testUser.setStatus(User.Status.active); // Giả sử có enum Status trong User
+        User user = userDAO.login(username, inputPassword);
 
-        boolean result = userDAO.createUser(testUser);
-
-        if (result) {
-            System.out.println("User created successfully!");
+        if (user != null) {
+            System.out.println("Đăng nhập thành công: " + user.getUsername());
         } else {
-            System.out.println("Failed to create user.");
+            System.out.println("Đăng nhập thất bại");
         }
     }
+
 }

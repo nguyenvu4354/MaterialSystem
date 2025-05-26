@@ -14,16 +14,25 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+        // Hủy session hiện tại nếu có
+        HttpSession session = request.getSession(false); // false = không tạo mới nếu không tồn tại
         if (session != null) {
-            session.invalidate(); 
+            session.invalidate();
         }
+
+        // Chuyển hướng về trang đăng nhập
         response.sendRedirect("Login.jsp");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response); 
+        // Gọi lại doGet để xử lý POST giống GET
+        doGet(request, response);
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Servlet xử lý đăng xuất người dùng";
     }
 }
