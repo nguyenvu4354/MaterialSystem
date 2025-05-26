@@ -70,7 +70,6 @@ public class CreateUserServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setUsername(username);
-            // Mã hóa password trước khi validate
             String hashedPassword = hashPasswordWithMD5(password);
             newUser.setPassword(hashedPassword);
             newUser.setFullName(fullName);
@@ -84,7 +83,6 @@ public class CreateUserServlet extends HttpServlet {
                 newUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
             }
 
-            // Validate gender hợp lệ trước khi set
             if (gender != null && !gender.isEmpty()) {
                 if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
                     newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
@@ -116,7 +114,7 @@ public class CreateUserServlet extends HttpServlet {
             boolean created = userDAO.createUser(newUser);
             if (created) {
                 session.setAttribute("successMessage", "User created successfully!");
-                response.sendRedirect(request.getContextPath() + "/HomePage.jsp");
+                response.sendRedirect(request.getContextPath() + "/UserList");
             } else {
                 request.setAttribute("error", "Failed to create user. Please try again.");
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
