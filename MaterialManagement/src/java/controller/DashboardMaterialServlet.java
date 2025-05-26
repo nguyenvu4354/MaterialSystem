@@ -18,13 +18,13 @@ public class DashboardMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Get search parameters
+           
             String searchTerm = request.getParameter("search");
             String status = request.getParameter("status");
             String showDisabled = request.getParameter("showDisabled");
             String sortBy = request.getParameter("sortBy");
             
-            // Pagination parameters
+            
             int page = 1;
             int pageSize = 10;
             String pageStr = request.getParameter("page");
@@ -35,14 +35,14 @@ public class DashboardMaterialServlet extends HttpServlet {
 
             MaterialDAO materialDAO = new MaterialDAO();
             
-            // Get total materials with filter
+            
             int totalMaterials = materialDAO.getTotalMaterialsWithFilter(searchTerm, status, showDisabled);
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             
-            // Get filtered and sorted materials
+            
             List<Material> materials = materialDAO.getAllMaterialsWithPagination(searchTerm, status, showDisabled, sortBy, page, pageSize);
             
-            // Set request attributes
+            
             request.setAttribute("materials", materials);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
@@ -52,7 +52,7 @@ public class DashboardMaterialServlet extends HttpServlet {
             request.setAttribute("showDisabled", showDisabled);
             request.setAttribute("sortBy", sortBy);
             
-            // Forward to dashboard
+            
             request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
             
         } catch (SQLException ex) {
