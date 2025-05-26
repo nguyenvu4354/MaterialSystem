@@ -198,11 +198,6 @@
                 <a href="editmaterial?id=${details.material.materialId}" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Material
                 </a>
-                <a href="deleteMaterial?id=${details.material.materialId}" 
-                   class="btn btn-danger ms-2"
-                   onclick="return confirm('Are you sure you want to delete this material?')">
-                    <i class="fas fa-trash"></i> Delete Material
-                </a>
             </div>
         </div>
     </div>
