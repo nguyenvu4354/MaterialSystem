@@ -22,7 +22,8 @@ public class CategoryServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
-        CategoryDAO dao = new CategoryDAO();
+        CategoryDAO dao = new CategoryDAO(); // Khai báo một lần duy nhất
+
         String service = request.getParameter("service");
         if (service == null) service = "listCategory";
 
@@ -44,7 +45,6 @@ public class CategoryServlet extends HttpServlet {
                         request.setAttribute("categories", dao.getAllCategories());
                         request.getRequestDispatcher("jsp/UpdateCategory.jsp").forward(request, response);
                     } else {
-                        // Xử lý cập nhật dữ liệu
                         try {
                             int id = Integer.parseInt(request.getParameter("categoryID"));
                             String name = request.getParameter("categoryName");
@@ -92,7 +92,7 @@ public class CategoryServlet extends HttpServlet {
                 case "deleteCategory": {
                     int categoryID = Integer.parseInt(request.getParameter("categoryID"));
                     dao.deleteCategory(categoryID);
-                    response.sendRedirect("CategoryServlet?service=listCategory");
+                    response.sendRedirect("jsp/Category.jsp");
                     break;
                 }
 
@@ -149,24 +149,98 @@ public class CategoryServlet extends HttpServlet {
                     String keyword = request.getParameter("categoryName");
                     String categoryIdRaw = request.getParameter("categoryId");
                     String status = request.getParameter("status");
+                    String pageRaw = request.getParameter("page");
+                    String sortBy = request.getParameter("sortBy"); // Tham số sortBy: name_asc, name_desc, status_asc, status_desc
                     List<Category> list = new ArrayList<>();
 
-                    if (categoryIdRaw != null && !categoryIdRaw.trim().isEmpty()) {
+                    final int PAGE_SIZE = 5;
+                    int currentPage = 1;
+
+                    if (pageRaw != null && !pageRaw.trim().isEmpty()) {
                         try {
-                            int id = Integer.parseInt(categoryIdRaw);
-                            list = dao.searchCategoriesById(id);
+                            currentPage = Integer.parseInt(pageRaw);
+                            if (currentPage < 1) currentPage = 1;
+                        } catch (NumberFormatException e) {
+                            currentPage = 1;
+                        }
+                    }
+
+                    boolean hasId = categoryIdRaw != null && !categoryIdRaw.trim().isEmpty();
+                    boolean hasName = keyword != null && !keyword.trim().isEmpty();
+                    boolean hasStatus = status != null && !status.trim().isEmpty();
+
+                    // Xử lý sắp xếp
+                    if (hasId && hasName && hasStatus) {
+                        try {
+                            int categoryId = Integer.parseInt(categoryIdRaw.trim());
+                            list = dao.searchCategoriesByIdNameAndStatus(categoryId, keyword.trim(), status.trim());
                         } catch (NumberFormatException e) {
                             request.setAttribute("error", "ID không hợp lệ.");
+                            list = new ArrayList<>();
                         }
-                    } else if (status != null && !status.isEmpty()) {
-                        list = dao.searchCategoriesByStatus(status);
-                    } else if (keyword != null && !keyword.trim().isEmpty()) {
-                        list = dao.searchCategoriesByName(keyword);
+                    } else if (hasId && hasName) {
+                        try {
+                            int categoryId = Integer.parseInt(categoryIdRaw.trim());
+                            list = dao.searchCategoriesByIdAndName(categoryId, keyword.trim());
+                        } catch (NumberFormatException e) {
+                            request.setAttribute("error", "ID không hợp lệ.");
+                            list = new ArrayList<>();
+                        }
+                    } else if (hasId && hasStatus) {
+                        try {
+                            int categoryId = Integer.parseInt(categoryIdRaw.trim());
+                            list = dao.searchCategoriesByIdAndStatus(categoryId, status.trim());
+                        } catch (NumberFormatException e) {
+                            request.setAttribute("error", "ID không hợp lệ.");
+                            list = new ArrayList<>();
+                        }
+                    } else if (hasName && hasStatus) {
+                        list = dao.searchCategoriesByNameAndStatus(keyword.trim(), status.trim());
+                    } else if (hasId) {
+                        try {
+                            int categoryId = Integer.parseInt(categoryIdRaw.trim());
+                            list = dao.searchCategoriesById(categoryId);
+                        } catch (NumberFormatException e) {
+                            request.setAttribute("error", "ID không hợp lệ.");
+                            list = new ArrayList<>();
+                        }
+                    } else if (hasStatus) {
+                        list = dao.searchCategoriesByStatusSorted(status.trim(), sortBy != null && sortBy.endsWith("_desc") ? "desc" : "asc");
+                    } else if (hasName) {
+                        list = dao.searchCategoriesByNameSorted(keyword.trim(), sortBy != null && sortBy.endsWith("_desc") ? "desc" : "asc");
                     } else {
-                        list = dao.getAllCategories();
+                        if ("name_asc".equalsIgnoreCase(sortBy)) {
+                            list = dao.getAllCategoriesSortedByName("asc");
+                        } else if ("name_desc".equalsIgnoreCase(sortBy)) {
+                            list = dao.getAllCategoriesSortedByName("desc");
+                        } else if ("status_asc".equalsIgnoreCase(sortBy)) {
+                            list = dao.getAllCategoriesSortedByStatus("asc");
+                        } else if ("status_desc".equalsIgnoreCase(sortBy)) {
+                            list = dao.getAllCategoriesSortedByStatus("desc");
+                        } else {
+                            list = dao.getAllCategories();
+                        }
+                    }
+
+                    int totalCategories = list.size();
+                    int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
+                    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+                    int start = (currentPage - 1) * PAGE_SIZE;
+                    int end = Math.min(start + PAGE_SIZE, totalCategories);
+                    if (start < totalCategories) {
+                        list = list.subList(start, end);
+                    } else {
+                        list = new ArrayList<>();
                     }
 
                     request.setAttribute("data", list);
+                    request.setAttribute("currentPage", currentPage);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("categoryName", keyword);
+                    request.setAttribute("categoryId", categoryIdRaw);
+                    request.setAttribute("status", status);
+                    request.setAttribute("sortBy", sortBy);
                     request.setAttribute("pageTitle", "Category Manager");
                     request.setAttribute("tableTitle", "List of Categories");
                     request.getRequestDispatcher("jsp/Category.jsp").forward(request, response);

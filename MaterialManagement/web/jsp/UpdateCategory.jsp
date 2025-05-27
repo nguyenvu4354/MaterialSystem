@@ -104,15 +104,14 @@
 
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="disable">Disable (0/1)</label>
-                                 <select id="disable" name="disable" class="form-control" required>
-                  
-                                    <option value="0" ${c.disable == '0' ? 'selected' : ''}>0</option>
-                                    <option value="1" ${c.disable == '1' ? 'selected' : ''}>1</option>
-                                </select>
-                            </div>
-                        </div>
+    <div class="form-group">
+        <label for="disable">Disable (0 = Active, 1 = Soft-Deleted)</label>
+        <select id="disable" name="disable" class="form-control" required onchange="if(this.value == '1') { alert('Setting Disable to 1 will hide this category from the active list.'); }">
+            <option value="0" ${c.disable == 0 ? 'selected' : ''}>0 (Active)</option>
+            <option value="1" ${c.disable == 1 ? 'selected' : ''}>1 (Soft-Deleted)</option>
+        </select>
+    </div>
+</div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="createdAt">Created At</label>
