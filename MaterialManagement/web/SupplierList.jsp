@@ -92,9 +92,9 @@
                                    placeholder="Search by name..." 
                                    value="${keyword != null ? keyword : ''}" 
                                    style="width: 200px; height: 50px" />
-                            <input type="number" name="id" class="form-control" 
-                                   placeholder="Search by ID..." 
-                                   value="${id != null ? id : ''}" 
+                            <input type="text" name="phone" class="form-control" 
+                                   placeholder="Search by phone..." 
+                                   value="${phone != null ? phone : ''}" 
                                    style="width: 200px; height: 50px" />
                             <select name="sortBy" class="form-select" style="width: 150px;height: 50px">
                                 <option value="">Sort By</option>
@@ -180,15 +180,15 @@
                     <nav>
                         <ul class="pagination">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage - 1}&keyword=${keyword}&id=${id}&sortBy=${sortBy}">Previous</a>
+                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage - 1}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="SupplierServlet?action=list&page=${i}&keyword=${keyword}&id=${id}&sortBy=${sortBy}">${i}</a>
+                                    <a class="page-link" href="SupplierServlet?action=list&page=${i}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage + 1}&keyword=${keyword}&id=${id}&sortBy=${sortBy}">Next</a>
+                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage + 1}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">Next</a>
                             </li>
                         </ul>
                     </nav>
