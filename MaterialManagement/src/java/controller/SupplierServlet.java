@@ -13,7 +13,7 @@ import jakarta.servlet.http.*;
 @WebServlet(name = "SupplierServlet", urlPatterns = {"/SupplierServlet"})
 public class SupplierServlet extends HttpServlet {
     private SupplierDAO supplierDAO;
-    private static final int PAGE_SIZE = 5; // Number of suppliers per page
+    private static final int PAGE_SIZE = 5; 
 
     @Override
     public void init() throws ServletException {
@@ -43,9 +43,9 @@ public class SupplierServlet extends HttpServlet {
     }
 
     private void listSuppliers(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
-        String idStr = request.getParameter("id");
+        String phone = request.getParameter("phone");
         String sortBy = request.getParameter("sortBy");
         String pageStr = request.getParameter("page");
         int currentPage = pageStr != null ? Integer.parseInt(pageStr) : 1;
@@ -54,31 +54,25 @@ public class SupplierServlet extends HttpServlet {
         List<Supplier> list;
         int totalSuppliers;
 
-        if (idStr != null && !idStr.isEmpty()) {
-            try {
-                int id = Integer.parseInt(idStr);
-                Supplier supplier = supplierDAO.getSupplierByID(id);
-                if (supplier != null) {
-                    list = Collections.singletonList(supplier);
-                    totalSuppliers = 1;
-                } else {
-                    list = Collections.emptyList();
-                    totalSuppliers = 0;
-                    request.setAttribute("error", "Không tìm thấy nhà cung cấp với ID: " + id);
-                }
-            } catch (NumberFormatException e) {
+        if (phone != null && !phone.trim().isEmpty()) {
+            Supplier supplier = supplierDAO.getSupplierByPhone(phone);
+            if (supplier != null) {
+                list = Collections.singletonList(supplier);
+                totalSuppliers = 1;
+            } else {
                 list = Collections.emptyList();
                 totalSuppliers = 0;
-                request.setAttribute("error", "ID không hợp lệ. Vui lòng nhập số.");
+                request.setAttribute("error", "No find the phone: " + phone);
             }
-        } else if (keyword != null && !keyword.trim().isEmpty()) {
-            list = supplierDAO.searchSuppliers(keyword);
-            totalSuppliers = list.size();
-            request.setAttribute("keyword", keyword);
-        } else {
-            list = supplierDAO.getAllSuppliers();
-            totalSuppliers = list.size();
-        }
+            request.setAttribute("phone", phone);
+    } else if (keyword != null && !keyword.trim().isEmpty()) {
+        list = supplierDAO.searchSuppliers(keyword);
+        totalSuppliers = list.size();
+        request.setAttribute("keyword", keyword);
+    } else {
+        list = supplierDAO.getAllSuppliers();
+        totalSuppliers = list.size();
+    }
 
         // Sorting
         if (sortBy != null && !sortBy.isEmpty()) {
@@ -109,7 +103,7 @@ public class SupplierServlet extends HttpServlet {
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
-        request.setAttribute("id", idStr);
+        request.setAttribute("phone", phone);
         request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
     }
 
@@ -122,7 +116,7 @@ public class SupplierServlet extends HttpServlet {
                 Supplier supplier = supplierDAO.getSupplierByID(id);
                 request.setAttribute("supplier", supplier);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID không hợp lệ.");
+                request.setAttribute("error", "ID erorr.");
             }
         }
         request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
