@@ -1,0 +1,109 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const WarehouseList = () => {
+  const [materials, setMaterials] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/api/warehouse')
+      .then(res => setMaterials(res.data))
+      .catch(err => console.error('Fetch error:', err));
+  }, []);
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Warehouse Inventory</h1>
+      <table className="min-w-full border">
+        <thead>
+          <tr className="bg-gray-100 text-left">
+            <th className="p-2 border">Code</th>
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Category</th>
+            <th className="p-2 border">Supplier</th>
+            <th className="p-2 border">Quantity</th>
+            <th className="p-2 border">Condition (%)</th>
+            <th className="p-2 border">Status</th>
+            <th className="p-2 border">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {materials.map((item) => (
+            <tr key={item.material_id} className="hover:bg-gray-50">
+              <td className="p-2 border">{item.material_code}</td>
+              <td className="p-2 border">{item.material_name}</td>
+              <td className="p-2 border">{item.category_name}</td>
+              <td className="p-2 border">{item.supplier_name || '-'}</td>
+              <td className="p-2 border">{item.quantity}</td>
+              <td className="p-2 border">{item.condition_percentage}%</td>
+              <td className="p-2 border">{item.material_status}</td>
+              <td className="p-2 border">${item.price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default WarehouseList;
+import WarehouseList from './components/WarehouseList';
+
+function App() {
+  return (
+    <div>
+      <WarehouseList />
+    </div>
+  );
+}
+
+
+//Backend
+GET /api/warehouse
+// routes/warehouseRoutes.js
+const express = require('express');
+const router = express.Router();
+const db = require('../config/db');
+
+// GET: List warehouse materials
+router.get('/', async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT 
+                m.material_id,
+                m.material_code,
+                m.material_name,
+                m.quantity,
+                m.condition_percentage,
+                m.material_status,
+                m.price,
+                c.category_name,
+                s.supplier_name
+            FROM Materials m
+            LEFT JOIN Categories c ON m.category_id = c.category_id
+            LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id
+            WHERE m.disable = 0
+        `);
+        res.json(rows);
+    } catch (err) {
+        console.error('Error fetching warehouse data:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+module.exports = router;
+// server.js
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const warehouseRoutes = require('./routes/warehouseRoutes');
+const db = require('./config/db');
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/warehouse', warehouseRoutes);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
