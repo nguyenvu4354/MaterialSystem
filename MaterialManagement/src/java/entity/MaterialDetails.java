@@ -2,6 +2,8 @@ package entity;
 
 import entity.Material;
 
+
+
 public class MaterialDetails {
     private Material material;
     private String categoryName;

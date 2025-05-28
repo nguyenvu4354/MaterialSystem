@@ -121,7 +121,7 @@
                     <div class="detail-row">
                         <div class="detail-label">Price</div>
                         <div class="h4">
-                            <fmt:formatNumber value="${details.material.price}" type="number" groupingUsed="true" maxFractionDigits="0"/>đ
+                            <fmt:formatNumber value="${details.material.price}" type="number" groupingUsed="true" minFractionDigits="2" maxFractionDigits="3"/>đ
                         </div>
                     </div>
 
