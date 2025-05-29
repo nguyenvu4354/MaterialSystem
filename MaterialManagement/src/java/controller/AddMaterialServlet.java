@@ -71,7 +71,7 @@ public class AddMaterialServlet extends HttpServlet {
             Part filePart = request.getPart("imageFile");
             String materialsUrl = request.getParameter("materialUrl");
             // Xu ly upload file anh
-            if(filePart != null && filePart.getSize() > 0){
+            if (filePart != null && filePart.getSize() > 0) {
                 // Lay ten file goc tu phan upload (vd: image.png)
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
 

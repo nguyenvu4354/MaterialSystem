@@ -27,7 +27,7 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="orders.jsp">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/SupplierServlet">
           <iconify-icon icon="ic:baseline-receipt" class="fs-4 me-3"></iconify-icon>
           Supplier
         </a>

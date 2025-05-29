@@ -121,7 +121,7 @@
                     <div class="detail-row">
                         <div class="detail-label">Price</div>
                         <div class="h4">
-                            <fmt:formatNumber value="${details.material.price}" type="number" groupingUsed="true" maxFractionDigits="0"/>đ
+                            <fmt:formatNumber value="${details.material.price}" type="number" groupingUsed="true" minFractionDigits="2" maxFractionDigits="3"/>đ
                         </div>
                     </div>
 
@@ -197,11 +197,6 @@
             <div class="mt-4">
                 <a href="editmaterial?id=${details.material.materialId}" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Material
-                </a>
-                <a href="deleteMaterial?id=${details.material.materialId}" 
-                   class="btn btn-danger ms-2"
-                   onclick="return confirm('Are you sure you want to delete this material?')">
-                    <i class="fas fa-trash"></i> Delete Material
                 </a>
             </div>
         </div>
