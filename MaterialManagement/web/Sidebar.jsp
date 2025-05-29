@@ -15,7 +15,7 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="dashboardmaterial">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/dashboardmaterial">
           <iconify-icon icon="ic:baseline-shopping-cart" class="fs-4 me-3"></iconify-icon>
           Material
         </a>
@@ -27,7 +27,7 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="SupplierServlet">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="orders.jsp">
           <iconify-icon icon="ic:baseline-receipt" class="fs-4 me-3"></iconify-icon>
           Supplier
         </a>
