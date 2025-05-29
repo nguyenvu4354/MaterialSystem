@@ -127,7 +127,29 @@ public class SupplierDAO extends DBContext {
         }
         return list;
     }
-
+    public Supplier getSupplierByPhone(String phone) {
+        String sql = "SELECT * FROM Suppliers WHERE phone_number = ? AND disable = 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Supplier s = new Supplier();
+                    s.setSupplierId(rs.getInt("supplier_id"));
+                    s.setSupplierName(rs.getString("supplier_name"));
+                    s.setContactInfo(rs.getString("contact_info"));
+                    s.setAddress(rs.getString("address"));
+                    s.setPhoneNumber(rs.getString("phone_number"));
+                    s.setEmail(rs.getString("email"));
+                    s.setDescription(rs.getString("description"));
+                    s.setTaxId(rs.getString("tax_id"));
+                    return s;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     // Hàm main để test
     public static void main(String[] args) {
         SupplierDAO dao = new SupplierDAO();
