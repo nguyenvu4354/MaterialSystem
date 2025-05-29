@@ -69,26 +69,19 @@ public class AddMaterialServlet extends HttpServlet {
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
             Part filePart = request.getPart("imageFile");
-            String materialsUrl = request.getParameter("materialUrl");
-            // Xu ly upload file anh
+            String materialsUrl = null;
             if (filePart != null && filePart.getSize() > 0) {
                 // Lay ten file goc tu phan upload (vd: image.png)
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-
-                // Lay phan duoi mo rong cua file (vd: .png, .jpg)
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-
-                // Tao mot ten file moi duy nhat bang UUID (vd: 2a5f6b28-c2d6-4a23-8d7b-3cb914e8cf8e.png)
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
-
-                // Tao duong dan day du tren server de luu file (vd: /duong_dan_project/material_images/ten_file_moi.png)
                 String filePath = uploadPath + File.separator + newFileName;
-
-                // Ghi file tu part vao duong dan tren server
                 filePart.write(filePath);
-
-                // Luu duong dan tuong doi cua anh de su dung trong database hoac giao dien web
-                materialsUrl = "material_images/" + newFileName;
+                materialsUrl = UPLOAD_DIRECTORY + "/" + newFileName;
+            } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
+                materialsUrl = request.getParameter("materialsUrl").trim();
+            } else {
+                materialsUrl = "material_images/default.jpg";
             }
 
             

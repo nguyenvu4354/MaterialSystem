@@ -13,12 +13,15 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
         <style>
+            body {
+                background: #fff !important;
+            }
             /* Tùy chỉnh các lớp CSS cho bảng, trạng thái, button, ... */
             .table-responsive {
                 margin: 20px 0;
             }
             .material-active {
-                background-color: rgba(25, 135, 84, 0.1) !important; /* Màu nền xanh nhạt cho vật tư active */
+                background-color: #fff !important; /* Màu nền trắng cho vật tư active */
             }
             .material-disabled {
                 background-color: rgba(220, 53, 69, 0.1) !important; /* Màu nền đỏ nhạt cho vật tư đã disabled */
@@ -243,7 +246,7 @@
                                         <!-- Các hành động với vật tư: xem chi tiết, chỉnh sửa -->
                                         <td>
                                             <div class="d-flex">
-                                                <a href="viewmaterial?id=${material.materialId}" 
+                                                <a href="${pageContext.request.contextPath}/viewmaterial?id=${material.materialId}" 
                                                    class="btn btn-info btn-action" 
                                                    title="View Details">
                                                     <i class="fas fa-eye"></i>
