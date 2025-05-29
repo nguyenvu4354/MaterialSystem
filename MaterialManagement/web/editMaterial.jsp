@@ -5,14 +5,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Edit Material - Material Management</title>
-
-        <!-- Bootstrap CSS để dùng style và responsive -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- FontAwesome để dùng icon -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-        <!-- Style tùy chỉnh cho select input -->
         <style>
             .form-select {
                 padding: 0.6rem 1rem;
@@ -32,38 +26,26 @@
     </head>
     <body class="bg-light">
         <div class="container mt-5">
-
-            <!-- Card chính chứa form sửa vật tư -->
             <div class="card shadow">
-
-                <!-- Header card màu xanh, tiêu đề -->
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Edit Material</h3>
                 </div>
-
                 <div class="card-body">
-
-                    <!-- Hiển thị lỗi nếu có -->
                     <c:if test="${not empty error}">
                         <div class="alert alert-danger" role="alert">
                             ${error}
                         </div>
                     </c:if>
 
-                    <!-- Hiển thị thông báo thành công nếu có -->
                     <c:if test="${not empty param.success}">
                         <div class="alert alert-success" role="alert">
                             ${param.success}
                         </div>
                     </c:if>
 
-                    <!-- Form gửi POST lên servlet xử lý 'editmaterial', enctype để upload file ảnh -->
                     <form action="editmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
-                        
-                        <!-- Ẩn input chứa ID vật tư để biết sửa cái nào -->
                         <input type="hidden" name="materialId" value="${details.material.materialId}">
 
-                        <!-- Row 1: Mã vật tư và tên vật tư -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="materialCode" class="form-label">Material Code</label>
@@ -77,17 +59,13 @@
                             </div>
                         </div>
 
-                        <!-- Phần hiển thị và nhập ảnh vật tư -->
                         <div class="mb-3">
                             <label class="form-label">Material Image</label>
-
-                            <!-- Hiển thị ảnh hiện tại với kích thước cố định -->
                             <div class="mb-3">
                                 <img src="${details.material.materialsUrl}" alt="${details.material.materialCode}" 
                                      class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                             </div>
 
-                            <!-- Tabs cho chọn cách nhập ảnh: upload file hoặc URL -->
                             <ul class="nav nav-tabs" id="imageInputTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" 
@@ -99,17 +77,13 @@
                                 </li>
                             </ul>
 
-                            <!-- Nội dung từng tab -->
                             <div class="tab-content pt-3" id="imageInputTabContent">
-
-                                <!-- Tab upload file -->
                                 <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
                                     <label class="form-label">Upload New Image</label>
                                     <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
                                     <div class="form-text">Upload a new image file (Max size: 10MB)</div>
                                 </div>
 
-                                <!-- Tab nhập URL ảnh -->
                                 <div class="tab-pane fade" id="url-content" role="tabpanel">
                                     <label class="form-label">Or Use Image URL</label>
                                     <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" 
@@ -119,19 +93,16 @@
                                 </div>
                             </div>
 
-                            <!-- Ghi chú cách sử dụng -->
                             <div class="form-text text-info mt-2">
                                 You can either upload a new image or provide an image URL. If both are provided, the uploaded file will take precedence.
                             </div>
                         </div>
 
-                        <!-- Row 2: Chọn category và nhập số lượng -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="categoryId" class="form-label">Category</label>
                                 <select class="form-select" id="categoryId" name="categoryId" required>
                                     <option value="">Select Category</option>
-                                    <!-- Lặp qua danh sách category để tạo option -->
                                     <c:forEach items="${categories}" var="category">
                                         <option value="${category.category_id}" ${details.material.categoryId == category.category_id ? 'selected' : ''}>
                                             ${category.category_name}
@@ -146,7 +117,6 @@
                             </div>
                         </div>
 
-                        <!-- Row 3: Giá tiền và phần trăm tình trạng -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="price" class="form-label">Price ($)</label>
@@ -165,7 +135,6 @@
                             </div>
                         </div>
 
-                        <!-- Row 4: Trạng thái và nhà cung cấp -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="materialStatus" class="form-label">Status</label>
@@ -176,10 +145,19 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
+                                <label for="disable" class="form-label">Active Status</label>
+                                <select class="form-select" id="disable" name="disable" required>
+                                    <option value="false" ${!details.material.disable ? 'selected' : ''}>Active</option>
+                                    <option value="true" ${details.material.disable ? 'selected' : ''}>Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label for="supplierId" class="form-label">Supplier</label>
                                 <select class="form-select" id="supplierId" name="supplierId">
                                     <option value="">Select Supplier</option>
-                                    <!-- Lặp danh sách nhà cung cấp -->
                                     <c:forEach items="${suppliers}" var="supplier">
                                         <option value="${supplier.supplierId}" ${details.material.supplierId == supplier.supplierId ? 'selected' : ''}>
                                             ${supplier.supplierName}
@@ -189,39 +167,28 @@
                             </div>
                         </div>
 
-                        <!-- Nút submit, hủy và xóa -->
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Save Changes
                             </button>
-
-                            <!-- Nút trở về danh sách vật tư -->
                             <a href="dashboardmaterial" class="btn btn-secondary ms-2">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
-
-                            <!-- Nút xóa vật tư, gọi confirm trước khi xóa -->
-                            <button type="button" class="btn btn-danger ms-2" onclick="confirmDelete()">
-                                <i class="fas fa-trash"></i> Delete Material
-                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Bootstrap JS Bundle (chứa Popper.js) để hỗ trợ tương tác JS của Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
         <script>
-            // Validation form với Bootstrap
+            // Form validation
             (function () {
                 'use strict'
                 var forms = document.querySelectorAll('.needs-validation')
                 Array.prototype.slice.call(forms)
                         .forEach(function (form) {
                             form.addEventListener('submit', function (event) {
-                                // Kiểm tra form có hợp lệ và giá tiền hợp lệ
                                 if (!form.checkValidity() || !validatePriceOnSubmit()) {
                                     event.preventDefault()
                                     event.stopPropagation()
@@ -231,7 +198,6 @@
                         })
             })()
 
-            // Hàm kiểm tra giá tiền phải lớn hơn 0
             function validatePrice(input) {
                 const price = parseFloat(input.value);
                 if (isNaN(price) || price <= 0) {
@@ -242,78 +208,69 @@
                 return true;
             }
 
-            // Gọi kiểm tra giá tiền khi submit
             function validatePriceOnSubmit() {
                 const priceInput = document.getElementById('price');
                 return validatePrice(priceInput);
             }
 
-            // Hàm làm sạch URL (nếu url bắt đầu bằng 'material_images/' thì bỏ đi)
+            // Function to clean URL from material_images prefix
             function cleanUrl(url) {
                 return url.startsWith('material_images/') ? '' : url;
             }
 
-            // Xử lý khi người dùng chọn file ảnh mới
+            // Handle file input change
             document.getElementById('imageFile').addEventListener('change', function (event) {
                 const file = event.target.files[0];
                 if (file) {
-                    // Xóa giá trị input URL
+                    // Clear URL input when file is selected
                     document.getElementById('materialsUrl').value = '';
 
-                    // Hiển thị preview ảnh mới
+                    // Show image preview
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         document.querySelector('.img-thumbnail').src = e.target.result;
                     }
                     reader.readAsDataURL(file);
 
-                    // Chuyển sang tab upload
+                    // Switch to upload tab
                     const uploadTab = document.getElementById('upload-tab');
                     bootstrap.Tab.getOrCreateInstance(uploadTab).show();
                 }
             });
 
-            // Xử lý khi nhập URL ảnh
+            // Handle URL input change
             document.getElementById('materialsUrl').addEventListener('input', function (event) {
                 const url = event.target.value.trim();
                 if (url) {
-                    // Xóa giá trị input file
+                    // Clear file input when URL is entered
                     document.getElementById('imageFile').value = '';
 
-                    // Cập nhật ảnh preview
+                    // Update preview
                     document.querySelector('.img-thumbnail').src = url;
 
-                    // Chuyển sang tab URL
+                    // Switch to URL tab
                     const urlTab = document.getElementById('url-tab');
                     bootstrap.Tab.getOrCreateInstance(urlTab).show();
                 }
             });
 
-            // Khi chuyển tab, xóa input không dùng để tránh nhập đồng thời 2 nguồn ảnh
+            // Clear other input when switching tabs
             document.getElementById('imageInputTabs').addEventListener('shown.bs.tab', function (event) {
                 if (event.target.id === 'upload-tab') {
                     document.getElementById('materialsUrl').value = '';
                 } else if (event.target.id === 'url-tab') {
                     document.getElementById('imageFile').value = '';
+                    // Clean URL when switching to URL tab
+                    const urlInput = document.getElementById('materialsUrl');
+                    urlInput.value = cleanUrl(urlInput.value);
                 }
             });
 
-            // Hàm confirm xóa vật tư
-            function confirmDelete() {
-                if (confirm("Are you sure you want to delete this material? This action cannot be undone.")) {
-                    // Tạo form mới gửi POST xóa với materialId
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'deletematerial'; // servlet xử lý xóa vật tư
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'materialId';
-                    input.value = '${details.material.materialId}';
-                    form.appendChild(input);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            }
+            // Clean URL on page load
+            window.addEventListener('load', function () {
+                const urlInput = document.getElementById('materialsUrl');
+                urlInput.value = cleanUrl(urlInput.value);
+            });
         </script>
     </body>
-</html>
+</html> 
