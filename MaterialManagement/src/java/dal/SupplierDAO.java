@@ -127,7 +127,10 @@ public class SupplierDAO extends DBContext {
         }
         return list;
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> 78d44fa33834937ce32290a1c7387de14198d5aa
     public Supplier getSupplierByPhone(String phone) {
         String sql = "SELECT * FROM Suppliers WHERE phone_number = ? AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
