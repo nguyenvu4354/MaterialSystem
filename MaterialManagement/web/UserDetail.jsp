@@ -48,21 +48,12 @@
                     <c:if test="${user != null}">
                         <div class="row">
                             <div class="col-md-4 text-center">
-                                <c:choose>
-                                    <c:when test="${not empty user.userPicture}">
-                                        <img src="images/profiles/${user.userPicture}" 
-                                             class="img-fluid rounded-circle mb-3" 
-                                             style="max-width: 200px;" 
-                                             alt="Profile Picture">
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="images/default-avatar.png" 
-                                             class="img-fluid rounded-circle mb-3" 
-                                             style="max-width: 200px;" 
-                                             alt="Default Avatar">
-                                    </c:otherwise>
-                                </c:choose>
+                                <img src="images/profiles/${empty user.userPicture ? 'default-avatar.png' : user.userPicture}" 
+                                     class="img-fluid rounded-circle mb-3" 
+                                     style="max-width: 200px;" 
+                                     alt="Profile Picture">
                             </div>
+
 
                             <div class="col-md-8">
                                 <h3 class="text-primary border-bottom pb-2">👤 User Detail Information</h3>
