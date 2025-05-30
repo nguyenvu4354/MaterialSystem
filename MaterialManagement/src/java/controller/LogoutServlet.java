@@ -24,7 +24,6 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Gọi lại doGet để xử lý POST giống GET
         doGet(request, response);
     }
 
