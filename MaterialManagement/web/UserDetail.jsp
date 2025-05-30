@@ -48,31 +48,21 @@
                     <c:if test="${user != null}">
                         <div class="row">
                             <div class="col-md-4 text-center">
-                                <c:choose>
-                                    <c:when test="${not empty user.userPicture}">
-                                        <img src="images/profiles/${user.userPicture}" 
-                                             class="img-fluid rounded-circle mb-3" 
-                                             style="max-width: 200px;" 
-                                             alt="Profile Picture">
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="images/default-avatar.png" 
-                                             class="img-fluid rounded-circle mb-3" 
-                                             style="max-width: 200px;" 
-                                             alt="Default Avatar">
-                                    </c:otherwise>
-                                </c:choose>
+                                <img src="images/profiles/${empty user.userPicture ? 'default-avatar.png' : user.userPicture}" 
+                                     class="img-fluid rounded-circle mb-3" 
+                                     style="max-width: 200px;" 
+                                     alt="Profile Picture">
                             </div>
 
 
                             <div class="col-md-8">
-                                <h3 class="text-primary border-bottom pb-2">👤 Thông tin chi tiết người dùng</h3>
+                                <h3 class="text-primary border-bottom pb-2">👤 User Detail Information</h3>
                                 <div class="row mb-2">
                                     <div class="col-sm-4 fw-bold">Username:</div>
                                     <div class="col-sm-8">${user.username}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Họ tên:</div>
+                                    <div class="col-sm-4 fw-bold">Full Name:</div>
                                     <div class="col-sm-8">${user.fullName}</div>
                                 </div>
                                 <div class="row mb-2">
@@ -80,49 +70,49 @@
                                     <div class="col-sm-8">${user.email}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Số điện thoại:</div>
+                                    <div class="col-sm-4 fw-bold">Phone Number:</div>
                                     <div class="col-sm-8">${user.phoneNumber}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Địa chỉ:</div>
+                                    <div class="col-sm-4 fw-bold">Address:</div>
                                     <div class="col-sm-8">${user.address}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Giới tính:</div>
+                                    <div class="col-sm-4 fw-bold">Gender:</div>
                                     <div class="col-sm-8">${user.gender}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Ngày sinh:</div>
+                                    <div class="col-sm-4 fw-bold">Date of Birth:</div>
                                     <div class="col-sm-8">${user.dateOfBirth}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Quyền:</div>
+                                    <div class="col-sm-4 fw-bold">Role:</div>
                                     <div class="col-sm-8">${user.roleName}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Trạng thái:</div>
+                                    <div class="col-sm-4 fw-bold">Status:</div>
                                     <div class="col-sm-8">${user.status}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Mô tả:</div>
+                                    <div class="col-sm-4 fw-bold">Description:</div>
                                     <div class="col-sm-8">${user.description}</div>
                                 </div>
                                 <div class="row mb-2">
-                                    <div class="col-sm-4 fw-bold">Ngày tạo:</div>
+                                    <div class="col-sm-4 fw-bold">Created At:</div>
                                     <div class="col-sm-8">${user.createdAt}</div>
                                 </div>
                                 <div class="row mb-4">
-                                    <div class="col-sm-4 fw-bold">Cập nhật lần cuối:</div>
+                                    <div class="col-sm-4 fw-bold">Last Updated:</div>
                                     <div class="col-sm-8">${user.updatedAt}</div>
                                 </div>
 
-                                <a href="UserList" class="btn btn-secondary">← Quay lại danh sách</a>
+                                <a href="UserList" class="btn btn-secondary">← Back to User List</a>
                             </div>
                         </div>
                     </c:if>
                     <c:if test="${user == null}">
-                        <div class="alert alert-danger">Không tìm thấy người dùng.</div>
-                        <a href="UserList" class="btn btn-secondary">← Quay lại danh sách</a>
+                        <div class="alert alert-danger">User not found.</div>
+                        <a href="UserList" class="btn btn-secondary">← Back to User List</a>
                     </c:if>
                 </div>
             </div>
