@@ -14,7 +14,6 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Hủy session hiện tại nếu có
         HttpSession session = request.getSession(false); // false = không tạo mới nếu không tồn tại
         if (session != null) {
             session.invalidate();
