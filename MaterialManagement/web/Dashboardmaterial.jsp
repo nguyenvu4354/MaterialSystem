@@ -16,7 +16,7 @@
                 margin: 20px 0;
             }
             .material-active {
-                background-color: #fff !important;
+                background-color: rgba(25, 135, 84, 0.1) !important;
             }
             .material-disabled {
                 background-color: rgba(220, 53, 69, 0.1) !important;
@@ -50,19 +50,6 @@
                 align-items: center;
                 justify-content: center;
                 margin: 0 2px;
-            }
-            .text-primary {
-                color: #e0ad69 !important;
-            }
-            .btn-primary {
-                background-color: #e0ad69 !important;
-                border-color: #e0ad69 !important;
-                color: #fff !important;
-            }
-            .table-light th {
-                background-color: #f8f9fa !important;
-                color: #212529 !important;
-                font-weight: bold;
             }
         </style>
     </head>
@@ -103,37 +90,53 @@
                 <div class="col-md-9 col-lg-10 px-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="text-primary fw-bold display-6 border-bottom pb-2">📦 Material List</h2>
-                        <a href="addmaterial" class="btn btn-primary" style="padding: 1.2rem 3rem; font-size: 1.25rem;">Add New Material</a>
+                        <a href="addmaterial" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add New Material
+                        </a>
                     </div>
 
-                    <!-- Filter Form -->
-                    <form method="get" action="dashboardmaterial" class="mb-3 d-flex flex-wrap gap-2 align-items-center">
-                        <input type="text" name="search" class="form-control" placeholder="Search by name" value="${searchTerm}" style="max-width: 200px; padding: 1.25rem 0 1.25rem 1.25rem; font-size: 1.25rem; border-radius: 0.25rem;"/>
-                        <select name="status" class="form-select" style="max-width: 150px;">
-                            <option value="">All Status</option>
-                            <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
-                            <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
-                            <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
-                        </select>
-                        <select name="sortBy" class="form-select" style="max-width: 150px;">
-                            <option value="">Sort By</option>
-                            <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
-                            <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
-                            <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
-                            <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
-                            <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
-                            <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
-                            <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
-                            <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
-                        </select>
-                        <button type="submit" class="btn btn-primary" style="padding: 1.2rem 3rem; font-size: 1.25rem;">Search</button>
-                        <a href="dashboardmaterial" class="btn btn-secondary">Clear</a>
-                    </form>
+                    <!-- Search and Filter Section -->
+                    <div class="row search-box">
+                        <div class="col-md-8">
+                            <form action="dashboardmaterial" method="GET" class="d-flex gap-2">
+                                <input type="text" 
+                                       name="search" 
+                                       value="${searchTerm}" 
+                                       class="form-control" 
+                                       placeholder="Search materials...">
+                                <select name="status" class="form-select" style="width: auto;">
+                                    <option value="">All Status</option>
+                                    <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
+                                    <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
+                                    <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
+                                </select>
+                                <select name="showDisabled" class="form-select" style="width: auto;">
+                                    <option value="">All Materials</option>
+                                    <option value="true" ${showDisabled == 'true' ? 'selected' : ''}>Disabled Only</option>
+                                    <option value="false" ${showDisabled == 'false' ? 'selected' : ''}>Active Only</option>
+                                </select>
+                                <select name="sortBy" class="form-select" style="width: auto;">
+                                    <option value="">Sort By</option>
+                                    <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                    <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                                    <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
+                                    <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
+                                    <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
+                                    <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
+                                    <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
+                                    <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </form>
+                        </div>
+                    </div>
 
                     <!-- Materials Table -->
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle text-center">
-                            <thead class="table-light">
+                        <table class="table table-hover">
+                            <thead>
                                 <tr>
                                     <th>Image</th>
                                     <th>Code</th>
@@ -147,9 +150,10 @@
                             </thead>
                             <tbody>
                                 <c:forEach items="${materials}" var="material">
-                                    <c:if test="${!material.disable}">
-                                    <tr class="material-active">
-                                        <td><img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image"></td>
+                                    <tr class="${material.disable ? 'material-disabled' : 'material-active'}">
+                                        <td>
+                                            <img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
+                                        </td>
                                         <td>${material.materialCode}</td>
                                         <td>${material.materialName}</td>
                                         <td>
@@ -158,16 +162,25 @@
                                             </span>
                                         </td>
                                         <td>${material.quantity}</td>
-                                        <td><fmt:formatNumber value="${material.price}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                                        <td>
+                                            <fmt:formatNumber value="${material.price}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                                        </td>
                                         <td>${material.conditionPercentage}%</td>
                                         <td>
-                                            <div class="d-flex justify-content-center gap-1">
-                                                <a href="viewmaterial?id=${material.materialId}" class="btn btn-primary btn-sm">View</a>
-                                                <a href="editmaterial?id=${material.materialId}" class="btn btn-warning btn-sm">Edit</a>
+                                            <div class="d-flex">
+                                                <a href="viewmaterial?id=${material.materialId}" 
+                                                   class="btn btn-info btn-action" 
+                                                   title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="editmaterial?id=${material.materialId}" 
+                                                   class="btn btn-warning btn-action"
+                                                   title="Edit Material">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
-                                    </c:if>
                                 </c:forEach>
                             </tbody>
                         </table>
@@ -178,15 +191,15 @@
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}">Previous</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="dashboardmaterial?page=${i}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}">${i}</a>
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}">Next</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&search=${searchTerm}&status=${selectedStatus}&showDisabled=${showDisabled}&sortBy=${sortBy}">Next</a>
                                 </li>
                             </ul>
                         </nav>
