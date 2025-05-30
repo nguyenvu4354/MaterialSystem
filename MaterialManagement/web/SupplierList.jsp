@@ -91,12 +91,12 @@
                             <input type="text" name="keyword" class="form-control" 
                                    placeholder="Search by name..." 
                                    value="${keyword != null ? keyword : ''}" 
-                                   style="width: 200px; height: 50px" />
+                                   style="width: 200px; height: 50px; border: 2px solid gray" />
                             <input type="text" name="phone" class="form-control" 
                                    placeholder="Search by phone..." 
                                    value="${phone != null ? phone : ''}" 
-                                   style="width: 200px; height: 50px" />
-                            <select name="sortBy" class="form-select" style="width: 150px;height: 50px">
+                                   style="width: 200px; height: 50px; border: 2px solid gray" />
+                            <select name="sortBy" class="form-select" style="width: 150px;height: 50px; border: 2px solid gray">
                                 <option value="">Sort By</option>
                                 <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
                                 <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Error Message -->
+                <!-- Error Mes -->
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
