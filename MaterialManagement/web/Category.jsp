@@ -5,6 +5,21 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    String userAgent = request.getHeader("User-Agent");
+
+    // Kiểm tra nếu không phải trình duyệt Edge thì chuyển hướng hoặc hiện thông báo
+    if (userAgent != null && !userAgent.contains("Edg")) {
+%>
+    <script>
+        alert("Trang này chỉ hỗ trợ trên Microsoft Edge!");
+        window.location.href = "https://www.microsoft.com/edge"; // Hoặc chuyển hướng trang khác
+    </script>
+<%
+        return; // Dừng render tiếp nội dung JSP
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
