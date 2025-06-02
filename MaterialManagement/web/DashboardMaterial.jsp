@@ -11,7 +11,7 @@
         <!-- Bootstrap & Custom CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+        
         <style>
             body {
                 background: #fff !important;
@@ -82,22 +82,27 @@
             .condition-bad {
                 background-color: #dc3545; /* Màu đỏ cho tình trạng xấu */
             }
+            .text-primary {
+                color: #DEAD6F !important;
+            }
+            .btn-primary {
+                background-color: #DEAD6F !important;
+                border-color: #DEAD6F !important;
+                color: #fff !important;
+            }
         </style>
     </head>
     <body>
-        <!-- Header section -->
+
+        <!-- Header -->
         <header>
             <div class="container py-2">
                 <div class="row py-4 pb-0 pb-sm-4 align-items-center">
-                    <!-- Logo và tiêu đề trang -->
                     <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-                        <a href="HomePage.jsp" class="text-decoration-none">
-                            <h2 class="mb-0 text-primary">
-                                <i class="fas fa-dollar-sign"></i> Material Management
-                            </h2>
+                        <a href="HomePage.jsp">
+                            <img src="images/logo.png" alt="logo" class="img-fluid" width="300px">
                         </a>
                     </div>
-                    <!-- Thông tin user hiện tại và nút đăng xuất -->
                     <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
                         <div class="text-end d-none d-xl-block">
                             <span class="fs-6 text-muted">Admin</span>
@@ -110,6 +115,7 @@
                 </div>
             </div>
         </header>
+        <div style="height: 90px;"></div>
 
         <!-- Nội dung chính -->
         <div class="container-fluid">
@@ -124,74 +130,38 @@
                     <!-- Tiêu đề và nút thêm vật tư mới -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="text-primary fw-bold display-6 border-bottom pb-2">📦 Material List</h2>
-                        <a href="addmaterial" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add New Material
-                        </a>
+                        <a href="addmaterial" class="btn" style="background:#DEAD6F; color:#fff; border:none; border-radius:0.5rem; padding:1.2rem 3rem; font-size:1.25rem; min-width:320px;">Add New Material</a>
                     </div>
 
-                    <!-- Phần tìm kiếm và lọc -->
-                    <div class="row search-box">
-                        <div class="col-md-8">
-                            <form action="dashboardmaterial" method="GET" class="row g-2 align-items-end mb-3">
-                                <!-- Input tìm kiếm theo tên vật tư -->
-                                <div class="col-md-4">
-                                    <label for="search" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-search"></i> Search
-                                    </label>
-                                    <input type="text" 
-                                           id="search"
-                                           name="search" 
-                                           value="${searchTerm}" 
-                                           class="form-control" 
-                                           placeholder="Search materials...">
-                                </div>
-
-                                <!-- Dropdown lọc theo trạng thái vật tư -->
-                                <div class="col-md-3">
-                                    <label for="status" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-filter"></i> Status
-                                    </label>
-                                    <select id="status" name="status" class="form-select">
-                                        <option value="">All Status</option>
-                                        <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
-                                        <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
-                                        <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
-                                    </select>
-                                </div>
-
-                                <!-- Dropdown chọn cách sắp xếp -->
-                                <div class="col-md-3">
-                                    <label for="sortBy" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-sort"></i> Sort By
-                                    </label>
-                                    <select id="sortBy" class="form-select" name="sortBy">
-                                        <option value="">Default</option>
-                                        <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
-                                        <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
-                                        <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
-                                        <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
-                                        <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
-                                        <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
-                                        <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
-                                        <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Nút submit tìm kiếm -->
-                                <div class="col-md-2 d-grid">
-                                    <label class="form-label mb-1 invisible">Search</label>
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                                        <i class="fas fa-search"></i> Search
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    <!-- Filter Form a-->
+                    <form method="get" action="dashboardmaterial" class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+                        <input type="text" name="search" class="form-control" placeholder="Search by name" value="${searchTerm}"
+                            style="height:56px; font-size:1.25rem; border-radius:0.25rem; padding:1.25rem 0 1.25rem 1.25rem; max-width:350px; border:1px solid rgba(65,64,62,0.20); color:#908F8D; text-transform:capitalize; letter-spacing:0.02125rem;"/>
+                        <select name="status" class="form-select" style="max-width: 150px;">
+                            <option value="">All Status</option>
+                            <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
+                            <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
+                            <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
+                        </select>
+                        <select name="sortBy" class="form-select" style="max-width: 150px;">
+                            <option value="">Sort By</option>
+                            <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                            <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                            <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
+                            <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
+                            <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
+                            <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
+                            <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
+                            <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
+                        </select>
+                        <button type="submit" class="btn" style="background:#DEAD6F; color:#fff; border:none; border-radius:0.5rem; padding:1.2rem 3rem; font-size:1.25rem;">Search</button>
+                        <a href="dashboardmaterial" class="btn btn-secondary">Clear</a>
+                    </form>
 
                     <!-- Bảng danh sách vật tư -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-bordered table-hover align-middle text-center">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Image</th>
                                     <th>Code</th>
@@ -220,7 +190,7 @@
 
                                         <!-- Trạng thái vật tư với màu sắc theo trạng thái -->
                                         <td>
-                                            <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
+                                            <span class="badge rounded-pill px-3 py-2 ${material.materialStatus == 'NEW' ? 'bg-success-subtle text-success' : material.materialStatus == 'USED' ? 'bg-warning-subtle text-warning' : 'bg-danger-subtle text-danger'}">
                                                 ${material.materialStatus}
                                             </span>
                                         </td>
@@ -230,32 +200,31 @@
 
                                         <!-- Giá vật tư, định dạng tiền tệ -->
                                         <td>
-                                            <fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/>
+                                            <fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2"/>
                                         </td>
 
                                         <!-- Thanh thể hiện % tình trạng vật tư -->
                                         <td>
-                                            <div class="condition-bar">
-                                                <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : 
-                                                                           material.conditionPercentage >= 40 ? 'condition-warning' : 
-                                                                           'condition-bad'}"
-                                                     style="width: ${material.conditionPercentage}%"></div>
+                                            <div class="progress" style="height: 8px;">
+                                                <c:choose>
+                                                    <c:when test="${material.conditionPercentage >= 70}">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: ${material.conditionPercentage}%;" aria-valuenow="${material.conditionPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </c:when>
+                                                    <c:when test="${material.conditionPercentage >= 40}">
+                                                        <div class="progress-bar bg-warning" role="progressbar" style="width: ${material.conditionPercentage}%;" aria-valuenow="${material.conditionPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div class="progress-bar bg-danger" role="progressbar" style="width: ${material.conditionPercentage}%;" aria-valuenow="${material.conditionPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                         </td>
 
                                         <!-- Các hành động với vật tư: xem chi tiết, chỉnh sửa -->
                                         <td>
-                                            <div class="d-flex">
-                                                <a href="${pageContext.request.contextPath}/viewmaterial?id=${material.materialId}" 
-                                                   class="btn btn-info btn-action" 
-                                                   title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="editmaterial?id=${material.materialId}" 
-                                                   class="btn btn-warning btn-action" 
-                                                   title="Edit Material">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
+                                            <div class="d-flex justify-content-center gap-1">
+                                                <a href="viewmaterial?id=${material.materialId}" class="btn" style="background:#DEAD6F; color:#fff; border:none; border-radius:0.5rem; padding:0.7rem 2rem; font-size:1rem;">View</a>
+                                                <a href="editmaterial?id=${material.materialId}" class="btn" style="background:#6c757d; color:#fff; border:none; border-radius:0.5rem; padding:0.7rem 2rem; font-size:1rem;">Edit</a>
                                             </div>
                                         </td>
                                     </tr>
