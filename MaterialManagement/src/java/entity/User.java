@@ -13,26 +13,23 @@ public class User {
     private String address;
     private String userPicture;
     private int roleId;
+    private String roleName; 
     private LocalDate dateOfBirth;
     private Gender gender;
     private String description;
-    private Status status;
+    private Status status; 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private boolean disable;
 
     public enum Gender {
         male, female, other
     }
 
     public enum Status {
-        active, inactive
+        active, inactive, deleted 
     }
 
-    // Constructors
     public User() {}
-
-    // Getters and Setters
 
     public int getUserId() {
         return userId;
@@ -106,6 +103,14 @@ public class User {
         this.roleId = roleId;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
@@ -154,11 +159,7 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public boolean isDisable() {
-        return disable;
-    }
-
-    public void setDisable(boolean disable) {
-        this.disable = disable;
+    public boolean isDeleted() {
+        return status == Status.deleted;
     }
 }

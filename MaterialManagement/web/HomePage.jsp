@@ -1317,8 +1317,24 @@
         <div class="offset-md-3 col-md-6 my-5 ">
           <h2 class="display-3 fw-normal text-center">GOOD PRODUCTS AND HIGH QUALITY <span class="text-primary"></span>
           </h2>
-         
-            <img src="images/bllog21.jpg" alt="alt" width="700px"/>
+          <form>
+            <div class="mb-3">
+              <input type="email" class="form-control form-control-lg" name="email" id="email"
+                placeholder="Enter Your Email Address">
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control form-control-lg" name="email" id="password1"
+                placeholder="Create Password">
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control form-control-lg" name="email" id="password2"
+                placeholder="Repeat Password">
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-dark btn-lg rounded-1">Register it now</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
