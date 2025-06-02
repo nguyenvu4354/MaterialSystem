@@ -7,7 +7,7 @@ import java.util.Properties;
 public class EmailUtils {
     public static void sendEmail(String to, String subject, String content) throws MessagingException {
         final String username = "nguyenvu150203@gmail.com"; // đổi thành Gmail bạn
-        final String password = "dcyr itbq jwpf eicr"; // App Password
+        final String password = "dcyr itbq jwpf eicr";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
