@@ -4,6 +4,21 @@
 <%@ page import="java.util.List" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    String userAgent = request.getHeader("User-Agent");
+
+    // Kiểm tra nếu không phải trình duyệt Edge thì chuyển hướng hoặc hiện thông báo
+    if (userAgent != null && !userAgent.contains("Edg")) {
+%>
+    <script>
+        alert("Trang này chỉ hỗ trợ trên Microsoft Edge!");
+        window.location.href = "https://www.microsoft.com/edge"; // Hoặc chuyển hướng trang khác
+    </script>
+<%
+        return; // Dừng render tiếp nội dung JSP
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
