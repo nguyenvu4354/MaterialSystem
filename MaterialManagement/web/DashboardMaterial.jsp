@@ -11,7 +11,7 @@
         <!-- Bootstrap & Custom CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+        
         <style>
             body {
                 background: #fff !important;
@@ -133,7 +133,7 @@
                         <a href="addmaterial" class="btn" style="background:#DEAD6F; color:#fff; border:none; border-radius:0.5rem; padding:1.2rem 3rem; font-size:1.25rem; min-width:320px;">Add New Material</a>
                     </div>
 
-                    <!-- Filter Form -->
+                    <!-- Filter Form a-->
                     <form method="get" action="dashboardmaterial" class="mb-3 d-flex flex-wrap gap-2 align-items-center">
                         <input type="text" name="search" class="form-control" placeholder="Search by name" value="${searchTerm}"
                             style="height:56px; font-size:1.25rem; border-radius:0.25rem; padding:1.25rem 0 1.25rem 1.25rem; max-width:350px; border:1px solid rgba(65,64,62,0.20); color:#908F8D; text-transform:capitalize; letter-spacing:0.02125rem;"/>
