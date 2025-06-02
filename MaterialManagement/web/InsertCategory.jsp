@@ -59,7 +59,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="parentID">Parent Category (Optional)</label>
+                                <label for="parentID">Parent Category</label>
                                 <select id="parentID" name="parentID" class="form-control">
                                     <option value="">None</option>
                                     <c:forEach var="category" items="${categories}">

@@ -85,7 +85,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-list-ul"></i> Category List</h2>
                     <a href="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Add New Category
+                        <i class="fas fa-plus me-1"></i> Create Category
                     </a>
                 </div>
 
