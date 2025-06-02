@@ -77,6 +77,7 @@
                     <jsp:include page="Sidebar.jsp" />
                 </div>
 
+                <!-- Page Content -->
                 <div class="col-md-9 col-lg-10 px-md-4">
 
 
@@ -133,8 +134,7 @@
                                                 <c:when test="${user.roleId == 1}">Admin</c:when>
                                                 <c:when test="${user.roleId == 2}">Warehouse Staff</c:when>
                                                 <c:when test="${user.roleId == 3}">Director</c:when>
-                                                <c:when test="${user.roleId == 4}">Employee</c:when>
-                                                <c:when test="${user.roleId == 5}">Department</c:when>
+                                                <c:when test="${user.roleId == 3}">Employee</c:when>
                                                 <c:otherwise>Unknown</c:otherwise>
                                             </c:choose>
                                         </td>

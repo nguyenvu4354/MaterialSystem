@@ -357,31 +357,18 @@ public class UserDAO extends DBContext {
         return 0;
     }
 
-    
     public static void main(String[] args) {
-        UserDAO userDAO = new UserDAO();
-        
-        User newUser = new User();
-        newUser.setUsername("Admin");
-        newUser.setPassword(md5("123")); // Hash the password using MD5
-        newUser.setFullName("Test User");
-        newUser.setEmail("testuser@example.com");
-        newUser.setPhoneNumber("1234567890");
-        newUser.setAddress("123 Test Street");
-        newUser.setUserPicture("profile.jpg");
-        newUser.setRoleId(1); // Assuming role_id 1 exists
-        newUser.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        newUser.setGender(User.Gender.male);
-        newUser.setDescription("Test user description");
-        newUser.setStatus(User.Status.active);
+        String username = "john12";
+        String inputPassword = "123";  // mật khẩu người dùng nhập
 
-        // Test the createUser method
-        boolean created = userDAO.createUser(newUser);
-        
-        if (created) {
-            System.out.println("✅ Tạo user thành công: " + newUser.getUsername());
+        UserDAO userDAO = new UserDAO();
+
+        User user = userDAO.login(username, inputPassword);
+
+        if (user != null) {
+            System.out.println("Đăng nhập thành công: " + user.getUsername());
         } else {
-            System.out.println("❌ Tạo user thất bại");
+            System.out.println("Đăng nhập thất bại");
         }
     }
 

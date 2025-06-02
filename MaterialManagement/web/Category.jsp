@@ -221,7 +221,7 @@
                                         }
                                     }
 
-                           
+                                    // Debugging: Log data size
                                     System.out.println("Category.jsp - Data fetched: " + (fullData != null ? fullData.size() : 0) + " categories");
 
                                     // Pagination
