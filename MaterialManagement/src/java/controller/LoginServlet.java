@@ -21,7 +21,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.login(username, password); // password sẽ được mã hóa MD5 bên trong DAO
+        User user = userDAO.login(username, password); 
 
         if (user != null) {
             if (user.getStatus() != null && user.getStatus().toString().equalsIgnoreCase("inactive")) {
@@ -47,10 +47,5 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.sendRedirect("Login.jsp");
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Login Servlet xử lý đăng nhập người dùng";
     }
 }

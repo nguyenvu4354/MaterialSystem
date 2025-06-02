@@ -16,14 +16,18 @@ public class DeleteMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             String materialId = request.getParameter("id");
+            if (materialId == null || materialId.trim().isEmpty()) {
+                materialId = request.getParameter("materialId");
+            }
+            System.out.println("DeleteMaterialServlet: materialId = " + materialId); // Log để debug
             if (materialId != null && !materialId.trim().isEmpty()) {
                 MaterialDAO materialDAO = new MaterialDAO();
                 boolean success = materialDAO.deleteMaterial(Integer.parseInt(materialId));
                 
                 if (success) {
-                    response.sendRedirect("dashboardmaterial?success=Material deleted successfully");
+                    response.sendRedirect("dashboardmaterial?success=Material disabled successfully");
                 } else {
-                    response.sendRedirect("dashboardmaterial?error=Failed to delete material");
+                    response.sendRedirect("dashboardmaterial?error=Failed to disable material");
                 }
             } else {
                 response.sendRedirect("dashboardmaterial");

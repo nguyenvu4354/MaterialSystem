@@ -6,11 +6,44 @@
         <title>Admin Dashboard - Computer Accessories</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
         <!-- Bootstrap & Custom CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="css/vendor.css">
         <link rel="stylesheet" type="text/css" href="style.css">
+        <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .table-responsive {
+            margin: 20px 0;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-action {
+            width: 50px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+        }
+        .content {
+            padding-left: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .custom-search {
+            max-width: 400px;
+        }
+    </style>
     </head>
     <body>
 
@@ -120,9 +153,9 @@
                                                     <option value="active" ${user.status == 'active' ? "selected" : ""}>Active</option>
                                                     <option value="inactive" ${user.status == 'inactive' ? "selected" : ""}>Inactive</option>
                                                 </select>
-                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
-                                                <i class="bi bi-eye"></i> View
-                                            </a>
+                                                <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
                                             </form>
                                         </td>
 
@@ -186,5 +219,8 @@
                                                         form.submit();
                                                     }
         </script>
+        <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     </body>
 </html>

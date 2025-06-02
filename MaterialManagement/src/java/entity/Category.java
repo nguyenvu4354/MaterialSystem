@@ -11,13 +11,15 @@ public class Category implements Serializable {
     private int disable;
     private String status;
     private String description;
-    private int priority;
+    private String priority;
+    private String code; 
+
     
     public Category() {
     }
     
     public Category(int category_id, String category_name, Integer parent_id, Timestamp created_at, 
-            int disable, String status, String description, int priority) {
+            int disable, String status, String description, String priority, String code) {
         this.category_id = category_id;
         this.category_name = category_name;
         this.parent_id = parent_id;
@@ -26,6 +28,8 @@ public class Category implements Serializable {
         this.status = status;
         this.description = description;
         this.priority = priority;
+        this.code= code;
+
     }
     
     // Getters
@@ -57,7 +61,7 @@ public class Category implements Serializable {
         return description;
     }
     
-    public int getPriority() {
+    public String getPriority() {
         return priority;
     }
     
@@ -90,14 +94,24 @@ public class Category implements Serializable {
         this.description = description;
     }
     
-    public void setPriority(int priority) {
+    public void setPriority(String priority) {
         this.priority = priority;
     }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+  
     
+
     @Override
     public String toString() {
-        return "Category{" + "category_id=" + category_id + ", category_name=" + category_name + 
-                ", parent_id=" + parent_id + ", created_at=" + created_at + ", disable=" + disable + 
-                ", status=" + status + ", description=" + description + ", priority=" + priority + '}';
+        return "Category{" + "category_id=" + category_id + ", category_name=" + category_name + ", parent_id=" + parent_id + ", created_at=" + created_at + ", disable=" + disable + ", status=" + status + ", description=" + description + ", priority=" + priority + ", code=" + code + '}';
     }
+   
 } 

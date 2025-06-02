@@ -1,34 +1,34 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
+<div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0" id="sidebarMenu">
   <div class="position-sticky pt-4">
     <ul class="nav flex-column menu-list list-unstyled">
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="AdminDashboard.jsp">
-          <iconify-icon icon="ic:baseline-dashboard" class="fs-4 me-3"></iconify-icon>
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/AdminDashboard.jsp">
+          <i class="fas fa-tachometer-alt fs-4 me-3"></i>
           Dashboard
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="UserList">
-          <iconify-icon icon="ic:baseline-people" class="fs-4 me-3"></iconify-icon>
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UserList">
+          <i class="fas fa-users fs-4 me-3"></i>
           Users
         </a>
       </li>
       <li class="nav-item mb-2">
         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/dashboardmaterial">
-          <iconify-icon icon="ic:baseline-shopping-cart" class="fs-4 me-3"></iconify-icon>
+          <i class="fas fa-shopping-cart fs-4 me-3"></i>
           Material
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="orders.jsp">
-          <iconify-icon icon="ic:baseline-receipt" class="fs-4 me-3"></iconify-icon>
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/Category.jsp">
+          <i class="fas fa-list fs-4 me-3"></i>
           Category
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="orders.jsp">
-          <iconify-icon icon="ic:baseline-receipt" class="fs-4 me-3"></iconify-icon>
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/SupplierServlet">
+          <i class="fas fa-truck fs-4 me-3"></i>
           Supplier
         </a>
       </li>
@@ -38,47 +38,47 @@
 
 <style>
   #sidebarMenu {
-    background: #f8f9fa; /* Nền sáng nhẹ từ template */
-    border-right: 1px solid #dee2e6; /* Viền phải tinh tế */
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
     padding: 10px 0;
   }
   #sidebarMenu .nav-link {
-    padding: 12px 20px; /* Tăng padding cho dễ nhìn */
-    border-radius: 8px; /* Viền tròn nhẹ */
-    margin: 0 10px; /* Khoảng cách hai bên */
-    color: #333; /* Màu chữ tối, hài hòa với template */
-    font-weight: 500; /* Font Montserrat medium */
-    transition: all 0.3s ease; /* Chuyển mượt cho tất cả thuộc tính */
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 0 10px;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
   }
   #sidebarMenu .nav-link:hover {
-    background-color: #8B4513; /* Màu nâu đậm khi hover */
-    color: #ffffff !important; /* Màu chữ trắng */
-    transform: scale(1.02); /* Phóng to nhẹ khi hover */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
+    background-color: #8B4513;
+    color: #ffffff !important;
+    transform: scale(1.02);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
   #sidebarMenu .nav-link.active {
-    background-color: #8B4513; /* Màu nâu đậm cho trang hiện tại */
-    color: #ffffff !important; /* Màu chữ trắng */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
+    background-color: #8B4513;
+    color: #ffffff !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-  #sidebarMenu .nav-link iconify-icon {
-    transition: color 0.3s ease; /* Chuyển màu icon mượt */
+  #sidebarMenu .nav-link i {
+    transition: color 0.3s ease;
   }
-  #sidebarMenu .nav-link:hover iconify-icon,
-  #sidebarMenu .nav-link.active iconify-icon {
-    color: #ffffff; /* Màu icon trắng khi hover hoặc active */
+  #sidebarMenu .nav-link:hover i,
+  #sidebarMenu .nav-link.active i {
+    color: #ffffff;
   }
 </style>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    // Lấy URL hiện tại (chỉ lấy phần tên file, ví dụ: "AdminDashboard.jsp")
+    // Get the current URL (only the file name, e.g., "Category.jsp")
     const currentPage = window.location.pathname.split('/').pop();
 
-    // Lấy tất cả các liên kết trong sidebar
+    // Get all links in the sidebar
     const navLinks = document.querySelectorAll('#sidebarMenu .nav-link');
 
-    // Đánh dấu trang hiện tại
+    // Mark the current page
     navLinks.forEach(link => {
       const href = link.getAttribute('href').split('/').pop();
       if (href === currentPage) {
@@ -90,16 +90,16 @@
       }
     });
 
-    // Xử lý sự kiện click
+    // Handle click events
     navLinks.forEach(link => {
       link.addEventListener('click', function(event) {
-        // Xóa lớp active khỏi tất cả các liên kết
+        // Remove the active class from all links
         navLinks.forEach(l => {
           l.classList.remove('active');
           l.removeAttribute('aria-current');
         });
 
-        // Thêm lớp active cho liên kết được click
+        // Add the active class to the clicked link
         this.classList.add('active');
         this.setAttribute('aria-current', 'page');
       });

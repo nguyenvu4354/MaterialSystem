@@ -35,7 +35,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         }
     }
 
-    // Lấy các tham số filter (có thể null hoặc rỗng)
     String usernameFilter = request.getParameter("username");
     String statusFilter = request.getParameter("status");
     String roleIdStr = request.getParameter("roleId");
@@ -56,7 +55,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     int totalUsers = userDAO.getUserCountByFilter(usernameFilter, statusFilter, roleIdFilter);
     int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
 
-    // Truyền dữ liệu về JSP
     request.setAttribute("userList", userList);
     request.setAttribute("currentPage", page);
     request.setAttribute("totalPages", totalPages);

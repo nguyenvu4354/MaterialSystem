@@ -217,7 +217,7 @@ public class MaterialDAO extends DBContext {
 
     // Xoa hoan toan vat tu (delete cung)
     public boolean deleteMaterial(int materialId) {
-        String sql = "DELETE FROM Materials WHERE material_id = ?";
+        String sql = "UPDATE Materials SET disable = 1 WHERE material_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, materialId);

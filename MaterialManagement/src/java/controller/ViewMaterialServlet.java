@@ -22,12 +22,14 @@ public class ViewMaterialServlet extends HttpServlet {
             if (materialId != null && !materialId.trim().isEmpty()) {
                 MaterialDAO materialDAO = new MaterialDAO();
                 MaterialDetails materialDetails = materialDAO.getMaterialById(Integer.parseInt(materialId));
-         
+
                 // ✅ In ra log để kiểm tra
                 System.out.println("MaterialDetails: " + materialDetails);
                 if (materialDetails != null) {
                     request.setAttribute("details", materialDetails);
-                    request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
+                    System.out.println("materialId = " + materialId);
+                    System.out.println("materialDetails = " + materialDetails);
+                    request.getRequestDispatcher("/ViewMaterial.jsp").forward(request, response);
                 } else {
                     response.sendRedirect("dashboardmaterial");
                 }

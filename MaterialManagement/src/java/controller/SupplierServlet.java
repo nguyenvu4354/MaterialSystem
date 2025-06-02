@@ -130,7 +130,7 @@ public class SupplierServlet extends HttpServlet {
                 int id = Integer.parseInt(idStr);
                 supplierDAO.deleteSupplier(id);
             } catch (NumberFormatException e) {
-                // Log error if needed
+                
             }
         }
         response.sendRedirect("SupplierServlet?action=list");
@@ -165,7 +165,7 @@ public class SupplierServlet extends HttpServlet {
                 supplier.setSupplierId(id);
                 supplierDAO.updateSupplier(supplier);
             } catch (NumberFormatException e) {
-                // Log error if needed
+                
             }
         }
         response.sendRedirect("SupplierServlet?action=list");
