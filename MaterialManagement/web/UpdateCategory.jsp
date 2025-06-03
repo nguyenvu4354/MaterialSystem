@@ -81,7 +81,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="parentID">Parent Category (Optional)</label>
+                                <label for="parentID">Parent Category</label>
                                 <div class="form-group">
                                     <select id="parentID" name="parentID" class="form-control">
                                         <option value="">None</option>
