@@ -134,7 +134,7 @@
                                                 <c:when test="${user.roleId == 1}">Admin</c:when>
                                                 <c:when test="${user.roleId == 2}">Warehouse Staff</c:when>
                                                 <c:when test="${user.roleId == 3}">Director</c:when>
-                                                <c:when test="${user.roleId == 3}">Employee</c:when>
+                                                <c:when test="${user.roleId == 4}">Employee</c:when>
                                                 <c:otherwise>Unknown</c:otherwise>
                                             </c:choose>
                                         </td>
@@ -157,8 +157,13 @@
                                                     <i class="bi bi-eye"></i> View
                                                 </a>
                                             </form>
+                                            <!-- Delete Form -->
+                                            <form method="post" action="UserList" style="display:inline;">
+                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                <input type="hidden" name="action" value="deleted"/>
+                                                <button type="submit" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                            </form>
                                         </td>
-
                                     </tr>
                                 </c:forEach>
                             </tbody>
@@ -208,7 +213,7 @@
         <!-- Footer -->
         <footer class="footer py-4 bg-light mt-auto">
             <div class="container text-center">
-                <span class="text-muted">&copy; 2025 Computer Accessories - All Rights Reserved.</span>
+                <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
             </div>
         </footer>
 
