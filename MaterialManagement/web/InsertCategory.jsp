@@ -3,19 +3,6 @@
 <%@ page import="entity.Category" %>
 <%@ page import="java.util.List" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%
-    String userAgent = request.getHeader("User-Agent");
-    if (userAgent != null && !userAgent.contains("Edg")) {
-%>
-    <script>
-        alert("Trang này chỉ hỗ trợ trên Microsoft Edge!");
-        window.location.href = "https://www.microsoft.com/edge"; 
-    </script>
-<%
-        return; 
-    }
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
