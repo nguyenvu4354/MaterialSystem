@@ -5,19 +5,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-    String userAgent = request.getHeader("User-Agent");
-    if (userAgent != null && !userAgent.contains("Edg")) {
-%>
-    <script>
-        alert("Trang này chỉ hỗ trợ trên Microsoft Edge!");
-        window.location.href = "https://www.microsoft.com/edge"; 
-    </script>
-<%
-        return; 
-    }
-%>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
