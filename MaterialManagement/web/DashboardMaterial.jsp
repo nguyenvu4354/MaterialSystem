@@ -11,10 +11,13 @@
         <!-- Bootstrap & Custom CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/vendor.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
 
         <style>
             body {
-                background: #fff !important;
+                background-color: #f8f9fa;
+                padding: 20px;
             }
             /* Tùy chỉnh các lớp CSS cho bảng, trạng thái, button, ... */
             .table-responsive {
@@ -48,7 +51,7 @@
             .status-used { background-color: #fff3cd; color: #664d03; } /* Màu vàng cho trạng thái Used */
             .status-damaged { background-color: #f8d7da; color: #842029; } /* Màu đỏ cho trạng thái Damaged */
             .btn-action {
-                width: 32px;
+                width: 50px;
                 height: 32px;
                 padding: 0;
                 display: flex;
@@ -82,225 +85,172 @@
             .condition-bad {
                 background-color: #dc3545; /* Màu đỏ cho tình trạng xấu */
             }
+            .content {
+                padding-left: 20px;
+                font-family: 'Roboto', sans-serif;
+            }
+            .custom-search {
+                max-width: 400px;
+            }
+            .btn-gold {
+                background: #e2b77a;
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                padding: 12px 36px;
+                font-size: 1.1rem;
+                font-weight: 500;
+                transition: background 0.2s;
+            }
+            .btn-gold:hover {
+                background: #cfa45e;
+                color: #fff;
+            }
+            .btn-grey {
+                background: #7b868e;
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                padding: 12px 24px;
+                font-size: 1.1rem;
+                font-weight: 500;
+            }
+            .dashboard-title {
+                color: #e2b77a;
+                font-size: 2.5rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
         </style>
     </head>
     <body>
-        <!-- Header section -->
+        <!-- Header -->
         <header>
-            <div class="container py-2">
-                <div class="row py-4 pb-0 pb-sm-4 align-items-center">
-                    <!-- Logo và tiêu đề trang -->
-                    <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-                        <a href="HomePage.jsp" class="text-decoration-none">
-                            <h2 class="mb-0 text-primary">
-                                <i class="fas fa-dollar-sign"></i> Material Management
-                            </h2>
-                        </a>
+            <div class="container-fluid py-2">
+                <div class="row align-items-center">
+                    <div class="col-6 d-flex align-items-center">
+                        <img src="images/logo.png" alt="logo" style="height:60px;">
+                        <span style="font-size:2.2rem; font-weight:600; color:#b88c4a; margin-left:12px;">Material Management</span>
                     </div>
-                    <!-- Thông tin user hiện tại và nút đăng xuất -->
-                    <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
-                        <div class="text-end d-none d-xl-block">
-                            <span class="fs-6 text-muted">Admin</span>
-                            <h5 class="mb-0">admin@accessories.com</h5>
+                    <div class="col-6 d-flex justify-content-end align-items-center">
+                        <div class="text-end me-4">
+                            <span style="font-size:1rem; color:#888;">Admin</span><br>
+                            <span style="font-size:1.1rem; color:#333;">admin@accessories.com</span>
                         </div>
-                        <a href="logout" class="btn btn-outline-dark btn-lg ms-4">
-                            Logout
-                        </a>
+                        <a href="logout" class="btn btn-outline-dark" style="font-size:1.3rem; border-radius:10px; padding:10px 36px; margin-left:10px;">LOGOUT</a>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Nội dung chính -->
+        <!-- Main content -->
         <div class="container-fluid">
             <div class="row">
-                <!-- Sidebar menu -->
+                <!-- Sidebar -->
                 <div class="col-md-3 col-lg-2 bg-light p-0">
                     <jsp:include page="Sidebar.jsp" />
                 </div>
 
-                <!-- Nội dung trang chính -->
-                <div class="col-md-9 col-lg-10 px-md-4">
-                    <!-- Tiêu đề và nút thêm vật tư mới -->
+                <!-- Page Content -->
+                <div class="col-md-9 col-lg-10 content px-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2">📦 Material List</h2>
-                        <a href="addmaterial" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add New Material
-                        </a>
+                        <div class="dashboard-title">
+                            <i class="fas fa-boxes" style="color:#b88c4a;"></i> Material List
+                        </div>
+                        <a href="MaterialServlet?action=edit" class="btn btn-gold">Add New Material</a>
                     </div>
 
-                    <!-- Phần tìm kiếm và lọc -->
+                    <!-- Search and Filter Section -->
                     <div class="row search-box">
-                        <div class="col-md-8">
-                            <form action="dashboardmaterial" method="GET" class="row g-2 align-items-end mb-3">
-                                <!-- Input tìm kiếm theo tên vật tư -->
-                                <div class="col-md-4">
-                                    <label for="search" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-search"></i> Search
-                                    </label>
-                                    <input type="text" 
-                                           id="search"
-                                           name="search" 
-                                           value="${searchTerm}" 
-                                           class="form-control" 
-                                           placeholder="Search materials...">
-                                </div>
-
-                                <!-- Dropdown lọc theo trạng thái vật tư -->
-                                <div class="col-md-3">
-                                    <label for="status" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-filter"></i> Status
-                                    </label>
-                                    <select id="status" name="status" class="form-select">
-                                        <option value="">All Status</option>
-                                        <option value="NEW" ${selectedStatus == 'NEW' ? 'selected' : ''}>New</option>
-                                        <option value="USED" ${selectedStatus == 'USED' ? 'selected' : ''}>Used</option>
-                                        <option value="DAMAGED" ${selectedStatus == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
-                                    </select>
-                                </div>
-
-                                <!-- Dropdown chọn cách sắp xếp -->
-                                <div class="col-md-3">
-                                    <label for="sortBy" class="form-label mb-1 fw-bold">
-                                        <i class="fas fa-sort"></i> Sort By
-                                    </label>
-                                    <select id="sortBy" class="form-select" name="sortBy">
-                                        <option value="">Default</option>
-                                        <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
-                                        <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
-                                        <option value="price_asc" ${sortBy == 'price_asc' ? 'selected' : ''}>Price (Low-High)</option>
-                                        <option value="price_desc" ${sortBy == 'price_desc' ? 'selected' : ''}>Price (High-Low)</option>
-                                        <option value="condition_asc" ${sortBy == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
-                                        <option value="condition_desc" ${sortBy == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
-                                        <option value="quantity_asc" ${sortBy == 'quantity_asc' ? 'selected' : ''}>Quantity (Low-High)</option>
-                                        <option value="quantity_desc" ${sortBy == 'quantity_desc' ? 'selected' : ''}>Quantity (High-Low)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Nút submit tìm kiếm -->
-                                <div class="col-md-2 d-grid">
-                                    <label class="form-label mb-1 invisible">Search</label>
-                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">
-                                        <i class="fas fa-search"></i> Search
-                                    </button>
-                                </div>
+                        <div class="col-md-8 d-flex gap-2">
+                            <form action="MaterialServlet" method="GET" class="d-flex gap-2 w-100">
+                                <input type="hidden" name="action" value="list" />
+                                <input type="text" name="keyword" class="form-control" 
+                                       placeholder="Search by name..." 
+                                       value="${keyword != null ? keyword : ''}" 
+                                       style="width: 200px; height: 50px; border: 2px solid gray" />
+                                <input type="text" name="code" class="form-control" 
+                                       placeholder="Search by code..." 
+                                       value="${code != null ? code : ''}" 
+                                       style="width: 200px; height: 50px; border: 2px solid gray" />
+                                <select name="sortBy" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                    <option value="">Sort By</option>
+                                    <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                    <option value="name_desc" ${sortBy == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                                    <option value="code_asc" ${sortBy == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
+                                    <option value="code_desc" ${sortBy == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
+                                    <i class="fas fa-search me-2"></i> Search
+                                </button>
+                                <a href="MaterialServlet?action=list" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Bảng danh sách vật tư -->
+                    <!-- Error Message -->
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger">${error}</div>
+                    </c:if>
+
+                    <!-- Material Table -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-bordered table-hover align-middle text-center">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Image</th>
-                                    <th>Code</th>
-                                    <th>Name</th>
-                                    <th>Status</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Condition</th>
-                                    <th>Actions</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col" style="width: 150px">Material Name</th>
+                                    <th scope="col" style="width: 150px">Code</th>
+                                    <th scope="col" style="width: 150px">Category</th>
+                                    <th scope="col" style="width: 150px">Supplier</th>
+                                    <th scope="col" style="width: 150px">Quantity</th>
+                                    <th scope="col" style="width: 150px">Unit Price</th>
+                                    <th scope="col" style="width: 200px">Description</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Duyệt từng vật tư trong danh sách materials -->
-                                <c:forEach items="${materials}" var="material">
-                                    <tr class="${material.disable ? 'material-disabled' : 'material-active'}">
-                                        <!-- Ảnh đại diện vật tư -->
+                                <c:forEach var="m" items="${materialList}">
+                                    <tr>
+                                        <td>${m.materialId}</td>
+                                        <td>${m.materialName}</td>
+                                        <td>${m.code}</td>
+                                        <td>${m.categoryName}</td>
+                                        <td>${m.supplierName}</td>
+                                        <td>${m.quantity}</td>
+                                        <td>${m.unitPrice}</td>
+                                        <td>${m.description}</td>
                                         <td>
-                                            <img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
-                                        </td>
-
-                                        <!-- Mã vật tư -->
-                                        <td>${material.materialCode}</td>
-
-                                        <!-- Tên vật tư -->
-                                        <td>${material.materialName}</td>
-
-                                        <!-- Trạng thái vật tư với màu sắc theo trạng thái -->
-                                        <td>
-                                            <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
-                                                ${material.materialStatus}
-                                            </span>
-                                        </td>
-
-                                        <!-- Số lượng vật tư -->
-                                        <td>${material.quantity}</td>
-
-                                        <!-- Giá vật tư, định dạng tiền tệ -->
-                                        <td>
-                                            <fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/>
-                                        </td>
-
-                                        <!-- Thanh thể hiện % tình trạng vật tư -->
-                                        <td>
-                                            <div class="condition-bar">
-                                                <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : 
-                                                                           material.conditionPercentage >= 40 ? 'condition-warning' : 
-                                                                           'condition-bad'}"
-                                                     style="width: ${material.conditionPercentage}%"></div>
-                                            </div>
-                                        </td>
-
-                                        <!-- Các hành động với vật tư: xem chi tiết, chỉnh sửa -->
-                                        <td>
-                                            <div class="d-flex">
-                                                <a href="${pageContext.request.contextPath}/viewmaterial?id=${material.materialId}" 
-                                                   class="btn btn-info btn-action" 
-                                                   title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="editmaterial?id=${material.materialId}" 
+                                            <div class="d-flex justify-content-center">
+                                                <a href="MaterialServlet?action=edit&id=${m.materialId}" 
                                                    class="btn btn-warning btn-action" 
-                                                   title="Edit Material">
-                                                    <i class="fas fa-pen"></i>
+                                                   title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="MaterialServlet?action=delete&id=${m.materialId}" 
+                                                   class="btn btn-danger btn-action" 
+                                                   onclick="return confirm('Are you sure you want to delete this material?');" 
+                                                   title="Delete">
+                                                    <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
                                         </td>
                                     </tr>
                                 </c:forEach>
-
-                                <!-- Nếu không có vật tư nào thì hiển thị dòng thông báo -->
-                                <c:if test="${empty materials}">
+                                <c:if test="${empty materialList}">
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">No materials found.</td>
+                                        <td colspan="9" class="text-center text-muted">No materials found.</td>
                                     </tr>
                                 </c:if>
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Phân trang -->
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <!-- Nút trang trước -->
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-
-                            <!-- Vòng lặp các trang -->
-                            <c:forEach var="i" begin="1" end="${totalPages}">
-                                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${i}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}">${i}</a>
-                                </li>
-                            </c:forEach>
-
-                            <!-- Nút trang tiếp theo -->
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&search=${searchTerm}&status=${selectedStatus}&sortBy=${sortBy}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
             </div>
         </div>
 
-        <!-- Bootstrap JS Bundle (Popper + Bootstrap JS) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
