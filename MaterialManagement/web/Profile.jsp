@@ -32,13 +32,12 @@
     <body>
         <section class="py-5">
             <div class="container">
-
                 <!-- Navigation buttons -->
                 <div class="text-center mb-4">
                     <div class="btn-group" role="group" aria-label="Profile Navigation">
-                        <a href="profile.jsp" class="btn btn-outline-primary">Profile</a>
-                        <a href="change-password.jsp" class="btn btn-outline-secondary">Change Password</a>
-                        <a href="my-applications.jsp" class="btn btn-outline-success">My Applications</a>
+                        <a href="profile.jsp" class="btn btn-primary">Profile</a>
+                        <a href="change-password.jsp" class="btn btn-secondary">Change Password</a>
+                        <a href="my-applications.jsp" class="btn btn-success">My Applications</a>
                     </div>
                 </div>
 
@@ -65,7 +64,7 @@
                     <ul class="mb-0">
                         <% for (Map.Entry<String, String> entry : errors.entrySet()) { %>
                         <li><strong><%= entry.getKey() %>:</strong> <%= entry.getValue() %></li>
-                            <% } %>
+                        <% } %>
                     </ul>
                 </div>
                 <% } %>
@@ -108,7 +107,6 @@
                                                pattern="^[0-9]{1,11}$" title="Phone number must be 1-11 digits"
                                                value="<%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "" %>" required>
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="address" class="form-label">Address</label>
                                         <input type="text" class="form-control" id="address" name="address"
@@ -129,6 +127,11 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
+                                        <label for="department" class="form-label">Department</label>
+                                        <input type="text" class="form-control" id="department" 
+                                               value="<%= user.getDepartmentName() != null ? user.getDepartmentName() : "-" %>" disabled>
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="3"><%= user.getDescription() != null ? user.getDescription() : "" %></textarea>
                                     </div>
@@ -146,21 +149,19 @@
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
-
+                crossorigin="anonymous"></script>
         <script>
-                                               function previewImage(event) {
-                                                   const input = event.target;
-                                                   const preview = document.getElementById('previewImage');
-
-                                                   if (input.files && input.files[0]) {
-                                                       const reader = new FileReader();
-                                                       reader.onload = function (e) {
-                                                           preview.src = e.target.result;
-                                                       }
-                                                       reader.readAsDataURL(input.files[0]);
-                                                   }
-                                               }
+            function previewImage(event) {
+                const input = event.target;
+                const preview = document.getElementById('previewImage');
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
         </script>
     </body>
 </html>
