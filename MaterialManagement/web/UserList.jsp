@@ -78,7 +78,7 @@
             <div class="col-md-9 col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2">👤 User List</h2>
-                    <button type="button" class="btn btn-primary" onclick="window.location.href = 'CreateUser.jsp'">Create User</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href = 'create-user'">Create User</button>
                 </div>
 
                 <!-- Filter Form -->
