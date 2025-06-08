@@ -27,9 +27,11 @@ public class UserDAO extends DBContext {
     }
 
     public User login(String username, String password) {
-        String sql = "SELECT u.*, r.role_name FROM Users u "
-                   + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                   + "WHERE u.username = ? AND u.password = ?";
+        String sql = "SELECT u.*, r.role_name, d.department_name " +
+                     "FROM Users u " +
+                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
+                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
+                     "WHERE u.username = ? AND u.password = ?";
 
         String md5Password = md5(password);
 
@@ -48,6 +50,8 @@ public class UserDAO extends DBContext {
                 user.setUserPicture(rs.getString("user_picture"));
                 user.setRoleId(rs.getInt("role_id"));
                 user.setRoleName(rs.getString("role_name"));
+                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
                 user.setDescription(rs.getString("description"));
@@ -68,10 +72,11 @@ public class UserDAO extends DBContext {
 
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM Users u "
-                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                + "WHERE u.status != 'deleted'";
+        String sql = "SELECT u.*, r.role_name, d.department_name " +
+                     "FROM Users u " +
+                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
+                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
+                     "WHERE u.status != 'deleted'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -85,6 +90,8 @@ public class UserDAO extends DBContext {
                 user.setUserPicture(rs.getString("user_picture"));
                 user.setRoleId(rs.getInt("role_id"));
                 user.setRoleName(rs.getString("role_name"));
+                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
                 user.setDescription(rs.getString("description"));
@@ -102,9 +109,11 @@ public class UserDAO extends DBContext {
     }
 
     public User getUserById(int userId) {
-        String sql = "SELECT u.*, r.role_name FROM Users u "
-                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
-                + "WHERE u.user_id = ? AND u.status != 'deleted'";
+        String sql = "SELECT u.*, r.role_name, d.department_name " +
+                     "FROM Users u " +
+                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
+                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
+                     "WHERE u.user_id = ? AND u.status != 'deleted'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -119,6 +128,8 @@ public class UserDAO extends DBContext {
                 user.setUserPicture(rs.getString("user_picture"));
                 user.setRoleId(rs.getInt("role_id"));
                 user.setRoleName(rs.getString("role_name"));
+                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
                 user.setDescription(rs.getString("description"));
@@ -138,7 +149,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, description = ?, status = ? WHERE user_id = ?";
+        String sql = "UPDATE Users SET full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, description = ?, status = ?, department_id = ? WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             System.out.println("🔄 Cập nhật user với user_id = " + user.getUserId());
             System.out.println("full_name = " + user.getFullName());
@@ -150,6 +161,7 @@ public class UserDAO extends DBContext {
             System.out.println("gender = " + (user.getGender() != null ? user.getGender().toString() : "null"));
             System.out.println("description = " + user.getDescription());
             System.out.println("status = " + (user.getStatus() != null ? user.getStatus().toString() : "null"));
+            System.out.println("department_id = " + user.getDepartmentId());
 
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
@@ -160,7 +172,8 @@ public class UserDAO extends DBContext {
             ps.setString(7, user.getGender() != null ? user.getGender().toString() : null);
             ps.setString(8, user.getDescription());
             ps.setString(9, user.getStatus() != null ? user.getStatus().toString() : null);
-            ps.setInt(10, user.getUserId());
+            ps.setObject(10, user.getDepartmentId());
+            ps.setInt(11, user.getUserId());
 
             int rowsAffected = ps.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected + " for user_id: " + user.getUserId());
@@ -179,8 +192,8 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, date_of_birth, gender, description, status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
@@ -191,10 +204,11 @@ public class UserDAO extends DBContext {
             ps.setString(6, user.getAddress());
             ps.setString(7, user.getUserPicture());
             ps.setInt(8, user.getRoleId());
-            ps.setObject(9, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
-            ps.setString(10, user.getGender() != null ? user.getGender().name() : null);
-            ps.setString(11, user.getDescription());
-            ps.setString(12, user.getStatus() != null ? user.getStatus().name() : "active");
+            ps.setObject(9, user.getDepartmentId());
+            ps.setObject(10, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
+            ps.setString(11, user.getGender() != null ? user.getGender().name() : null);
+            ps.setString(12, user.getDescription());
+            ps.setString(13, user.getStatus() != null ? user.getStatus().name() : "active");
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -202,7 +216,6 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
             return false;
         }
-
     }
 
     public boolean deleteUserById(int id) {
@@ -260,11 +273,14 @@ public class UserDAO extends DBContext {
         }
     }
 
-    public List<User> getUsersByPageAndFilter(int page, int pageSize, String username, String status, Integer roleId) {
+    public List<User> getUsersByPageAndFilter(int page, int pageSize, String username, String status, Integer roleId, Integer departmentId) {
         List<User> userList = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT u.*, r.role_name FROM Users u ");
-        sql.append("LEFT JOIN Roles r ON u.role_id = r.role_id ");
-        sql.append("WHERE u.status != 'deleted' ");
+        StringBuilder sql = new StringBuilder(
+                "SELECT u.*, r.role_name, d.department_name " +
+                "FROM Users u " +
+                "LEFT JOIN Roles r ON u.role_id = r.role_id " +
+                "LEFT JOIN Departments d ON u.department_id = d.department_id " +
+                "WHERE u.status != 'deleted' ");
 
         List<Object> params = new ArrayList<>();
 
@@ -281,6 +297,11 @@ public class UserDAO extends DBContext {
         if (roleId != null) {
             sql.append("AND u.role_id = ? ");
             params.add(roleId);
+        }
+
+        if (departmentId != null) {
+            sql.append("AND u.department_id = ? ");
+            params.add(departmentId);
         }
 
         sql.append("ORDER BY u.user_id LIMIT ? OFFSET ?");
@@ -304,6 +325,8 @@ public class UserDAO extends DBContext {
                 user.setUserPicture(rs.getString("user_picture"));
                 user.setRoleId(rs.getInt("role_id"));
                 user.setRoleName(rs.getString("role_name"));
+                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
                 user.setDescription(rs.getString("description"));
@@ -321,7 +344,7 @@ public class UserDAO extends DBContext {
         return userList;
     }
 
-    public int getUserCountByFilter(String username, String status, Integer roleId) {
+    public int getUserCountByFilter(String username, String status, Integer roleId, Integer departmentId) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Users WHERE status != 'deleted' ");
         List<Object> params = new ArrayList<>();
 
@@ -338,6 +361,11 @@ public class UserDAO extends DBContext {
         if (roleId != null) {
             sql.append("AND role_id = ? ");
             params.add(roleId);
+        }
+
+        if (departmentId != null) {
+            sql.append("AND department_id = ? ");
+            params.add(departmentId);
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -358,18 +386,27 @@ public class UserDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-        String username = "john12";
-        String inputPassword = "123";  // mật khẩu người dùng nhập
+    UserDAO userDAO = new UserDAO();
+    User user = new User();
+    user.setUsername("Admin2");
+    user.setPassword(userDAO.md5("123")); // MD5 hash password
+    user.setFullName("User");
+    user.setEmail("testuser@example.com");
+    user.setPhoneNumber("0123456789");
+    user.setAddress("123 Test Street");
+    user.setUserPicture("test.jpg");
+    user.setRoleId(1); // Employee role
+    user.setDepartmentId(1); // Example department ID
+    user.setDateOfBirth(LocalDate.of(1990, 1, 1));
+    user.setGender(User.Gender.male);
+    user.setDescription("Test user for DAO");
+    user.setStatus(User.Status.active);
 
-        UserDAO userDAO = new UserDAO();
-
-        User user = userDAO.login(username, inputPassword);
-
-        if (user != null) {
-            System.out.println("Đăng nhập thành công: " + user.getUsername());
-        } else {
-            System.out.println("Đăng nhập thất bại");
-        }
+    boolean created = userDAO.createUser(user);
+    if (created) {
+        System.out.println("✅ Tạo user thành công: " + user.getUsername());
+    } else {
+        System.out.println("❌ Tạo user thất bại");
     }
-
+}
 }

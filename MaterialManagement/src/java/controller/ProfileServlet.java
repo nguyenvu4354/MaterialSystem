@@ -81,29 +81,20 @@ public class ProfileServlet extends HttpServlet {
             // Handle image upload
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
-                // Lấy tên file gốc
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-
-                // Đường dẫn lưu ảnh trong thư mục images/profiles của webapp
                 String uploadPath = getServletContext().getRealPath("/") + "images" + File.separator + "profiles" + File.separator;
-
                 Path uploadDir = Paths.get(uploadPath);
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
-
                 String filePath = uploadPath + fileName;
-                // Lưu file vào đường dẫn
                 filePart.write(filePath);
-
-                // Cập nhật tên file ảnh vào user
                 user.setUserPicture(fileName);
             }
 
-            // Cập nhật user vào database
+            // Update user in database
             boolean updated = userDAO.updateUser(user);
             if (updated) {
-                // Tải lại user mới nhất từ DB vào session
                 user = userDAO.getUserById(user.getUserId());
                 session.setAttribute("user", user);
                 request.setAttribute("message", "✔️ Cập nhật hồ sơ thành công!");

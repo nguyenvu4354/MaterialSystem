@@ -1,6 +1,8 @@
 package controller;
 
+import dal.DepartmentDAO; // New DAO for departments
 import dal.UserDAO;
+import entity.Department;
 import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,7 +20,7 @@ public class UserListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8"); 
+        request.setCharacterEncoding("UTF-8");
 
         int page = 1;
         int pageSize = 5;
@@ -36,7 +38,10 @@ public class UserListServlet extends HttpServlet {
         String usernameFilter = request.getParameter("username");
         String statusFilter = request.getParameter("status");
         String roleIdStr = request.getParameter("roleId");
+        String departmentIdStr = request.getParameter("departmentId"); // New filter parameter
         Integer roleIdFilter = null;
+        Integer departmentIdFilter = null;
+
         if (roleIdStr != null && !roleIdStr.isEmpty()) {
             try {
                 roleIdFilter = Integer.parseInt(roleIdStr);
@@ -44,22 +49,34 @@ public class UserListServlet extends HttpServlet {
             }
         }
 
+        if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
+            try {
+                departmentIdFilter = Integer.parseInt(departmentIdStr);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
         UserDAO userDAO = new UserDAO();
+        DepartmentDAO departmentDAO = new DepartmentDAO(); // New DAO instance
 
-        // Lấy danh sách users theo filter và phân trang
-        List<User> userList = userDAO.getUsersByPageAndFilter(page, pageSize, usernameFilter, statusFilter, roleIdFilter);
+        // Fetch department list for filter dropdown
+        List<Department> departmentList = departmentDAO.getAllDepartments();
+        request.setAttribute("departmentList", departmentList);
 
-        // Đếm tổng số user theo filter để phân trang
-        int totalUsers = userDAO.getUserCountByFilter(usernameFilter, statusFilter, roleIdFilter);
+        // Fetch users with filters and pagination
+        List<User> userList = userDAO.getUsersByPageAndFilter(page, pageSize, usernameFilter, statusFilter, roleIdFilter, departmentIdFilter);
+
+        // Count total users for pagination
+        int totalUsers = userDAO.getUserCountByFilter(usernameFilter, statusFilter, roleIdFilter, departmentIdFilter);
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
 
         request.setAttribute("userList", userList);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-
         request.setAttribute("usernameFilter", usernameFilter);
         request.setAttribute("statusFilter", statusFilter);
         request.setAttribute("roleIdFilter", roleIdFilter);
+        request.setAttribute("departmentIdFilter", departmentIdFilter);
 
         request.getRequestDispatcher("UserList.jsp").forward(request, response);
     }
@@ -84,7 +101,7 @@ public class UserListServlet extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
 
             if ("delete".equals(action)) {
-                // Xử lý xóa mềm
+                // Handle soft delete
                 boolean deleted = userDAO.deleteUserById(userId);
                 if (deleted) {
                     request.setAttribute("message", "Xóa người dùng thành công.");
@@ -92,7 +109,7 @@ public class UserListServlet extends HttpServlet {
                     request.setAttribute("error", "Xóa người dùng thất bại. Không tìm thấy người dùng hoặc đã bị xóa.");
                 }
             } else {
-                // Xử lý cập nhật trạng thái và vai trò
+                // Handle status and role update
                 String roleIdStr = request.getParameter("roleId");
                 String statusStr = request.getParameter("status");
 

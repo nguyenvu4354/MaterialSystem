@@ -19,8 +19,9 @@ public class UserDetailServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         String userIdStr = request.getParameter("userId");
-        if (userIdStr == null) {
-            response.sendRedirect("UserList");
+        if (userIdStr == null || userIdStr.trim().isEmpty()) {
+            request.setAttribute("error", "Thiếu hoặc không hợp lệ userId.");
+            request.getRequestDispatcher("UserList").forward(request, response);
             return;
         }
 
@@ -33,10 +34,13 @@ public class UserDetailServlet extends HttpServlet {
                 request.setAttribute("user", user);
                 request.getRequestDispatcher("UserDetail.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Không tìm thấy người dùng.");
+                request.setAttribute("error", "Không tìm thấy người dùng với ID: " + userId);
                 request.getRequestDispatcher("UserList.jsp").forward(request, response);
             }
 
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID người dùng không hợp lệ: " + userIdStr);
+            request.getRequestDispatcher("UserList.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi khi lấy thông tin chi tiết: " + e.getMessage());
             e.printStackTrace();

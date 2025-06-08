@@ -1,6 +1,8 @@
 package controller;
 
+import dal.DepartmentDAO;
 import dal.UserDAO;
+import entity.Department;
 import entity.User;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet(name = "CreateUserServlet", value = "/create-user")
@@ -19,6 +22,7 @@ import java.util.Map;
 public class CreateUserServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
+    private DepartmentDAO departmentDAO = new DepartmentDAO(); 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,6 +38,9 @@ public class CreateUserServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
+
+        List<Department> departments = departmentDAO.getAllDepartments();
+        request.setAttribute("departments", departments);
 
         request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
     }
@@ -55,7 +62,7 @@ public class CreateUserServlet extends HttpServlet {
 
         try {
             String username = request.getParameter("username");
-            String password = request.getParameter("password"); // Giữ lại mật khẩu gốc để gửi mail
+            String password = request.getParameter("password");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phoneNumber = request.getParameter("phoneNumber");
@@ -64,10 +71,16 @@ public class CreateUserServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String description = request.getParameter("description");
             String roleIdStr = request.getParameter("roleId");
+            String departmentIdStr = request.getParameter("departmentId"); // New parameter
             int roleId = 0;
+            int departmentId = 0;
 
             try {
                 roleId = Integer.parseInt(roleIdStr);
+            } catch (NumberFormatException ignored) {
+            }
+            try {
+                departmentId = Integer.parseInt(departmentIdStr);
             } catch (NumberFormatException ignored) {
             }
 
@@ -80,6 +93,7 @@ public class CreateUserServlet extends HttpServlet {
             newUser.setPhoneNumber(phoneNumber);
             newUser.setAddress(address);
             newUser.setRoleId(roleId);
+            newUser.setDepartmentId(departmentId); // Set departmentId
             newUser.setDescription(description);
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
@@ -98,6 +112,11 @@ public class CreateUserServlet extends HttpServlet {
                 request.setAttribute("errors", errors);
                 request.setAttribute("enteredUser", newUser);
                 request.setAttribute("enteredDateOfBirth", dateOfBirthStr);
+                request.setAttribute("enteredGender", gender);
+                request.setAttribute("enteredRoleId", roleIdStr);
+                request.setAttribute("enteredDepartmentId", departmentIdStr);
+                List<Department> departments = departmentDAO.getAllDepartments();
+                request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 return;
             }
@@ -124,22 +143,25 @@ public class CreateUserServlet extends HttpServlet {
                             + "Password: " + password + "\n\n"
                             + "Please log in and change your password after your first login to ensure security.\n\n"
                             + "Best regards,\nSupport Team.";
-
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
                 } catch (Exception e) {
-                    e.printStackTrace(); 
+                    e.printStackTrace();
                 }
 
                 session.setAttribute("successMessage", "User created successfully!");
                 response.sendRedirect(request.getContextPath() + "/UserList");
             } else {
                 request.setAttribute("error", "Failed to create user. Please try again.");
+                List<Department> departments = departmentDAO.getAllDepartments();
+                request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Error occurred: " + e.getMessage());
+            List<Department> departments = departmentDAO.getAllDepartments();
+            request.setAttribute("departments", departments);
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
         }
     }

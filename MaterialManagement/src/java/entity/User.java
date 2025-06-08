@@ -13,11 +13,13 @@ public class User {
     private String address;
     private String userPicture;
     private int roleId;
-    private String roleName; 
+    private String roleName;
+    private Integer departmentId;
+    private String departmentName; // Added to store department name
     private LocalDate dateOfBirth;
     private Gender gender;
     private String description;
-    private Status status; 
+    private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -26,7 +28,7 @@ public class User {
     }
 
     public enum Status {
-        active, inactive, deleted 
+        active, inactive, deleted
     }
 
     public User() {}
@@ -109,6 +111,22 @@ public class User {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public Integer getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 
     public LocalDate getDateOfBirth() {
