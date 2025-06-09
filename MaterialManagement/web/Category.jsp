@@ -50,26 +50,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header>
-        <div class="container py-2">
-            <div class="row py-4 pb-0 pb-sm-4 align-items-center">
-                <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-                    <a href="HomePage.jsp" class="text-decoration-none">
-                        <h2 class="mb-0 text-primary">
-                            <i class="fas fa-list"></i> Category Management
-                        </h2>
-                    </a>
-                </div>
-                <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
-                    <div class="text-end d-none d-xl-block">
-                        <span class="fs-6 text-muted">Admin</span>
-                        <h5 class="mb-0">admin@accessories.com</h5>
-                    </div>
-                    <a href="logout" class="btn btn-outline-dark btn-lg ms-4">Logout</a>
-                </div>
-            </div>
-        </div>
-    </header>
+      <jsp:include page="header.jsp" />
 
     <!-- Main content -->
     <div class="container-fluid">
@@ -309,11 +290,7 @@
     </div> <!-- end container-fluid -->
 
     <!-- Footer -->
-    <footer class="footer py-4 bg-light mt-auto">
-        <div class="container text-center">
-            <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
-        </div>
-    </footer>
+      <jsp:include page="Footer.jsp" />
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
