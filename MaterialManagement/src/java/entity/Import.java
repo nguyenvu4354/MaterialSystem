@@ -25,6 +25,7 @@ public class Import {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    
     public int getImportId() {
         return importId;
     }
