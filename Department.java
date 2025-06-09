@@ -1,3 +1,4 @@
+// Department list
 public class Department {
     private int departmentId;
     private String departmentName;
@@ -26,3 +27,21 @@ public class Department {
     public boolean isDisable() { return disable; }
     public void setDisable(boolean disable) { this.disable = disable; }
 }
+
+// Create Department
+public class Department {
+    private int departmentId;
+    private String departmentName;
+    private String description;
+
+    // Constructors
+    public Department(String departmentName, String description) {
+        this.departmentName = departmentName;
+        this.description = description;
+    }
+
+    // Getters and Setters
+    public String getDepartmentName() { return departmentName; }
+    public String getDescription() { return description; }
+}
+
