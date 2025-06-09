@@ -1,0 +1,25 @@
+import java.sql.*;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        String jdbcURL = "jdbc:mysql://localhost:3306/material_management";
+        String dbUser = "root";
+        String dbPassword = "your_password"; // thay đổi mật khẩu tương ứng
+
+        try (Connection conn = DriverManager.getConnection(jdbcURL, dbUser, dbPassword)) {
+            DepartmentDAO dao = new DepartmentDAO(conn);
+            List<Department> departments = dao.getAllDepartments();
+
+            System.out.println("Danh sách phòng ban:");
+            for (Department dept : departments) {
+                System.out.println("ID: " + dept.getDepartmentId() + 
+                                   ", Tên: " + dept.getDepartmentName() + 
+                                   ", Mô tả: " + dept.getDescription());
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
