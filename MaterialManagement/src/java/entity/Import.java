@@ -4,7 +4,6 @@
  */
 package entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -14,13 +13,13 @@ import java.time.LocalDateTime;
 public class Import {
     private int importId;
     private String importCode;
-    private LocalDate importDate;
+    private LocalDateTime importDate;
     private int importedBy;
     private Integer supplierId;
     private String destination;
     private String batchNumber;
     private boolean isDamaged;
-    private LocalDate actualArrival;
+    private LocalDateTime actualArrival;
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -42,11 +41,11 @@ public class Import {
         this.importCode = importCode;
     }
 
-    public LocalDate getImportDate() {
+    public LocalDateTime getImportDate() {
         return importDate;
     }
 
-    public void setImportDate(LocalDate importDate) {
+    public void setImportDate(LocalDateTime importDate) {
         this.importDate = importDate;
     }
 
@@ -90,11 +89,11 @@ public class Import {
         this.isDamaged = isDamaged;
     }
 
-    public LocalDate getActualArrival() {
+    public LocalDateTime getActualArrival() {
         return actualArrival;
     }
 
-    public void setActualArrival(LocalDate actualArrival) {
+    public void setActualArrival(LocalDateTime actualArrival) {
         this.actualArrival = actualArrival;
     }
 
