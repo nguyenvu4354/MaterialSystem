@@ -1,0 +1,28 @@
+public class Department {
+    private int departmentId;
+    private String departmentName;
+    private String description;
+    private boolean disable;
+
+    public Department() {}
+
+    public Department(int departmentId, String departmentName, String description, boolean disable) {
+        this.departmentId = departmentId;
+        this.departmentName = departmentName;
+        this.description = description;
+        this.disable = disable;
+    }
+
+    // Getters & Setters
+    public int getDepartmentId() { return departmentId; }
+    public void setDepartmentId(int departmentId) { this.departmentId = departmentId; }
+
+    public String getDepartmentName() { return departmentName; }
+    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public boolean isDisable() { return disable; }
+    public void setDisable(boolean disable) { this.disable = disable; }
+}
