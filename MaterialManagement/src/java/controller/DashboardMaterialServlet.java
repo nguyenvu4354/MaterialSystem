@@ -10,47 +10,58 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import entity.Material;
+import java.util.ArrayList;
 
 @WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboardmaterial"})
 public class DashboardMaterialServlet extends HttpServlet {
 
     @Override
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String searchTerm = request.getParameter("search");
-            String status = request.getParameter("status");
-            String sortBy = request.getParameter("sortBy");
-            
-            int page = 1;
+            int pageIndex = 1;
             int pageSize = 10;
-            String pageStr = request.getParameter("page");
-            if (pageStr != null && !pageStr.isEmpty()) {
-                page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
+
+            // Lấy trang hiện tại
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                pageIndex = Integer.parseInt(pageParam);
             }
 
-            MaterialDAO materialDAO = new MaterialDAO();
-            
-            int totalMaterials = materialDAO.countMaterials(searchTerm, status);
+            // Lấy từ khóa tìm kiếm
+            String keyword = request.getParameter("keyword");
+            if (keyword == null) {
+                keyword = "";
+            }
+            String status = request.getParameter("status");
+            if (status == null) {
+                status = "";
+            }
+            String sortOption = request.getParameter("sortOption");
+            if (sortOption == null) {
+                sortOption = "";
+            }
+            MaterialDAO md = new MaterialDAO();
+
+            List<Material> list;
+            int totalMaterials;
+
+            list = md.searchMaterials(keyword, status, pageIndex, pageSize,sortOption);
+            totalMaterials = md.countMaterials(keyword, status);
+
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
-            
-            List<Material> materials = materialDAO.getMaterials(searchTerm, status, sortBy, page, pageSize);
-            
-            request.setAttribute("materials", materials);
-            request.setAttribute("currentPage", page);
+
+            // Truyền dữ liệu ra JSP
+            request.setAttribute("list", list);
+            request.setAttribute("currentPage", pageIndex);
             request.setAttribute("totalPages", totalPages);
-            request.setAttribute("pageSize", pageSize);
-            request.setAttribute("searchTerm", searchTerm);
-            request.setAttribute("selectedStatus", status);
-            request.setAttribute("sortBy", sortBy);
-            
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("status", status);
+            request.setAttribute("sortOption", sortOption);
             request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + ex.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

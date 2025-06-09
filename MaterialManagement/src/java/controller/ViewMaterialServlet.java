@@ -15,31 +15,35 @@ import jakarta.servlet.http.HttpServletResponse;
 public class ViewMaterialServlet extends HttpServlet {
 
     @Override
+  
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            
             String materialId = request.getParameter("id");
-            if (materialId != null && !materialId.trim().isEmpty()) {
-                MaterialDAO materialDAO = new MaterialDAO();
-                MaterialDetails materialDetails = materialDAO.getMaterialById(Integer.parseInt(materialId));
-
-                // ✅ In ra log để kiểm tra
-                System.out.println("MaterialDetails: " + materialDetails);
-                if (materialDetails != null) {
-                    request.setAttribute("details", materialDetails);
-                    System.out.println("materialId = " + materialId);
-                    System.out.println("materialDetails = " + materialDetails);
-                    request.getRequestDispatcher("/ViewMaterial.jsp").forward(request, response);
-                } else {
-                    response.sendRedirect("dashboardmaterial");
-                }
-            } else {
-                response.sendRedirect("dashboardmaterial");
+           
+            if (materialId == null || materialId.isEmpty()) {
+                
+                return;
             }
-        } catch (SQLException | NumberFormatException ex) {
+
+            int id = Integer.parseInt(materialId);
+            MaterialDAO md = new MaterialDAO();
+            Material m = md.getInformation(id);
+
+            if (m == null) {
+                
+                return;
+            }
+
+            request.setAttribute("m", m);
+            request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
+
+        } catch (Exception ex) {
             ex.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + ex.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
+
 }
