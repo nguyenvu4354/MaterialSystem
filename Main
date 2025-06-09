@@ -1,3 +1,4 @@
+// Department list
 import java.sql.*;
 import java.util.List;
 
@@ -23,3 +24,52 @@ public class Main {
         }
     }
 }
+
+// Create Department
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class Main {
+    public static void main(String[] args) {
+        String jdbcURL = "jdbc:mysql://localhost:3306/material_management";
+        String dbUser = "root";
+        String dbPassword = "your_password_here";
+
+        try (Connection conn = DriverManager.getConnection(jdbcURL, dbUser, dbPassword)) {
+            Department newDept = new Department("IT Department", "Handles technical infrastructure.");
+            DepartmentDAO deptDAO = new DepartmentDAO(conn);
+            boolean success = deptDAO.createDepartment(newDept);
+
+            if (success) {
+                System.out.println("Department created successfully.");
+            } else {
+                System.out.println("Failed to create department.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// Edit Department
+public class EditDepartmentExample {
+    public static void main(String[] args) {
+        DepartmentDAO dao = new DepartmentDAO();
+        Department dept = new Department();
+
+        // Ví dụ: sửa phòng ban có ID = 2
+        dept.setDepartmentId(2);
+        dept.setDepartmentName("Logistics");
+        dept.setDescription("Handles shipping, receiving, and inventory.");
+        dept.setStatus("active");
+
+        boolean success = dao.updateDepartment(dept);
+        if (success) {
+            System.out.println("Department updated successfully!");
+        } else {
+            System.out.println("Failed to update department.");
+        }
+    }
+}
+
