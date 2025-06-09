@@ -95,7 +95,7 @@
                         </div>
                     </div>
 
-                    <!-- Danh mục và số lượng -->
+                    <!-- Danh mục và đơn vị -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="categoryId" class="form-label required-field">Category</label>
@@ -109,9 +109,14 @@
                             <div class="invalid-feedback">Please select a category.</div>
                         </div>
                         <div class="col-md-6">
-                            <label for="quantity" class="form-label required-field">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0" required>
-                            <div class="invalid-feedback">Please enter a valid quantity.</div>
+                            <label for="unitId" class="form-label required-field">Unit</label>
+                            <select class="form-select" id="unitId" name="unitId" required>
+                                <option value="" selected disabled>Select Unit</option>
+                                <c:forEach items="${units}" var="unit">
+                                    <option value="${unit.id}">${unit.unitName}</option>
+                                </c:forEach>
+                            </select>
+                            <div class="invalid-feedback">Please select a unit.</div>
                         </div>
                     </div>
 
@@ -141,14 +146,14 @@
                             <div class="invalid-feedback">Please select a status.</div>
                         </div>
                         <div class="col-md-6">
-                            <label for="supplierId" class="form-label">Supplier</label>
-                            <select class="form-select" id="supplierId" name="supplierId">
-                                <option value="">Select Supplier (Optional)</option>
-                                <!-- Lặp danh sách nhà cung cấp -->
+                            <label for="supplierId" class="form-label required-field">Supplier</label>
+                            <select class="form-select" id="supplierId" name="supplierId" required>
+                                <option value="" selected disabled>Select Supplier</option>
                                 <c:forEach items="${suppliers}" var="supplier">
                                     <option value="${supplier.supplierId}">${supplier.supplierName}</option>
                                 </c:forEach>
                             </select>
+                            <div class="invalid-feedback">Please select a supplier.</div>
                         </div>
                     </div>
 

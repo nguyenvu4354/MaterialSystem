@@ -3,47 +3,48 @@ package controller;
 import dal.MaterialDAO;
 import dal.CategoryDAO;
 import dal.SupplierDAO;
+import dal.UnitDAO;
 import entity.Material;
+import entity.Category;
+import entity.Supplier;
+import entity.Unit;
+
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.nio.file.Paths;
+import java.util.UUID;
+
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
-import entity.Category;
-import entity.Supplier;
 
-// Dinh nghia servlet xu ly duong dan /addmaterial
 @WebServlet(name = "AddMaterialServlet", urlPatterns = {"/addmaterial"})
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // Gioi han kich thuoc file (1MB)
-        maxFileSize = 1024 * 1024 * 10, // Kich thuoc toi da cua file (10MB)
-        maxRequestSize = 1024 * 1024 * 15 // Kich thuoc toi da cua request (15MB)
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 15
 )
 public class AddMaterialServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIRECTORY = "material_images"; // Thu muc luu anh
+    private static final String UPLOAD_DIRECTORY = "material_images";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lay danh sach danh muc va nha cung cap
-            CategoryDAO categoryDAO = new CategoryDAO();
-            SupplierDAO supplierDAO = new SupplierDAO();
-            request.setAttribute("categories", categoryDAO.getAllCategories());
-            request.setAttribute("suppliers", supplierDAO.getAllSuppliers());
+            CategoryDAO cd = new CategoryDAO();
+            SupplierDAO sd = new SupplierDAO();
+            UnitDAO ud = new UnitDAO();
 
-            // Chuyen huong toi trang AddMaterial.jsp
+            request.setAttribute("categories", cd.getAllCategories());
+            request.setAttribute("suppliers", sd.getAllSuppliers());
+            request.setAttribute("units", ud.getAllUnits());
+
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -56,22 +57,22 @@ public class AddMaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Tao thu muc luu anh neu chua ton tai
-            String applicationPath = request.getServletContext().getRealPath(""); // luu file up load
+            // Tạo thư mục upload nếu chưa có
+            String applicationPath = request.getServletContext().getRealPath("");
             String uploadPath = applicationPath + File.separator + UPLOAD_DIRECTORY;
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            // Lay du lieu tu form
-            String materialCode  = request.getParameter("materialCode");
+            // Lấy dữ liệu từ form
+            String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
+
             Part filePart = request.getPart("imageFile");
             String materialsUrl = null;
             if (filePart != null && filePart.getSize() > 0) {
-                // Lay ten file goc tu phan upload (vd: image.png)
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
@@ -84,82 +85,62 @@ public class AddMaterialServlet extends HttpServlet {
                 materialsUrl = "material_images/default.jpg";
             }
 
-            
-            // Xu ly gia tien
-            String priceStr = request.getParameter("price"); // Lay chuoi gia tien tu form
+            // Xử lý giá
+            String priceStr = request.getParameter("price");
             BigDecimal price;
-
-             // Kiem tra neu chuoi gia la null hoac trong => nem loi
             if (priceStr == null || priceStr.trim().isEmpty()) {
-                throw new IllegalArgumentException("Price is required");
+                throw new IllegalArgumentException("Price is required.");
             }
-
             try {
-                // Chuyen chuoi thanh doi tuong BigDecimal de tinh toan chinh xac (tranh sai so nhu float, double)
                 price = new BigDecimal(priceStr);
-
-                // Kiem tra neu gia <= 0 thi nem loi
                 if (price.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new IllegalArgumentException("Price must be greater than $0");
+                    throw new IllegalArgumentException("Price must be greater than $0.");
                 }
-
-                // Lam tron gia den 2 chu so thap phan (vd: 123.456 -> 123.46)
                 price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
             } catch (NumberFormatException e) {
-                // Neu nguoi dung nhap khong dung dinh dang so (vd: "abc") thi nem loi
-                throw new IllegalArgumentException("Invalid price format. Please enter a valid number");
+                throw new IllegalArgumentException("Invalid price format.");
             }
 
-            // Lay cac thong tin con lai
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
             String supplierIdStr = request.getParameter("supplierId");
-            // Xử lý ID nhà cung cấp (supplierId)
-            Integer supplierId = (supplierIdStr != null && !supplierIdStr.trim().isEmpty()) ? Integer.parseInt(supplierIdStr) : null;
+            if (supplierIdStr == null || supplierIdStr.trim().isEmpty()) {
+                request.setAttribute("error", "Vui lòng chọn nhà cung cấp!");
+                doGet(request, response);
+                return;
+            }
+            Integer supplierId = Integer.parseInt(supplierIdStr);
+            int unitId = Integer.parseInt(request.getParameter("unitId"));
             int conditionPercentage = Integer.parseInt(request.getParameter("conditionPercentage"));
 
-            // Tao doi tuong vat tu
+            // Tạo đối tượng Material
             Material material = new Material();
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
-            material.setMaterialsUrl(materialsUrl);
             material.setMaterialStatus(materialStatus);
-            material.setPrice(price);
-            material.setQuantity(quantity);
-            material.setCategoryId(categoryId);
-            material.setSupplierId(supplierId);
             material.setConditionPercentage(conditionPercentage);
-            material.setCreatedAt(LocalDateTime.now());
-            material.setUpdatedAt(LocalDateTime.now());
-            material.setDisable(false);
+            material.setPrice(price.doubleValue());
+            material.setMaterialsUrl(materialsUrl);
 
-            // Luu vao database
-            MaterialDAO materialDAO = new MaterialDAO();
-            boolean success = materialDAO.createMaterial(material);
+            Category category = new Category();
+            category.setCategory_id(categoryId);
+            material.setCategory(category);
 
-            // Neu thanh cong thi chuyen huong ve dashboard
-            if (success) {
-                response.sendRedirect("dashboardmaterial?success=Material added successfully");
-            } else {
-                // Neu that bai thi quay ve form va hien loi
-                CategoryDAO categoryDAO = new CategoryDAO();
-                SupplierDAO supplierDAO = new SupplierDAO();
-                request.setAttribute("categories", categoryDAO.getAllCategories());
-                request.setAttribute("suppliers", supplierDAO.getAllSuppliers());
-                request.setAttribute("error", "Failed to add material");
-                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
-            }
+            
+            Supplier supplier = new Supplier();
+            supplier.setSupplierId(supplierId);
+            material.setSupplier(supplier);
+          
+
+            Unit unit = new Unit();
+            unit.setId(unitId);
+            material.setUnit(unit);
+
+            MaterialDAO md = new MaterialDAO();
+            md.addMaterial(material);
+            response.sendRedirect("dashboardmaterial?success=Material added successfully");
+            
         } catch (Exception ex) {
             ex.printStackTrace();
-            try {
-                // Neu loi thi lay lai du lieu danh muc va nha cung cap
-                CategoryDAO categoryDAO = new CategoryDAO();
-                SupplierDAO supplierDAO = new SupplierDAO();
-                request.setAttribute("categories", categoryDAO.getAllCategories());
-                request.setAttribute("suppliers", supplierDAO.getAllSuppliers());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             request.setAttribute("error", "Error occurred: " + ex.getMessage());
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         }
