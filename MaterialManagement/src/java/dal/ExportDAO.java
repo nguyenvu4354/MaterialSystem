@@ -1,3 +1,4 @@
+
 package dal;
 
 import entity.DBContext;
@@ -90,8 +91,6 @@ public class ExportDAO extends DBContext {
             int[] affectedRows = insertStmt.executeBatch();
             for (int rows : affectedRows) {
                 if (rows == 0) {
-                    // Chỉ ném lỗi nếu có bản ghi mới được thêm vào batch mà không thành công
-                    // (tránh lỗi khi batch rỗng vì tất cả đều là cập nhật)
                     if (insertStmt.getUpdateCount() > 0) {
                         throw new SQLException("Adding material to export failed.");
                     }

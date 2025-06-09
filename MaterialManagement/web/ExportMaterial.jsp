@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -35,6 +36,14 @@
             margin: 5px 0;
         }
     </style>
+    <script>
+        function validateQuantity(input) {
+            if (input.value <= 0) {
+                alert("Quantity must be greater than 0.");
+                input.value = 1;
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Export Materials</h1>
@@ -67,7 +76,7 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td><input type="number" name="quantity" min="0" required></td>
+                    <td><input type="number" name="quantity" min="1" required onchange="validateQuantity(this)"></td>
                     <td>
                         <select name="materialCondition" required>
                             <option value="new">New</option>
@@ -89,12 +98,20 @@
                 <th>Quantity</th>
                 <th>Condition</th>
                 <th>Stock Available</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
             <c:forEach var="detail" items="${exportDetails}">
                 <tr>
                     <td>${materialMap[detail.materialId].materialName}</td>
-                    <td>${detail.quantity}</td>
+                    <td>
+                        <form action="ExportMaterial" method="post" style="display:inline;">
+                            <input type="hidden" name="action" value="updateQuantity">
+                            <input type="hidden" name="materialId" value="${detail.materialId}">
+                            <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
+                            <input type="number" name="quantity" value="${detail.quantity}" min="1" required onchange="validateQuantity(this)">
+                            <input type="submit" value="Update">
+                        </form>
+                    </td>
                     <td>${detail.materialCondition}</td>
                     <td>${stockMap[detail.materialId]}</td>
                     <td>
