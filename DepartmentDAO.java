@@ -56,3 +56,30 @@ public class DepartmentDAO {
     }
 }
 
+// Edit Department
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class DepartmentDAO {
+
+    public boolean updateDepartment(Department department) {
+        String sql = "UPDATE Departments SET department_name = ?, description = ?, status = ?, updated_at = NOW() WHERE department_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, department.getDepartmentName());
+            stmt.setString(2, department.getDescription());
+            stmt.setString(3, department.getStatus());
+            stmt.setInt(4, department.getDepartmentId());
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
