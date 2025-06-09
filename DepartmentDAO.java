@@ -1,3 +1,4 @@
+// Department list
 import java.sql.*;
 import java.util.*;
 
@@ -28,3 +29,30 @@ public class DepartmentDAO {
         return list;
     }
 }
+
+// Create department
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class DepartmentDAO {
+    private Connection conn;
+
+    public DepartmentDAO(Connection conn) {
+        this.conn = conn;
+    }
+
+    public boolean createDepartment(Department department) {
+        String sql = "INSERT INTO Departments (department_name, description) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, department.getDepartmentName());
+            stmt.setString(2, department.getDescription());
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();  // Replace with proper logging in production
+            return false;
+        }
+    }
+}
+
