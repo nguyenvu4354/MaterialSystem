@@ -1,3 +1,4 @@
+
 package controller;
 
 import dal.DepartmentDAO;
@@ -96,6 +97,8 @@ public class ExportMaterialServlet extends HttpServlet {
                 handleExport(request, response, session, user);
             } else if ("remove".equals(action)) {
                 handleRemoveMaterial(request, response, session);
+            } else if ("updateQuantity".equals(action)) {
+                handleUpdateQuantity(request, response, session);
             } else {
                 request.setAttribute("error", "Invalid action.");
                 doGet(request, response);
@@ -199,10 +202,42 @@ public class ExportMaterialServlet extends HttpServlet {
         loadDataAndForward(request, response);
     }
 
+    private void handleUpdateQuantity(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws ServletException, IOException, SQLException {
+        int materialId = Integer.parseInt(request.getParameter("materialId"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        String materialCondition = request.getParameter("materialCondition");
+        int tempExportId = (int) session.getAttribute("tempExportId");
+
+        if (quantity <= 0) {
+            request.setAttribute("error", "Quantity must be greater than 0.");
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        int currentStock = inventoryDAO.getStockByMaterialId(materialId);
+        if (currentStock < quantity) {
+            request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        ExportDetail existingDetail = exportDAO.getExportDetailByMaterialAndCondition(tempExportId, materialId, materialCondition);
+        if (existingDetail == null) {
+            request.setAttribute("error", "Export detail not found for material ID: " + materialId);
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        exportDAO.updateExportDetailQuantity(existingDetail.getExportDetailId(), quantity);
+        request.setAttribute("success", "Quantity updated for material ID: " + materialId);
+        loadDataAndForward(request, response);
+    }
+
     private void handleExport(HttpServletRequest request, HttpServletResponse response, HttpSession session, User user)
             throws ServletException, IOException, SQLException {
         int tempExportId = (int) session.getAttribute("tempExportId");
-        if (tempExportId == 0) {
+        if (tempExportId == 0)  {
             request.setAttribute("error", "No materials selected for export.");
             loadDataAndForward(request, response);
             return;

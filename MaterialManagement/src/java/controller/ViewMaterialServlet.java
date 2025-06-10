@@ -10,6 +10,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
+import java.util.Date;
+import java.io.PrintWriter;
 
 @WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewmaterial"})
 public class ViewMaterialServlet extends HttpServlet {
@@ -18,28 +21,34 @@ public class ViewMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String materialId = request.getParameter("id");
-            if (materialId != null && !materialId.trim().isEmpty()) {
-                MaterialDAO materialDAO = new MaterialDAO();
-                MaterialDetails materialDetails = materialDAO.getMaterialById(Integer.parseInt(materialId));
-
-                // ✅ In ra log để kiểm tra
-                System.out.println("MaterialDetails: " + materialDetails);
-                if (materialDetails != null) {
-                    request.setAttribute("details", materialDetails);
-                    System.out.println("materialId = " + materialId);
-                    System.out.println("materialDetails = " + materialDetails);
-                    request.getRequestDispatcher("/ViewMaterial.jsp").forward(request, response);
-                } else {
-                    response.sendRedirect("dashboardmaterial");
-                }
-            } else {
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+            String materialId = request.getParameter("materialId");
+            
+            if (materialId == null || materialId.isEmpty()) {
                 response.sendRedirect("dashboardmaterial");
+                return;
             }
-        } catch (SQLException | NumberFormatException ex) {
+            
+            MaterialDAO md = new MaterialDAO();
+            int id = Integer.parseInt(materialId);
+            
+            Material m = md.getInformation(id);
+
+            if (m == null) {
+                return;
+            }
+
+            // Không cần chuyển đổi sang java.util.Date nữa.
+
+            request.setAttribute("m", m);
+            request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
+
+        } catch (Exception ex) {
             ex.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + ex.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
+
 }

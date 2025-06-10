@@ -3,33 +3,38 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package entity;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+
 /**
  *
  * @author Admin
  */
 public class Material {
+
     private int materialId;
     private String materialCode;
     private String materialName;
     private String materialsUrl;
-    private String materialStatus; // Should be 'new', 'used', or 'damaged'
+    private String materialStatus;
     private int conditionPercentage;
-    private BigDecimal price;
-    private int quantity;
-    private int categoryId;
-    private Integer supplierId; // nullable
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private double price;
+
+    private Category category;
+    private Supplier supplier;
+    private Unit unit;
+
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private boolean disable;
 
-    // Constructors
-    public Material() {}
+    public Material() {
+    }
 
     public Material(int materialId, String materialCode, String materialName, String materialsUrl, String materialStatus,
-                    int conditionPercentage, BigDecimal price, int quantity, int categoryId, Integer supplierId,
-                    LocalDateTime createdAt, LocalDateTime updatedAt, boolean disable) {
+            int conditionPercentage, double price, Category category, Supplier supplier, Unit unit,
+            Timestamp createdAt, Timestamp updatedAt, boolean disable) {
         this.materialId = materialId;
         this.materialCode = materialCode;
         this.materialName = materialName;
@@ -37,15 +42,31 @@ public class Material {
         this.materialStatus = materialStatus;
         this.conditionPercentage = conditionPercentage;
         this.price = price;
-        this.quantity = quantity;
-        this.categoryId = categoryId;
-        this.supplierId = supplierId;
+        this.category = category;
+        this.supplier = supplier;
+        this.unit = unit;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.disable = disable;
     }
 
-    // Getters and Setters
+    // Getters và Setters
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public int getMaterialId() {
         return materialId;
     }
@@ -94,52 +115,36 @@ public class Material {
         this.conditionPercentage = conditionPercentage;
     }
 
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
-    public Integer getSupplierId() {
-        return supplierId;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public boolean isDisable() {
@@ -149,4 +154,5 @@ public class Material {
     public void setDisable(boolean disable) {
         this.disable = disable;
     }
+
 }
