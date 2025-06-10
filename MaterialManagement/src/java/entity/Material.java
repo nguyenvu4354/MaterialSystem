@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 public class Material {
 
-    private int id;
+    private int materialId;
     private String materialCode;
     private String materialName;
     private String materialsUrl;
@@ -32,10 +32,10 @@ public class Material {
     public Material() {
     }
 
-    public Material(int id, String materialCode, String materialName, String materialsUrl, String materialStatus,
+    public Material(int materialId, String materialCode, String materialName, String materialsUrl, String materialStatus,
             int conditionPercentage, double price, Category category, Supplier supplier, Unit unit,
             Timestamp createdAt, Timestamp updatedAt, boolean disable) {
-        this.id = id;
+        this.materialId = materialId;
         this.materialCode = materialCode;
         this.materialName = materialName;
         this.materialsUrl = materialsUrl;
@@ -67,12 +67,12 @@ public class Material {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
-        return id;
+    public int getMaterialId() {
+        return materialId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMaterialId(int materialId) {
+        this.materialId = materialId;
     }
 
     public String getMaterialCode() {

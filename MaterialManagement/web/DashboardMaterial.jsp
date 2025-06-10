@@ -148,14 +148,14 @@
                                 <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                 <td>
                                     <div class="d-flex">
-                                        <a href="${pageContext.request.contextPath}/viewmaterial?id=${material.id}" class="btn btn-info btn-action" title="View Details">
+                                        <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" class="btn btn-info btn-action" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="editmaterial?id=${material.id}" class="btn btn-warning btn-action" title="Edit Material">
+                                        <a href="editmaterial?materialId=${material.materialId}" class="btn btn-warning btn-action" title="Edit Material">
                                             <i class="fas fa-pen"></i>
                                         </a>
                                         <form method="post" action="deletematerial" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vật tư này?');">
-                                            <input type="hidden" name="materialId" value="${material.id}" />
+                                            <input type="hidden" name="materialId" value="${material.materialId}" />
                                             <button type="submit" class="btn btn-danger btn-action" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>

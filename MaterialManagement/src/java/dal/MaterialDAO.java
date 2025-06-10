@@ -90,7 +90,7 @@ public class MaterialDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Material m = new Material();
-                m.setId(rs.getInt("material_id"));
+                m.setMaterialId(rs.getInt("material_id"));
                 m.setMaterialCode(rs.getString("material_code"));
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
@@ -161,13 +161,13 @@ public class MaterialDAO extends DBContext {
         return total;
     }
 
-    public void deleteMaterial(int id) {
+    public void deleteMaterial(int materialId) {
         try {
             String sql = "UPDATE materials m\n"
                     + "SET disable = 1\n"
                     + "WHERE m.material_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql.toString());
-            ps.setInt(1, id);
+            ps.setInt(1, materialId);
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -175,7 +175,7 @@ public class MaterialDAO extends DBContext {
         }
     }
 
-    public Material getInformation(int id) {
+    public Material getInformation(int materialId) {
         Material m = new Material();
         try {
             String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, "
@@ -191,10 +191,10 @@ public class MaterialDAO extends DBContext {
                     + "WHERE m.material_id = ?";
 
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setInt(1, materialId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                m.setId(rs.getInt("material_id"));
+                m.setMaterialId(rs.getInt("material_id"));
                 m.setMaterialCode(rs.getString("material_code"));
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
@@ -235,8 +235,8 @@ public class MaterialDAO extends DBContext {
         return m;
     }
 
-    public void editInformationMaterial(Material m) {
-        String sql = "UPDATE materials SET material_code = ?, material_name = ?, materials_url = ?, "
+    public void updateMaterial(Material m) {
+        String sql = "UPDATE Materials SET material_code = ?, material_name = ?, materials_url = ?, "
                 + "material_status = ?, condition_percentage = ?, price = ?, category_id = ?, "
                 + "supplier_id = ?, unit_id = ?, updated_at = CURRENT_TIMESTAMP, disable = ? WHERE material_id = ?";
         try {
@@ -245,15 +245,14 @@ public class MaterialDAO extends DBContext {
             st.setString(2, m.getMaterialName());
             st.setString(3, m.getMaterialsUrl());
             st.setString(4, m.getMaterialStatus());
-            st.setDouble(5, m.getConditionPercentage());
+            st.setInt(5, m.getConditionPercentage());
             st.setDouble(6, m.getPrice());
             st.setInt(7, m.getCategory().getCategory_id());
             st.setInt(8, m.getSupplier().getSupplierId());
             st.setInt(9, m.getUnit().getId());
             st.setBoolean(10, m.isDisable());
-            st.setInt(11, m.getId());
-            int rows = st.executeUpdate();
-            System.out.println("Số dòng bị cập nhật: " + rows);
+            st.setInt(11, m.getMaterialId());
+            st.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -297,7 +296,7 @@ public class MaterialDAO extends DBContext {
         m.setMaterialName(m.getMaterialName() + " (test update)");
 
         // Gọi hàm update
-        md.editInformationMaterial(m);
+        md.updateMaterial(m);
 
         // Lấy lại thông tin vật tư sau khi update
         Material m2 = md.getInformation(5);

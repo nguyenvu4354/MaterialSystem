@@ -32,7 +32,7 @@ public class EditMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String materialId = request.getParameter("id");
+            String materialId = request.getParameter("materialId");
             if (materialId == null || materialId.trim().isEmpty()) {
                 response.sendRedirect("dashboardmaterial");
                 return;
@@ -71,6 +71,9 @@ public class EditMaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            request.setCharacterEncoding("UTF-8");
+            response.setContentType("text/html;charset=UTF-8");
+
             // Lấy thông tin từ form
             String materialId = request.getParameter("materialId");
             String materialCode = request.getParameter("materialCode");
@@ -111,7 +114,7 @@ public class EditMaterialServlet extends HttpServlet {
 
             // Tạo đối tượng Material
             Material material = new Material();
-            material.setId(Integer.parseInt(materialId));
+            material.setMaterialId(Integer.parseInt(materialId));
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
             material.setMaterialsUrl(imageUrl);
@@ -136,7 +139,7 @@ public class EditMaterialServlet extends HttpServlet {
             
             // Xử lý URL ảnh
             MaterialDAO materialDAO = new MaterialDAO();
-            Material oldMaterial = materialDAO.getInformation(material.getId());
+            Material oldMaterial = materialDAO.getInformation(material.getMaterialId());
             
             if (imageUrl != null) {
                 material.setMaterialsUrl(imageUrl);
@@ -159,9 +162,9 @@ public class EditMaterialServlet extends HttpServlet {
             System.out.println("unitId: " + unitId);
 
             // In log đối tượng Material trước khi update
-            System.out.println("Material update: id=" + material.getId()
-                + ", code=" + material.getMaterialCode()
-                + ", name=" + material.getMaterialName()
+            System.out.println("Material update: materialId=" + material.getMaterialId()
+                + ", materialCode=" + material.getMaterialCode()
+                + ", materialName=" + material.getMaterialName()
                 + ", status=" + material.getMaterialStatus()
                 + ", condition=" + material.getConditionPercentage()
                 + ", price=" + material.getPrice()
@@ -173,8 +176,8 @@ public class EditMaterialServlet extends HttpServlet {
                 + ", updatedAt=" + material.getUpdatedAt()
             );
 
-            // Cập nhật vào database
-            materialDAO.editInformationMaterial(material);
+            // Gọi hàm update
+            materialDAO.updateMaterial(material);
 
             // Chuyển hướng về dashboardmaterial
             response.sendRedirect("dashboardmaterial?success=Material updated successfully");

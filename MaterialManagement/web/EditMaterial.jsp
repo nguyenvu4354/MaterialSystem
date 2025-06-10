@@ -67,7 +67,7 @@
                     <form action="${pageContext.request.contextPath}/editmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
 
                         <!-- Ẩn input chứa ID vật tư để biết sửa cái nào -->
-                        <input type="hidden" name="materialId" value="${m.id}">
+                        <input type="hidden" name="materialId" value="${m.materialId}">
 
                         <!-- Thông tin cơ bản -->
                         <div class="row mb-3">
@@ -299,7 +299,7 @@
                                         const input = document.createElement('input')
                                         input.type = 'hidden'
                                         input.name = 'materialId'
-                                        input.value = '${m.id}'  // Bạn nhớ xử lý đúng giá trị này ở JSP
+                                        input.value = '${m.materialId}'  // Bạn nhớ xử lý đúng giá trị này ở JSP
                                         form.appendChild(input)
                                         document.body.appendChild(form)
                                         form.submit()
