@@ -12,29 +12,30 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.ZoneId;
 import java.util.Date;
+import java.io.PrintWriter;
 
 @WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewmaterial"})
 public class ViewMaterialServlet extends HttpServlet {
 
     @Override
-  
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+            String materialId = request.getParameter("materialId");
             
-            String materialId = request.getParameter("id");
-           
             if (materialId == null || materialId.isEmpty()) {
-                
+                response.sendRedirect("dashboardmaterial");
                 return;
             }
-
-            int id = Integer.parseInt(materialId);
+            
             MaterialDAO md = new MaterialDAO();
+            int id = Integer.parseInt(materialId);
+            
             Material m = md.getInformation(id);
 
             if (m == null) {
-                
                 return;
             }
 
