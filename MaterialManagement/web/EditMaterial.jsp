@@ -64,7 +64,7 @@
                     </c:if>
 
                     <!-- Form gửi POST lên servlet xử lý 'editmaterial', enctype để upload file ảnh -->
-                    <form action="editmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+                    <form action="${pageContext.request.contextPath}/editmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
 
                         <!-- Ẩn input chứa ID vật tư để biết sửa cái nào -->
                         <input type="hidden" name="materialId" value="${m.id}">

@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
@@ -33,7 +34,7 @@ public class EditMaterialServlet extends HttpServlet {
         try {
             String materialId = request.getParameter("id");
             if (materialId == null || materialId.trim().isEmpty()) {
-                response.sendRedirect("dashboard");
+                response.sendRedirect("dashboardmaterial");
                 return;
             }
 
@@ -41,7 +42,7 @@ public class EditMaterialServlet extends HttpServlet {
             Material material = materialDAO.getInformation(Integer.parseInt(materialId));
             
             if (material == null) {
-                response.sendRedirect("dashboard");
+                response.sendRedirect("dashboardmaterial");
                 return;
             }
 
@@ -62,7 +63,7 @@ public class EditMaterialServlet extends HttpServlet {
             
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("dashboard");
+            response.sendRedirect("dashboardmaterial");
         }
     }
 
@@ -84,7 +85,7 @@ public class EditMaterialServlet extends HttpServlet {
             // Validate dữ liệu
             if (materialId == null || materialCode == null || materialName == null || 
                 materialStatus == null || conditionPercentage == null || price == null || 
-                categoryId == null || unitId == null) {
+                categoryId == null || unitId == null || supplierId == null || supplierId.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng điền đầy đủ thông tin bắt buộc");
                 doGet(request, response);
                 return;
@@ -113,6 +114,7 @@ public class EditMaterialServlet extends HttpServlet {
             material.setId(Integer.parseInt(materialId));
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
+            material.setMaterialsUrl(imageUrl);
             material.setMaterialStatus(materialStatus);
             material.setConditionPercentage(Integer.parseInt(conditionPercentage));
             material.setPrice(Double.parseDouble(price));
@@ -122,12 +124,10 @@ public class EditMaterialServlet extends HttpServlet {
             category.setCategory_id(Integer.parseInt(categoryId));
             material.setCategory(category);
             
-            // Set supplier (nếu có)
-            if (supplierId != null && !supplierId.trim().isEmpty()) {
-                Supplier supplier = new Supplier();
-                supplier.setSupplierId(Integer.parseInt(supplierId));
-                material.setSupplier(supplier);
-            }
+            // Set supplier (bắt buộc)
+            Supplier supplier = new Supplier();
+            supplier.setSupplierId(Integer.parseInt(supplierId));
+            material.setSupplier(supplier);
             
             // Set unit
             Unit unit = new Unit();
@@ -143,6 +143,35 @@ public class EditMaterialServlet extends HttpServlet {
             } else if (oldMaterial != null && oldMaterial.getMaterialsUrl() != null) {
                 material.setMaterialsUrl(oldMaterial.getMaterialsUrl());
             }
+
+            material.setUpdatedAt(LocalDateTime.now());
+            material.setDisable(oldMaterial.isDisable());
+
+            // In log các giá trị nhận được từ request
+            System.out.println("materialId: " + materialId);
+            System.out.println("materialCode: " + materialCode);
+            System.out.println("materialName: " + materialName);
+            System.out.println("materialStatus: " + materialStatus);
+            System.out.println("conditionPercentage: " + conditionPercentage);
+            System.out.println("price: " + price);
+            System.out.println("categoryId: " + categoryId);
+            System.out.println("supplierId: " + supplierId);
+            System.out.println("unitId: " + unitId);
+
+            // In log đối tượng Material trước khi update
+            System.out.println("Material update: id=" + material.getId()
+                + ", code=" + material.getMaterialCode()
+                + ", name=" + material.getMaterialName()
+                + ", status=" + material.getMaterialStatus()
+                + ", condition=" + material.getConditionPercentage()
+                + ", price=" + material.getPrice()
+                + ", categoryId=" + material.getCategory().getCategory_id()
+                + ", supplierId=" + material.getSupplier().getSupplierId()
+                + ", unitId=" + material.getUnit().getId()
+                + ", disable=" + material.isDisable()
+                + ", url=" + material.getMaterialsUrl()
+                + ", updatedAt=" + material.getUpdatedAt()
+            );
 
             // Cập nhật vào database
             materialDAO.editInformationMaterial(material);
