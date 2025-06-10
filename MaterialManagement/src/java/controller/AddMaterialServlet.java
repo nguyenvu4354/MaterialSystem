@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.servlet.ServletException;
@@ -71,18 +72,17 @@ public class AddMaterialServlet extends HttpServlet {
             String materialStatus = request.getParameter("materialStatus");
 
             Part filePart = request.getPart("imageFile");
-            String materialsUrl = null;
+            String filePath = null;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
-                String filePath = uploadPath + File.separator + newFileName;
+                filePath = UPLOAD_DIRECTORY + "/" + newFileName;
                 filePart.write(filePath);
-                materialsUrl = UPLOAD_DIRECTORY + "/" + newFileName;
             } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
-                materialsUrl = request.getParameter("materialsUrl").trim();
+                filePath = request.getParameter("materialsUrl").trim();
             } else {
-                materialsUrl = "material_images/default.jpg";
+                filePath = "material_images/default.jpg";
             }
 
             // Xử lý giá
@@ -113,30 +113,35 @@ public class AddMaterialServlet extends HttpServlet {
             int conditionPercentage = Integer.parseInt(request.getParameter("conditionPercentage"));
 
             // Tạo đối tượng Material
-            Material material = new Material();
-            material.setMaterialCode(materialCode);
-            material.setMaterialName(materialName);
-            material.setMaterialStatus(materialStatus);
-            material.setConditionPercentage(conditionPercentage);
-            material.setPrice(price.doubleValue());
-            material.setMaterialsUrl(materialsUrl);
+            Material m = new Material();
+            m.setMaterialCode(materialCode);
+            m.setMaterialName(materialName);
+            m.setMaterialsUrl(filePath);
+            m.setMaterialStatus(materialStatus);
+            m.setConditionPercentage(conditionPercentage);
+            m.setPrice(price.doubleValue());
 
             Category category = new Category();
             category.setCategory_id(categoryId);
-            material.setCategory(category);
+            m.setCategory(category);
 
             
             Supplier supplier = new Supplier();
             supplier.setSupplierId(supplierId);
-            material.setSupplier(supplier);
+            m.setSupplier(supplier);
           
 
             Unit unit = new Unit();
             unit.setId(unitId);
-            material.setUnit(unit);
+            m.setUnit(unit);
+
+            m.setDisable(false);
+
+            m.setCreatedAt(LocalDateTime.now());
+            m.setUpdatedAt(LocalDateTime.now());
 
             MaterialDAO md = new MaterialDAO();
-            md.addMaterial(material);
+            md.addMaterial(m);
             response.sendRedirect("dashboardmaterial?success=Material added successfully");
             
         } catch (Exception ex) {
