@@ -2,6 +2,7 @@ package dal;
 
 import entity.DBContext;
 import entity.ExportDetail;
+import entity.ImportDetail;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,6 +59,44 @@ public class InventoryDAO extends DBContext {
                     return rs.getInt("stock");
                 } else {
                     return 0; // Return 0 if no inventory record exists
+                }
+            }
+        }
+    }
+    public void updateInventoryForImport(List<ImportDetail> details, int updatedBy) throws SQLException {
+        Objects.requireNonNull(details, "Danh sách chi tiết nhập kho không được null");
+        if (details.isEmpty()) {
+            throw new SQLException("Danh sách chi tiết nhập kho không được rỗng.");
+        }
+        if (updatedBy <= 0) {
+            throw new SQLException("ID người dùng cập nhật không hợp lệ: " + updatedBy);
+        }
+
+        String checkStockSql = "SELECT stock FROM Inventory WHERE material_id = ?";
+        String updateStockSql = "UPDATE Inventory SET stock = stock + ?, last_updated = CURRENT_TIMESTAMP, updated_by = ? WHERE material_id = ?";
+        String insertStockSql = "INSERT INTO Inventory (material_id, stock, last_updated, updated_by, location) VALUES (?, ?, CURRENT_TIMESTAMP, ?, 'Default Warehouse')";
+
+        try (PreparedStatement checkStmt = connection.prepareStatement(checkStockSql);
+             PreparedStatement updateStmt = connection.prepareStatement(updateStockSql);
+             PreparedStatement insertStmt = connection.prepareStatement(insertStockSql)) {
+            for (ImportDetail detail : details) {
+                checkStmt.setInt(1, detail.getMaterialId());
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        updateStmt.setInt(1, detail.getQuantity());
+                        updateStmt.setInt(2, updatedBy);
+                        updateStmt.setInt(3, detail.getMaterialId());
+                        if (updateStmt.executeUpdate() == 0) {
+                            throw new SQLException("Cập nhật tồn kho thất bại cho vật tư ID: " + detail.getMaterialId());
+                        }
+                    } else {
+                        insertStmt.setInt(1, detail.getMaterialId());
+                        insertStmt.setInt(2, detail.getQuantity());
+                        insertStmt.setInt(3, updatedBy);
+                        if (insertStmt.executeUpdate() == 0) {
+                            throw new SQLException("Thêm mới tồn kho thất bại cho vật tư ID: " + detail.getMaterialId());
+                        }
+                    }
                 }
             }
         }

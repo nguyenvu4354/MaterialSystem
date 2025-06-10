@@ -81,7 +81,7 @@ public class Import {
         this.batchNumber = batchNumber;
     }
 
-    public boolean isIsDamaged() {
+    public boolean isDamaged() {
         return isDamaged;
     }
 
