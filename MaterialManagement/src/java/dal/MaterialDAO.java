@@ -1,230 +1,310 @@
 package dal;
 
+import entity.Category;
 import entity.DBContext;
 import entity.Material;
 import entity.MaterialDetails;
+import entity.Supplier;
+import entity.Unit;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MaterialDAO extends DBContext {
 
     // Phuong thuc tao ket noi toi database MySQL
-    private Connection getConnection() throws SQLException {
-        String url = "jdbc:mysql://127.0.0.1:3306/material_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-        String username = "root";
-        String password = "12345";
-        return java.sql.DriverManager.getConnection(url, username, password);
-    }
+   
 
-    // Lay chi tiet thong tin cua 1 vat tu theo id
-    public MaterialDetails getMaterialById(int id) throws SQLException {
-        String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, m.material_status, m.condition_percentage, m.price, m.quantity, m.category_id, m.supplier_id, m.created_at, m.updated_at, m.disable, c.category_name, c.description as category_description, s.supplier_name, s.contact_info, s.address, s.phone_number, s.email " +
-                "FROM Materials m " +
-                "LEFT JOIN Categories c ON m.category_id = c.category_id " +
-                "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id " +
-                "WHERE m.material_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    // Tao doi tuong Material va set cac thuoc tinh tu CSDL
-                    Material material = new Material();
-                    material.setMaterialId(rs.getInt("material_id"));
-                    material.setMaterialCode(rs.getString("material_code"));
-                    material.setMaterialName(rs.getString("material_name"));
-                    material.setMaterialsUrl(rs.getString("materials_url"));
-                    material.setMaterialStatus(rs.getString("material_status"));
-                    material.setConditionPercentage(rs.getInt("condition_percentage"));
-                    material.setPrice(rs.getBigDecimal("price"));
-                    material.setQuantity(rs.getInt("quantity"));
-                    material.setCategoryId(rs.getInt("category_id"));
-                    material.setSupplierId(rs.getInt("supplier_id"));
-                    material.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                    material.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                    material.setDisable(rs.getBoolean("disable"));
-
-                    // Tao doi tuong MaterialDetails tu Material
-                    MaterialDetails details = new MaterialDetails(material);
-                    details.setCategoryName(rs.getString("category_name"));
-                    details.setCategoryDescription(rs.getString("category_description"));
-                    details.setSupplierName(rs.getString("supplier_name"));
-                    details.setSupplierContact(rs.getString("contact_info"));
-                    details.setSupplierAddress(rs.getString("address"));
-                    details.setSupplierPhone(rs.getString("phone_number"));
-                    details.setSupplierEmail(rs.getString("email"));
-                    return details;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace(); // In loi ra console
-        }
-        return null;
-    }
-
-    // Lay danh sach vat tu co phan trang, tim kiem, loc trang thai, sap xep
-    public List<Material> getMaterials(String searchTerm, String status, String sortBy, int page, int pageSize) {
+    // search theo name hoặc code và status
+    public List<Material> searchMaterials(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
         List<Material> list = new ArrayList<>();
-        String query = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, m.material_status, m.condition_percentage, m.price, m.quantity, m.category_id, m.supplier_id, m.created_at, m.updated_at, m.disable " +
-                "FROM Materials m WHERE m.disable = 0 ";
-        // Tim kiem theo ten hoac ma vat tu
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            query += "AND (m.material_name LIKE ? OR m.material_code LIKE ?) ";
-        }
-        // Loc theo trang thai vat tu
-        if (status != null && !status.trim().isEmpty()) {
-            query += "AND m.material_status = ? ";
-        }
-        // Sap xep theo thuoc tinh
-        if (sortBy != null && !sortBy.trim().isEmpty()) {
-            switch (sortBy) {
-                case "name_asc": query += "ORDER BY m.material_name ASC "; break;
-                case "name_desc": query += "ORDER BY m.material_name DESC "; break;
-                case "price_asc": query += "ORDER BY m.price ASC "; break;
-                case "price_desc": query += "ORDER BY m.price DESC "; break;
-                case "condition_asc": query += "ORDER BY m.condition_percentage ASC "; break;
-                case "condition_desc": query += "ORDER BY m.condition_percentage DESC "; break;
-                case "quantity_asc": query += "ORDER BY m.quantity ASC "; break;
-                case "quantity_desc": query += "ORDER BY m.quantity DESC "; break;
-                default: query += "ORDER BY m.material_id DESC ";
-            }
-        } else {
-            query += "ORDER BY m.material_id DESC ";
-        }
-        query += "LIMIT ? OFFSET ?"; // Phan trang
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT m.*, c.category_name, s.supplier_name, u.unit_name ")
+                    .append("FROM materials m ")
+                    .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
+                    .append("LEFT JOIN suppliers s ON m.supplier_id = s.supplier_id ")
+                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("WHERE m.disable = 0 ");
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-            int paramIndex = 1;
-            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchTerm + "%");
-                ps.setString(paramIndex++, "%" + searchTerm + "%");
+            List<Object> params = new ArrayList<>();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                sql.append("AND (m.material_name LIKE ? OR m.material_code LIKE ?) ");
+                params.add("%" + keyword + "%");
+                params.add("%" + keyword + "%");
             }
-            if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex++, status);
+
+            if (status != null && !status.isEmpty()) {
+                sql.append("AND m.material_status = ? ");
+                params.add(status);
             }
-            ps.setInt(paramIndex++, pageSize);
-            ps.setInt(paramIndex, (page - 1) * pageSize);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    // Tao doi tuong Material va them vao danh sach
-                    Material material = new Material();
-                    material.setMaterialId(rs.getInt("material_id"));
-                    material.setMaterialCode(rs.getString("material_code"));
-                    material.setMaterialName(rs.getString("material_name"));
-                    material.setMaterialsUrl(rs.getString("materials_url"));
-                    material.setMaterialStatus(rs.getString("material_status"));
-                    material.setConditionPercentage(rs.getInt("condition_percentage"));
-                    material.setPrice(rs.getBigDecimal("price"));
-                    material.setQuantity(rs.getInt("quantity"));
-                    material.setCategoryId(rs.getInt("category_id"));
-                    material.setSupplierId(rs.getInt("supplier_id"));
-                    material.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                    material.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                    material.setDisable(rs.getBoolean("disable"));
-                    list.add(material);
-                }
+            String sortBy = "m.material_code"; // default
+            String sortOrder = "ASC";
+
+            switch (sortOption) {
+                case "name_asc":
+                    sortBy = "m.material_name";
+                    sortOrder = "ASC";
+                    break;
+                case "name_desc":
+                    sortBy = "m.material_name";
+                    sortOrder = "DESC";
+                    break;
+                case "code_asc":
+                    sortBy = "m.material_code";
+                    sortOrder = "ASC";
+                    break;
+                case "code_desc":
+                    sortBy = "m.material_code";
+                    sortOrder = "DESC";
+                    break;
+                case "condition_asc":
+                    sortBy = "m.condition_percentage";
+                    sortOrder = "ASC";
+                    break;
+                case "condition_desc":
+                    sortBy = "m.condition_percentage";
+                    sortOrder = "DESC";
+                    break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
+
+            sql.append("LIMIT ? OFFSET ?");
+            params.add(pageSize);
+            params.add((pageIndex - 1) * pageSize);
+
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Material m = new Material();
+                m.setId(rs.getInt("material_id"));
+                m.setMaterialCode(rs.getString("material_code"));
+                m.setMaterialName(rs.getString("material_name"));
+                m.setMaterialsUrl(rs.getString("materials_url"));
+                m.setMaterialStatus(rs.getString("material_status"));
+                m.setConditionPercentage(rs.getInt("condition_percentage"));
+                m.setPrice(rs.getDouble("price"));
+
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                
+                Category c = new Category();
+                c.setCategory_id(rs.getInt("category_id"));
+                c.setCategory_name(rs.getString("category_name"));
+                m.setCategory(c);
+
+                Supplier s = new Supplier();
+                s.setSupplierId(rs.getInt("supplier_id"));
+                s.setSupplierName(rs.getString("supplier_name"));
+                m.setSupplier(s);
+
+                Unit u = new Unit();
+                u.setId(rs.getInt("unit_id"));
+                u.setUnitName(rs.getString("unit_name"));
+                m.setUnit(u);
+
+                list.add(m);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return list;
     }
 
-    // Dem tong so vat tu (phuc vu phan trang)
-    public int countMaterials(String searchTerm, String status) {
-        String sql = "SELECT COUNT(*) FROM Materials WHERE disable = 0 ";
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            sql += "AND (material_name LIKE ? OR material_code LIKE ?) ";
-        }
-        if (status != null && !status.trim().isEmpty()) {
-            sql += "AND material_status = ? ";
-        }
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            int paramIndex = 1;
-            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchTerm + "%");
-                ps.setString(paramIndex++, "%" + searchTerm + "%");
+    public int countMaterials(String keyword, String status) {
+        int total = 0;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(*) FROM materials m WHERE m.disable = 0 ");
+
+            List<Object> params = new ArrayList<>();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                sql.append("AND (m.material_name LIKE ? OR m.material_code LIKE ?) ");
+                params.add("%" + keyword + "%");
+                params.add("%" + keyword + "%");
             }
-            if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex++, status);
+
+            if (status != null && !status.isEmpty()) {
+                sql.append("AND m.material_status = ? ");
+                params.add(status);
             }
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1); // Lay gia tri dem duoc
-                }
+
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        return 0;
+        return total;
     }
 
-    // Tao moi 1 vat tu trong database
-    public boolean createMaterial(Material material) {
-        String sql = "INSERT INTO Materials (material_code, material_name, materials_url, material_status, condition_percentage, price, quantity, category_id, supplier_id, created_at, updated_at, disable) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setString(1, material.getMaterialCode());
-            st.setString(2, material.getMaterialName());
-            st.setString(3, material.getMaterialsUrl());
-            st.setString(4, material.getMaterialStatus());
-            st.setInt(5, material.getConditionPercentage());
-            st.setBigDecimal(6, material.getPrice());
-            st.setInt(7, material.getQuantity());
-            st.setInt(8, material.getCategoryId());
-            st.setObject(9, material.getSupplierId());
-            st.setObject(10, java.sql.Timestamp.valueOf(material.getCreatedAt()));
-            st.setObject(11, java.sql.Timestamp.valueOf(material.getUpdatedAt()));
-            st.setBoolean(12, material.isDisable());
-            return st.executeUpdate() > 0; // Tra ve true neu insert thanh cong
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    public void deleteMaterial(int id) {
+        try {
+            String sql = "UPDATE materials m\n"
+                    + "SET disable = 1\n"
+                    + "WHERE m.material_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
-    // Cap nhat thong tin cua 1 vat tu
-    public boolean updateMaterial(Material material) {
-        String sql = "UPDATE Materials SET material_code = ?, material_name = ?, materials_url = ?, material_status = ?, condition_percentage = ?, price = ?, quantity = ?, category_id = ?, supplier_id = ?, updated_at = ?, disable = ? WHERE material_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setString(1, material.getMaterialCode());
-            st.setString(2, material.getMaterialName());
-            st.setString(3, material.getMaterialsUrl());
-            st.setString(4, material.getMaterialStatus());
-            st.setInt(5, material.getConditionPercentage());
-            st.setBigDecimal(6, material.getPrice());
-            st.setInt(7, material.getQuantity());
-            st.setInt(8, material.getCategoryId());
-            st.setObject(9, material.getSupplierId());
-            st.setObject(10, java.sql.Timestamp.valueOf(LocalDateTime.now())); // Cap nhat ngay sua
-            st.setBoolean(11, material.isDisable());
-            st.setInt(12, material.getMaterialId());
-            return st.executeUpdate() > 0; // Tra ve true neu update thanh cong
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    public Material getInformation(int id) {
+        Material m = new Material();
+        try {
+            String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, "
+                    + "m.material_status, m.condition_percentage, m.price, "
+                    + "c.category_id, c.category_name, c.description AS category_description, "
+                    + "s.supplier_id, s.supplier_name, s.address, s.phone_number, s.email, s.contact_info, s.description AS supplier_description, s.tax_id, "
+                    + "u.unit_id, u.unit_name, u.symbol, u.description AS unit_description, "
+                    + "m.created_at, m.updated_at, m.disable "
+                    + "FROM materials m "
+                    + "LEFT JOIN categories c ON m.category_id = c.category_id "
+                    + "LEFT JOIN suppliers s ON m.supplier_id = s.supplier_id "
+                    + "LEFT JOIN units u ON m.unit_id = u.unit_id "
+                    + "WHERE m.material_id = ?";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                m.setId(rs.getInt("material_id"));
+                m.setMaterialCode(rs.getString("material_code"));
+                m.setMaterialName(rs.getString("material_name"));
+                m.setMaterialsUrl(rs.getString("materials_url"));
+                m.setMaterialStatus(rs.getString("material_status"));
+                m.setConditionPercentage(rs.getInt("condition_percentage"));
+                m.setPrice(rs.getDouble("price"));
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setUpdatedAt(rs.getTimestamp("updated_at"));
+                m.setDisable(rs.getBoolean("disable"));
+
+                Category c = new Category();
+                c.setCategory_id(rs.getInt("category_id"));
+                c.setCategory_name(rs.getString("category_name"));
+                c.setDescription(rs.getString("category_description"));
+                m.setCategory(c);
+
+                Supplier s = new Supplier();
+                s.setSupplierId(rs.getInt("supplier_id"));
+                s.setSupplierName(rs.getString("supplier_name"));
+                s.setAddress(rs.getString("address"));
+                s.setPhoneNumber(rs.getString("phone_number"));
+                s.setEmail(rs.getString("email"));
+                s.setContactInfo(rs.getString("contact_info"));
+                s.setDescription(rs.getString("supplier_description"));
+                s.setTaxId(rs.getString("tax_id"));
+                m.setSupplier(s);
+
+                Unit u = new Unit();
+                u.setId(rs.getInt("unit_id"));
+                u.setUnitName(rs.getString("unit_name"));
+                u.setSymbol(rs.getString("symbol"));
+                u.setDescription(rs.getString("unit_description"));
+                m.setUnit(u);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return m;
+    }
+
+    public void editInformationMaterial(Material m) {
+        String sql = "UPDATE materials SET material_code = ?, material_name = ?, materials_url = ?, "
+                + "material_status = ?, condition_percentage = ?, price = ?, category_id = ?, "
+                + "supplier_id = ?, unit_id = ?, updated_at = CURRENT_TIMESTAMP, disable = ? WHERE material_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, m.getMaterialCode());
+            st.setString(2, m.getMaterialName());
+            st.setString(3, m.getMaterialsUrl());
+            st.setString(4, m.getMaterialStatus());
+            st.setDouble(5, m.getConditionPercentage());
+            st.setDouble(6, m.getPrice());
+            st.setInt(7, m.getCategory().getCategory_id());
+            st.setInt(8, m.getSupplier().getSupplierId());
+            st.setInt(9, m.getUnit().getId());
+            st.setBoolean(10, m.isDisable());
+            st.setInt(11, m.getId());
+            int rows = st.executeUpdate();
+            System.out.println("Số dòng bị cập nhật: " + rows);
+        } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 
-    // Xoa hoan toan vat tu (delete cung)
-    public boolean deleteMaterial(int materialId) {
-        String sql = "UPDATE Materials SET disable = 1 WHERE material_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setInt(1, materialId);
-            return st.executeUpdate() > 0; // Tra ve true neu xoa thanh cong
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+    public void addMaterial(Material m) {
+        try {
+            String sql = "INSERT INTO materials ("
+                    + "material_code, material_name, materials_url, material_status, "
+                    + "condition_percentage, price, category_id, supplier_id, unit_id, disable"
+                    + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, m.getMaterialCode());
+            ps.setString(2, m.getMaterialName());
+            ps.setString(3, m.getMaterialsUrl());
+            ps.setString(4, m.getMaterialStatus());
+            ps.setInt(5, m.getConditionPercentage());
+            ps.setDouble(6, m.getPrice());
+            ps.setInt(7, m.getCategory().getCategory_id());
+            ps.setInt(8, m.getSupplier().getSupplierId());
+            ps.setInt(9, m.getUnit().getId());
+            ps.setBoolean(10, m.isDisable());
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
+    
+    
+
+    public static void main(String[] args) {
+        MaterialDAO md = new MaterialDAO();
+
+        // Lấy thông tin vật tư trước khi update
+        Material m = md.getInformation(4);
+        System.out.println("Trước khi update:");
+        System.out.println("Tên: " + m.getMaterialName());
+        System.out.println("Updated_at: " + m.getUpdatedAt());
+
+        // Thay đổi tên vật tư (hoặc trường bất kỳ)
+        m.setMaterialName(m.getMaterialName() + " (test update)");
+
+        // Gọi hàm update
+        md.editInformationMaterial(m);
+
+        // Lấy lại thông tin vật tư sau khi update
+        Material m2 = md.getInformation(5);
+        System.out.println("Sau khi update:");
+        System.out.println("Tên: " + m2.getMaterialName());
+        System.out.println("Updated_at: " + m2.getUpdatedAt());
+    }
+    
+
 }
