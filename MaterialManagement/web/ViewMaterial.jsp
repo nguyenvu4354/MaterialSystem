@@ -120,6 +120,14 @@
                                 <fmt:formatNumber value="${m.price}" type="currency" currencySymbol="VNĐ"/>
                             </div>
                         </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-bold">Last Updated:</div>
+                            <div class="col-sm-8"><fmt:formatDate value="${m.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-4 fw-bold">Created At:</div>
+                            <div class="col-sm-8"><fmt:formatDate value="${m.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></div>
+                        </div>
                     </div>
                 </div>
                 <!-- Category Information -->

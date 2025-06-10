@@ -126,6 +126,8 @@
                             <th>Status</th>
                             <th>Price</th>
                             <th>Condition</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -142,6 +144,8 @@
                                         <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : material.conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" style="width: ${material.conditionPercentage}%;"></div>
                                     </div>
                                 </td>
+                                <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                 <td>
                                     <div class="d-flex">
                                         <a href="${pageContext.request.contextPath}/viewmaterial?id=${material.id}" class="btn btn-info btn-action" title="View Details">

@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import jakarta.servlet.ServletException;
@@ -137,8 +137,8 @@ public class AddMaterialServlet extends HttpServlet {
 
             m.setDisable(false);
 
-            m.setCreatedAt(LocalDateTime.now());
-            m.setUpdatedAt(LocalDateTime.now());
+            m.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             MaterialDAO md = new MaterialDAO();
             md.addMaterial(m);
