@@ -1,56 +1,27 @@
 package entity;
 
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class ExportRequest {
     private int exportRequestId;
     private String requestCode;
     private int userId;
-    private int recipientUserId;
-    private Date requestDate;
+    private String userName;
+    private int recipientId;
+    private String recipientName;
+    private Timestamp requestDate;
     private String status;
     private Date deliveryDate;
     private String reason;
-    private Integer approvedBy;
-    private String approvalReason;
-    private Date approvedAt;
-    private String rejectionReason;
-    private Date createdAt;
-    private Date updatedAt;
-    private boolean disable;
-    
-    // Additional fields for display
-    private String userName;
-    private String recipientName;
+    private int approvedBy;
     private String approverName;
+    private String approvalReason;
+    private Timestamp approvedAt;
+    private String rejectionReason;
     private List<ExportRequestDetail> details;
 
-    public ExportRequest() {
-    }
-
-    public ExportRequest(int exportRequestId, String requestCode, int userId, int recipientUserId, 
-            Date requestDate, String status, Date deliveryDate, String reason, Integer approvedBy, 
-            String approvalReason, Date approvedAt, String rejectionReason, Date createdAt, 
-            Date updatedAt, boolean disable) {
-        this.exportRequestId = exportRequestId;
-        this.requestCode = requestCode;
-        this.userId = userId;
-        this.recipientUserId = recipientUserId;
-        this.requestDate = requestDate;
-        this.status = status;
-        this.deliveryDate = deliveryDate;
-        this.reason = reason;
-        this.approvedBy = approvedBy;
-        this.approvalReason = approvalReason;
-        this.approvedAt = approvedAt;
-        this.rejectionReason = rejectionReason;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.disable = disable;
-    }
-
-    // Getters and Setters
     public int getExportRequestId() {
         return exportRequestId;
     }
@@ -75,19 +46,35 @@ public class ExportRequest {
         this.userId = userId;
     }
 
-    public int getRecipientUserId() {
-        return recipientUserId;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setRecipientUserId(int recipientUserId) {
-        this.recipientUserId = recipientUserId;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public Date getRequestDate() {
+    public int getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(int recipientId) {
+        this.recipientId = recipientId;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public Timestamp getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
+    public void setRequestDate(Timestamp requestDate) {
         this.requestDate = requestDate;
     }
 
@@ -115,12 +102,20 @@ public class ExportRequest {
         this.reason = reason;
     }
 
-    public Integer getApprovedBy() {
+    public int getApprovedBy() {
         return approvedBy;
     }
 
-    public void setApprovedBy(Integer approvedBy) {
+    public void setApprovedBy(int approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
     }
 
     public String getApprovalReason() {
@@ -131,11 +126,11 @@ public class ExportRequest {
         this.approvalReason = approvalReason;
     }
 
-    public Date getApprovedAt() {
+    public Timestamp getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(Date approvedAt) {
+    public void setApprovedAt(Timestamp approvedAt) {
         this.approvedAt = approvedAt;
     }
 
@@ -145,54 +140,6 @@ public class ExportRequest {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public boolean isDisable() {
-        return disable;
-    }
-
-    public void setDisable(boolean disable) {
-        this.disable = disable;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getRecipientName() {
-        return recipientName;
-    }
-
-    public void setRecipientName(String recipientName) {
-        this.recipientName = recipientName;
-    }
-
-    public String getApproverName() {
-        return approverName;
-    }
-
-    public void setApproverName(String approverName) {
-        this.approverName = approverName;
     }
 
     public List<ExportRequestDetail> getDetails() {

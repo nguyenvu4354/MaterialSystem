@@ -6,24 +6,26 @@ public class ExportRequestDetail {
     private int detailId;
     private int exportRequestId;
     private int materialId;
+    private String materialCode;
+    private String materialName;
+    private String materialUnit;
     private int quantity;
     private String exportCondition;
     private Date createdAt;
     private Date updatedAt;
     
-    // Additional fields for display
-    private String materialName;
-    private String materialCode;
-    private String materialUnit;
-
     public ExportRequestDetail() {
     }
 
     public ExportRequestDetail(int detailId, int exportRequestId, int materialId, 
-            int quantity, String exportCondition, Date createdAt, Date updatedAt) {
+            String materialCode, String materialName, String materialUnit, int quantity, 
+            String exportCondition, Date createdAt, Date updatedAt) {
         this.detailId = detailId;
         this.exportRequestId = exportRequestId;
         this.materialId = materialId;
+        this.materialCode = materialCode;
+        this.materialName = materialName;
+        this.materialUnit = materialUnit;
         this.quantity = quantity;
         this.exportCondition = exportCondition;
         this.createdAt = createdAt;
@@ -53,6 +55,30 @@ public class ExportRequestDetail {
 
     public void setMaterialId(int materialId) {
         this.materialId = materialId;
+    }
+
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
+    }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
+
+    public String getMaterialUnit() {
+        return materialUnit;
+    }
+
+    public void setMaterialUnit(String materialUnit) {
+        this.materialUnit = materialUnit;
     }
 
     public int getQuantity() {
@@ -85,29 +111,5 @@ public class ExportRequestDetail {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
-    public String getMaterialCode() {
-        return materialCode;
-    }
-
-    public void setMaterialCode(String materialCode) {
-        this.materialCode = materialCode;
-    }
-
-    public String getMaterialUnit() {
-        return materialUnit;
-    }
-
-    public void setMaterialUnit(String materialUnit) {
-        this.materialUnit = materialUnit;
     }
 } 
