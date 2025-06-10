@@ -24,6 +24,7 @@ public class Import {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    
     public int getImportId() {
         return importId;
     }
@@ -80,7 +81,7 @@ public class Import {
         this.batchNumber = batchNumber;
     }
 
-    public boolean isIsDamaged() {
+    public boolean isDamaged() {
         return isDamaged;
     }
 
