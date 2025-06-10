@@ -6,25 +6,17 @@ package entity;
 
 /**
  *
- * @author Nhat Anh
+ * @author Admin
  */
 public class Unit {
-
     private int id;
     private String unitName;
     private String symbol;
     private String description;
 
-    // Constructors
-    public Unit() {
-    }
+    // Constructors aaaa
+    public Unit() {}
 
-    public Unit(int id, String unitName) {
-        this.id = id;
-        this.unitName = unitName;
-    }
-
-    
     public Unit(int id, String unitName, String symbol, String description) {
         this.id = id;
         this.unitName = unitName;
@@ -68,11 +60,11 @@ public class Unit {
     // Optional: toString method for debugging
     @Override
     public String toString() {
-        return "Unit{"
-                + "id=" + id
-                + ", unitName='" + unitName + '\''
-                + ", symbol='" + symbol + '\''
-                + ", description='" + description + '\''
-                + '}';
+        return "Unit{" +
+                "id=" + id +
+                ", unitName='" + unitName + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }
