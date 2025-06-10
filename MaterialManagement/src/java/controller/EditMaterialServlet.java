@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 @WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
@@ -144,7 +144,7 @@ public class EditMaterialServlet extends HttpServlet {
                 material.setMaterialsUrl(oldMaterial.getMaterialsUrl());
             }
 
-            material.setUpdatedAt(LocalDateTime.now());
+            material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             material.setDisable(oldMaterial.isDisable());
 
             // In log các giá trị nhận được từ request

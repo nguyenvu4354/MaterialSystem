@@ -10,6 +10,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
+import java.util.Date;
 
 @WebServlet(name = "ViewMaterialServlet", urlPatterns = {"/viewmaterial"})
 public class ViewMaterialServlet extends HttpServlet {
@@ -35,6 +37,8 @@ public class ViewMaterialServlet extends HttpServlet {
                 
                 return;
             }
+
+            // Không cần chuyển đổi sang java.util.Date nữa.
 
             request.setAttribute("m", m);
             request.getRequestDispatcher("ViewMaterial.jsp").forward(request, response);
