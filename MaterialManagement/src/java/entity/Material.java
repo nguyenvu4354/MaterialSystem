@@ -22,7 +22,6 @@ public class Material {
     private double price;
 
     private Category category;
-    private Supplier supplier;
     private Unit unit;
 
     private Timestamp createdAt;
@@ -33,7 +32,7 @@ public class Material {
     }
 
     public Material(int materialId, String materialCode, String materialName, String materialsUrl, String materialStatus,
-            int conditionPercentage, double price, Category category, Supplier supplier, Unit unit,
+            int conditionPercentage, double price, Category category, Unit unit,
             Timestamp createdAt, Timestamp updatedAt, boolean disable) {
         this.materialId = materialId;
         this.materialCode = materialCode;
@@ -43,7 +42,6 @@ public class Material {
         this.conditionPercentage = conditionPercentage;
         this.price = price;
         this.category = category;
-        this.supplier = supplier;
         this.unit = unit;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -129,14 +127,6 @@ public class Material {
 
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
     }
 
     public Unit getUnit() {

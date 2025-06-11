@@ -2,11 +2,9 @@ package controller;
 
 import dal.CategoryDAO;
 import dal.MaterialDAO;
-import dal.SupplierDAO;
 import dal.UnitDAO;
 import entity.Category;
 import entity.Material;
-import entity.Supplier;
 import entity.Unit;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -46,18 +44,15 @@ public class EditMaterialServlet extends HttpServlet {
                 return;
             }
 
-            // Lấy danh sách categories, suppliers và units
+            // Lấy danh sách categories và units
             CategoryDAO categoryDAO = new CategoryDAO();
-            SupplierDAO supplierDAO = new SupplierDAO();
             UnitDAO unitDAO = new UnitDAO();
             
             List<Category> categories = categoryDAO.getAllCategories();
-            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             List<Unit> units = unitDAO.getAllUnits();
 
             request.setAttribute("m", material);
             request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
             request.setAttribute("units", units);
             request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
             
@@ -82,13 +77,12 @@ public class EditMaterialServlet extends HttpServlet {
             String conditionPercentage = request.getParameter("conditionPercentage");
             String price = request.getParameter("price");
             String categoryId = request.getParameter("categoryId");
-            String supplierId = request.getParameter("supplierId");
             String unitId = request.getParameter("unitId");
 
             // Validate dữ liệu
             if (materialId == null || materialCode == null || materialName == null || 
                 materialStatus == null || conditionPercentage == null || price == null || 
-                categoryId == null || unitId == null || supplierId == null || supplierId.trim().isEmpty()) {
+                categoryId == null || unitId == null || categoryId.trim().isEmpty() || unitId.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng điền đầy đủ thông tin bắt buộc");
                 doGet(request, response);
                 return;
@@ -127,11 +121,6 @@ public class EditMaterialServlet extends HttpServlet {
             category.setCategory_id(Integer.parseInt(categoryId));
             material.setCategory(category);
             
-            // Set supplier (bắt buộc)
-            Supplier supplier = new Supplier();
-            supplier.setSupplierId(Integer.parseInt(supplierId));
-            material.setSupplier(supplier);
-            
             // Set unit
             Unit unit = new Unit();
             unit.setId(Integer.parseInt(unitId));
@@ -158,7 +147,6 @@ public class EditMaterialServlet extends HttpServlet {
             System.out.println("conditionPercentage: " + conditionPercentage);
             System.out.println("price: " + price);
             System.out.println("categoryId: " + categoryId);
-            System.out.println("supplierId: " + supplierId);
             System.out.println("unitId: " + unitId);
 
             // In log đối tượng Material trước khi update
@@ -169,7 +157,6 @@ public class EditMaterialServlet extends HttpServlet {
                 + ", condition=" + material.getConditionPercentage()
                 + ", price=" + material.getPrice()
                 + ", categoryId=" + material.getCategory().getCategory_id()
-                + ", supplierId=" + material.getSupplier().getSupplierId()
                 + ", unitId=" + material.getUnit().getId()
                 + ", disable=" + material.isDisable()
                 + ", url=" + material.getMaterialsUrl()
