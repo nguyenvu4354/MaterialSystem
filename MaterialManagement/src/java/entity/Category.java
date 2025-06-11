@@ -17,6 +17,11 @@ public class Category implements Serializable {
     
     public Category() {
     }
+
+    public Category(int category_id, String category_name) {
+        this.category_id = category_id;
+        this.category_name = category_name;
+    }
     
     public Category(int category_id, String category_name, Integer parent_id, Timestamp created_at, 
             int disable, String status, String description, String priority, String code) {

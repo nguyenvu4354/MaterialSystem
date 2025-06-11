@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 public class MaterialDAO extends DBContext {
 
     // Phuong thuc tao ket noi toi database MySQL
-   
-
     // search theo name hoặc code và status
     public List<Material> searchMaterials(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
         List<Material> list = new ArrayList<>();
@@ -100,7 +98,6 @@ public class MaterialDAO extends DBContext {
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
 
-                
                 Category c = new Category();
                 c.setCategory_id(rs.getInt("category_id"));
                 c.setCategory_name(rs.getString("category_name"));
@@ -257,8 +254,429 @@ public class MaterialDAO extends DBContext {
             ex.printStackTrace();
         }
     }
-    
-    
+
+    // Phương thức lấy chi tiết sản phẩm theo materialId
+    public Material getProductById(int materialId) {
+        Material product = null;
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+                + "WHERE m.material_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, materialId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                product = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
+
+    // Phương thức lấy danh sách tất cả sản phẩm
+    public List<Material> getAllProducts() {
+        List<Material> list = new ArrayList<>();
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                Material m = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+                list.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Phương thức tìm kiếm sản phẩm theo tên (có thể chứa một phần tên)
+    public List<Material> searchProductsByName(String keyword) {
+        List<Material> products = new ArrayList<>();
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+                + "WHERE m.material_name LIKE ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                Material m = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+                products.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    // Phương thức tìm kiếm sản phẩm theo mã
+    public List<Material> searchProductsByCode(String materialCode) {
+        List<Material> products = new ArrayList<>();
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+                + "WHERE m.material_code LIKE ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + materialCode + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                Material m = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+                products.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    // Phương thức tìm kiếm sản phẩm theo categoryId
+    public List<Material> searchMaterialsByCategoriesID(int categoryId) {
+        List<Material> products = new ArrayList<>();
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+                + "WHERE m.category_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, categoryId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                Material m = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+                products.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    // Phương thức sắp xếp sản phẩm theo tên
+    public List<Material> sortMaterialsByName() {
+        List<Material> products = new ArrayList<>();
+        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+                + "FROM Materials m "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+                + "ORDER BY m.material_name ASC";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Tạo đối tượng Category
+                Category category = new Category(
+                        rs.getInt("category_id"),
+                        rs.getString("category_name")
+                );
+
+                // Tạo đối tượng Unit (nếu có)
+                Unit unit = null;
+                if (rs.getObject("unit_id") != null) {
+                    unit = new Unit(
+                            rs.getInt("unit_id"),
+                            rs.getString("unit_name")
+                    );
+                }
+
+                // Tạo đối tượng Material với các thuộc tính phù hợp
+                Material m = new Material(
+                        rs.getInt("material_id"),
+                        rs.getString("material_code"),
+                        rs.getString("material_name"),
+                        rs.getString("materials_url"),
+                        rs.getString("material_status"),
+                        rs.getInt("condition_percentage"),
+                        rs.getDouble("price"),
+                        category,
+                        unit,
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        rs.getBoolean("disable")
+                );
+                products.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    // Phương thức lấy sản phẩm theo supplierId
+//    public List<Material> getMaterialsBySupplierId(int supplierId) {
+//        List<Material> products = new ArrayList<>();
+//        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+//                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+//                + "FROM Materials m "
+//                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+//                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+//                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
+//                + "WHERE m.supplier_id = ?";
+//
+//        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+//            stmt.setInt(1, supplierId);
+//            ResultSet rs = stmt.executeQuery();
+//
+//            while (rs.next()) {
+//                // Tạo đối tượng Category
+//                Category category = new Category(
+//                        rs.getInt("category_id"),
+//                        rs.getString("category_name")
+//                );
+//
+//                // Tạo đối tượng Unit (nếu có)
+//                Unit unit = null;
+//                if (rs.getObject("unit_id") != null) {
+//                    unit = new Unit(
+//                            rs.getInt("unit_id"),
+//                            rs.getString("unit_name")
+//                    );
+//                }
+//
+//                // Tạo đối tượng Material với các thuộc tính phù hợp
+//                Material m = new Material(
+//                        rs.getInt("material_id"),
+//                        rs.getString("material_code"),
+//                        rs.getString("material_name"),
+//                        rs.getString("materials_url"),
+//                        rs.getString("material_status"),
+//                        rs.getInt("condition_percentage"),
+//                        rs.getDouble("price"),
+//                        category,
+//                        unit,
+//                        rs.getTimestamp("created_at"),
+//                        rs.getTimestamp("updated_at"),
+//                        rs.getBoolean("disable")
+//                );
+//                products.add(m);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return products;
+//    }
+
+    // Phương thức lấy tất cả sản phẩm kèm thông tin nhà cung cấp
+//    public List<Material> getAllMaterialsWithSupplier() {
+//        List<Material> materials = new ArrayList<>();
+//        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
+//                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+//                + "FROM Materials m "
+//                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+//                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+//                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id";
+//
+//        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+//
+//            while (rs.next()) {
+//                // Tạo đối tượng Category
+//                Category category = new Category(
+//                        rs.getInt("category_id"),
+//                        rs.getString("category_name")
+//                );
+//
+//                // Tạo đối tượng Unit (nếu có)
+//                Unit unit = null;
+//                if (rs.getObject("unit_id") != null) {
+//                    unit = new Unit(
+//                            rs.getInt("unit_id"),
+//                            rs.getString("unit_name")
+//                    );
+//                }
+//
+//                // Tạo đối tượng Material với các thuộc tính phù hợp
+//                Material m;
+//                m = new Material(
+//                        rs.getInt("material_id"),
+//                        rs.getString("material_code"),
+//                        rs.getString("material_name"),
+//                        rs.getString("materials_url"),
+//                        rs.getString("material_status"),
+//                        rs.getInt("condition_percentage"),
+//                        rs.getDouble("price"),
+//                        category,
+//                        unit,
+//                        rs.getTimestamp("created_at"),
+//                        rs.getTimestamp("updated_at"),
+//                        rs.getBoolean("disable")
+//                );
+//                materials.add(m);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return materials;
+//    }
 
     public static void main(String[] args) {
         MaterialDAO md = new MaterialDAO();
@@ -281,6 +699,5 @@ public class MaterialDAO extends DBContext {
         System.out.println("Tên: " + m2.getMaterialName());
         System.out.println("Updated_at: " + m2.getUpdatedAt());
     }
-    
 
 }
