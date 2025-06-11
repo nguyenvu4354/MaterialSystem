@@ -24,6 +24,12 @@ public class Unit {
         this.description = description;
     }
 
+    public Unit(int id, String unitName) {
+        this.id = id;
+        this.unitName = unitName;
+    }
+    
+
     // Getters and Setters
     public int getId() {
         return id;
