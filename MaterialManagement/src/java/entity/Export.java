@@ -1,6 +1,5 @@
 package entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Export {
@@ -8,12 +7,9 @@ public class Export {
     private String exportCode;
     private LocalDateTime exportDate;
     private int exportedBy;
-    private Integer departmentId;
+    private int recipientUserId;
     private String batchNumber;
-    private LocalDate expiryDate;
-    private String destination;
     private String note;
-    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -50,12 +46,12 @@ public class Export {
         this.exportedBy = exportedBy;
     }
 
-    public Integer getDepartmentId() {
-        return departmentId;
+    public int getRecipientUserId() {
+        return recipientUserId;
     }
 
-    public void setDepartmentId(Integer departmentId) {
-        this.departmentId = departmentId;
+    public void setRecipientUserId(int recipientUserId) {
+        this.recipientUserId = recipientUserId;
     }
 
     public String getBatchNumber() {
@@ -66,36 +62,12 @@ public class Export {
         this.batchNumber = batchNumber;
     }
 
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
     public String getNote() {
         return note;
     }
 
     public void setNote(String note) {
         this.note = note;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {
