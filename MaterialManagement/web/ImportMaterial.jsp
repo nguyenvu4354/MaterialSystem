@@ -80,7 +80,7 @@
                         <select name="materialId" required>
                             <option value="">Select Material</option>
                             <c:forEach var="material" items="${materials}">
-                                <option value="${material.materialId}">${material.materialName}</option>
+                                <option value="${material.materialId}">${material.materialName} (${material.unit.name}) - ${material.category.categoryName}</option>
                             </c:forEach>
                         </select>
                     </td>
@@ -98,50 +98,56 @@
                 </tr>
             </tbody>
         </table>
-        <input type="submit" value="Add to Import List">
+        <input type="submit" value="Add to Import">
     </form>
 
     <h2>Current Import List</h2>
     <c:if test="${not empty importDetails}">
         <table>
-            <tr>
+            <thead>
                 <th>Material</th>
+                <th>Unit</th>
+                <th>Category</th>
                 <th>Quantity</th>
                 <th>Unit Price</th>
                 <th>Condition</th>
                 <th>Expiry Date</th>
                 <th>Stock Available</th>
                 <th>Actions</th>
-            </tr>
-            <c:forEach var="detail" items="${importDetails}">
-                <tr>
-                    <td>${materialMap[detail.materialId].materialName}</td>
-                    <td>
-                        <form action="ImportMaterial" method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="updateQuantity">
-                            <input type="hidden" name="materialId" value="${detail.materialId}">
-                            <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                            <input type="number" name="quantity" value="${detail.quantity}" min="1" required onchange="validateQuantity(this)">
-                            <input type="submit" value="Update">
-                        </form>
-                    </td>
-                    <td>${detail.unitPrice}</td>
-                    <td>${detail.materialCondition}</td>
-                    <td>${detail.expiryDate}</td>
-                    <td>${stockMap[detail.materialId]}</td>
-                    <td>
-                        <form action="ImportMaterial" method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="remove">
-                            <input type="hidden" name="materialId" value="${detail.materialId}">
-                            <input type="hidden" name="quantity" value="${detail.quantity}">
-                            <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                            <input type="submit" value="Remove">
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-    </c:if>
+            </thead>
+            <tbody>
+                <c:forEach var="detail" items="${importDetails}">
+                    <tr>
+                        <td>${materialMap[detail.materialId].materialName}</td>
+                        <td>${materialMap[detail.materialId].unit.name}</td>
+                        <td>${materialMap[detail.materialId].category.categoryName}</td>
+                        <td>
+                            <form action="ImportMaterial" method="post" style="display:inline;">
+                                <input type="hidden" name="action" value="updateQuantity">
+                                <input type="hidden" name="materialId" value="1">
+                                <input type="hidden" name="materialCondition" value="${detail.quantity}">
+                                <input type="number" name="quantity" value="1" min="1" required onchange="validateQuantity(this)">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>${detail.unitPrice}</td>
+                        <td>${detail.materialCondition}</td>
+                        <td>${detail.expiryDate}</td>
+                        <td>${stockMap[detail.materialId]}</td>
+                        <td>
+                            <form action="ImportMaterial" method="post" style="true">
+                                <input type="hidden" name="action" value="remove">
+                                <input type="hidden" name="materialId" value="${detail.materialId}">
+                                    <input type="hidden" name="quantity" value="${detail.quantity}">
+                                    <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
+                                    <input type="submit" value="Remove">
+                                </form>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
 
     <h2>Confirm Import</h2>
     <form action="ImportMaterial" method="post" class="confirm-form">
@@ -156,7 +162,7 @@
         <label>Destination:</label>
         <input type="text" name="destination"><br>
         <label>Batch Number:</label>
-        <input type="text" name="batchNumber" maxlength="50"><br>
+        input<input type="text" name="batchNumber" maxlength="50"><br>
         <label>Actual Arrival:</label>
         <input type="datetime-local" name="actualArrival"><br>
         <label>Is Damaged:</label>
