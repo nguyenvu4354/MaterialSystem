@@ -164,17 +164,6 @@
                                     <option value="NEW" <c:if test="${m.materialStatus == 'NEW'}">selected</c:if>>New</option>
                                     <option value="USED" <c:if test="${m.materialStatus == 'USED'}">selected</c:if>>Used</option>
                                     <option value="DAMAGED" <c:if test="${m.materialStatus == 'DAMAGED'}">selected</c:if>>Damaged</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="supplierId" class="form-label">Supplier</label>
-                                    <select class="form-select" id="supplierId" name="supplierId">
-                                        <option value="">Select Supplier</option>
-                                    <c:forEach items="${suppliers}" var="supplier">
-                                        <option value="${supplier.supplierId}" <c:if test="${m.supplier != null && m.supplier.supplierId == supplier.supplierId}">selected</c:if>>
-                                            ${supplier.supplierName}
-                                        </option>
-                                    </c:forEach>
                                 </select>
                             </div>
                         </div>

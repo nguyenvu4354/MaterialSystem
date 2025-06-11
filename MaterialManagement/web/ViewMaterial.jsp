@@ -146,43 +146,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- Supplier Information -->
-                <div class="info-section">
-                    <h3><i class="fas fa-truck me-2"></i>Supplier Information</h3>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="detail-row">
-                                <div class="detail-label">Supplier Name</div>
-                                <div>${empty m.supplier.supplierName ? 'Không có thông tin' : m.supplier.supplierName}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Address</div>
-                                <div>${empty m.supplier.address ? 'Không có thông tin' : m.supplier.address}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-row">
-                                <div class="detail-label">Phone Number</div>
-                                <div>
-                                    <a href="tel:${m.supplier.phoneNumber}" class="text-decoration-none">
-                                        <i class="fas fa-phone me-2"></i>${empty m.supplier.phoneNumber ? 'Không có thông tin' : m.supplier.phoneNumber}
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Email</div>
-                                <div>
-                                    <a href="mailto:${m.supplier.email}" class="text-decoration-none">
-                                        <i class="fas fa-envelope me-2"></i>${empty m.supplier.email ? 'Không có thông tin' : m.supplier.email}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <!-- Unit Information -->
                 <div class="info-section">
-                    <h3><i class="fas fa-balance-scale me-2"></i>Unit Information</h3>
+                    <h3><i class="fas fa-ruler me-2"></i>Unit Information</h3>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="detail-row">
@@ -192,10 +158,6 @@
                             <div class="detail-row">
                                 <div class="detail-label">Symbol</div>
                                 <div>${empty m.unit.symbol ? 'Không có thông tin' : m.unit.symbol}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Description</div>
-                                <div>${empty m.unit.description ? 'Không có thông tin' : m.unit.description}</div>
                             </div>
                         </div>
                     </div>

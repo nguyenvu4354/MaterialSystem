@@ -2,11 +2,9 @@ package controller;
 
 import dal.MaterialDAO;
 import dal.CategoryDAO;
-import dal.SupplierDAO;
 import dal.UnitDAO;
 import entity.Material;
 import entity.Category;
-import entity.Supplier;
 import entity.Unit;
 
 import java.io.File;
@@ -39,11 +37,9 @@ public class AddMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             CategoryDAO cd = new CategoryDAO();
-            SupplierDAO sd = new SupplierDAO();
             UnitDAO ud = new UnitDAO();
 
             request.setAttribute("categories", cd.getAllCategories());
-            request.setAttribute("suppliers", sd.getAllSuppliers());
             request.setAttribute("units", ud.getAllUnits());
 
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
@@ -102,13 +98,6 @@ public class AddMaterialServlet extends HttpServlet {
             }
 
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            String supplierIdStr = request.getParameter("supplierId");
-            if (supplierIdStr == null || supplierIdStr.trim().isEmpty()) {
-                request.setAttribute("error", "Vui lòng chọn nhà cung cấp!");
-                doGet(request, response);
-                return;
-            }
-            Integer supplierId = Integer.parseInt(supplierIdStr);
             int unitId = Integer.parseInt(request.getParameter("unitId"));
             int conditionPercentage = Integer.parseInt(request.getParameter("conditionPercentage"));
 
@@ -125,18 +114,11 @@ public class AddMaterialServlet extends HttpServlet {
             category.setCategory_id(categoryId);
             m.setCategory(category);
 
-            
-            Supplier supplier = new Supplier();
-            supplier.setSupplierId(supplierId);
-            m.setSupplier(supplier);
-          
-
             Unit unit = new Unit();
             unit.setId(unitId);
             m.setUnit(unit);
 
             m.setDisable(false);
-
             m.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 

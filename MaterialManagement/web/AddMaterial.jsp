@@ -134,7 +134,7 @@
                         </div>
                     </div>
 
-                    <!-- Trạng thái và nhà cung cấp -->
+                    <!-- Trạng thái vật tư -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialStatus" class="form-label required-field">Status</label>
@@ -144,16 +144,6 @@
                                 <option value="DAMAGED">Damaged</option>
                             </select>
                             <div class="invalid-feedback">Please select a status.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="supplierId" class="form-label required-field">Supplier</label>
-                            <select class="form-select" id="supplierId" name="supplierId" required>
-                                <option value="" selected disabled>Select Supplier</option>
-                                <c:forEach items="${suppliers}" var="supplier">
-                                    <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                                </c:forEach>
-                            </select>
-                            <div class="invalid-feedback">Please select a supplier.</div>
                         </div>
                     </div>
 
