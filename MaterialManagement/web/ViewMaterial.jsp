@@ -201,7 +201,7 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                    <a href="editmaterial?id=${m.id}" class="btn btn-primary">
+                    <a href="editmaterial?materialId=${m.materialId}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit Material
                     </a>
                 </div>
