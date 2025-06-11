@@ -48,7 +48,8 @@ public class ImportMaterialServlet extends HttpServlet {
         HttpSession session = request.getSession();
         try {
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-            List<Material> materials = materialDAO.getMaterials("", null, null, 1, Integer.MAX_VALUE);
+            // Sử dụng searchMaterials để lấy tất cả vật tư (keyword rỗng, không lọc status)
+            List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
             List<ImportDetail> importDetails = (tempImportId != null && tempImportId != 0)
                     ? importDAO.getDraftImportDetails(tempImportId)
@@ -122,7 +123,7 @@ public class ImportMaterialServlet extends HttpServlet {
         String expiryDateStr = request.getParameter("expiryDate");
         boolean isDamaged = Boolean.parseBoolean(request.getParameter("isDamaged"));
         List<ImportDetail> detailsToAdd = new ArrayList<>();
-        List<Material> materials = materialDAO.getMaterials("", null, null, 1, Integer.MAX_VALUE);
+        List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
         Map<Integer, Material> materialMap = new HashMap<>();
         for (Material material : materials) {
             materialMap.put(material.getMaterialId(), material);
@@ -271,7 +272,7 @@ public class ImportMaterialServlet extends HttpServlet {
         imports.setImportId(tempImportId);
         imports.setImportCode("IMP-" + UUID.randomUUID().toString().substring(0, 8));
         imports.setImportDate(LocalDateTime.now());
-        imports.setImportedBy(user.getUserId()); // Sửa lỗi: thay "imports Filling" bằng "imports"
+        imports.setImportedBy(user.getUserId());
         imports.setSupplierId(supplierId);
         imports.setDestination(destination);
         imports.setBatchNumber(batchNumber);
@@ -292,7 +293,7 @@ public class ImportMaterialServlet extends HttpServlet {
     private void loadDataAndForward(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-        List<Material> materials = materialDAO.getMaterials("", null, null, 1, Integer.MAX_VALUE);
+        List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
         Integer tempImportId = (Integer) request.getSession().getAttribute("tempImportId");
         List<ImportDetail> importDetails = (tempImportId != null && tempImportId != 0)
                 ? importDAO.getDraftImportDetails(tempImportId)
