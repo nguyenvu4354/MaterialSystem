@@ -1,18 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package entity;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Admin
  */
-
-import java.util.Date;
-
 public class PurchaseRequest {
-     private int id;
+    private int id;
     private String requestCode;
     private int userId;
     private Date requestDate;
@@ -26,13 +22,15 @@ public class PurchaseRequest {
     private Date createdAt;
     private Date updatedAt;
     private boolean disable;
+    private List<PurchaseRequestDetail> details; // Added field for details
 
     public PurchaseRequest() {
     }
 
-    
-    
-    public PurchaseRequest(int id, String requestCode, int userId, Date requestDate, String status, Double estimatedPrice, String reason, Integer approvedBy, String approvalReason, Date approvedAt, String rejectionReason, Date createdAt, Date updatedAt, boolean disable) {
+    public PurchaseRequest(int id, String requestCode, int userId, Date requestDate, String status, 
+                           Double estimatedPrice, String reason, Integer approvedBy, String approvalReason, 
+                           Date approvedAt, String rejectionReason, Date createdAt, Date updatedAt, 
+                           boolean disable) {
         this.id = id;
         this.requestCode = requestCode;
         this.userId = userId;
@@ -160,6 +158,12 @@ public class PurchaseRequest {
     public void setDisable(boolean disable) {
         this.disable = disable;
     }
-    
-    
+
+    public List<PurchaseRequestDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<PurchaseRequestDetail> details) {
+        this.details = details;
+    }
 }

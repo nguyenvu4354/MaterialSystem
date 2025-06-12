@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -28,6 +25,7 @@ public class RepairRequest {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean disable;
+    private List<RepairRequestDetail> details; // Added field for details
 
     // Constructor mặc định
     public RepairRequest() {
@@ -195,6 +193,14 @@ public class RepairRequest {
         this.disable = disable;
     }
 
+    public List<RepairRequestDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<RepairRequestDetail> details) {
+        this.details = details;
+    }
+
     @Override
     public String toString() {
         return "RepairRequest{" +
@@ -215,6 +221,7 @@ public class RepairRequest {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", disable=" + disable +
+                ", details=" + details +
                 '}';
     }
 }
