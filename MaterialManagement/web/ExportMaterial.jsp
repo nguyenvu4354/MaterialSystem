@@ -1,10 +1,10 @@
-
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Export Materials</title>
+    <title>Xuất vật tư</title>
+    <meta charset="UTF-8">
     <style>
         table {
             border-collapse: collapse;
@@ -39,14 +39,14 @@
     <script>
         function validateQuantity(input) {
             if (input.value <= 0) {
-                alert("Quantity must be greater than 0.");
+                alert("Số lượng phải lớn hơn 0.");
                 input.value = 1;
             }
         }
     </script>
 </head>
 <body>
-    <h1>Export Materials</h1>
+    <h1>Xuất vật tư</h1>
     
     <c:if test="${not empty error}">
         <p class="error">${error}</p>
@@ -55,22 +55,22 @@
         <p class="success">${success}</p>
     </c:if>
 
-    <h2>Add Material to Export</h2>
+    <h2>Thêm vật tư vào danh sách xuất</h2>
     <form action="ExportMaterial" method="post" class="add-material-form">
         <input type="hidden" name="action" value="add">
         <table>
             <thead>
                 <tr>
-                    <th>Material Name</th>
-                    <th>Quantity</th>
-                    <th>Condition</th>
+                    <th>Tên vật tư</th>
+                    <th>Số lượng</th>
+                    <th>Tình trạng</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>
                         <select name="materialId" required>
-                            <option value="">Select Material</option>
+                            <option value="">Chọn vật tư</option>
                             <c:forEach var="material" items="${materials}">
                                 <option value="${material.materialId}">${material.materialName}</option>
                             </c:forEach>
@@ -79,26 +79,26 @@
                     <td><input type="number" name="quantity" min="1" required onchange="validateQuantity(this)"></td>
                     <td>
                         <select name="materialCondition" required>
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
-                            <option value="refurbished">Refurbished</option>
+                            <option value="new">Mới</option>
+                            <option value="used">Đã sử dụng</option>
+                            <option value="refurbished">Tân trang</option>
                         </select>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <input type="submit" value="Add to Export List">
+        <input type="submit" value="Thêm vào danh sách xuất">
     </form>
 
-    <h2>Current Export List</h2>
+    <h2>Danh sách xuất hiện tại</h2>
     <c:if test="${not empty exportDetails}">
         <table>
             <tr>
-                <th>Material</th>
-                <th>Quantity</th>
-                <th>Condition</th>
-                <th>Stock Available</th>
-                <th>Actions</th>
+                <th>Vật tư</th>
+                <th>Số lượng</th>
+                <th>Tình trạng</th>
+                <th>Tồn kho khả dụng</th>
+                <th>Thao tác</th>
             </tr>
             <c:forEach var="detail" items="${exportDetails}">
                 <tr>
@@ -109,7 +109,7 @@
                             <input type="hidden" name="materialId" value="${detail.materialId}">
                             <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
                             <input type="number" name="quantity" value="${detail.quantity}" min="1" required onchange="validateQuantity(this)">
-                            <input type="submit" value="Update">
+                            <input type="submit" value="Cập nhật">
                         </form>
                     </td>
                     <td>${detail.materialCondition}</td>
@@ -120,7 +120,7 @@
                             <input type="hidden" name="materialId" value="${detail.materialId}">
                             <input type="hidden" name="quantity" value="${detail.quantity}">
                             <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                            <input type="submit" value="Remove">
+                            <input type="submit" value="Xóa">
                         </form>
                     </td>
                 </tr>
@@ -128,25 +128,21 @@
         </table>
     </c:if>
 
-    <h2>Confirm Export</h2>
+    <h2>Xác nhận xuất kho</h2>
     <form action="ExportMaterial" method="post" class="confirm-form">
         <input type="hidden" name="action" value="export">
-        <label>Department:</label>
-        <select name="departmentId">
-            <option value="">Select Department</option>
-            <c:forEach var="department" items="${departments}">
-                <option value="${department.departmentId}">${department.departmentName}</option>
+        <label>Người nhận:</label>
+        <select name="recipientUserId" required>
+            <option value="">Chọn người nhận</option>
+            <c:forEach var="user" items="${users}">
+                <option value="${user.userId}">${user.fullName} (ID: ${user.userId}, ${user.departmentName != null ? user.departmentName : 'Không có phòng ban'})</option>
             </c:forEach>
         </select><br>
-        <label>Destination:</label>
-        <input type="text" name="destination"><br>
-        <label>Batch Number:</label>
+        <label>Số lô:</label>
         <input type="text" name="batchNumber" maxlength="50"><br>
-        <label>Expiry Date:</label>
-        <input type="date" name="expiryDate"><br>
-        <label>Note:</label>
+        <label>Ghi chú:</label>
         <textarea name="note"></textarea><br>
-        <input type="submit" value="Confirm Export">
+        <input type="submit" value="Xác nhận xuất kho">
     </form>
 </body>
 </html>

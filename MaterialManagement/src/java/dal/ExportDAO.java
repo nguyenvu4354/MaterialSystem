@@ -1,4 +1,3 @@
-
 package dal;
 
 import entity.DBContext;
@@ -14,19 +13,16 @@ import java.util.List;
 public class ExportDAO extends DBContext {
 
     public int createExport(Export export) throws SQLException {
-        String sql = "INSERT INTO Exports (export_code, export_date, exported_by, department_id, batch_number, expiry_date, destination, note, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Exports (export_code, export_date, exported_by, recipient_user_id, batch_number, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, export.getExportCode());
             stmt.setObject(2, export.getExportDate());
             stmt.setInt(3, export.getExportedBy());
-            stmt.setObject(4, export.getDepartmentId());
+            stmt.setInt(4, export.getRecipientUserId());
             stmt.setString(5, export.getBatchNumber());
-            stmt.setObject(6, export.getExpiryDate());
-            stmt.setString(7, export.getDestination());
-            stmt.setString(8, export.getNote());
-            stmt.setString(9, export.getStatus());
-            stmt.setObject(10, export.getCreatedAt());
-            stmt.setObject(11, export.getUpdatedAt());
+            stmt.setString(6, export.getNote());
+            stmt.setObject(7, export.getCreatedAt());
+            stmt.setObject(8, export.getUpdatedAt());
             
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -144,12 +140,6 @@ public class ExportDAO extends DBContext {
                 throw new SQLException("No draft export details found to confirm for export ID: " + exportId);
             }
         }
-        
-        String updateExportSql = "UPDATE Exports SET status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE export_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(updateExportSql)) {
-            stmt.setInt(1, exportId);
-            stmt.executeUpdate();
-        }
     }
 
     public List<ExportDetail> getDraftExportDetails(int exportId) throws SQLException {
@@ -202,19 +192,16 @@ public class ExportDAO extends DBContext {
     }
 
     public void updateExport(Export export) throws SQLException {
-        String sql = "UPDATE Exports SET export_code = ?, export_date = ?, exported_by = ?, department_id = ?, batch_number = ?, expiry_date = ?, destination = ?, note = ?, status = ?, updated_at = ? WHERE export_id = ?";
+        String sql = "UPDATE Exports SET export_code = ?, export_date = ?, exported_by = ?, recipient_user_id = ?, batch_number = ?, note = ?, updated_at = ? WHERE export_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, export.getExportCode());
             stmt.setObject(2, export.getExportDate());
             stmt.setInt(3, export.getExportedBy());
-            stmt.setObject(4, export.getDepartmentId());
+            stmt.setInt(4, export.getRecipientUserId());
             stmt.setString(5, export.getBatchNumber());
-            stmt.setObject(6, export.getExpiryDate());
-            stmt.setString(7, export.getDestination());
-            stmt.setString(8, export.getNote());
-            stmt.setString(9, export.getStatus());
-            stmt.setObject(10, export.getUpdatedAt());
-            stmt.setInt(11, export.getExportId());
+            stmt.setString(6, export.getNote());
+            stmt.setObject(7, export.getUpdatedAt());
+            stmt.setInt(8, export.getExportId());
             
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
