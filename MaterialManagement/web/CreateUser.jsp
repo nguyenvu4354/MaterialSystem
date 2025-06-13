@@ -47,6 +47,9 @@
         </style>
     </head>
     <body>
+        <jsp:include page="HeaderAdmin.jsp" />
+        
+        
         <section id="create-user" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
             <div class="container">
                 <div class="row my-5 py-5">
