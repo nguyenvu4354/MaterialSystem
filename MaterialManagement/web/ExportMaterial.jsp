@@ -35,11 +35,17 @@
         .confirm-form input, .confirm-form select, .confirm-form textarea {
             margin: 5px 0;
         }
+        .material-img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
     </style>
     <script>
         function validateQuantity(input) {
             if (input.value <= 0) {
-                alert("Số lượng phải lớn hơn 0.");
+                alert("Số lượng phải lớn hơn (material-img)0.");
                 input.value = 1;
             }
         }
@@ -94,6 +100,7 @@
     <c:if test="${not empty exportDetails}">
         <table>
             <tr>
+                <th>Hình ảnh</th>
                 <th>Vật tư</th>
                 <th>Số lượng</th>
                 <th>Tình trạng</th>
@@ -102,6 +109,11 @@
             </tr>
             <c:forEach var="detail" items="${exportDetails}">
                 <tr>
+                    <td>
+                        <img src="${pageContext.request.contextPath}/images/${empty materialMap[detail.materialId].materialsUrl ? 'default-material.png' : materialMap[detail.materialId].materialsUrl}" 
+                             class="material-img" 
+                             alt="${materialMap[detail.materialId].materialName}">
+                    </td>
                     <td>${materialMap[detail.materialId].materialName}</td>
                     <td>
                         <form action="ExportMaterial" method="post" style="display:inline;">

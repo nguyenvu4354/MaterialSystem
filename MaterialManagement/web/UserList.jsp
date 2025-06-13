@@ -44,27 +44,8 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container py-2">
-            <div class="row py-4 pb-0 pb-sm-4 align-items-center">
-                <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-                    <a href="HomePage.jsp">
-                        <img src="images/AdminLogo.png" alt="logo" class="img-fluid" width="300px">
-                    </a>
-                </div>
-                <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
-                    <div class="text-end d-none d-xl-block">
-                        <span class="fs-6 text-muted">Admin</span>
-                        <h5 class="mb-0">admin@accessories.com</h5>
-                    </div>
-                    <a href="logout" class="btn btn-outline-dark btn-lg ms-4">
-                        Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
+    <%@ include file="HeaderAdmin.jsp" %>
+
 
     <!-- Main content -->
     <div class="container-fluid">

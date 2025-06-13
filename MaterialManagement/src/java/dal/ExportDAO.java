@@ -159,7 +159,7 @@ public class ExportDAO extends DBContext {
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
                     details.add(detail);
-                }
+                }   
             }
         }
         return details;
