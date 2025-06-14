@@ -4,10 +4,10 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>View Export Request</title>
-        <link href="css/style.css" rel="stylesheet" type="text/css"/>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <title>Export Request Details</title>
+        <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet" type="text/css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.15.0/css/all.min.css">
     </head>
     <body>
         <jsp:include page="header.jsp"/>
@@ -18,19 +18,15 @@
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                         <h1 class="h2">Export Request Details</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
-                            <c:if test="${exportRequest.status == 'draft'}">
-                                <a href="EditExportRequest?id=${exportRequest.exportRequestId}" class="btn btn-warning me-2">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <button onclick="deleteRequest(${exportRequest.exportRequestId})" class="btn btn-danger me-2">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </c:if>
-                            <a href="ExportRequestList" class="btn btn-secondary">
+                            <a href="http://ExportRequestList" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to List
                             </a>
                         </div>
                     </div>
+
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger">${error}</div>
+                    </c:if>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -62,7 +58,7 @@
                                         <dd class="col-sm-8">${exportRequest.userName}</dd>
 
                                         <dt class="col-sm-4">Recipient</dt>
-                                        <dd class="col-sm-8">${exportRequest.recipientName}</dd>
+                                        <dd class="col-sm-8">${exportRequest.recipientName != null ? exportRequest.recipientName : 'N/A'}</dd>
 
                                         <dt class="col-sm-4">Reason</dt>
                                         <dd class="col-sm-8">${exportRequest.reason}</dd>
@@ -79,7 +75,7 @@
                                 <div class="card-body">
                                     <dl class="row">
                                         <dt class="col-sm-4">Approved By</dt>
-                                        <dd class="col-sm-8">${exportRequest.approvedBy != null ? exportRequest.approverName : 'Not approved yet'}</dd>
+                                        <dd class="col-sm-8">${exportRequest.approverName != null ? exportRequest.approverName : 'Not approved yet'}</dd>
 
                                         <dt class="col-sm-4">Approval Date</dt>
                                         <dd class="col-sm-8">${exportRequest.approvedAt != null ? exportRequest.approvedAt : 'Not approved yet'}</dd>
@@ -93,7 +89,7 @@
                                         </c:if>
                                     </dl>
 
-                                    <c:if test="${sessionScope.user.role == 'director' && exportRequest.status == 'draft'}">
+                                    <c:if test="${sessionScope.user.roleName == 'director' && exportRequest.status == 'draft'}">
                                         <div class="mt-4">
                                             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#approveModal">
                                                 <i class="fas fa-check"></i> Approve
@@ -139,6 +135,9 @@
                                                 </td>
                                             </tr>
                                         </c:forEach>
+                                        <c:if test="${empty exportRequest.details}">
+                                            <tr><td colspan="5" class="text-center text-muted">No materials requested.</td></tr>
+                                        </c:if>
                                     </tbody>
                                 </table>
                             </div>
@@ -156,12 +155,12 @@
                         <h5 class="modal-title" id="approveModalLabel">Approve Export Request</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="ApproveExportRequest" method="POST">
+                    <form action="http://ApproveExportRequest" method="POST">
                         <div class="modal-body">
                             <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
                             <div class="mb-3">
-                                <label for="approvalReason" class="form-label">Approval Reason</label>
-                                <textarea class="form-control" id="approvalReason" name="approvalReason" rows="3"></textarea>
+                                <label for="approvalReason" class="form-label">Approval Reason <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="approvalReason" name="approvalReason" rows="3" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -181,7 +180,7 @@
                         <h5 class="modal-title" id="rejectModalLabel">Reject Export Request</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="RejectExportRequest" method="POST">
+                    <form action="http://RejectExportRequest" method="POST">
                         <div class="modal-body">
                             <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
                             <div class="mb-3">
@@ -198,13 +197,6 @@
             </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            function deleteRequest(id) {
-                if (confirm('Are you sure you want to delete this request?')) {
-                    window.location.href = 'DeleteExportRequest?id=' + id;
-                }
-            }
-        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
-</html> 
+</html>
