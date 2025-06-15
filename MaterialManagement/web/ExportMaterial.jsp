@@ -177,7 +177,7 @@
                             </div>
                             <div class="col-12">
                                 <label for="note" class="form-label text-muted">Note</label>
-                                <textarea name="note" id="note" class="form-control" rows="3" placeholder="Enter Note"></textarea>
+                                <input type="text" name="note" id="note" maxlength="100" class="form-control" placeholder="Enter Note">
                             </div>
                             <div class="col-12 mt-4">
                                 <div class="d-grid gap-2">

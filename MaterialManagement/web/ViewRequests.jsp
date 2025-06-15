@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,28 +73,6 @@
             pointer-events: none;
             background-color: #f8f9fa;
         }
-        .request-section .detail-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .request-section .detail-btn:hover {
-            background-color: #45a049;
-        }
-        .request-section .cancel-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
-        }
-        .request-section .cancel-btn:hover {
-            background-color: #d32f2f;
-        }
         .request-section .nav-buttons .btn {
             margin: 0 0.5rem;
             border-radius: 0.25rem;
@@ -110,7 +89,7 @@
                 <div class="col-12 bg-white p-4 rounded shadow request-section">
                     <!-- Navigation buttons -->
                     <div class="text-center mb-4 nav-buttons">
-                        <a href="profile.jsp" class="btn btn-primary">Profile</a>
+                        <a href="profile" class="btn btn-primary">Profile</a>
                         <a href="change-password.jsp" class="btn btn-secondary">Change Password</a>
                         <a href="ViewRequests.jsp" class="btn btn-success active">My Applications</a>
                     </div>
@@ -194,8 +173,9 @@
                                                 <td>${request.recipientName}</td>
                                                 <td>${request.status}</td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=export&id=${request.exportRequestId}"
-                                                       class="detail-btn">Detail</a>
+                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=export&id=${request.exportRequestId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <c:if test="${request.status == 'draft'}">
@@ -203,7 +183,7 @@
                                                             <input type="hidden" name="action" value="cancel">
                                                             <input type="hidden" name="type" value="export">
                                                             <input type="hidden" name="id" value="${request.exportRequestId}">
-                                                            <button type="submit" class="cancel-btn"
+                                                            <button type="submit" class="btn btn-danger btn-sm mt-2"
                                                                     onclick="return confirm('Are you sure you want to cancel this request?')">Cancel</button>
                                                         </form>
                                                     </c:if>
@@ -251,8 +231,9 @@
                                                 <td>${request.requestDate}</td>
                                                 <td>${request.status}</td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=purchase&id=${request.id}"
-                                                       class="detail-btn">Detail</a>
+                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=purchase&id=${request.id}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <c:if test="${request.status == 'draft'}">
@@ -260,7 +241,7 @@
                                                             <input type="hidden" name="action" value="cancel">
                                                             <input type="hidden" name="type" value="purchase">
                                                             <input type="hidden" name="id" value="${request.id}">
-                                                            <button type="submit" class="cancel-btn"
+                                                            <button type="submit" class="btn btn-danger btn-sm mt-2"
                                                                     onclick="return confirm('Are you sure you want to cancel this request?')">Cancel</button>
                                                         </form>
                                                     </c:if>
@@ -308,8 +289,9 @@
                                                 <td>${request.requestDate}</td>
                                                 <td>${request.status}</td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=repair&id=${request.repairRequestId}"
-                                                       class="detail-btn">Detail</a>
+                                                    <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=repair&id=${request.repairRequestId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <c:if test="${request.status == 'draft'}">
@@ -317,7 +299,7 @@
                                                             <input type="hidden" name="action" value="cancel">
                                                             <input type="hidden" name="type" value="repair">
                                                             <input type="hidden" name="id" value="${request.repairRequestId}">
-                                                            <button type="submit" class="cancel-btn"
+                                                            <button type="submit" class="btn btn-danger btn-sm mt-2"
                                                                     onclick="return confirm('Are you sure you want to cancel this request?')">Cancel</button>
                                                         </form>
                                                     </c:if>
@@ -356,7 +338,6 @@
     <script src="js/script.js"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
-        // Ensure the correct tab is active on page load based on URL parameter
         $(document).ready(function() {
             const urlParams = new URLSearchParams(window.location.search);
             const tab = urlParams.get('tab');
