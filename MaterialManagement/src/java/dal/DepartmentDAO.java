@@ -59,21 +59,22 @@ public class DepartmentDAO extends DBContext {
     }
 
     public List<Material> getMaterials() throws SQLException {
-        List<Material> materials = new ArrayList<>();
-        String sql = "SELECT material_id, material_name FROM Materials WHERE disable = 0";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Material material = new Material();
-                material.setMaterialId(rs.getInt("material_id"));
-                material.setMaterialName(rs.getString("material_name"));
-                materials.add(material);
-            }
-            System.out.println("✅ Lấy danh sách vật tư thành công, số lượng: " + materials.size());
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi getMaterials: " + e.getMessage());
-            throw e;
+    List<Material> materials = new ArrayList<>();
+    String sql = "SELECT material_id, material_name, materials_url FROM Materials WHERE disable = 0";
+    try (PreparedStatement stmt = connection.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+            Material material = new Material();
+            material.setMaterialId(rs.getInt("material_id"));
+            material.setMaterialName(rs.getString("material_name"));
+            material.setMaterialsUrl(rs.getString("materials_url"));
+            materials.add(material);
         }
-        return materials;
+        System.out.println("✅ Lấy danh sách vật tư thành công, số lượng: " + materials.size());
+    } catch (SQLException e) {
+        System.out.println("❌ Lỗi getMaterials: " + e.getMessage());
+        throw e;
     }
+    return materials;
+}
 }

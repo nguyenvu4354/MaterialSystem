@@ -1,83 +1,166 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Request Details</title>
+    <title>Waggy - Request Details</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
+          rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { color: #333; }
-        .detail-container { max-width: 800px; margin: 0 auto; }
-        .detail-container p { margin: 5px 0; }
-        .detail-container ul { list-style-type: disc; margin-left: 20px; }
-        .back-btn { padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
-        .back-btn:hover { background-color: #45a049; }
-        .cancel-btn { padding: 10px 20px; background-color: #f44336; color: white; border: none; cursor: pointer; border-radius: 5px; margin-left: 10px; }
-        .cancel-btn:hover { background-color: #d32f2f; }
-        .message { color: green; margin-bottom: 10px; }
-        .error { color: red; margin-bottom: 10px; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: url('images/background-img.png') no-repeat;
+            background-size: cover;
+        }
+        .detail-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .detail-container h2 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .detail-container h2 span {
+            color: #0d6efd;
+        }
+        .detail-container h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .detail-container p {
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+        .detail-container ul {
+            list-style-type: disc;
+            margin-left: 30px;
+            font-size: 1rem;
+        }
+        .btn {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5c636a;
+            border-color: #565e64;
+        }
+        .alert {
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="detail-container">
-        <h2>${requestType} Request Details</h2>
+    <jsp:include page="HeaderAdmin.jsp" />
 
-        <!-- Display success or error message -->
-        <c:if test="${not empty message}">
-            <div class="${message.startsWith('Error') ? 'error' : 'message'}">
-                ${message}
+    <section id="request-details">
+        <div class="detail-container">
+            <h2 class="display-4 fw-normal text-center mb-4">Request <span class="text-primary">Details</span></h2>
+
+            <!-- Display success or error message -->
+            <c:if test="${not empty message}">
+                <div class="alert ${message.startsWith('Error') ? 'alert-danger' : 'alert-success'}">
+                    ${message}
+                </div>
+            </c:if>
+
+            <p><strong>Request Code:</strong> ${request.requestCode}</p>
+            <p><strong>Request Date:</strong> ${request.requestDate}</p>
+            <p><strong>Status:</strong> ${request.status}</p>
+            <p><strong>Reason:</strong> ${request.reason != null ? request.reason : "N/A"}</p>
+            <p><strong>Approval Reason:</strong> ${request.approvalReason != null ? request.approvalReason : "N/A"}</p>
+            <p><strong>Rejection Reason:</strong> ${request.rejectionReason != null ? request.rejectionReason : "N/A"}</p>
+
+            <c:if test="${requestType == 'Export'}">
+                <p><strong>Recipient:</strong> ${request.recipientName}</p>
+                <p><strong>Approver:</strong> ${request.approverName != null ? request.approverName : "N/A"}</p>
+                <p><strong>Approved At:</strong> ${request.approvedAt != null ? request.approvedAt : "N/A"}</p>
+                <p><strong>Delivery Date:</strong> ${request.deliveryDate != null ? request.deliveryDate : "N/A"}</p>
+            </c:if>
+            <c:if test="${requestType == 'Purchase'}">
+                <p><strong>Estimated Price:</strong> ${request.estimatedPrice != null ? request.estimatedPrice : "N/A"}</p>
+            </c:if>
+            <c:if test="${requestType == 'Repair'}">
+                <p><strong>Repair Person Phone:</strong> ${request.repairPersonPhoneNumber != null ? request.repairPersonPhoneNumber : "N/A"}</p>
+                <p><strong>Repair Person Email:</strong> ${request.repairPersonEmail != null ? request.repairPersonEmail : "N/A"}</p>
+                <p><strong>Repair Location:</strong> ${request.repairLocation != null ? request.repairLocation : "N/A"}</p>
+                <p><strong>Estimated Return Date:</strong> ${request.estimatedReturnDate != null ? request.estimatedReturnDate : "N/A"}</p>
+            </c:if>
+
+            <h3>Details</h3>
+            <ul>
+                <c:forEach var="detail" items="${request.details}">
+                    <c:choose>
+                        <c:when test="${requestType == 'Export'}">
+                            <li>${detail.materialName} (${detail.materialCode}): ${detail.quantity} ${detail.materialUnit} (${detail.exportCondition})</li>
+                        </c:when>
+                        <c:when test="${requestType == 'Purchase'}">
+                            <li>${detail.materialName}: ${detail.quantity} (Notes: ${detail.notes != null ? detail.notes : "N/A"})</li>
+                        </c:when>
+                        <c:when test="${requestType == 'Repair'}">
+                            <li>Material ID: ${detail.materialId}, Quantity: ${detail.quantity}, Damage: ${detail.damageDescription != null ? detail.damageDescription : "N/A"}, Repair Cost: ${detail.repairCost != null ? detail.repairCost : "N/A"}</li>
+                        </c:when>
+                    </c:choose>
+                </c:forEach>
+            </ul>
+
+            <div class="mt-4">
+                <a href="${pageContext.request.contextPath}/ViewRequests" class="btn btn-secondary">Back to Requests</a>
+                <c:if test="${request.status == 'draft'}">
+                    <form action="${pageContext.request.contextPath}/ViewRequestDetails" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="cancel">
+                        <input type="hidden" name="type" value="${requestType.toLowerCase()}">
+                        <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.id : request.repairRequestId)}">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel Request</button>
+                    </form>
+                </c:if>
             </div>
-        </c:if>
+        </div>
+    </section>
 
-        <p><strong>Request Code:</strong> ${request.requestCode}</p>
-        <p><strong>Request Date:</strong> ${request.requestDate}</p>
-        <p><strong>Status:</strong> ${request.status}</p>
-        <p><strong>Reason:</strong> ${request.reason != null ? request.reason : "N/A"}</p>
-        <p><strong>Approval Reason:</strong> ${request.approvalReason != null ? request.approvalReason : "N/A"}</p>
-        <p><strong>Rejection Reason:</strong> ${request.rejectionReason != null ? request.rejectionReason : "N/A"}</p>
-
-        <c:if test="${requestType == 'Export'}">
-            <p><strong>Recipient:</strong> ${request.recipientName}</p>
-            <p><strong>Approver:</strong> ${request.approverName != null ? request.approverName : "N/A"}</p>
-            <p><strong>Approved At:</strong> ${request.approvedAt != null ? request.approvedAt : "N/A"}</p>
-            <p><strong>Delivery Date:</strong> ${request.deliveryDate != null ? request.deliveryDate : "N/A"}</p>
-        </c:if>
-        <c:if test="${requestType == 'Purchase'}">
-            <p><strong>Estimated Price:</strong> ${request.estimatedPrice != null ? request.estimatedPrice : "N/A"}</p>
-        </c:if>
-        <c:if test="${requestType == 'Repair'}">
-            <p><strong>Repair Person Phone:</strong> ${request.repairPersonPhoneNumber != null ? request.repairPersonPhoneNumber : "N/A"}</p>
-            <p><strong>Repair Person Email:</strong> ${request.repairPersonEmail != null ? request.repairPersonEmail : "N/A"}</p>
-            <p><strong>Repair Location:</strong> ${request.repairLocation != null ? request.repairLocation : "N/A"}</p>
-            <p><strong>Estimated Return Date:</strong> ${request.estimatedReturnDate != null ? request.estimatedReturnDate : "N/A"}</p>
-        </c:if>
-
-        <h3>Details</h3>
-        <ul>
-            <c:forEach var="detail" items="${request.details}">
-                <c:choose>
-                    <c:when test="${requestType == 'Export'}">
-                        <li>${detail.materialName} (${detail.materialCode}): ${detail.quantity} ${detail.materialUnit} (${detail.exportCondition})</li>
-                    </c:when>
-                    <c:when test="${requestType == 'Purchase'}">
-                        <li>${detail.materialName}: ${detail.quantity} (Notes: ${detail.notes != null ? detail.notes : "N/A"})</li>
-                    </c:when>
-                    <c:when test="${requestType == 'Repair'}">
-                        <li>Material ID: ${detail.materialId}, Quantity: ${detail.quantity}, Damage: ${detail.damageDescription != null ? detail.damageDescription : "N/A"}, Repair Cost: ${detail.repairCost != null ? detail.repairCost : "N/A"}</li>
-                    </c:when>
-                </c:choose>
-            </c:forEach>
-        </ul>
-
-        <a href="${pageContext.request.contextPath}/ViewRequests" class="back-btn">Back to Requests</a>
-        <c:if test="${request.status == 'draft'}">
-            <form action="${pageContext.request.contextPath}/ViewRequestDetails" method="post" style="display:inline;">
-                <input type="hidden" name="action" value="cancel">
-                <input type="hidden" name="type" value="${requestType.toLowerCase()}">
-                <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.id : request.repairRequestId)}">
-                <button type="submit" class="cancel-btn" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel Request</button>
-            </form>
-        </c:if>
-    </div>
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="js/plugins.js"></script>
+    <script src="js/script.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </body>
-</html>
+</html> 
