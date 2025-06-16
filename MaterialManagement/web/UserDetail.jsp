@@ -33,7 +33,6 @@
 <body>
     <jsp:include page="HeaderAdmin.jsp" />
 
-    <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
