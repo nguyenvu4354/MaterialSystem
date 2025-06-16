@@ -5,7 +5,6 @@
 package entity;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 /**
  *
  * @author Admin
@@ -16,7 +15,6 @@ public class ImportDetail {
     private int materialId;
     private int quantity;
     private double unitPrice;
-    private LocalDate expiryDate;
     private String materialCondition;
     private String status;
     private LocalDateTime createdAt;
@@ -61,14 +59,6 @@ public class ImportDetail {
         this.unitPrice = unitPrice;
     }
 
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
     public String getMaterialCondition() {
         return materialCondition;
     }
@@ -92,6 +82,7 @@ public class ImportDetail {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
 
 
 

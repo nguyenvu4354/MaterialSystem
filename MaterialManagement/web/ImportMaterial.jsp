@@ -4,37 +4,220 @@
 <html>
 <head>
     <title>Import Materials</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1.5rem;
         }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+        .table th {
+            background-color: #f8f9fa;
         }
-        th {
-            background-color: #f2f2f2;
+        .form-label {
+            font-weight: 500;
         }
-        .error {
-            color: red;
+        .alert {
+            margin-bottom: 1rem;
         }
-        .success {
-            color: green;
+        .btn-icon {
+            margin-right: 0.5rem;
         }
-        .add-material-form {
-            margin-bottom: 20px;
-        }
-        .confirm-form label {
-            display: inline-block;
-            width: 120px;
-            margin: 5px 0;
-        }
-        .confirm-form input, .confirm-form select, .confirm-form textarea {
-            margin: 5px 0;
+        .material-list {
+            max-height: 400px;
+            overflow-y: auto;
         }
     </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4"><i class="fas fa-box-open me-2"></i>Import Materials</h2>
+                
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>${error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${success}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+
+                <!-- Add Material Form -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-plus-circle me-2"></i>Add Material to Import</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="ImportMaterial" method="post" class="row g-3">
+                            <input type="hidden" name="action" value="add">
+                            <div class="col-md-3">
+                                <label class="form-label">Material</label>
+                                <select name="materialId" class="form-select" required>
+                                    <option value="">Select Material</option>
+                                    <c:forEach var="material" items="${materials}">
+                                        <option value="${material.materialId}">${material.materialName} (${material.unit.name}) - ${material.category.categoryName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" name="quantity" class="form-control" min="1" required onchange="validateQuantity(this)">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Unit Price</label>
+                                <input type="number" name="unitPrice" class="form-control" min="0" step="0.01" required onchange="validateUnitPrice(this)">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Condition</label>
+                                <select name="materialCondition" class="form-select" required>
+                                    <option value="new">New</option>
+                                    <option value="used">Used</option>
+                                    <option value="refurbished">Refurbished</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="date" name="expiryDate" class="form-control">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">Damaged</label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" name="isDamaged" class="form-check-input" value="true">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle me-2"></i>Add to Import
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Import List -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Current Import List</h5>
+                    </div>
+                    <div class="card-body">
+                        <c:if test="${not empty importDetails}">
+                            <div class="table-responsive material-list">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Unit</th>
+                                            <th>Category</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Price</th>
+                                            <th>Condition</th>
+                                            <th>Expiry Date</th>
+                                            <th>Stock Available</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="detail" items="${importDetails}">
+                                            <tr>
+                                                <td>${materialMap[detail.materialId].materialName}</td>
+                                                <td>${materialMap[detail.materialId].unit.name}</td>
+                                                <td>${materialMap[detail.materialId].category.categoryName}</td>
+                                                <td>
+                                                    <form action="ImportMaterial" method="post" class="d-flex align-items-center">
+                                                        <input type="hidden" name="action" value="updateQuantity">
+                                                        <input type="hidden" name="materialId" value="${detail.materialId}">
+                                                        <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
+                                                        <input type="number" name="quantity" value="${detail.quantity}" class="form-control form-control-sm" style="width: 80px" min="1" required onchange="validateQuantity(this)">
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
+                                                            <i class="fas fa-sync-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                                <td>${detail.unitPrice}</td>
+                                                <td>${detail.materialCondition}</td>
+                                                <td>${detail.expiryDate}</td>
+                                                <td>${stockMap[detail.materialId]}</td>
+                                                <td>
+                                                    <form action="ImportMaterial" method="post" class="d-inline">
+                                                        <input type="hidden" name="action" value="remove">
+                                                        <input type="hidden" name="materialId" value="${detail.materialId}">
+                                                        <input type="hidden" name="quantity" value="${detail.quantity}">
+                                                        <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:if>
+                    </div>
+                </div>
+
+                <!-- Confirm Import Form -->
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0"><i class="fas fa-check-circle me-2"></i>Confirm Import</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="ImportMaterial" method="post" class="row g-3">
+                            <input type="hidden" name="action" value="import">
+                            <div class="col-md-4">
+                                <label class="form-label">Supplier</label>
+                                <select name="supplierId" class="form-select" required>
+                                    <option value="">Select Supplier</option>
+                                    <c:forEach var="supplier" items="${suppliers}">
+                                        <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Destination</label>
+                                <input type="text" name="destination" class="form-control" placeholder="Enter destination" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Batch Number</label>
+                                <input type="text" name="batchNumber" class="form-control" maxlength="50" placeholder="Enter batch number" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Actual Arrival</label>
+                                <input type="datetime-local" name="actualArrival" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Is Damaged</label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" name="isDamaged" class="form-check-input" value="true">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Note</label>
+                                <textarea name="note" class="form-control" rows="1" placeholder="Enter note"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check-circle me-2"></i>Confirm Import
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function validateQuantity(input) {
             if (input.value <= 0) {
@@ -42,6 +225,7 @@
                 input.value = 1;
             }
         }
+        
         function validateUnitPrice(input) {
             if (input.value < 0) {
                 alert("Unit price cannot be negative.");
@@ -49,127 +233,5 @@
             }
         }
     </script>
-</head>
-<body>
-    <h1>Import Materials</h1>
-
-    <c:if test="${not empty error}">
-        <p class="error">${error}</p>
-    </c:if>
-    <c:if test="${not empty success}">
-        <p class="success">${success}</p>
-    </c:if>
-
-    <h2>Add Material to Import</h2>
-    <form action="ImportMaterial" method="post" class="add-material-form">
-        <input type="hidden" name="action" value="add">
-        <table>
-            <thead>
-                <tr>
-                    <th>Material</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Condition</th>
-                    <th>Expiry Date</th>
-                    <th>Is Damaged</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <select name="materialId" required>
-                            <option value="">Select Material</option>
-                            <c:forEach var="material" items="${materials}">
-                                <option value="${material.materialId}">${material.materialName} (${material.unit.name}) - ${material.category.categoryName}</option>
-                            </c:forEach>
-                        </select>
-                    </td>
-                    <td><input type="number" name="quantity" min="1" required onchange="validateQuantity(this)"></td>
-                    <td><input type="number" name="unitPrice" min="0" step="0.01" required onchange="validateUnitPrice(this)"></td>
-                    <td>
-                        <select name="materialCondition" required>
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
-                            <option value="refurbished">Refurbished</option>
-                        </select>
-                    </td>
-                    <td><input type="date" name="expiryDate"></td>
-                    <td><input type="checkbox" name="isDamaged" value="true"></td>
-                </tr>
-            </tbody>
-        </table>
-        <input type="submit" value="Add to Import">
-    </form>
-
-    <h2>Current Import List</h2>
-    <c:if test="${not empty importDetails}">
-        <table>
-            <thead>
-                <th>Material</th>
-                <th>Unit</th>
-                <th>Category</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Condition</th>
-                <th>Expiry Date</th>
-                <th>Stock Available</th>
-                <th>Actions</th>
-            </thead>
-            <tbody>
-                <c:forEach var="detail" items="${importDetails}">
-                    <tr>
-                        <td>${materialMap[detail.materialId].materialName}</td>
-                        <td>${materialMap[detail.materialId].unit.name}</td>
-                        <td>${materialMap[detail.materialId].category.categoryName}</td>
-                        <td>
-                            <form action="ImportMaterial" method="post" style="display:inline;">
-                                <input type="hidden" name="action" value="updateQuantity">
-                                <input type="hidden" name="materialId" value="1">
-                                <input type="hidden" name="materialCondition" value="${detail.quantity}">
-                                <input type="number" name="quantity" value="1" min="1" required onchange="validateQuantity(this)">
-                                <input type="submit" value="Update">
-                            </form>
-                        </td>
-                        <td>${detail.unitPrice}</td>
-                        <td>${detail.materialCondition}</td>
-                        <td>${detail.expiryDate}</td>
-                        <td>${stockMap[detail.materialId]}</td>
-                        <td>
-                            <form action="ImportMaterial" method="post" style="true">
-                                <input type="hidden" name="action" value="remove">
-                                <input type="hidden" name="materialId" value="${detail.materialId}">
-                                    <input type="hidden" name="quantity" value="${detail.quantity}">
-                                    <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                                    <input type="submit" value="Remove">
-                                </form>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </c:if>
-
-    <h2>Confirm Import</h2>
-    <form action="ImportMaterial" method="post" class="confirm-form">
-        <input type="hidden" name="action" value="import">
-        <label>Supplier:</label>
-        <select name="supplierId">
-            <option value="">Select Supplier</option>
-            <c:forEach var="supplier" items="${suppliers}">
-                <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-            </c:forEach>
-        </select><br>
-        <label>Destination:</label>
-        <input type="text" name="destination"><br>
-        <label>Batch Number:</label>
-        input<input type="text" name="batchNumber" maxlength="50"><br>
-        <label>Actual Arrival:</label>
-        <input type="datetime-local" name="actualArrival"><br>
-        <label>Is Damaged:</label>
-        <input type="checkbox" name="isDamaged" value="true"><br>
-        <label>Note:</label>
-        <textarea name="note"></textarea><br>
-        <input type="submit" value="Confirm Import">
-    </form>
 </body>
 </html>

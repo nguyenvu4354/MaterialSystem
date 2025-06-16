@@ -43,7 +43,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void createImportDetails(List<ImportDetail> details) throws SQLException {
-        String sql = "INSERT INTO Import_Details (import_id, material_id, quantity, unit_price, expiry_date, material_condition, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Import_Details (import_id, material_id, quantity, unit_price, material_condition, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (ImportDetail detail : details) {
                 if (detail.getQuantity() <= 0) {
@@ -59,10 +59,9 @@ public class ImportDAO extends DBContext {
                     stmt.setInt(2, detail.getMaterialId());
                     stmt.setInt(3, detail.getQuantity());
                     stmt.setDouble(4, detail.getUnitPrice());
-                    stmt.setObject(5, detail.getExpiryDate());
-                    stmt.setString(6, detail.getMaterialCondition());
-                    stmt.setString(7, detail.getStatus());
-                    stmt.setObject(8, detail.getCreatedAt());
+                    stmt.setString(5, detail.getMaterialCondition());
+                    stmt.setString(6, detail.getStatus());
+                    stmt.setObject(7, detail.getCreatedAt());
                     stmt.addBatch();
                 }
             }
@@ -89,7 +88,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setExpiryDate(rs.getDate("expiry_date") != null ? rs.getDate("expiry_date").toLocalDate() : null);
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -134,7 +132,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setExpiryDate(rs.getDate("expiry_date") != null ? rs.getDate("expiry_date").toLocalDate() : null);
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -197,7 +194,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setExpiryDate(rs.getDate("expiry_date") != null ? rs.getDate("expiry_date").toLocalDate() : null);
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -215,6 +211,30 @@ public class ImportDAO extends DBContext {
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("No import found to delete for import ID: " + importId);
             }
+        }
+    }
+
+    // Thêm hàm main để test kết nối và truy vấn dữ liệu
+    public static void main(String[] args) {
+        ImportDAO dao = new ImportDAO();
+        try {
+            // Test lấy tất cả các Import_Details (nếu muốn test Imports thì có thể viết thêm hàm getAllImports)
+            int testImportId = 1; // Thay đổi ID này cho phù hợp với dữ liệu thực tế
+            List<ImportDetail> details = dao.getDraftImportDetails(testImportId);
+            System.out.println("===== Danh sách Import_Details (status = draft) cho import_id = " + testImportId + " =====");
+            for (ImportDetail d : details) {
+                System.out.println("ImportDetailId: " + d.getImportDetailId());
+                System.out.println("ImportId: " + d.getImportId());
+                System.out.println("MaterialId: " + d.getMaterialId());
+                System.out.println("Quantity: " + d.getQuantity());
+                System.out.println("UnitPrice: " + d.getUnitPrice());
+                System.out.println("MaterialCondition: " + d.getMaterialCondition());
+                System.out.println("Status: " + d.getStatus());
+                System.out.println("CreatedAt: " + d.getCreatedAt());
+                System.out.println("-----------------------------------");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
