@@ -1,5 +1,6 @@
-package dal;
+package controller;
 
+import dal.*;
 import controller.*;
 import dal.RepairRequestDAO;
 import entity.RepairRequest;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "RepairRequestServlet", urlPatterns = {"/repairrequest"})
-public class RepairRequestServlet extends HttpServlet {
+public class RepairRequestServlet1 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
