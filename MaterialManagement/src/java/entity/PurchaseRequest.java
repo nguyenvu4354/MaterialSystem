@@ -11,11 +11,8 @@ public class PurchaseRequest {
     private int purchaseRequestId;
     private String requestCode;
     private int userId;
-    private String userName;
-    private String email;
-    private String phoneNumber;
     private Timestamp requestDate;
-    private String status; // ENUM: draft, approved, rejected, cancel
+    private String status; // ENUM: PENDING, APPROVED, REJECTED, CANCELLED
     private double estimatedPrice;
     private String reason;
     private Integer approvedBy;
@@ -28,26 +25,6 @@ public class PurchaseRequest {
     private List<PurchaseRequestDetail> details;
 
     public PurchaseRequest() {
-    }
-
-    public PurchaseRequest(int purchaseRequestId, String requestCode, int userId, Timestamp requestDate, String status, 
-                           double estimatedPrice, String reason, Integer approvedBy, String approvalReason, 
-                           Timestamp approvedAt, String rejectionReason, Timestamp createdAt, Timestamp updatedAt, 
-                           boolean disable) {
-        this.purchaseRequestId = purchaseRequestId;
-        this.requestCode = requestCode;
-        this.userId = userId;
-        this.requestDate = requestDate;
-        this.status = status;
-        this.estimatedPrice = estimatedPrice;
-        this.reason = reason;
-        this.approvedBy = approvedBy;
-        this.approvalReason = approvalReason;
-        this.approvedAt = approvedAt;
-        this.rejectionReason = rejectionReason;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.disable = disable;
     }
 
     public int getPurchaseRequestId() {
@@ -72,30 +49,6 @@ public class PurchaseRequest {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public Timestamp getRequestDate() {

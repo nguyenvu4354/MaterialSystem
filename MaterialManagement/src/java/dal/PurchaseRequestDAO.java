@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -57,51 +59,48 @@ public class PurchaseRequestDAO extends DBContext {
         List<PurchaseRequest> list = new ArrayList<>();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT pr.*, u.full_name, u.email, u.phone_number ")
-               .append("FROM material_management.purchase_requests pr ")
-               .append("LEFT JOIN material_management.users u ON pr.user_id = u.user_id ")
-               .append("WHERE pr.disable = 0 ");
+            sql.append("SELECT * FROM material_management.purchase_requests WHERE disable = 0 ");
 
             List<Object> params = new ArrayList<>();
 
             if (keyword != null && !keyword.isEmpty()) {
-                sql.append("AND (pr.request_code LIKE ? OR pr.purchase_request_id LIKE ?) ");
+                sql.append("AND (request_code LIKE ? OR purchase_request_id LIKE ?) ");
                 params.add("%" + keyword + "%");
                 params.add("%" + keyword + "%");
             }
 
             if (status != null && !status.isEmpty()) {
-                sql.append("AND pr.status = ? ");
+                sql.append("AND status = ? ");
                 params.add(status);
             }
 
-            String sortBy = "pr.request_date";
+            String sortBy = "request_date";
             String sortOrder = "DESC";
 
             if (sortOption != null) {
                 switch (sortOption) {
                     case "code_asc":
-                        sortBy = "pr.request_code";
+                        sortBy = "request_code";
                         sortOrder = "ASC";
                         break;
                     case "code_desc":
-                        sortBy = "pr.request_code";
+                        sortBy = "request_code";
                         sortOrder = "DESC";
                         break;
                     case "date_asc":
-                        sortBy = "pr.request_date";
+                        sortBy = "request_date";
                         sortOrder = "ASC";
                         break;
                     case "date_desc":
-                        sortBy = "pr.request_date";
+                        sortBy = "request_date";
                         sortOrder = "DESC";
                         break;
                     case "status_asc":
-                        sortBy = "pr.status";
+                        sortBy = "status";
                         sortOrder = "ASC";
                         break;
                     case "status_desc":
-                        sortBy = "pr.status";
+                        sortBy = "status";
                         sortOrder = "DESC";
                         break;
                 }
@@ -135,10 +134,6 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setCreatedAt(rs.getTimestamp("created_at"));
                 pr.setUpdatedAt(rs.getTimestamp("updated_at"));
                 pr.setDisable(rs.getBoolean("disable"));
-                
-                // Set thông tin người dùng
-                pr.setUserName(rs.getString("full_name"));
-                
                 list.add(pr);
             }
         } catch (SQLException ex) {
