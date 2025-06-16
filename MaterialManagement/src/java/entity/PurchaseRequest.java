@@ -1,6 +1,6 @@
 package entity;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -8,30 +8,33 @@ import java.util.List;
  * @author Admin
  */
 public class PurchaseRequest {
-    private int id;
+    private int purchaseRequestId;
     private String requestCode;
     private int userId;
-    private Date requestDate;
-    private String status;
-    private Double estimatedPrice;
+    private String userName;
+    private String email;
+    private String phoneNumber;
+    private Timestamp requestDate;
+    private String status; // ENUM: draft, approved, rejected, cancel
+    private double estimatedPrice;
     private String reason;
     private Integer approvedBy;
     private String approvalReason;
-    private Date approvedAt;
+    private Timestamp approvedAt;
     private String rejectionReason;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private boolean disable;
-    private List<PurchaseRequestDetail> details; // Added field for details
+    private List<PurchaseRequestDetail> details;
 
     public PurchaseRequest() {
     }
 
-    public PurchaseRequest(int id, String requestCode, int userId, Date requestDate, String status, 
-                           Double estimatedPrice, String reason, Integer approvedBy, String approvalReason, 
-                           Date approvedAt, String rejectionReason, Date createdAt, Date updatedAt, 
+    public PurchaseRequest(int purchaseRequestId, String requestCode, int userId, Timestamp requestDate, String status, 
+                           double estimatedPrice, String reason, Integer approvedBy, String approvalReason, 
+                           Timestamp approvedAt, String rejectionReason, Timestamp createdAt, Timestamp updatedAt, 
                            boolean disable) {
-        this.id = id;
+        this.purchaseRequestId = purchaseRequestId;
         this.requestCode = requestCode;
         this.userId = userId;
         this.requestDate = requestDate;
@@ -47,12 +50,12 @@ public class PurchaseRequest {
         this.disable = disable;
     }
 
-    public int getId() {
-        return id;
+    public int getPurchaseRequestId() {
+        return purchaseRequestId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setPurchaseRequestId(int purchaseRequestId) {
+        this.purchaseRequestId = purchaseRequestId;
     }
 
     public String getRequestCode() {
@@ -71,11 +74,35 @@ public class PurchaseRequest {
         this.userId = userId;
     }
 
-    public Date getRequestDate() {
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Timestamp getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
+    public void setRequestDate(Timestamp requestDate) {
         this.requestDate = requestDate;
     }
 
@@ -87,11 +114,11 @@ public class PurchaseRequest {
         this.status = status;
     }
 
-    public Double getEstimatedPrice() {
+    public double getEstimatedPrice() {
         return estimatedPrice;
     }
 
-    public void setEstimatedPrice(Double estimatedPrice) {
+    public void setEstimatedPrice(double estimatedPrice) {
         this.estimatedPrice = estimatedPrice;
     }
 
@@ -119,11 +146,11 @@ public class PurchaseRequest {
         this.approvalReason = approvalReason;
     }
 
-    public Date getApprovedAt() {
+    public Timestamp getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(Date approvedAt) {
+    public void setApprovedAt(Timestamp approvedAt) {
         this.approvedAt = approvedAt;
     }
 
@@ -135,19 +162,19 @@ public class PurchaseRequest {
         this.rejectionReason = rejectionReason;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
