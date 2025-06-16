@@ -1,11 +1,12 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Click nb://SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package entity;
 
 import java.sql.Timestamp;
 import java.sql.Date;
+import java.util.List;
 
 /**
  *
@@ -29,14 +30,18 @@ public class RepairRequest {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private boolean disable;
+    private List<RepairRequestDetail> details; // Added field
 
     // Constructor mặc định
     public RepairRequest() {
     }
 
-    // Constructor với tất cả các thuộc tính
-
-    public RepairRequest(int repairRequestId, String requestCode, int userId, Timestamp requestDate, String repairPersonPhoneNumber, String repairPersonEmail, String repairLocation, Date estimatedReturnDate, String status, String reason, Integer approvedBy, String approvalReason, Timestamp approvedAt, String rejectionReason, Timestamp createdAt, Timestamp updatedAt, boolean disable) {
+    // Constructor với tất cả các thuộc tính, including details
+    public RepairRequest(int repairRequestId, String requestCode, int userId, Timestamp requestDate, 
+            String repairPersonPhoneNumber, String repairPersonEmail, String repairLocation, 
+            Date estimatedReturnDate, String status, String reason, Integer approvedBy, 
+            String approvalReason, Timestamp approvedAt, String rejectionReason, 
+            Timestamp createdAt, Timestamp updatedAt, boolean disable, List<RepairRequestDetail> details) {
         this.repairRequestId = repairRequestId;
         this.requestCode = requestCode;
         this.userId = userId;
@@ -54,6 +59,7 @@ public class RepairRequest {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.disable = disable;
+        this.details = details;
     }
 
     public int getRepairRequestId() {
@@ -192,6 +198,14 @@ public class RepairRequest {
         this.disable = disable;
     }
 
+    // Getter and setter for details
+    public List<RepairRequestDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<RepairRequestDetail> details) {
+        this.details = details;
+    }
 
     @Override
     public String toString() {
@@ -213,6 +227,7 @@ public class RepairRequest {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", disable=" + disable +
+                ", details=" + details +
                 '}';
     }
 }

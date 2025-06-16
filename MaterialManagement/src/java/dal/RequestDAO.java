@@ -22,12 +22,12 @@ public class RequestDAO extends DBContext {
     public List<ExportRequest> getExportRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         List<ExportRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name " +
-                "FROM Export_Requests er " +
-                "JOIN Users u1 ON er.user_id = u1.user_id " +
-                "JOIN Users u2 ON er.recipient_user_id = u2.user_id " +
-                "LEFT JOIN Users u3 ON er.approved_by = u3.user_id " +
-                "WHERE er.user_id = ? AND er.disable = 0 "
+                "SELECT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name "
+                + "FROM Export_Requests er "
+                + "JOIN Users u1 ON er.user_id = u1.user_id "
+                + "JOIN Users u2 ON er.recipient_user_id = u2.user_id "
+                + "LEFT JOIN Users u3 ON er.approved_by = u3.user_id "
+                + "WHERE er.user_id = ? AND er.disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -91,12 +91,12 @@ public class RequestDAO extends DBContext {
 
     // Fetch a single export request by ID
     public ExportRequest getExportRequestById(int exportRequestId) {
-        String sql = "SELECT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name " +
-                     "FROM Export_Requests er " +
-                     "JOIN Users u1 ON er.user_id = u1.user_id " +
-                     "JOIN Users u2 ON er.recipient_user_id = u2.user_id " +
-                     "LEFT JOIN Users u3 ON er.approved_by = u3.user_id " +
-                     "WHERE er.export_request_id = ? AND er.disable = 0";
+        String sql = "SELECT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name "
+                + "FROM Export_Requests er "
+                + "JOIN Users u1 ON er.user_id = u1.user_id "
+                + "JOIN Users u2 ON er.recipient_user_id = u2.user_id "
+                + "LEFT JOIN Users u3 ON er.approved_by = u3.user_id "
+                + "WHERE er.export_request_id = ? AND er.disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, exportRequestId);
             ResultSet rs = ps.executeQuery();
@@ -130,11 +130,11 @@ public class RequestDAO extends DBContext {
     // Fetch details for a specific export request
     private List<ExportRequestDetail> getExportRequestDetails(int exportRequestId) {
         List<ExportRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT erd.*, m.material_code, m.material_name, u.unit_name " +
-                     "FROM Export_Request_Details erd " +
-                     "JOIN Materials m ON erd.material_id = m.material_id " +
-                     "LEFT JOIN Units u ON m.unit_id = u.unit_id " +
-                     "WHERE erd.export_request_id = ?";
+        String sql = "SELECT erd.*, m.material_code, m.material_name, u.unit_name "
+                + "FROM Export_Request_Details erd "
+                + "JOIN Materials m ON erd.material_id = m.material_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "WHERE erd.export_request_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, exportRequestId);
@@ -163,8 +163,8 @@ public class RequestDAO extends DBContext {
     // Count export requests for a user with filtering
     public int getExportRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Export_Requests " +
-                "WHERE user_id = ? AND disable = 0 "
+                "SELECT COUNT(*) FROM Export_Requests "
+                + "WHERE user_id = ? AND disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -208,11 +208,11 @@ public class RequestDAO extends DBContext {
     public List<PurchaseRequest> getPurchaseRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         List<PurchaseRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT pr.*, u.full_name AS user_name, u2.full_name AS approver_name " +
-                "FROM Purchase_Requests pr " +
-                "JOIN Users u ON pr.user_id = u.user_id " +
-                "LEFT JOIN Users u2 ON pr.approved_by = u2.user_id " +
-                "WHERE pr.user_id = ? AND pr.disable = 0 "
+                "SELECT pr.*, u.full_name AS user_name, u2.full_name AS approver_name "
+                + "FROM Purchase_Requests pr "
+                + "JOIN Users u ON pr.user_id = u.user_id "
+                + "LEFT JOIN Users u2 ON pr.approved_by = u2.user_id "
+                + "WHERE pr.user_id = ? AND pr.disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -248,7 +248,7 @@ public class RequestDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 PurchaseRequest request = new PurchaseRequest();
-                request.setId(rs.getInt("purchase_request_id"));
+                request.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
@@ -262,7 +262,7 @@ public class RequestDAO extends DBContext {
                 request.setCreatedAt(rs.getTimestamp("created_at"));
                 request.setUpdatedAt(rs.getTimestamp("updated_at"));
                 request.setDisable(rs.getBoolean("disable"));
-                request.setDetails(getPurchaseRequestDetails(request.getId()));
+                request.setDetails(getPurchaseRequestDetails(request.getPurchaseRequestId()));
                 requests.add(request);
             }
             System.out.println("✅ Lấy danh sách purchase requests thành công, số lượng: " + requests.size());
@@ -275,17 +275,17 @@ public class RequestDAO extends DBContext {
 
     // Fetch a single purchase request by ID
     public PurchaseRequest getPurchaseRequestById(int purchaseRequestId) {
-        String sql = "SELECT pr.*, u.full_name AS user_name, u2.full_name AS approver_name " +
-                     "FROM Purchase_Requests pr " +
-                     "JOIN Users u ON pr.user_id = u.user_id " +
-                     "LEFT JOIN Users u2 ON pr.approved_by = u2.user_id " +
-                     "WHERE pr.purchase_request_id = ? AND pr.disable = 0";
+        String sql = "SELECT pr.*, u.full_name AS user_name, u2.full_name AS approver_name "
+                + "FROM Purchase_Requests pr "
+                + "JOIN Users u ON pr.user_id = u.user_id "
+                + "LEFT JOIN Users u2 ON pr.approved_by = u2.user_id "
+                + "WHERE pr.purchase_request_id = ? AND pr.disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, purchaseRequestId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 PurchaseRequest request = new PurchaseRequest();
-                request.setId(rs.getInt("purchase_request_id"));
+                request.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
@@ -312,17 +312,17 @@ public class RequestDAO extends DBContext {
     // Fetch details for a specific purchase request
     private List<PurchaseRequestDetail> getPurchaseRequestDetails(int purchaseRequestId) {
         List<PurchaseRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT prd.*, c.category_name " +
-                     "FROM Purchase_Request_Details prd " +
-                     "JOIN Categories c ON prd.category_id = c.category_id " +
-                     "WHERE prd.purchase_request_id = ?";
+        String sql = "SELECT prd.*, c.category_name "
+                + "FROM Purchase_Request_Details prd "
+                + "JOIN Categories c ON prd.category_id = c.category_id "
+                + "WHERE prd.purchase_request_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, purchaseRequestId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 PurchaseRequestDetail detail = new PurchaseRequestDetail();
-                detail.setId(rs.getInt("detail_id"));
+                detail.setDetailId(rs.getInt("detail_id"));
                 detail.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 detail.setMaterialName(rs.getString("material_name"));
                 detail.setCategoryId(rs.getInt("category_id"));
@@ -342,8 +342,8 @@ public class RequestDAO extends DBContext {
     // Count purchase requests for a user with filtering
     public int getPurchaseRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Purchase_Requests " +
-                "WHERE user_id = ? AND disable = 0 "
+                "SELECT COUNT(*) FROM Purchase_Requests "
+                + "WHERE user_id = ? AND disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -387,11 +387,11 @@ public class RequestDAO extends DBContext {
     public List<RepairRequest> getRepairRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         List<RepairRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT rr.*, u.full_name AS user_name, u2.full_name AS approver_name " +
-                "FROM Repair_Requests rr " +
-                "JOIN Users u ON rr.user_id = u.user_id " +
-                "LEFT JOIN Users u2 ON rr.approved_by = u2.user_id " +
-                "WHERE rr.user_id = ? AND rr.disable = 0 "
+                "SELECT rr.*, u.full_name AS user_name, u2.full_name AS approver_name "
+                + "FROM Repair_Requests rr "
+                + "JOIN Users u ON rr.user_id = u.user_id "
+                + "LEFT JOIN Users u2 ON rr.approved_by = u2.user_id "
+                + "WHERE rr.user_id = ? AND rr.disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -430,24 +430,19 @@ public class RequestDAO extends DBContext {
                 request.setRepairRequestId(rs.getInt("repair_request_id"));
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
-                request.setRequestDate(rs.getTimestamp("request_date") != null 
-                    ? rs.getTimestamp("request_date").toLocalDateTime() : null);
+                request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
                 request.setRepairPersonEmail(rs.getString("repair_person_email"));
                 request.setRepairLocation(rs.getString("repair_location"));
-                request.setEstimatedReturnDate(rs.getTimestamp("estimated_return_date") != null 
-                    ? rs.getTimestamp("estimated_return_date").toLocalDateTime() : null);
+                request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 request.setApprovalReason(rs.getString("approval_reason"));
-                request.setApprovedAt(rs.getTimestamp("approved_at") != null 
-                    ? rs.getTimestamp("approved_at").toLocalDateTime() : null);
+                request.setApprovedAt(rs.getTimestamp("approved_at"));
                 request.setRejectionReason(rs.getString("rejection_reason"));
-                request.setCreatedAt(rs.getTimestamp("created_at") != null 
-                    ? rs.getTimestamp("created_at").toLocalDateTime() : null);
-                request.setUpdatedAt(rs.getTimestamp("updated_at") != null 
-                    ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                request.setCreatedAt(rs.getTimestamp("created_at"));
+                request.setUpdatedAt(rs.getTimestamp("updated_at"));
                 request.setDisable(rs.getBoolean("disable"));
                 request.setDetails(getRepairRequestDetails(request.getRepairRequestId()));
                 requests.add(request);
@@ -462,11 +457,11 @@ public class RequestDAO extends DBContext {
 
     // Fetch a single repair request by ID
     public RepairRequest getRepairRequestById(int repairRequestId) {
-        String sql = "SELECT rr.*, u.full_name AS user_name, u2.full_name AS approver_name " +
-                     "FROM Repair_Requests rr " +
-                     "JOIN Users u ON rr.user_id = u.user_id " +
-                     "LEFT JOIN Users u2 ON rr.approved_by = u2.user_id " +
-                     "WHERE rr.repair_request_id = ? AND rr.disable = 0";
+        String sql = "SELECT rr.*, u.full_name AS user_name, u2.full_name AS approver_name "
+                + "FROM Repair_Requests rr "
+                + "JOIN Users u ON rr.user_id = u.user_id "
+                + "LEFT JOIN Users u2 ON rr.approved_by = u2.user_id "
+                + "WHERE rr.repair_request_id = ? AND rr.disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
             ResultSet rs = ps.executeQuery();
@@ -475,24 +470,19 @@ public class RequestDAO extends DBContext {
                 request.setRepairRequestId(rs.getInt("repair_request_id"));
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
-                request.setRequestDate(rs.getTimestamp("request_date") != null 
-                    ? rs.getTimestamp("request_date").toLocalDateTime() : null);
+                request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
                 request.setRepairPersonEmail(rs.getString("repair_person_email"));
                 request.setRepairLocation(rs.getString("repair_location"));
-                request.setEstimatedReturnDate(rs.getTimestamp("estimated_return_date") != null 
-                    ? rs.getTimestamp("estimated_return_date").toLocalDateTime() : null);
+                request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 request.setApprovalReason(rs.getString("approval_reason"));
-                request.setApprovedAt(rs.getTimestamp("approved_at") != null 
-                    ? rs.getTimestamp("approved_at").toLocalDateTime() : null);
+                request.setApprovedAt(rs.getTimestamp("approved_at"));
                 request.setRejectionReason(rs.getString("rejection_reason"));
-                request.setCreatedAt(rs.getTimestamp("created_at") != null 
-                    ? rs.getTimestamp("created_at").toLocalDateTime() : null);
-                request.setUpdatedAt(rs.getTimestamp("updated_at") != null 
-                    ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                request.setCreatedAt(rs.getTimestamp("created_at"));
+                request.setUpdatedAt(rs.getTimestamp("updated_at"));
                 request.setDisable(rs.getBoolean("disable"));
                 request.setDetails(getRepairRequestDetails(rs.getInt("repair_request_id")));
                 return request;
@@ -507,10 +497,10 @@ public class RequestDAO extends DBContext {
     // Fetch details for a specific repair request
     private List<RepairRequestDetail> getRepairRequestDetails(int repairRequestId) {
         List<RepairRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT rrd.*, m.material_code, m.material_name " +
-                     "FROM Repair_Request_Details rrd " +
-                     "JOIN Materials m ON rrd.material_id = m.material_id " +
-                     "WHERE rrd.repair_request_id = ?";
+        String sql = "SELECT rrd.*, m.material_code, m.material_name "
+                + "FROM Repair_Request_Details rrd "
+                + "JOIN Materials m ON rrd.material_id = m.material_id "
+                + "WHERE rrd.repair_request_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
@@ -523,10 +513,8 @@ public class RequestDAO extends DBContext {
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setDamageDescription(rs.getString("damage_description"));
                 detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
-                detail.setCreatedAt(rs.getTimestamp("created_at") != null 
-                    ? rs.getTimestamp("created_at").toLocalDateTime() : null);
-                detail.setUpdatedAt(rs.getTimestamp("updated_at") != null 
-                    ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                detail.setCreatedAt(rs.getTimestamp("created_at"));
+                detail.setUpdatedAt(rs.getTimestamp("updated_at"));
                 details.add(detail);
             }
         } catch (SQLException e) {
@@ -539,8 +527,8 @@ public class RequestDAO extends DBContext {
     // Count repair requests for a user with filtering
     public int getRepairRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate) {
         StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Repair_Requests " +
-                "WHERE user_id = ? AND disable = 0 "
+                "SELECT COUNT(*) FROM Repair_Requests "
+                + "WHERE user_id = ? AND disable = 0 "
         );
         List<Object> params = new ArrayList<>();
         params.add(userId);
@@ -582,8 +570,8 @@ public class RequestDAO extends DBContext {
 
     // Cancel an export request
     public boolean cancelExportRequest(int exportRequestId, int userId) {
-        String sql = "UPDATE Export_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP " +
-                     "WHERE export_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+        String sql = "UPDATE Export_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
+                + "WHERE export_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, exportRequestId);
             ps.setInt(2, userId);
@@ -599,8 +587,8 @@ public class RequestDAO extends DBContext {
 
     // Cancel a purchase request
     public boolean cancelPurchaseRequest(int purchaseRequestId, int userId) {
-        String sql = "UPDATE Purchase_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP " +
-                     "WHERE purchase_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+        String sql = "UPDATE Purchase_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
+                + "WHERE purchase_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, purchaseRequestId);
             ps.setInt(2, userId);
@@ -616,8 +604,8 @@ public class RequestDAO extends DBContext {
 
     // Cancel a repair request
     public boolean cancelRepairRequest(int repairRequestId, int userId) {
-        String sql = "UPDATE Repair_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP " +
-                     "WHERE repair_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+        String sql = "UPDATE Repair_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
+                + "WHERE repair_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
             ps.setInt(2, userId);
