@@ -504,9 +504,7 @@
             </div>
           </div>
           <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
+            
             <div class="card position-relative">
               <a href="single-product.html"><img src="images/iitem2.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
