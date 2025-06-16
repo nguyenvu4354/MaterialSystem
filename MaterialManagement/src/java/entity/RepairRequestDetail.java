@@ -4,8 +4,7 @@
  */
 package entity;
 
-import java.time.LocalDateTime;
-
+import java.sql.Timestamp;
 /**
  *
  * @author Nhat Anh
@@ -16,18 +15,17 @@ public class RepairRequestDetail {
     private int materialId;
     private int quantity;
     private String damageDescription;
-    private Double repairCost; // Nullable theo DEFAULT NULL
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Double repairCost; 
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     // Constructor mặc định
     public RepairRequestDetail() {
     }
 
     // Constructor với tất cả các thuộc tính
-    public RepairRequestDetail(int detailId, int repairRequestId, int materialId, int quantity,
-                              String damageDescription, Double repairCost, LocalDateTime createdAt,
-                              LocalDateTime updatedAt) {
+  
+    public RepairRequestDetail(int detailId, int repairRequestId, int materialId, int quantity, String damageDescription, Double repairCost, Timestamp createdAt, Timestamp updatedAt) {
         this.detailId = detailId;
         this.repairRequestId = repairRequestId;
         this.materialId = materialId;
@@ -38,7 +36,6 @@ public class RepairRequestDetail {
         this.updatedAt = updatedAt;
     }
 
-    // Getters và Setters
     public int getDetailId() {
         return detailId;
     }
@@ -87,19 +84,19 @@ public class RepairRequestDetail {
         this.repairCost = repairCost;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
