@@ -1,0 +1,248 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package dal;
+
+import entity.PurchaseRequestDetail;
+import entity.DBContext;
+import entity.PurchaseRequest;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Admin
+ */
+public class PurchaseRequestDAO extends DBContext {
+
+    public int getTotalRecords(String keyword, String status) {
+        int total = 0;
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT COUNT(*) FROM material_management.purchase_requests pr WHERE pr.disable = 0 ");
+
+            List<Object> params = new ArrayList<>();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                sql.append("AND (pr.request_code LIKE ? OR pr.purchase_request_id LIKE ?) ");
+                params.add("%" + keyword + "%");
+                params.add("%" + keyword + "%");
+            }
+
+            if (status != null && !status.isEmpty()) {
+                sql.append("AND pr.status = ? ");
+                params.add(status);
+            }
+
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return total;
+    }
+
+    public List<PurchaseRequest> searchPurchaseRequest(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
+        List<PurchaseRequest> list = new ArrayList<>();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT pr.*, u.full_name, u.email, u.phone_number ")
+               .append("FROM material_management.purchase_requests pr ")
+               .append("LEFT JOIN material_management.users u ON pr.user_id = u.user_id ")
+               .append("WHERE pr.disable = 0 ");
+
+            List<Object> params = new ArrayList<>();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                sql.append("AND (pr.request_code LIKE ? OR pr.purchase_request_id LIKE ?) ");
+                params.add("%" + keyword + "%");
+                params.add("%" + keyword + "%");
+            }
+
+            if (status != null && !status.isEmpty()) {
+                sql.append("AND pr.status = ? ");
+                params.add(status);
+            }
+
+            String sortBy = "pr.request_date";
+            String sortOrder = "DESC";
+
+            if (sortOption != null) {
+                switch (sortOption) {
+                    case "code_asc":
+                        sortBy = "pr.request_code";
+                        sortOrder = "ASC";
+                        break;
+                    case "code_desc":
+                        sortBy = "pr.request_code";
+                        sortOrder = "DESC";
+                        break;
+                    case "date_asc":
+                        sortBy = "pr.request_date";
+                        sortOrder = "ASC";
+                        break;
+                    case "date_desc":
+                        sortBy = "pr.request_date";
+                        sortOrder = "DESC";
+                        break;
+                    case "status_asc":
+                        sortBy = "pr.status";
+                        sortOrder = "ASC";
+                        break;
+                    case "status_desc":
+                        sortBy = "pr.status";
+                        sortOrder = "DESC";
+                        break;
+                }
+            }
+
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
+            sql.append("LIMIT ? OFFSET ? ");
+            params.add(pageSize);
+            params.add((pageIndex - 1) * pageSize);
+
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                PurchaseRequest pr = new PurchaseRequest();
+                pr.setPurchaseRequestId(rs.getInt("purchase_request_id"));
+                pr.setRequestCode(rs.getString("request_code"));
+                pr.setUserId(rs.getInt("user_id"));
+                pr.setRequestDate(rs.getTimestamp("request_date"));
+                pr.setStatus(rs.getString("status"));
+                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
+                pr.setReason(rs.getString("reason"));
+                pr.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
+                pr.setApprovalReason(rs.getString("approval_reason"));
+                pr.setApprovedAt(rs.getTimestamp("approved_at"));
+                pr.setRejectionReason(rs.getString("rejection_reason"));
+                pr.setCreatedAt(rs.getTimestamp("created_at"));
+                pr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                pr.setDisable(rs.getBoolean("disable"));
+                
+                // Set thông tin người dùng
+                pr.setUserName(rs.getString("full_name"));
+                
+                list.add(pr);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+
+    public PurchaseRequest getPurchaseRequestById(int purchaseRequestId) {
+        try {
+            String sql = "SELECT pr.*, u.full_name, u.email, u.phone_number "
+                    + "FROM material_management.purchase_requests pr "
+                    + "LEFT JOIN material_management.users u ON pr.user_id = u.user_id "
+                    + "WHERE pr.purchase_request_id = ? AND pr.disable = 0";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, purchaseRequestId);
+
+            ResultSet rs = ps.executeQuery();
+            PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
+
+            if (rs.next()) {
+                PurchaseRequest pr = new PurchaseRequest();
+                pr.setPurchaseRequestId(rs.getInt("purchase_request_id"));
+                pr.setRequestCode(rs.getString("request_code"));
+                pr.setUserId(rs.getInt("user_id"));
+                pr.setRequestDate(rs.getTimestamp("request_date"));
+                pr.setStatus(rs.getString("status"));
+                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
+                pr.setReason(rs.getString("reason"));
+
+                int approvedBy = rs.getInt("approved_by");
+                if (!rs.wasNull()) {
+                    pr.setApprovedBy(approvedBy);
+                } else {
+                    pr.setApprovedBy(null);
+                }
+
+                pr.setApprovalReason(rs.getString("approval_reason"));
+                pr.setApprovedAt(rs.getTimestamp("approved_at"));
+                pr.setRejectionReason(rs.getString("rejection_reason"));
+                pr.setCreatedAt(rs.getTimestamp("created_at"));
+                pr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                pr.setDisable(rs.getBoolean("disable"));
+
+                List<PurchaseRequestDetail> details = prdd.getPurchaseRequestDetailById(pr.getPurchaseRequestId());
+                pr.setDetails(details);
+
+                return pr;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        PurchaseRequestDAO dao = new PurchaseRequestDAO();
+        
+        // Test getTotalRecords
+        System.out.println("=== Test getTotalRecords ===");
+        int total = dao.getTotalRecords("", "");
+        System.out.println("Tổng số bản ghi: " + total);
+        
+        // Test searchPurchaseRequest
+        System.out.println("\n=== Test searchPurchaseRequest ===");
+        List<PurchaseRequest> requests = dao.searchPurchaseRequest("", "", 1, 10, "date_desc");
+        for (PurchaseRequest request : requests) {
+            System.out.println("\nMã yêu cầu: " + request.getRequestCode());
+            System.out.println("ID yêu cầu: " + request.getPurchaseRequestId());
+            System.out.println("ID người yêu cầu: " + request.getUserId());
+            System.out.println("Ngày yêu cầu: " + request.getRequestDate());
+            System.out.println("Trạng thái: " + request.getStatus());
+            System.out.println("Giá dự kiến: " + request.getEstimatedPrice());
+            System.out.println("Lý do: " + request.getReason());
+            System.out.println("Người duyệt: " + request.getApprovedBy());
+            System.out.println("Lý do duyệt: " + request.getApprovalReason());
+            System.out.println("Thời gian duyệt: " + request.getApprovedAt());
+            System.out.println("Lý do từ chối: " + request.getRejectionReason());
+            System.out.println("Ngày tạo: " + request.getCreatedAt());
+            System.out.println("Ngày cập nhật: " + request.getUpdatedAt());
+            System.out.println("Trạng thái xóa: " + request.isDisable());
+        }
+        
+        // Test getPurchaseRequestById
+        System.out.println("\n=== Test getPurchaseRequestById ===");
+        if (!requests.isEmpty()) {
+            PurchaseRequest request = dao.getPurchaseRequestById(requests.get(0).getPurchaseRequestId());
+            if (request != null) {
+                System.out.println("Mã yêu cầu: " + request.getRequestCode());
+                System.out.println("ID yêu cầu: " + request.getPurchaseRequestId());
+                System.out.println("ID người yêu cầu: " + request.getUserId());
+                System.out.println("Ngày yêu cầu: " + request.getRequestDate());
+                System.out.println("Trạng thái: " + request.getStatus());
+                System.out.println("Giá dự kiến: " + request.getEstimatedPrice());
+                System.out.println("Lý do: " + request.getReason());
+                System.out.println("Người duyệt: " + request.getApprovedBy());
+                System.out.println("Lý do duyệt: " + request.getApprovalReason());
+                System.out.println("Thời gian duyệt: " + request.getApprovedAt());
+                System.out.println("Lý do từ chối: " + request.getRejectionReason());
+                System.out.println("Ngày tạo: " + request.getCreatedAt());
+                System.out.println("Ngày cập nhật: " + request.getUpdatedAt());
+                System.out.println("Trạng thái xóa: " + request.isDisable());
+            }
+        }
+    }
+}

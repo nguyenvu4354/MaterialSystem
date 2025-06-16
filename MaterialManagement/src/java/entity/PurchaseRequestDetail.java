@@ -9,24 +9,24 @@ package entity;
  * @author Admin
  */
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class PurchaseRequestDetail {
-    private int id;
+    private int detailId;
     private int purchaseRequestId;
     private String materialName;
     private int categoryId;
     private int quantity;
     private String notes;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     
     public PurchaseRequestDetail() {
     }
 
-    public PurchaseRequestDetail(int id, int purchaseRequestId, String materialName, int categoryId, int quantity, String notes, Date createdAt, Date updatedAt) {
-        this.id = id;
+    public PurchaseRequestDetail(int detailId, int purchaseRequestId, String materialName, int categoryId, int quantity, String notes, Timestamp createdAt, Timestamp updatedAt) {
+        this.detailId = detailId;
         this.purchaseRequestId = purchaseRequestId;
         this.materialName = materialName;
         this.categoryId = categoryId;
@@ -36,12 +36,12 @@ public class PurchaseRequestDetail {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
-        return id;
+    public int getDetailId() {
+        return detailId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDetailId(int detailId) {
+        this.detailId = detailId;
     }
 
     public int getPurchaseRequestId() {
@@ -84,19 +84,19 @@ public class PurchaseRequestDetail {
         this.notes = notes;
     }
 
-    public Date getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
     
