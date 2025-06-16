@@ -405,7 +405,6 @@ public class RequestDAO extends DBContext {
             sql.append("AND rr.request_code LIKE ? ");
             params.add("%" + requestCode.trim() + "%");
         }
-// helisjxj
         if (startDate != null) {
             sql.append("AND rr.request_date >= ? ");
             params.add(Timestamp.valueOf(startDate.atStartOfDay()));
