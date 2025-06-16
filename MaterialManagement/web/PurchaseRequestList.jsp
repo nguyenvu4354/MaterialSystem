@@ -96,6 +96,8 @@
                                         <th><a href="ListPurchaseRequestsServlet?sort=code_${sortOption == 'code_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">Mã yêu cầu</a></th>
                                         <th>Người yêu cầu</th>
                                         <th><a href="ListPurchaseRequestsServlet?sort=date_${sortOption == 'date_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">Ngày yêu cầu</a></th>
+                                        <th>Giá dự kiến</th>
+                                        <th>Lý do</th>
                                         <th><a href="ListPurchaseRequestsServlet?sort=status_${sortOption == 'status_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">Trạng thái</a></th>
                                         <th>Thao tác</th>
                                     </tr>
@@ -104,8 +106,10 @@
                                     <c:forEach items="${purchaseRequests}" var="request">
                                         <tr>
                                             <td>${request.requestCode}</td>
-                                            <td>${request.userName}</td>
+                                            <td>${request.userId}</td>
                                             <td>${request.requestDate}</td>
+                                            <td>${request.estimatedPrice}</td>
+                                            <td>${request.reason}</td>
                                             <td>
                                                 <span class="status-badge status-${request.status}">
                                                     ${request.status == 'PENDING' ? 'Chờ duyệt' : 

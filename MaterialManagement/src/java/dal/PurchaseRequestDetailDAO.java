@@ -21,7 +21,7 @@ public class PurchaseRequestDetailDAO extends DBContext {
     public List<PurchaseRequestDetail> getPurchaseRequestDetailById(int purchaseRequestId) {
         List<PurchaseRequestDetail> list = new ArrayList<>();
         try {
-        String sql = "SELECT * FROM material_management.purchase_request_details WHERE purchase_request_id = ?";
+            String sql = "SELECT * FROM material_management.purchase_request_details WHERE purchase_request_id = ?";
 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, purchaseRequestId);
@@ -29,7 +29,7 @@ public class PurchaseRequestDetailDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 PurchaseRequestDetail prd = new PurchaseRequestDetail();
-                prd.setDetailId(rs.getInt("detail_id"));
+                prd.setPurchaseRequestDetailId(rs.getInt("detail_id"));
                 prd.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 prd.setMaterialName(rs.getString("material_name"));
                 prd.setCategoryId(rs.getInt("category_id"));
@@ -76,7 +76,7 @@ public class PurchaseRequestDetailDAO extends DBContext {
             ps.setInt(2, prd.getCategoryId());
             ps.setInt(3, prd.getQuantity());
             ps.setString(4, prd.getNotes());
-            ps.setInt(5, prd.getDetailId());
+            ps.setInt(5, prd.getPurchaseRequestDetailId());
             ps.setInt(6, prd.getPurchaseRequestId());
 
             return ps.executeUpdate() > 0;

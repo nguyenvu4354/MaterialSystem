@@ -12,7 +12,7 @@ package entity;
 import java.sql.Timestamp;
 
 public class PurchaseRequestDetail {
-    private int detailId;
+    private int purchaseRequestDetailId;
     private int purchaseRequestId;
     private String materialName;
     private int categoryId;
@@ -25,23 +25,12 @@ public class PurchaseRequestDetail {
     public PurchaseRequestDetail() {
     }
 
-    public PurchaseRequestDetail(int detailId, int purchaseRequestId, String materialName, int categoryId, int quantity, String notes, Timestamp createdAt, Timestamp updatedAt) {
-        this.detailId = detailId;
-        this.purchaseRequestId = purchaseRequestId;
-        this.materialName = materialName;
-        this.categoryId = categoryId;
-        this.quantity = quantity;
-        this.notes = notes;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public int getPurchaseRequestDetailId() {
+        return purchaseRequestDetailId;
     }
 
-    public int getDetailId() {
-        return detailId;
-    }
-
-    public void setDetailId(int detailId) {
-        this.detailId = detailId;
+    public void setPurchaseRequestDetailId(int purchaseRequestDetailId) {
+        this.purchaseRequestDetailId = purchaseRequestDetailId;
     }
 
     public int getPurchaseRequestId() {
@@ -99,7 +88,4 @@ public class PurchaseRequestDetail {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
-    
-
 }
