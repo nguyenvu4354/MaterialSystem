@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBContext {
+
     protected Connection connection;
+
     public DBContext() {
         try {
             String url = "jdbc:mysql://127.0.0.1:3306/material_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
@@ -18,6 +20,10 @@ public class DBContext {
         } catch (ClassNotFoundException | SQLException ex) {
             System.out.println("Lỗi kết nối: " + ex.getMessage());
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
     public static void main(String[] args) {
