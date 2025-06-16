@@ -504,7 +504,6 @@
             </div>
           </div>
           <div class="swiper-slide">
-            
             <div class="card position-relative">
               <a href="single-product.html"><img src="images/iitem2.jpg" class="img-fluid rounded-4" alt="image"></a>
               <div class="card-body p-0">
@@ -531,9 +530,7 @@
                       <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
                     </a>
                   </div>
-
                 </div>
-
               </div>
             </div>
           </div>
