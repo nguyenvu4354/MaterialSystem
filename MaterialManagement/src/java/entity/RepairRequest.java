@@ -1,7 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.sql.Timestamp;
+import java.sql.Date;
 
 /**
  *
@@ -11,32 +15,28 @@ public class RepairRequest {
     private int repairRequestId;
     private String requestCode;
     private int userId;
-    private LocalDateTime requestDate;
+    private Timestamp requestDate;
     private String repairPersonPhoneNumber;
     private String repairPersonEmail;
     private String repairLocation;
-    private LocalDateTime estimatedReturnDate;
+    private Date estimatedReturnDate;
     private String status;
     private String reason;
     private Integer approvedBy; // Nullable theo FOREIGN KEY
     private String approvalReason;
-    private LocalDateTime approvedAt;
+    private Timestamp approvedAt;
     private String rejectionReason;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private boolean disable;
-    private List<RepairRequestDetail> details; // Added field for details
 
     // Constructor mặc định
     public RepairRequest() {
     }
 
     // Constructor với tất cả các thuộc tính
-    public RepairRequest(int repairRequestId, String requestCode, int userId, LocalDateTime requestDate,
-                         String repairPersonPhoneNumber, String repairPersonEmail, String repairLocation,
-                         LocalDateTime estimatedReturnDate, String status, String reason, Integer approvedBy,
-                         String approvalReason, LocalDateTime approvedAt, String rejectionReason,
-                         LocalDateTime createdAt, LocalDateTime updatedAt, boolean disable) {
+
+    public RepairRequest(int repairRequestId, String requestCode, int userId, Timestamp requestDate, String repairPersonPhoneNumber, String repairPersonEmail, String repairLocation, Date estimatedReturnDate, String status, String reason, Integer approvedBy, String approvalReason, Timestamp approvedAt, String rejectionReason, Timestamp createdAt, Timestamp updatedAt, boolean disable) {
         this.repairRequestId = repairRequestId;
         this.requestCode = requestCode;
         this.userId = userId;
@@ -56,7 +56,6 @@ public class RepairRequest {
         this.disable = disable;
     }
 
-    // Getters và Setters
     public int getRepairRequestId() {
         return repairRequestId;
     }
@@ -81,11 +80,11 @@ public class RepairRequest {
         this.userId = userId;
     }
 
-    public LocalDateTime getRequestDate() {
+    public Timestamp getRequestDate() {
         return requestDate;
     }
 
-    public void setRequestDate(LocalDateTime requestDate) {
+    public void setRequestDate(Timestamp requestDate) {
         this.requestDate = requestDate;
     }
 
@@ -113,11 +112,11 @@ public class RepairRequest {
         this.repairLocation = repairLocation;
     }
 
-    public LocalDateTime getEstimatedReturnDate() {
+    public Date getEstimatedReturnDate() {
         return estimatedReturnDate;
     }
 
-    public void setEstimatedReturnDate(LocalDateTime estimatedReturnDate) {
+    public void setEstimatedReturnDate(Date estimatedReturnDate) {
         this.estimatedReturnDate = estimatedReturnDate;
     }
 
@@ -153,11 +152,11 @@ public class RepairRequest {
         this.approvalReason = approvalReason;
     }
 
-    public LocalDateTime getApprovedAt() {
+    public Timestamp getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(LocalDateTime approvedAt) {
+    public void setApprovedAt(Timestamp approvedAt) {
         this.approvedAt = approvedAt;
     }
 
@@ -169,19 +168,19 @@ public class RepairRequest {
         this.rejectionReason = rejectionReason;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -193,13 +192,6 @@ public class RepairRequest {
         this.disable = disable;
     }
 
-    public List<RepairRequestDetail> getDetails() {
-        return details;
-    }
-
-    public void setDetails(List<RepairRequestDetail> details) {
-        this.details = details;
-    }
 
     @Override
     public String toString() {
@@ -221,7 +213,6 @@ public class RepairRequest {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", disable=" + disable +
-                ", details=" + details +
                 '}';
     }
 }
