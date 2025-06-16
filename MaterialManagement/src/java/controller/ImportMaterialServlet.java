@@ -47,36 +47,47 @@ public class ImportMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         try {
+            // Lấy danh sách nhà cung cấp
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-            // Sử dụng searchMaterials để lấy tất cả vật tư (keyword rỗng, không lọc status)
+            
+            // Lấy danh sách vật tư
             List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
+            
+            // Lấy ID phiếu nhập tạm thời từ session
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
-            List<ImportDetail> importDetails = (tempImportId != null && tempImportId != 0)
-                    ? importDAO.getDraftImportDetails(tempImportId)
-                    : new ArrayList<>();
+            
+            // Lấy chi tiết phiếu nhập
+            List<ImportDetail> importDetails = new ArrayList<>();
+            if (tempImportId != null && tempImportId != 0) {
+                importDetails = importDAO.getDraftImportDetails(tempImportId);
+            }
 
+            // Tạo map để dễ dàng truy xuất thông tin vật tư
             Map<Integer, Material> materialMap = new HashMap<>();
             for (Material material : materials) {
                 materialMap.put(material.getMaterialId(), material);
             }
 
+            // Lấy thông tin tồn kho cho từng vật tư
             Map<Integer, Integer> stockMap = new HashMap<>();
             for (ImportDetail detail : importDetails) {
                 int stock = inventoryDAO.getStockByMaterialId(detail.getMaterialId());
                 stockMap.put(detail.getMaterialId(), stock);
             }
 
+            // Set các thuộc tính cho request
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", materials);
             request.setAttribute("importDetails", importDetails);
             request.setAttribute("materialMap", materialMap);
             request.setAttribute("stockMap", stockMap);
 
+            // Khởi tạo tempImportId nếu chưa có
             if (tempImportId == null) {
                 session.setAttribute("tempImportId", 0);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Error fetching data: " + e.getMessage());
+            request.setAttribute("error", "Lỗi khi lấy dữ liệu: " + e.getMessage());
         }
         request.getRequestDispatcher("/ImportMaterial.jsp").forward(request, response);
     }
@@ -120,7 +131,6 @@ public class ImportMaterialServlet extends HttpServlet {
         String quantityStr = request.getParameter("quantity");
         String condition = request.getParameter("materialCondition");
         String unitPriceStr = request.getParameter("unitPrice");
-        String expiryDateStr = request.getParameter("expiryDate");
         boolean isDamaged = Boolean.parseBoolean(request.getParameter("isDamaged"));
         List<ImportDetail> detailsToAdd = new ArrayList<>();
         List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
@@ -142,7 +152,6 @@ public class ImportMaterialServlet extends HttpServlet {
             int materialId = Integer.parseInt(materialIdStr);
             int quantity = Integer.parseInt(quantityStr);
             double unitPrice = Double.parseDouble(unitPriceStr);
-            LocalDate expiryDate = (expiryDateStr != null && !expiryDateStr.isEmpty()) ? LocalDate.parse(expiryDateStr) : null;
 
             if (quantity <= 0) {
                 request.setAttribute("error", "Quantity must be greater than 0.");
@@ -160,7 +169,6 @@ public class ImportMaterialServlet extends HttpServlet {
             detail.setMaterialId(materialId);
             detail.setQuantity(quantity);
             detail.setUnitPrice(unitPrice);
-            detail.setExpiryDate(expiryDate);
             detail.setMaterialCondition(condition);
             detail.setStatus("draft");
             detail.setCreatedAt(LocalDateTime.now());
@@ -170,7 +178,7 @@ public class ImportMaterialServlet extends HttpServlet {
             loadDataAndForward(request, response);
             return;
         } catch (Exception e) {
-            request.setAttribute("error", "Invalid expiry date format.");
+            request.setAttribute("error", "Invalid data format.");
             loadDataAndForward(request, response);
             return;
         }
