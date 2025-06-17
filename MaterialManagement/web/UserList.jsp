@@ -46,7 +46,6 @@
 <body>
     <%@ include file="HeaderAdmin.jsp" %>
 
-
     <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
@@ -72,10 +71,11 @@
                     </select>
                     <select name="roleId" class="form-select" style="max-width: 150px;">
                         <option value="">All Roles</option>
-                        <option value="1" ${roleIdFilter == 1 ? 'selected' : ''}>Warehouse Manager</option>
-                        <option value="2" ${roleIdFilter == 2 ? 'selected' : ''}>Warehouse Staff</option>
-                        <option value="3" ${roleIdFilter == 3 ? 'selected' : ''}>Director</option>
-                        <option value="4" ${roleIdFilter == 4 ? 'selected' : ''}>Employee</option>
+                        <c:forEach var="role" items="${roleList}">
+                            <c:if test="${role.roleId != 1}">
+                                <option value="${role.roleId}" ${roleIdFilter == role.roleId ? 'selected' : ''}>${role.roleName}</option>
+                            </c:if>
+                        </c:forEach>
                     </select>
                     <select name="departmentId" class="form-select" style="max-width: 150px;">
                         <option value="">All Departments</option>
@@ -112,38 +112,79 @@
                         </thead>
                         <tbody>
                             <c:forEach var="user" items="${userList}">
-                                <tr>
-                                    <td>${user.userId}</td>
-                                    <td>${user.username}</td>
-                                    <td>${user.fullName}</td>
-                                    <td>${user.email}</td>
-                                    <td>${user.departmentName != null ? user.departmentName : '-'}</td>
-                                    <td>${user.roleName}</td>
-                                    <td>${user.status}</td>
-                                    <td>
-                                        <form method="post" action="UserList" style="display:inline;">
-                                            <input type="hidden" name="userId" value="${user.userId}"/>
-                                            <select name="roleId" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
-                                                <option value="1" ${user.roleId == 1 ? 'selected' : ''} ${user.roleId == 1 ? 'disabled' : ''}>Warehouse Manager</option>
-                                                <option value="2" ${user.roleId == 2 ? 'selected' : ''}>Warehouse Staff</option>
-                                                <option value="3" ${user.roleId == 3 ? 'selected' : ''}>Director</option>
-                                                <option value="4" ${user.roleId == 4 ? 'selected' : ''}>Employee</option>
-                                            </select>
-                                            <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
-                                                <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
-                                                <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
-                                            </select>
-                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                <c:if test="${user.roleId != 1}">
+                                    <tr>
+                                        <td>${user.userId}</td>
+                                        <td>${user.username}</td>
+                                        <td>${user.fullName}</td>
+                                        <td>${user.email}</td>
+                                        <td>
+                                            <form method="post" action="UserList" style="display:inline;">
+                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                <input type="hidden" name="action" value="updateDepartment"/>
+                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                <input type="hidden" name="page" value="${currentPage}"/>
+                                                <select name="departmentId" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                                    <option value="">No Department</option>
+                                                    <c:forEach var="dept" items="${departmentList}">
+                                                        <option value="${dept.departmentId}" ${user.departmentId == dept.departmentId ? 'selected' : ''}>${dept.departmentName}</option>
+                                                    </c:forEach>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form method="post" action="UserList" style="display:inline;">
+                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                <input type="hidden" name="action" value="updateRole"/>
+                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                <input type="hidden" name="page" value="${currentPage}"/>
+                                                <select name="roleId" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                                    <c:forEach var="role" items="${roleList}">
+                                                        <c:if test="${role.roleId != 1}">
+                                                            <option value="${role.roleId}" ${user.roleId == role.roleId ? 'selected' : ''}>${role.roleName}</option>
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form method="post" action="UserList" style="display:inline;">
+                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                <input type="hidden" name="action" value="updateStatus"/>
+                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                <input type="hidden" name="page" value="${currentPage}"/>
+                                                <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                                    <option value="active" ${user.status == 'active' ? 'selected' : ''}>Active</option>
+                                                    <option value="inactive" ${user.status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
                                                 <i class="bi bi-eye"></i> View
                                             </a>
-                                        </form>
-                                        <form method="post" action="UserList" style="display:inline;">
-                                            <input type="hidden" name="userId" value="${user.userId}"/>
-                                            <input type="hidden" name="action" value="delete"/>
-                                            <button type="submit" class="btn btn-danger btn-sm mt-2" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                            <form method="post" action="UserList" style="display:inline;">
+                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                <input type="hidden" name="action" value="delete"/>
+                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                <input type="hidden" name="page" value="${currentPage}"/>
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:if>
                             </c:forEach>
                         </tbody>
                     </table>
