@@ -322,7 +322,7 @@ public class RequestDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 PurchaseRequestDetail detail = new PurchaseRequestDetail();
-                detail.setDetailId(rs.getInt("detail_id"));
+                detail.setPurchaseRequestDetailId(rs.getInt("detail_id"));
                 detail.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 detail.setMaterialName(rs.getString("material_name"));
                 detail.setCategoryId(rs.getInt("category_id"));
