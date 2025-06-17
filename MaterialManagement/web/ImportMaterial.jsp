@@ -10,8 +10,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.075);
+            margin-bottom: 24px;
         }
         .table th {
             background-color: #f8f9fa;
@@ -20,10 +20,10 @@
             font-weight: 500;
         }
         .alert {
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
         }
         .btn-icon {
-            margin-right: 0.5rem;
+            margin-right: 8px;
         }
         .material-list {
             max-height: 400px;
@@ -50,6 +50,14 @@
                     </div>
                 </c:if>
 
+                <!-- Debug: Hiển thị số lượng vật tư và nhà cung cấp -->
+                <c:if test="${empty materials}">
+                    <div class="alert alert-warning">Không có vật tư nào trong hệ thống!</div>
+                </c:if>
+                <c:if test="${empty suppliers}">
+                    <div class="alert alert-warning">Không có nhà cung cấp nào trong hệ thống!</div>
+                </c:if>
+
                 <!-- Add Material Form -->
                 <div class="card">
                     <div class="card-header bg-primary text-white">
@@ -63,7 +71,9 @@
                                 <select name="materialId" class="form-select" required>
                                     <option value="">Select Material</option>
                                     <c:forEach var="material" items="${materials}">
-                                        <option value="${material.materialId}">${material.materialName} (${material.unit.name}) - ${material.category.categoryName}</option>
+                                        <option value="${material.materialId}">
+                                            ${material.materialName} (${material.unit.unitName}) - ${material.category.category_name}
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>
