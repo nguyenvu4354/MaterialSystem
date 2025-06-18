@@ -18,7 +18,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,42 +46,31 @@ public class ImportMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         try {
-            // Lấy danh sách nhà cung cấp
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-            
-            // Lấy danh sách vật tư
             List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
-            
-            // Lấy ID phiếu nhập tạm thời từ session
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
-            
-            // Lấy chi tiết phiếu nhập
             List<ImportDetail> importDetails = new ArrayList<>();
             if (tempImportId != null && tempImportId != 0) {
                 importDetails = importDAO.getDraftImportDetails(tempImportId);
             }
 
-            // Tạo map để dễ dàng truy xuất thông tin vật tư
             Map<Integer, Material> materialMap = new HashMap<>();
             for (Material material : materials) {
                 materialMap.put(material.getMaterialId(), material);
             }
 
-            // Lấy thông tin tồn kho cho từng vật tư
             Map<Integer, Integer> stockMap = new HashMap<>();
             for (ImportDetail detail : importDetails) {
                 int stock = inventoryDAO.getStockByMaterialId(detail.getMaterialId());
                 stockMap.put(detail.getMaterialId(), stock);
             }
 
-            // Set các thuộc tính cho request
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", materials);
             request.setAttribute("importDetails", importDetails);
             request.setAttribute("materialMap", materialMap);
             request.setAttribute("stockMap", stockMap);
 
-            // Khởi tạo tempImportId nếu chưa có
             if (tempImportId == null) {
                 session.setAttribute("tempImportId", 0);
             }
@@ -132,12 +120,6 @@ public class ImportMaterialServlet extends HttpServlet {
         String condition = request.getParameter("materialCondition");
         String unitPriceStr = request.getParameter("unitPrice");
         boolean isDamaged = Boolean.parseBoolean(request.getParameter("isDamaged"));
-        List<ImportDetail> detailsToAdd = new ArrayList<>();
-        List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
-        Map<Integer, Material> materialMap = new HashMap<>();
-        for (Material material : materials) {
-            materialMap.put(material.getMaterialId(), material);
-        }
 
         if (materialIdStr == null || materialIdStr.isEmpty() ||
                 quantityStr == null || quantityStr.isEmpty() ||
@@ -148,37 +130,28 @@ public class ImportMaterialServlet extends HttpServlet {
             return;
         }
 
+        int materialId, quantity;
+        double unitPrice;
         try {
-            int materialId = Integer.parseInt(materialIdStr);
-            int quantity = Integer.parseInt(quantityStr);
-            double unitPrice = Double.parseDouble(unitPriceStr);
-
-            if (quantity <= 0) {
-                request.setAttribute("error", "Quantity must be greater than 0.");
-                loadDataAndForward(request, response);
-                return;
-            }
-
-            if (!materialMap.containsKey(materialId)) {
-                request.setAttribute("error", "Invalid material selected.");
-                loadDataAndForward(request, response);
-                return;
-            }
-
-            ImportDetail detail = new ImportDetail();
-            detail.setMaterialId(materialId);
-            detail.setQuantity(quantity);
-            detail.setUnitPrice(unitPrice);
-            detail.setMaterialCondition(condition);
-            detail.setStatus("draft");
-            detail.setCreatedAt(LocalDateTime.now());
-            detailsToAdd.add(detail);
+            materialId = Integer.parseInt(materialIdStr);
+            quantity = Integer.parseInt(quantityStr);
+            unitPrice = Double.parseDouble(unitPriceStr);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid number format for material ID, quantity, or unit price.");
             loadDataAndForward(request, response);
             return;
-        } catch (Exception e) {
-            request.setAttribute("error", "Invalid data format.");
+        }
+
+        if (quantity <= 0) {
+            request.setAttribute("error", "Quantity must be greater than 0.");
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        List<Material> materials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
+        boolean validMaterial = materials.stream().anyMatch(m -> m.getMaterialId() == materialId);
+        if (!validMaterial) {
+            request.setAttribute("error", "Invalid material selected.");
             loadDataAndForward(request, response);
             return;
         }
@@ -196,10 +169,16 @@ public class ImportMaterialServlet extends HttpServlet {
             session.setAttribute("tempImportId", tempImportId);
         }
 
-        for (ImportDetail detail : detailsToAdd) {
-            detail.setImportId(tempImportId);
-        }
-        importDAO.createImportDetails(detailsToAdd);
+        ImportDetail detail = new ImportDetail();
+        detail.setImportId(tempImportId);
+        detail.setMaterialId(materialId);
+        detail.setQuantity(quantity);
+        detail.setUnitPrice(unitPrice);
+        detail.setMaterialCondition(condition);
+        detail.setStatus("draft");
+        detail.setCreatedAt(LocalDateTime.now());
+
+        importDAO.addMaterialToImport(detail);
         request.setAttribute("success", "Material added to import list.");
         loadDataAndForward(request, response);
     }
@@ -262,7 +241,6 @@ public class ImportMaterialServlet extends HttpServlet {
         String destination = request.getParameter("destination");
         String batchNumber = request.getParameter("batchNumber");
         String actualArrivalStr = request.getParameter("actualArrival");
-        String note = request.getParameter("note");
         boolean isDamaged = Boolean.parseBoolean(request.getParameter("isDamaged"));
 
         LocalDateTime actualArrival = null;
@@ -286,7 +264,6 @@ public class ImportMaterialServlet extends HttpServlet {
         imports.setBatchNumber(batchNumber);
         imports.setIsDamaged(isDamaged);
         imports.setActualArrival(actualArrival);
-        imports.setNote(note);
         imports.setUpdatedAt(LocalDateTime.now());
 
         importDAO.updateImport(imports);
