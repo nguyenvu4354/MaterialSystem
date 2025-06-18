@@ -29,6 +29,14 @@
             max-height: 400px;
             overflow-y: auto;
         }
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .is-invalid .invalid-feedback {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -64,7 +72,7 @@
                         <h5 class="card-title mb-0"><i class="fas fa-plus-circle me-2"></i>Add Material to Import</h5>
                     </div>
                     <div class="card-body">
-                        <form action="ImportMaterial" method="post" class="row g-3">
+                        <form id="addMaterialForm" action="ImportMaterial" method="post" class="row g-3" onsubmit="return validateAddForm()">
                             <input type="hidden" name="action" value="add">
                             <div class="col-md-3">
                                 <label class="form-label">Material</label>
@@ -72,18 +80,21 @@
                                     <option value="">Select Material</option>
                                     <c:forEach var="material" items="${materials}">
                                         <option value="${material.materialId}">
-                                            ${material.materialName} (${material.unit.unitName}) - ${material.category.category_name}
+                                            ${material.materialName} (${material.unit.unitName}) - ${material.category.categoryName}
                                         </option>
                                     </c:forEach>
                                 </select>
+                                <div class="invalid-feedback">Please select a material.</div>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Quantity</label>
-                                <input type="number" name="quantity" class="form-control" min="1" required onchange="validateQuantity(this)">
+                                <input type="number" name="quantity" class="form-control" min="1" required>
+                                <div class="invalid-feedback">Quantity must be greater than 0.</div>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Unit Price</label>
-                                <input type="number" name="unitPrice" class="form-control" min="0" step="0.01" required onchange="validateUnitPrice(this)">
+                                <input type="number" name="unitPrice" class="form-control" min="0" step="0.01" required>
+                                <div class="invalid-feedback">Unit price cannot be negative.</div>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Condition</label>
@@ -92,15 +103,13 @@
                                     <option value="used">Used</option>
                                     <option value="refurbished">Refurbished</option>
                                 </select>
+                                <div class="invalid-feedback">Please select a condition.</div>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Expiry Date</label>
-                                <input type="date" name="expiryDate" class="form-control">
-                            </div>
-                            <div class="col-md-1">
+                            <div class="col-md-3">
                                 <label class="form-label">Damaged</label>
                                 <div class="form-check mt-2">
                                     <input type="checkbox" name="isDamaged" class="form-check-input" value="true">
+                                    <label class="form-check-label">Is Damaged</label>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -129,7 +138,6 @@
                                             <th>Quantity</th>
                                             <th>Unit Price</th>
                                             <th>Condition</th>
-                                            <th>Expiry Date</th>
                                             <th>Stock Available</th>
                                             <th>Actions</th>
                                         </tr>
@@ -137,15 +145,36 @@
                                     <tbody>
                                         <c:forEach var="detail" items="${importDetails}">
                                             <tr>
-                                                <td>${materialMap[detail.materialId].materialName}</td>
-                                                <td>${materialMap[detail.materialId].unit.name}</td>
-                                                <td>${materialMap[detail.materialId].category.categoryName}</td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${not empty materialMap[detail.materialId]}">
+                                                            ${materialMap[detail.materialId].materialName}
+                                                        </c:when>
+                                                        <c:otherwise>Unknown Material</c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${not empty materialMap[detail.materialId]}">
+                                                            ${materialMap[detail.materialId].unit.unitName}
+                                                        </c:when>
+                                                        <c:otherwise>-</c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${not empty materialMap[detail.materialId]}">
+                                                            ${materialMap[detail.materialId].category.categoryName}
+                                                        </c:when>
+                                                        <c:otherwise>-</c:otherwise>
+                                                    </c:choose>
+                                                </td>
                                                 <td>
                                                     <form action="ImportMaterial" method="post" class="d-flex align-items-center">
                                                         <input type="hidden" name="action" value="updateQuantity">
                                                         <input type="hidden" name="materialId" value="${detail.materialId}">
                                                         <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                                                        <input type="number" name="quantity" value="${detail.quantity}" class="form-control form-control-sm" style="width: 80px" min="1" required onchange="validateQuantity(this)">
+                                                        <input type="number" name="quantity" value="${detail.quantity}" class="form-control form-control-sm" style="width: 80px" min="1" required>
                                                         <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
                                                             <i class="fas fa-sync-alt"></i>
                                                         </button>
@@ -153,8 +182,14 @@
                                                 </td>
                                                 <td>${detail.unitPrice}</td>
                                                 <td>${detail.materialCondition}</td>
-                                                <td>${detail.expiryDate}</td>
-                                                <td>${stockMap[detail.materialId]}</td>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${not empty stockMap[detail.materialId]}">
+                                                            ${stockMap[detail.materialId]}
+                                                        </c:when>
+                                                        <c:otherwise>0</c:otherwise>
+                                                    </c:choose>
+                                                </td>
                                                 <td>
                                                     <form action="ImportMaterial" method="post" class="d-inline">
                                                         <input type="hidden" name="action" value="remove">
@@ -172,6 +207,9 @@
                                 </table>
                             </div>
                         </c:if>
+                        <c:if test="${empty importDetails}">
+                            <p class="text-muted">No materials added to the import list.</p>
+                        </c:if>
                     </div>
                 </div>
 
@@ -181,7 +219,7 @@
                         <h5 class="card-title mb-0"><i class="fas fa-check-circle me-2"></i>Confirm Import</h5>
                     </div>
                     <div class="card-body">
-                        <form action="ImportMaterial" method="post" class="row g-3">
+                        <form id="confirmImportForm" action="ImportMaterial" method="post" class="row g-3" onsubmit="return validateConfirmForm()">
                             <input type="hidden" name="action" value="import">
                             <div class="col-md-4">
                                 <label class="form-label">Supplier</label>
@@ -191,28 +229,29 @@
                                         <option value="${supplier.supplierId}">${supplier.supplierName}</option>
                                     </c:forEach>
                                 </select>
+                                <div class="invalid-feedback">Please select a supplier.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Destination</label>
                                 <input type="text" name="destination" class="form-control" placeholder="Enter destination" required>
+                                <div class="invalid-feedback">Please enter a destination.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Batch Number</label>
                                 <input type="text" name="batchNumber" class="form-control" maxlength="50" placeholder="Enter batch number" required>
+                                <div class="invalid-feedback">Please enter a batch number.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Actual Arrival</label>
                                 <input type="datetime-local" name="actualArrival" class="form-control" required>
+                                <div class="invalid-feedback">Please select an arrival date and time.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Is Damaged</label>
                                 <div class="form-check mt-2">
                                     <input type="checkbox" name="isDamaged" class="form-check-input" value="true">
+                                    <label class="form-check-label">Is Damaged</label>
                                 </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Note</label>
-                                <textarea name="note" class="form-control" rows="1" placeholder="Enter note"></textarea>
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-success">
@@ -229,18 +268,84 @@
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function validateQuantity(input) {
-            if (input.value <= 0) {
-                alert("Quantity must be greater than 0.");
-                input.value = 1;
+        function validateAddForm() {
+            const form = document.getElementById('addMaterialForm');
+            let isValid = true;
+
+            const materialId = form.querySelector('select[name="materialId"]');
+            const quantity = form.querySelector('input[name="quantity"]');
+            const unitPrice = form.querySelector('input[name="unitPrice"]');
+            const condition = form.querySelector('select[name="materialCondition"]');
+
+            if (!materialId.value) {
+                materialId.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                materialId.classList.remove('is-invalid');
             }
+
+            if (!quantity.value || quantity.value <= 0) {
+                quantity.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                quantity.classList.remove('is-invalid');
+            }
+
+            if (!unitPrice.value || unitPrice.value < 0) {
+                unitPrice.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                unitPrice.classList.remove('is-invalid');
+            }
+
+            if (!condition.value) {
+                condition.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                condition.classList.remove('is-invalid');
+            }
+
+            return isValid;
         }
-        
-        function validateUnitPrice(input) {
-            if (input.value < 0) {
-                alert("Unit price cannot be negative.");
-                input.value = 0;
+
+        function validateConfirmForm() {
+            const form = document.getElementById('confirmImportForm');
+            let isValid = true;
+
+            const supplierId = form.querySelector('select[name="supplierId"]');
+            const destination = form.querySelector('input[name="destination"]');
+            const batchNumber = form.querySelector('input[name="batchNumber"]');
+            const actualArrival = form.querySelector('input[name="actualArrival"]');
+
+            if (!supplierId.value) {
+                supplierId.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                supplierId.classList.remove('is-invalid');
             }
+
+            if (!destination.value.trim()) {
+                destination.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                destination.classList.remove('is-invalid');
+            }
+
+            if (!batchNumber.value.trim()) {
+                batchNumber.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                batchNumber.classList.remove('is-invalid');
+            }
+
+            if (!actualArrival.value) {
+                actualArrival.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                actualArrival.classList.remove('is-invalid');
+            }
+
+            return isValid;
         }
     </script>
 </body>
