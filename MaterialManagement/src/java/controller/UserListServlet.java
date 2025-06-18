@@ -1,9 +1,11 @@
 package controller;
 
-import dal.DepartmentDAO; // New DAO for departments
+import dal.DepartmentDAO; 
 import dal.UserDAO;
+import dal.RoleDAO;
 import entity.Department;
 import entity.User;
+import entity.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -38,7 +40,7 @@ public class UserListServlet extends HttpServlet {
         String usernameFilter = request.getParameter("username");
         String statusFilter = request.getParameter("status");
         String roleIdStr = request.getParameter("roleId");
-        String departmentIdStr = request.getParameter("departmentId"); // New filter parameter
+        String departmentIdStr = request.getParameter("departmentId");
         Integer roleIdFilter = null;
         Integer departmentIdFilter = null;
 
@@ -57,16 +59,16 @@ public class UserListServlet extends HttpServlet {
         }
 
         UserDAO userDAO = new UserDAO();
-        DepartmentDAO departmentDAO = new DepartmentDAO(); // New DAO instance
+        DepartmentDAO departmentDAO = new DepartmentDAO();
+        RoleDAO roleDAO = new RoleDAO();
 
-        // Fetch department list for filter dropdown
         List<Department> departmentList = departmentDAO.getAllDepartments();
+        List<Role> roleList = roleDAO.getAllRoles();
         request.setAttribute("departmentList", departmentList);
+        request.setAttribute("roleList", roleList);
 
-        // Fetch users with filters and pagination
         List<User> userList = userDAO.getUsersByPageAndFilter(page, pageSize, usernameFilter, statusFilter, roleIdFilter, departmentIdFilter);
 
-        // Count total users for pagination
         int totalUsers = userDAO.getUserCountByFilter(usernameFilter, statusFilter, roleIdFilter, departmentIdFilter);
         int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
 
@@ -91,9 +93,34 @@ public class UserListServlet extends HttpServlet {
         String userIdStr = request.getParameter("userId");
         UserDAO userDAO = new UserDAO();
 
+        // Preserve filter parameters to maintain the current view
+        String usernameFilter = request.getParameter("usernameFilter");
+        String statusFilter = request.getParameter("statusFilter");
+        String roleIdFilterStr = request.getParameter("roleIdFilter");
+        String departmentIdFilterStr = request.getParameter("departmentIdFilter");
+        String pageStr = request.getParameter("page");
+
+        // Reconstruct query string for redirect to preserve filters
+        StringBuilder queryString = new StringBuilder("UserList?");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            queryString.append("page=").append(pageStr).append("&");
+        }
+        if (usernameFilter != null && !usernameFilter.isEmpty()) {
+            queryString.append("username=").append(usernameFilter).append("&");
+        }
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            queryString.append("status=").append(statusFilter).append("&");
+        }
+        if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty()) {
+            queryString.append("roleId=").append(roleIdFilterStr).append("&");
+        }
+        if (departmentIdFilterStr != null && !departmentIdFilterStr.isEmpty()) {
+            queryString.append("departmentId=").append(departmentIdFilterStr).append("&");
+        }
+
         if (userIdStr == null) {
             request.setAttribute("error", "Thiếu userId.");
-            doGet(request, response);
+            response.sendRedirect(queryString.toString());
             return;
         }
 
@@ -101,39 +128,62 @@ public class UserListServlet extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
 
             if ("delete".equals(action)) {
-                // Handle soft delete
                 boolean deleted = userDAO.deleteUserById(userId);
                 if (deleted) {
                     request.setAttribute("message", "Xóa người dùng thành công.");
                 } else {
                     request.setAttribute("error", "Xóa người dùng thất bại. Không tìm thấy người dùng hoặc đã bị xóa.");
                 }
-            } else {
-                // Handle status and role update
-                String roleIdStr = request.getParameter("roleId");
+            } else if ("updateDepartment".equals(action)) {
+                String departmentIdStr = request.getParameter("departmentId");
+                Integer departmentId = null;
+                if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
+                    try {
+                        departmentId = Integer.parseInt(departmentIdStr);
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                boolean updated = userDAO.updateDepartment(userId, departmentId);
+                if (updated) {
+                    request.setAttribute("message", "Cập nhật phòng ban thành công.");
+                } else {
+                    request.setAttribute("error", "Cập nhật phòng ban thất bại.");
+                }
+            } else if ("updateStatus".equals(action)) {
                 String statusStr = request.getParameter("status");
-
-                if (roleIdStr == null || statusStr == null) {
-                    request.setAttribute("error", "Thiếu dữ liệu cập nhật.");
-                    doGet(request, response);
+                if (statusStr == null) {
+                    request.setAttribute("error", "Thiếu trạng thái.");
+                    response.sendRedirect(queryString.toString());
                     return;
                 }
-
                 if (!statusStr.equals("active") && !statusStr.equals("inactive")) {
                     request.setAttribute("error", "Trạng thái không hợp lệ. Chỉ cho phép 'active' hoặc 'inactive'.");
-                    doGet(request, response);
+                    response.sendRedirect(queryString.toString());
                     return;
                 }
-
-                int roleId = Integer.parseInt(roleIdStr);
                 User.Status status = User.Status.valueOf(statusStr);
-
-                boolean updated = userDAO.updateStatusAndRole(userId, status, roleId);
-                if (!updated) {
-                    request.setAttribute("error", "Cập nhật thất bại.");
+                boolean updated = userDAO.updateStatus(userId, status);
+                if (updated) {
+                    request.setAttribute("message", "Cập nhật trạng thái thành công.");
                 } else {
-                    request.setAttribute("message", "Cập nhật người dùng thành công.");
+                    request.setAttribute("error", "Cập nhật trạng thái thất bại.");
                 }
+            } else if ("updateRole".equals(action)) {
+                String roleIdStr = request.getParameter("roleId");
+                if (roleIdStr == null) {
+                    request.setAttribute("error", "Thiếu roleId.");
+                    response.sendRedirect(queryString.toString());
+                    return;
+                }
+                int roleId = Integer.parseInt(roleIdStr);
+                boolean updated = userDAO.updateRole(userId, roleId);
+                if (updated) {
+                    request.setAttribute("message", "Cập nhật vai trò thành công.");
+                } else {
+                    request.setAttribute("error", "Cập nhật vai trò thất bại. Vai trò có thể bị vô hiệu hóa hoặc không tìm thấy người dùng.");
+                }
+            } else {
+                request.setAttribute("error", "Hành động không hợp lệ.");
             }
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Dữ liệu không hợp lệ (userId hoặc roleId).");
@@ -142,6 +192,7 @@ public class UserListServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        doGet(request, response);
+        // Redirect to preserve filters
+        response.sendRedirect(queryString.toString());
     }
 }

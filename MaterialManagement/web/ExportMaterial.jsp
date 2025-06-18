@@ -135,8 +135,7 @@
                                                     <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
                                                     <input type="number" name="quantity" value="${detail.quantity}" min="1"
                                                            class="form-control me-2" style="width: 100px;" required
-                                                           onchange="validateQuantity(this)">
-                                                    <button type="submit" class="btn btn-outline-dark btn-sm">Update</button>
+                                                           onchange="validateQuantity(this); this.form.submit();"> 
                                                 </form>
                                             </td>
                                             <td>${detail.materialCondition}</td>

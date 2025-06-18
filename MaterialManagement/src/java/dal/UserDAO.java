@@ -252,22 +252,76 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    public boolean updateStatusAndRole(int userId, User.Status status, int roleId) {
-        String sql = "UPDATE Users SET status = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'inactive'";
+    public boolean updateStatus(int userId, User.Status status) {
+        String sql = "UPDATE Users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'deleted'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status.name());
-            ps.setInt(2, roleId);
-            ps.setInt(3, userId);
+            ps.setInt(2, userId);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("✅ Cập nhật status và role thành công cho user_id: " + userId);
+                System.out.println("✅ Cập nhật status thành công cho user_id: " + userId);
                 return true;
             } else {
                 System.out.println("❌ Không tìm thấy user để cập nhật với user_id: " + userId);
                 return false;
             }
         } catch (Exception e) {
-            System.out.println("❌ Lỗi updateStatusAndRole: " + e.getMessage());
+            System.out.println("❌ Lỗi updateStatus: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateRole(int userId, int roleId) {
+        // Check if the role is disabled
+        String checkSql = "SELECT disable FROM Roles WHERE role_id = ?";
+        try (PreparedStatement checkPs = connection.prepareStatement(checkSql)) {
+            checkPs.setInt(1, roleId);
+            ResultSet rs = checkPs.executeQuery();
+            if (rs.next() && rs.getBoolean("disable")) {
+                System.out.println("❌ Role bị vô hiệu hóa: role_id = " + roleId);
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi kiểm tra role: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+
+        String sql = "UPDATE Users SET role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'deleted'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ps.setInt(2, userId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Cập nhật role thành công cho user_id: " + userId);
+                return true;
+            } else {
+                System.out.println("❌ Không tìm thấy user để cập nhật với user_id: " + userId);
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi updateRole: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateDepartment(int userId, Integer departmentId) {
+        String sql = "UPDATE Users SET department_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND status != 'deleted'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setObject(1, departmentId);
+            ps.setInt(2, userId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Cập nhật department thành công cho user_id: " + userId);
+                return true;
+            } else {
+                System.out.println("❌ Không tìm thấy user để cập nhật với user_id: " + userId);
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi updateDepartment: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -386,27 +440,27 @@ public class UserDAO extends DBContext {
     }
 
     public static void main(String[] args) {
-    UserDAO userDAO = new UserDAO();
-    User user = new User();
-    user.setUsername("Admin2");
-    user.setPassword(userDAO.md5("123")); // MD5 hash password
-    user.setFullName("User");
-    user.setEmail("testuser@example.com");
-    user.setPhoneNumber("0123456789");
-    user.setAddress("123 Test Street");
-    user.setUserPicture("test.jpg");
-    user.setRoleId(1); // Employee role
-    user.setDepartmentId(1); // Example department ID
-    user.setDateOfBirth(LocalDate.of(1990, 1, 1));
-    user.setGender(User.Gender.male);
-    user.setDescription("Test user for DAO");
-    user.setStatus(User.Status.active);
+        UserDAO userDAO = new UserDAO();
+        User user = new User();
+        user.setUsername("Admin2");
+        user.setPassword(userDAO.md5("123")); 
+        user.setFullName("User");
+        user.setEmail("testuser@example.com");
+        user.setPhoneNumber("0123456789");
+        user.setAddress("123 Test Street");
+        user.setUserPicture("test.jpg");
+        user.setRoleId(1);
+        user.setDepartmentId(1); 
+        user.setDateOfBirth(LocalDate.of(1990, 1, 1));
+        user.setGender(User.Gender.male);
+        user.setDescription("Test user for DAO");
+        user.setStatus(User.Status.active);
 
-    boolean created = userDAO.createUser(user);
-    if (created) {
-        System.out.println("✅ Tạo user thành công: " + user.getUsername());
-    } else {
-        System.out.println("❌ Tạo user thất bại");
+        boolean created = userDAO.createUser(user);
+        if (created) {
+            System.out.println("✅ Tạo user thành công: " + user.getUsername());
+        } else {
+            System.out.println("❌ Tạo user thất bại");
+        }
     }
-}
 }
