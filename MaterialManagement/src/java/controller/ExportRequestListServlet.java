@@ -1,6 +1,10 @@
 package controller;
 
 import dal.ExportRequestDAO;
+import dal.UserDAO;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,16 +13,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import entity.ExportRequest;
 import entity.User;
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.Set;
+import java.util.HashSet;
 
 @WebServlet(name = "ExportRequestListServlet", urlPatterns = {"/ExportRequestList"})
 public class ExportRequestListServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(ExportRequestListServlet.class.getName());
     private final ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
+    private final UserDAO userDAO = new UserDAO();
     
     // Hằng số cho phân trang
     private static final int DEFAULT_PAGE = 1;
@@ -50,6 +55,7 @@ public class ExportRequestListServlet extends HttpServlet {
             String toDate = request.getParameter("toDate");
             String sortBy = request.getParameter("sortBy");
             String sortOrder = request.getParameter("sortOrder");
+            String searchRecipient = request.getParameter("searchRecipient");
             
             // Xử lý phân trang
             int page = DEFAULT_PAGE;
@@ -75,7 +81,8 @@ public class ExportRequestListServlet extends HttpServlet {
             LOGGER.info("Parameters: status=" + status + ", search=" + search + 
                        ", fromDate=" + fromDate + ", toDate=" + toDate +
                        ", page=" + page + ", itemsPerPage=" + itemsPerPage +
-                       ", sortBy=" + sortBy + ", sortOrder=" + sortOrder);
+                       ", sortBy=" + sortBy + ", sortOrder=" + sortOrder +
+                       ", searchRecipient=" + searchRecipient);
 
             // Lấy dữ liệu theo điều kiện sắp xếp
             List<ExportRequest> exportRequests;
@@ -91,10 +98,10 @@ public class ExportRequestListServlet extends HttpServlet {
                         exportRequests = exportRequestDAO.getAllSortedByRequestCode(sortOrder);
                         break;
                     default:
-                        exportRequests = exportRequestDAO.getAll(status, search, page, itemsPerPage);
+                        exportRequests = exportRequestDAO.getAll(status, search, searchRecipient, page, itemsPerPage);
                 }
             } else {
-                exportRequests = exportRequestDAO.getAll(status, search, page, itemsPerPage);
+                exportRequests = exportRequestDAO.getAll(status, search, searchRecipient, page, itemsPerPage);
             }
 
             int totalItems = exportRequestDAO.getTotalCount(status, search);
@@ -110,6 +117,15 @@ public class ExportRequestListServlet extends HttpServlet {
                 LOGGER.info("No export requests found");
             }
 
+            // Lấy danh sách tất cả recipient user thực tế cho dropdown
+            List<Integer> recipientIds = exportRequestDAO.getAllRecipientUserIds();
+            List<User> recipients = new ArrayList<>();
+            for (Integer rid : recipientIds) {
+                User recipient = userDAO.getUserById(rid);
+                if (recipient != null) recipients.add(recipient);
+            }
+            request.setAttribute("recipients", recipients);
+
             // Set các thuộc tính cho JSP
             request.setAttribute("exportRequests", exportRequests);
             request.setAttribute("currentPage", page);
@@ -122,6 +138,7 @@ public class ExportRequestListServlet extends HttpServlet {
             request.setAttribute("toDate", toDate);
             request.setAttribute("sortBy", sortBy);
             request.setAttribute("sortOrder", sortOrder);
+            request.setAttribute("searchRecipient", searchRecipient);
 
             LOGGER.info("Forwarding to ExportRequestList.jsp");
             request.getRequestDispatcher("ExportRequestList.jsp").forward(request, response);
