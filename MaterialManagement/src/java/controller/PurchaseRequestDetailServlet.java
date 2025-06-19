@@ -5,6 +5,10 @@
 
 package controller;
 
+import dal.PurchaseRequestDAO;
+import dal.PurchaseRequestDetailDAO;
+import entity.PurchaseRequest;
+import entity.PurchaseRequestDetail;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,12 +16,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
  * @author Admin
  */
-@WebServlet(name="PurchaseRequestDetailServlet", urlPatterns={"/PurchaseRequestDetailServlet"})
+@WebServlet(name="ListPurchaseDetailServlet", urlPatterns={"/PurchaseRequestDetailServlet"})
+
 public class PurchaseRequestDetailServlet extends HttpServlet {
    
     /** 
@@ -55,7 +61,17 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        
+        
+        try {
+           int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
+            PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
+            List<PurchaseRequestDetail> purchaseRequestDetailList = prdd.getPurchaseRequestDetailByPurchaseRequestId(purchaseRequestId);
+            request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
+            request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     } 
 
     /** 
@@ -68,7 +84,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        doGet(request, response);
     }
 
     /** 
@@ -77,7 +93,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Servlet xử lý chi tiết yêu cầu mua hàng";
     }// </editor-fold>
 
 }
