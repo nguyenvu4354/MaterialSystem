@@ -19,144 +19,356 @@
         <link rel="stylesheet" href="css/vendor.css">
         <link rel="stylesheet" href="style.css">
         <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
         <style>
-            .purchase-detail .info-label {
-                font-size: 0.9rem;
-                color: #6c757d;
-                margin-bottom: 0.25rem;
+            body {
+                background-color: #f8f9fa;
+                font-family: 'Montserrat', Arial, sans-serif;
             }
-            .purchase-detail .info-value {
+            
+            .main-content {
+                padding: 2rem 0;
+                min-height: calc(100vh - 80px);
+            }
+            
+            .page-header {
+                background: #fff;
+                color: #212529;
+                padding: 2rem 0 1.5rem 0;
+                margin-bottom: 2rem;
+                border-radius: 12px 12px 0 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            }
+            
+            .page-title {
+                font-size: 2.5rem;
+                font-weight: 400;
+                margin-bottom: 0.5rem;
+                color: #212529;
+                letter-spacing: -1px;
+            }
+            
+            .page-title .text-primary {
+                color: #e6b800;
+                font-weight: 500;
+            }
+            
+            .page-subtitle {
                 font-size: 1.1rem;
-                font-weight: 500;
-            }
-            .purchase-detail .table th {
-                font-weight: 500;
                 color: #6c757d;
+                font-weight: 400;
             }
-            .purchase-detail .table td {
-                vertical-align: middle;
+            
+            .content-card {
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border: none;
             }
-            .status-badge {
-                padding: 0.5rem 1rem;
-                border-radius: 50px;
-                font-size: 0.875rem;
+            
+            .table-container {
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                overflow: hidden;
+                margin-bottom: 2rem;
+            }
+            
+            .table {
+                margin-bottom: 0;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: #fff;
+            }
+            
+            .table thead th {
+                background: #f8f9fa;
+                color: #6c757d;
                 font-weight: 500;
+                padding: 1rem 0.75rem;
+                border: none;
+                font-size: 1rem;
+                text-transform: none;
+                letter-spacing: 0;
             }
-            .status-draft {
-                background-color: #e9ecef;
+            
+            .table thead th:first-child {
+                border-top-left-radius: 12px;
+            }
+            
+            .table thead th:last-child {
+                border-top-right-radius: 12px;
+            }
+            
+            .table tbody tr {
+                transition: all 0.2s;
+            }
+            
+            .table tbody tr:hover {
+                background-color: #f6f6f6;
+            }
+            
+            .table tbody td {
+                padding: 1rem 0.75rem;
+                border-bottom: 1px solid #ececec;
+                vertical-align: middle;
+                font-size: 1rem;
+                color: #212529;
+            }
+            
+            .table tbody tr:last-child td {
+                border-bottom: none;
+            }
+            
+            .badge {
+                padding: 0.45em 1em;
+                border-radius: 50px;
+                font-size: 0.95em;
+                font-weight: 500;
+                text-transform: none;
+                letter-spacing: 0;
+                background: #ececec;
+                color: #495057;
+                display: inline-block;
+            }
+            
+            .badge-primary {
+                background: #ececec;
                 color: #495057;
             }
-            .status-approved {
-                background-color: #d4edda;
+            
+            .badge-success {
+                background: #d4edda;
                 color: #155724;
             }
-            .status-rejected {
-                background-color: #f8d7da;
-                color: #721c24;
-            }
-            .status-cancel {
-                background-color: #fff3cd;
+            
+            .badge-warning {
+                background: #fff3cd;
                 color: #856404;
+            }
+            
+            .badge-info {
+                background: #e3f2fd;
+                color: #1976d2;
+            }
+            
+            .btn-back {
+                background: #212529;
+                border: none;
+                color: #fff;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-weight: 500;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.2s;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            }
+            
+            .btn-back:hover {
+                background: #e6b800;
+                color: #212529;
+                text-decoration: none;
+            }
+            
+            .empty-state {
+                text-align: center;
+                padding: 3rem 2rem;
+                color: #bfa000;
+            }
+            
+            .empty-state i {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+                opacity: 0.5;
+            }
+            
+            .empty-state h4 {
+                margin-bottom: 0.5rem;
+                color: #495057;
+            }
+            
+            .stats-card {
+                background: #fffbe6;
+                color: #bfa000;
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            }
+            
+            .stats-number {
+                font-size: 2.2rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: #e6b800;
+            }
+            
+            .stats-label {
+                font-size: 0.95rem;
+                opacity: 0.9;
+                text-transform: none;
+                letter-spacing: 0;
+                color: #bfa000;
+            }
+            
+            @media (max-width: 768px) {
+                .page-title {
+                    font-size: 2rem;
+                }
+                
+                .table-responsive {
+                    border-radius: 12px;
+                }
+                
+                .table thead th {
+                    font-size: 0.9rem;
+                    padding: 0.8rem 0.4rem;
+                }
+                
+                .table tbody td {
+                    font-size: 0.9rem;
+                    padding: 0.8rem 0.4rem;
+                }
             }
         </style>
     </head>
     <body>
         <jsp:include page="HeaderAdmin.jsp"/>
 
-        <section id="purchase-detail" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+        <div class="main-content">
             <div class="container">
-                <div class="row my-5 py-5">
-                    <div class="col-12 bg-white p-4 rounded shadow purchase-detail">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="display-4 fw-normal">Chi tiết <span class="text-primary">Yêu Cầu Mua Hàng</span></h2>
-                            <div class="btn-group">
-                                <a href="PurchaseRequestForm.jsp?id=${request.purchaseRequestId}" class="btn btn-outline-secondary btn-lg rounded-1">
-                                    <i class="fas fa-edit"></i> Chỉnh sửa
-                                </a>
-                                <a href="PurchaseRequestList.jsp" class="btn btn-outline-dark btn-lg rounded-1">
-                                    <i class="fas fa-arrow-left"></i> Quay lại
-                                </a>
-                            </div>
-                        </div>
+                <!-- Page Header -->
+                <div class="page-header text-center">
+                    <h1 class="page-title">
+                        <i class="fas fa-clipboard-list me-3"></i>
+                        Chi tiết yêu cầu mua hàng
+                    </h1>
+                    <p class="page-subtitle">Xem thông tin chi tiết về yêu cầu mua hàng</p>
+                </div>
 
-                        <div class="row g-4 mb-5">
-                            <div class="col-md-3">
-                                <div class="info-label">Mã yêu cầu</div>
-                                <div class="info-value">${request.requestCode}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">Ngày tạo</div>
-                                <div class="info-value">${request.requestDate}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">Người yêu cầu</div>
-                                <div class="info-value">${request.userName}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="info-label">Trạng thái</div>
-                                <div class="info-value">
-                                    <span class="status-badge status-${request.status}">
-                                        ${request.status}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-label">Giá dự kiến</div>
-                                <div class="info-value">${request.estimatedPrice}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-label">Lý do</div>
-                                <div class="info-value">${request.reason}</div>
-                            </div>
+                <!-- Stats Card -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <div class="stats-number">${purchaseRequestDetailList.size()}</div>
+                            <div class="stats-label">Tổng số vật tư</div>
                         </div>
-
-                        <h3 class="fw-normal mb-4">Danh sách vật tư</h3>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Tên vật tư</th>
-                                        <th>Danh mục</th>
-                                        <th>Số lượng</th>
-                                        <th>Ghi chú</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:forEach var="detail" items="${requestDetails}" varStatus="loop">
-                                        <tr>
-                                            <td>${loop.index + 1}</td>
-                                            <td>${detail.materialName}</td>
-                                            <td>${detail.categoryName}</td>
-                                            <td>${detail.quantity}</td>
-                                            <td>${detail.notes}</td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <c:if test="${request.status == 'approved' || request.status == 'rejected'}">
-                            <div class="row g-4 mt-5">
-                                <div class="col-md-6">
-                                    <div class="info-label">Người duyệt</div>
-                                    <div class="info-value">${request.approvedByName}</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-label">Ngày duyệt</div>
-                                    <div class="info-value">${request.approvedAt}</div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="info-label">Ghi chú duyệt</div>
-                                    <div class="info-value">${request.approvalNotes}</div>
-                                </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <div class="stats-number">
+                                <c:set var="totalQuantity" value="0"/>
+                                <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                    <c:set var="totalQuantity" value="${totalQuantity + item.quantity}"/>
+                                </c:forEach>
+                                ${totalQuantity}
                             </div>
-                        </c:if>
+                            <div class="stats-label">Tổng số lượng</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stats-card text-center">
+                            <div class="stats-number">
+                                <c:set var="uniqueCategories" value="0"/>
+                                <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                    <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
+                                </c:forEach>
+                                ${uniqueCategories}
+                            </div>
+                            <div class="stats-label">Loại vật tư</div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Table Container -->
+                <div class="table-container">
+                    <c:choose>
+                        <c:when test="${not empty purchaseRequestDetailList}">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                                            <th><i class="fas fa-file-invoice me-2"></i>Mã yêu cầu</th>
+                                            <th><i class="fas fa-box me-2"></i>Tên vật tư</th>
+                                            <th><i class="fas fa-tags me-2"></i>Danh mục</th>
+                                            <th><i class="fas fa-sort-numeric-up me-2"></i>Số lượng</th>
+                                            <th><i class="fas fa-sticky-note me-2"></i>Ghi chú</th>
+                                            <th><i class="fas fa-calendar-plus me-2"></i>Ngày tạo</th>
+                                            <th><i class="fas fa-calendar-check me-2"></i>Ngày cập nhật</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="item" items="${purchaseRequestDetailList}" varStatus="status">
+                                        <tr>
+                                            <td>
+                                                <span class="badge badge-primary">#${item.purchaseRequestDetailId}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">${item.purchaseRequestId}</span>
+                                            </td>
+                                            <td>
+                                                <strong>${item.materialName}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-warning">${item.categoryId}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-success">${item.quantity}</span>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty item.notes}">
+                                                        <span class="text-muted">${item.notes}</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted fst-italic">Không có ghi chú</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    ${item.createdAt}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    ${item.updatedAt}
+                                                </small>
+                                            </td>
+                                        </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h4>Không có dữ liệu</h4>
+                                <p>Chưa có chi tiết yêu cầu mua hàng nào được tìm thấy.</p>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
+                <!-- Back Button -->
+                <div class="text-center">
+                    <a href="javascript:history.back()" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay lại
+                    </a>
+                </div>
             </div>
-        </section>
+        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
