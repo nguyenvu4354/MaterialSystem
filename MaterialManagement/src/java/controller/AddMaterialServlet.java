@@ -123,6 +123,16 @@ public class AddMaterialServlet extends HttpServlet {
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             MaterialDAO md = new MaterialDAO();
+            // Kiểm tra trùng mã vật tư
+            if (md.isMaterialCodeExists(materialCode)) {
+                CategoryDAO cd = new CategoryDAO();
+                UnitDAO ud = new UnitDAO();
+                request.setAttribute("categories", cd.getAllCategories());
+                request.setAttribute("units", ud.getAllUnits());
+                request.setAttribute("error", "Mã vật tư đã tồn tại, vui lòng nhập mã khác!");
+                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
+                return;
+            }
             md.addMaterial(m);
             response.sendRedirect("dashboardmaterial?success=Material added successfully");
             
