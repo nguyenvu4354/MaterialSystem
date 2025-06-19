@@ -32,34 +32,35 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        
         
         try {
-            // Lấy các tham số từ request
+            
             String keyword = request.getParameter("keyword");
             String status = request.getParameter("status");
             String sortOption = request.getParameter("sort");
             
-            // Mặc định pageIndex = 1 và pageSize = 10 nếu không có
-            int pageIndex = 1;
             int pageSize = 10;
+            
+            int pageIndex = 1;
+        
+            
             
             try {
                 pageIndex = Integer.parseInt(request.getParameter("page"));
                 pageSize = Integer.parseInt(request.getParameter("pageSize"));
             } catch (NumberFormatException e) {
-                // Sử dụng giá trị mặc định nếu parse lỗi
+                
             }
             
-            // Khởi tạo DAO và lấy danh sách
-            PurchaseRequestDAO prDAO = new PurchaseRequestDAO();
-            List<PurchaseRequest> purchaseRequests = prDAO.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
             
-            // Lấy tổng số bản ghi để tính số trang
-            int totalRecords = prDAO.getTotalRecords(keyword, status);
+            PurchaseRequestDAO prd = new PurchaseRequestDAO();
+            List<PurchaseRequest> purchaseRequests = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
+            
+            
+            int totalRecords = prd.countPurchaseRequest(keyword, status);
             int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
             
-            // Set các attribute cho JSP
             request.setAttribute("purchaseRequests", purchaseRequests);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
@@ -69,13 +70,13 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalRecords", totalRecords);
             
-            // Forward đến trang JSP
+           
             request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
             
         } catch (Exception e) {
-            // Log lỗi
+            
             e.printStackTrace();
-            // Chuyển hướng đến trang lỗi hoặc hiển thị thông báo lỗi
+            
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }

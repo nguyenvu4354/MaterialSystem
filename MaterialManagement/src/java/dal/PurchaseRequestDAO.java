@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import entity.Material;
 
 /**
  *
@@ -21,7 +22,7 @@ import java.util.HashMap;
  */
 public class PurchaseRequestDAO extends DBContext {
 
-    public int getTotalRecords(String keyword, String status) {
+    public int countPurchaseRequest(String keyword, String status) {
         int total = 0;
         try {
             StringBuilder sql = new StringBuilder();
@@ -93,6 +94,14 @@ public class PurchaseRequestDAO extends DBContext {
                         break;
                     case "date_desc":
                         sortBy = "request_date";
+                        sortOrder = "DESC";
+                        break;
+                    case "id_asc":
+                        sortBy = "purchase_request_id";
+                        sortOrder = "ASC";
+                        break;
+                    case "id_desc":
+                        sortBy = "purchase_request_id";
                         sortOrder = "DESC";
                         break;
                     case "status_asc":
@@ -179,7 +188,7 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUpdatedAt(rs.getTimestamp("updated_at"));
                 pr.setDisable(rs.getBoolean("disable"));
 
-                List<PurchaseRequestDetail> details = prdd.getPurchaseRequestDetailById(pr.getPurchaseRequestId());
+                List<PurchaseRequestDetail> details = prdd.getPurchaseRequestDetailByPurchaseRequestId(pr.getPurchaseRequestId());
                 pr.setDetails(details);
 
                 return pr;
@@ -190,12 +199,13 @@ public class PurchaseRequestDAO extends DBContext {
         return null;
     }
 
+    
     public static void main(String[] args) {
         PurchaseRequestDAO dao = new PurchaseRequestDAO();
         
-        // Test getTotalRecords
-        System.out.println("=== Test getTotalRecords ===");
-        int total = dao.getTotalRecords("", "");
+        // Test countPurchaseRequest
+        System.out.println("=== Test countPurchaseRequest ===");
+        int total = dao.countPurchaseRequest("", "");
         System.out.println("Tổng số bản ghi: " + total);
         
         // Test searchPurchaseRequest
