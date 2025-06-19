@@ -696,6 +696,19 @@ public class MaterialDAO extends DBContext {
         return materials;
     }
 
+    // Kiểm tra mã vật tư đã tồn tại chưa
+    public boolean isMaterialCodeExists(String materialCode) {
+        String sql = "SELECT 1 FROM materials WHERE material_code = ? LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, materialCode);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         MaterialDAO md = new MaterialDAO();
 

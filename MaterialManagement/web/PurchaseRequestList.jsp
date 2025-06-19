@@ -93,6 +93,7 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th><a href="ListPurchaseRequestsServlet?sort=id_${sortOption == 'id_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">ID</a></th>
                                         <th><a href="ListPurchaseRequestsServlet?sort=code_${sortOption == 'code_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">Mã yêu cầu</a></th>
                                         <th>Người yêu cầu</th>
                                         <th><a href="ListPurchaseRequestsServlet?sort=date_${sortOption == 'date_asc' ? 'desc' : 'asc'}&status=${status}&keyword=${keyword}&page=${currentPage}">Ngày yêu cầu</a></th>
@@ -105,6 +106,7 @@
                                 <tbody>
                                     <c:forEach items="${purchaseRequests}" var="request">
                                         <tr>
+                                            <td>${request.purchaseRequestId}</td>
                                             <td>${request.requestCode}</td>
                                             <td>${request.userId}</td>
                                             <td>${request.requestDate}</td>
@@ -120,7 +122,7 @@
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <a href="PurchaseRequestDetail.jsp?id=${request.purchaseRequestId}" class="btn btn-info btn-sm">
+                                                    <a href="PurchaseRequestDetailServlet?id=${request.purchaseRequestId}" class="btn btn-info btn-sm">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <c:if test="${request.status == 'PENDING'}">

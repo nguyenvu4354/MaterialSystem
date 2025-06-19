@@ -1,9 +1,8 @@
 package controller;
 
-import dal.RequestDAO;
+import dal.ExportRequestDAO;
+import dal.ExportRequestDetailDAO;
 import entity.ExportRequest;
-import entity.PurchaseRequest;
-import entity.RepairRequest;
 import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,11 +15,13 @@ import java.io.IOException;
 @WebServlet(name = "ViewRequestDetailsServlet", urlPatterns = {"/ViewRequestDetails"})
 public class ViewRequestDetailsServlet extends HttpServlet {
 
-    private RequestDAO requestDAO;
+    private ExportRequestDAO exportRequestDAO;
+    private ExportRequestDetailDAO exportRequestDetailDAO;
 
     @Override
     public void init() throws ServletException {
-        requestDAO = new RequestDAO();
+        exportRequestDAO = new ExportRequestDAO();
+        exportRequestDetailDAO = new ExportRequestDetailDAO();
     }
 
     @Override
@@ -34,40 +35,15 @@ public class ViewRequestDetailsServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         try {
-            String type = request.getParameter("type");
-            int id = Integer.parseInt(request.getParameter("id"));
-            Object requestObj = null;
-            String requestType = "";
+            int requestId = Integer.parseInt(request.getParameter("id"));
+            ExportRequest exportRequest = exportRequestDAO.getById(requestId);
 
-            if ("export".equalsIgnoreCase(type)) {
-                requestObj = requestDAO.getExportRequestById(id);
-                requestType = "Export";
-            } else if ("purchase".equalsIgnoreCase(type)) {
-                requestObj = requestDAO.getPurchaseRequestById(id);
-                requestType = "Purchase";
-            } else if ("repair".equalsIgnoreCase(type)) {
-                requestObj = requestDAO.getRepairRequestById(id);
-                requestType = "Repair";
-            } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request type");
+            if (exportRequest == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Export request not found");
                 return;
             }
 
-            if (requestObj == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Request not found");
-                return;
-            }
-
-            Integer userId = user.getUserId();
-            boolean hasAccess = false;
-            if (requestObj instanceof ExportRequest) {
-                hasAccess = ((ExportRequest) requestObj).getUserId() == userId;
-            } else if (requestObj instanceof PurchaseRequest) {
-                hasAccess = ((PurchaseRequest) requestObj).getUserId() == userId;
-            } else if (requestObj instanceof RepairRequest) {
-                hasAccess = ((RepairRequest) requestObj).getUserId() == userId;
-            }
-
+            boolean hasAccess = exportRequest.getUserId() == user.getUserId() || "Director".equals(user.getRoleName());
             if (!hasAccess) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                 return;
@@ -78,11 +54,12 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 request.setAttribute("message", message);
             }
 
-            request.setAttribute("request", requestObj);
-            request.setAttribute("requestType", requestType);
+            request.setAttribute("request", exportRequest);
+            request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
+            request.setAttribute("isDirector", "director".equals(user.getRoleName()));
             request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
-        } catch (Exception e) {
-            throw new ServletException("Error fetching request details", e);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
         }
     }
 
@@ -96,42 +73,58 @@ public class ViewRequestDetailsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        if (!"Director".equals(user.getRoleName())) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+            return;
+        }
+
         try {
+            int requestId = Integer.parseInt(request.getParameter("requestId"));
             String action = request.getParameter("action");
-            if ("cancel".equalsIgnoreCase(action)) {
-                String type = request.getParameter("type");
-                int id = Integer.parseInt(request.getParameter("id"));
-                boolean success = false;
+            ExportRequest exportRequest = exportRequestDAO.getById(requestId);
 
-                if ("export".equalsIgnoreCase(type)) {
-                    success = requestDAO.cancelExportRequest(id, user.getUserId());
-                } else if ("purchase".equalsIgnoreCase(type)) {
-                    success = requestDAO.cancelPurchaseRequest(id, user.getUserId());
-                } else if ("repair".equalsIgnoreCase(type)) {
-                    success = requestDAO.cancelRepairRequest(id, user.getUserId());
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + id + "&message=Error: Invalid request type");
-                    return;
-                }
-
-                if (success) {
-                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + id + "&message=Request canceled successfully");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + id + "&message=Error: Cannot cancel request. It may not be in draft status or you lack permission.");
-                }
-            } else {
-                doGet(request, response); // Fallback to GET for other POST requests
+            if (exportRequest == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Export request not found");
+                return;
             }
-        } catch (Exception e) {
-            String type = request.getParameter("type");
-            String id = request.getParameter("id");
-            response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + id + "&message=Error: " + e.getMessage());
-            throw new ServletException("Error processing request", e);
+
+            if (!"draft".equals(exportRequest.getStatus())) {
+                request.setAttribute("error", "Only draft requests can be processed.");
+                request.setAttribute("request", exportRequest);
+                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
+                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                return;
+            }
+
+            String reason = request.getParameter("reason");
+            if (reason == null || reason.trim().isEmpty()) {
+                request.setAttribute("error", "Reason is required.");
+                request.setAttribute("request", exportRequest);
+                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
+                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                return;
+            }
+
+            if ("approve".equals(action)) {
+                exportRequest.setStatus("approved");
+                exportRequest.setApprovedBy(user.getUserId());
+                exportRequest.setApprovalReason(reason);
+            } else if ("reject".equals(action)) {
+                exportRequest.setStatus("rejected");
+                exportRequest.setApprovedBy(user.getUserId());
+                exportRequest.setRejectionReason(reason);
+            }
+
+            if (exportRequestDAO.update(exportRequest)) {
+                response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?id=" + requestId);
+            } else {
+                request.setAttribute("error", "Failed to process request.");
+                request.setAttribute("request", exportRequest);
+                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
+                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
         }
     }
-    
-    @Override
-    public String getServletInfo() {
-        return "Servlet for viewing and canceling details of a specific user request (export, purchase, repair)";
-    }
-}   
+}

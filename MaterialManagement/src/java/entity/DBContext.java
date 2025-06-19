@@ -6,23 +6,38 @@ import java.sql.SQLException;
 
 public class DBContext {
 
+    private static final String URL = "jdbc:mysql://127.0.0.1:3306/material_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "Hoang1062004";
+
     protected Connection connection;
 
     public DBContext() {
-        try {
-            String url = "jdbc:mysql://127.0.0.1:3306/material_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-            String username = "root";
-            String password = "Hoang1062004";
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Kết nối thành công tới MySQL!");
+        connect(); // Tạo kết nối khi khởi tạo
+    }
 
+    // Phương thức tạo kết nối mới
+    private void connect() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                System.out.println("✅ Kết nối thành công tới MySQL!");
+            }
         } catch (ClassNotFoundException | SQLException ex) {
-            System.out.println("Lỗi kết nối: " + ex.getMessage());
+            System.err.println("❌ Lỗi kết nối MySQL: " + ex.getMessage());
         }
     }
 
+    // Luôn đảm bảo trả về Connection đang hoạt động
     public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                connect(); // Kết nối lại nếu cần
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi kiểm tra kết nối: " + e.getMessage());
+        }
         return connection;
     }
 
