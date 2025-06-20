@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet(name = "CreateUserServlet", value = "/create-user")
+@WebServlet(name = "CreateUserServlet", value = "/CreateUser")
 @MultipartConfig
 public class CreateUserServlet extends HttpServlet {
 
@@ -71,7 +71,7 @@ public class CreateUserServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String description = request.getParameter("description");
             String roleIdStr = request.getParameter("roleId");
-            String departmentIdStr = request.getParameter("departmentId"); // New parameter
+            String departmentIdStr = request.getParameter("departmentId"); 
             int roleId = 0;
             int departmentId = 0;
 
