@@ -61,16 +61,25 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        
-        
         try {
-           int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
+            int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
+            
+            // Lấy thông tin chi tiết yêu cầu
             PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
             List<PurchaseRequestDetail> purchaseRequestDetailList = prdd.getPurchaseRequestDetailByPurchaseRequestId(purchaseRequestId);
+            
+            // Lấy thông tin yêu cầu
+            PurchaseRequestDAO prd = new PurchaseRequestDAO();
+            PurchaseRequest purchaseRequest = prd.getPurchaseRequestById(purchaseRequestId);
+
             request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
+            request.setAttribute("purchaseRequest", purchaseRequest);
+            
             request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
-        }catch(Exception ex){
+        } catch(Exception ex) {
+            System.out.println("Error in PurchaseRequestDetailServlet: " + ex.getMessage());
             ex.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
         }
     } 
 
@@ -84,7 +93,32 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        doGet(request, response);
+        try {
+            String action = request.getParameter("action");
+            int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
+            
+            PurchaseRequestDAO prd = new PurchaseRequestDAO();
+            boolean success = false;
+            
+            if ("approve".equals(action)) {
+               
+                success = prd.updatePurchaseRequestStatus(purchaseRequestId, "approved", null);
+            } else if ("reject".equals(action)) {
+                
+                success = prd.updatePurchaseRequestStatus(purchaseRequestId, "rejected", null);
+            }
+            
+            if (success) {
+                response.sendRedirect("PurchaseRequestDetailServlet?id=" + purchaseRequestId);
+            } else {
+                response.sendRedirect("PurchaseRequestDetailServlet?id=" + purchaseRequestId + "&error=action_failed");
+            }
+            
+        } catch(Exception ex) {
+            System.out.println("Error in PurchaseRequestDetailServlet POST: " + ex.getMessage());
+            ex.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
+        }
     }
 
     /** 

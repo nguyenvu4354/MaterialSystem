@@ -212,8 +212,8 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             purchaseRequest.setReason(reason.trim());
 
             // Sử dụng phương thức tạo yêu cầu với chi tiết trong một transaction
-            PurchaseRequestDAO prDAO = new PurchaseRequestDAO();
-            boolean success = prDAO.createPurchaseRequestWithDetails(purchaseRequest, purchaseRequestDetails);
+            PurchaseRequestDAO prd = new PurchaseRequestDAO();
+            boolean success = prd.createPurchaseRequestWithDetails(purchaseRequest, purchaseRequestDetails);
 
             if (success) {
                 // Redirect đến trang danh sách với thông báo thành công

@@ -10,11 +10,11 @@ import entity.PurchaseRequest;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import entity.Material;
+
 
 /**
  *
@@ -199,15 +199,143 @@ public class PurchaseRequestDAO extends DBContext {
         return null;
     }
 
+    public boolean updatePurchaseRequestStatus(int requestId, String status, Integer userId) {
+        String sql = "UPDATE material_management.purchase_requests "
+                + "SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
+                + "WHERE purchase_request_id = ? AND disable = 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            if (userId != null) {
+                ps.setInt(2, userId);
+            } else {
+                ps.setNull(2, java.sql.Types.INTEGER);
+            }
+            ps.setInt(3, requestId);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     
+    public int insertPurchaseRequest(PurchaseRequest request) {
+        int generatedId = -1;
+        String sql = "INSERT INTO Purchase_Requests (request_code, user_id, request_date, status, estimated_price, reason) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, request.getRequestCode());
+            ps.setInt(2, request.getUserId());
+            ps.setTimestamp(3, new Timestamp(request.getRequestDate().getTime()));
+            ps.setString(4, request.getStatus());
+
+            // Sử dụng setDouble vì estimatedPrice là kiểu double
+            ps.setDouble(5, request.getEstimatedPrice());
+
+            ps.setString(6, request.getReason());
+
+            ps.executeUpdate();
+
+            // Lấy ID tự động sinh
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    generatedId = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // hoặc log lỗi
+        }
+
+        return generatedId;
+    }
+
+    public boolean createPurchaseRequestWithDetails(PurchaseRequest request, List<PurchaseRequestDetail> details) {
+        String insertRequestSQL = "INSERT INTO material_management.purchase_requests (request_code, user_id, request_date, status, estimated_price, reason) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertDetailSQL = "INSERT INTO material_management.purchase_request_details (purchase_request_id, material_name, category_id, quantity, notes) VALUES (?, ?, ?, ?, ?)";
+
+        try {
+            // Bắt đầu transaction
+            connection.setAutoCommit(false);
+
+            // 1. Thêm yêu cầu chính và lấy ID được tạo
+            try (PreparedStatement psRequest = connection.prepareStatement(insertRequestSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                psRequest.setString(1, request.getRequestCode());
+                psRequest.setInt(2, request.getUserId());
+                psRequest.setTimestamp(3, request.getRequestDate());
+                psRequest.setString(4, request.getStatus());
+                psRequest.setDouble(5, request.getEstimatedPrice());
+                psRequest.setString(6, request.getReason());
+
+                int affectedRows = psRequest.executeUpdate();
+                if (affectedRows == 0) {
+                    connection.rollback();
+                    return false;
+                }
+
+                // Lấy ID của yêu cầu vừa được tạo
+                try (ResultSet generatedKeys = psRequest.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int purchaseRequestId = generatedKeys.getInt(1);
+                        
+                        // 2. Thêm các chi tiết yêu cầu
+                        if (details != null && !details.isEmpty()) {
+                            try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSQL)) {
+                                for (PurchaseRequestDetail detail : details) {
+                                    psDetail.setInt(1, purchaseRequestId);
+                                    psDetail.setString(2, detail.getMaterialName());
+                                    psDetail.setInt(3, detail.getCategoryId());
+                                    psDetail.setInt(4, detail.getQuantity());
+                                    
+                                    // Xử lý notes có thể null
+                                    if (detail.getNotes() != null) {
+                                        psDetail.setString(5, detail.getNotes());
+                                    } else {
+                                        psDetail.setNull(5, Types.VARCHAR);
+                                    }
+                                    
+                                    psDetail.addBatch();
+                                }
+                                psDetail.executeBatch();
+                            }
+                        }
+
+                        // Commit transaction
+                        connection.commit();
+                        return true;
+                    } else {
+                        connection.rollback();
+                        return false;
+                    }
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            try {
+                connection.rollback(); // Rollback nếu có lỗi
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true); // Trả lại chế độ auto-commit
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         PurchaseRequestDAO dao = new PurchaseRequestDAO();
-        
+
         // Test countPurchaseRequest
         System.out.println("=== Test countPurchaseRequest ===");
         int total = dao.countPurchaseRequest("", "");
         System.out.println("Tổng số bản ghi: " + total);
-        
+
         // Test searchPurchaseRequest
         System.out.println("\n=== Test searchPurchaseRequest ===");
         List<PurchaseRequest> requests = dao.searchPurchaseRequest("", "", 1, 10, "date_desc");
@@ -227,7 +355,7 @@ public class PurchaseRequestDAO extends DBContext {
             System.out.println("Ngày cập nhật: " + request.getUpdatedAt());
             System.out.println("Trạng thái xóa: " + request.isDisable());
         }
-        
+
         // Test getPurchaseRequestById
         System.out.println("\n=== Test getPurchaseRequestById ===");
         if (!requests.isEmpty()) {
