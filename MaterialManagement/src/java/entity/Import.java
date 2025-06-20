@@ -18,7 +18,6 @@ public class Import {
     private Integer supplierId;
     private String destination;
     private String batchNumber;
-    private boolean isDamaged;
     private LocalDateTime actualArrival;
     private String note;
     private LocalDateTime createdAt;
@@ -79,14 +78,6 @@ public class Import {
 
     public void setBatchNumber(String batchNumber) {
         this.batchNumber = batchNumber;
-    }
-
-    public boolean isDamaged() {
-        return isDamaged;
-    }
-
-    public void setIsDamaged(boolean isDamaged) {
-        this.isDamaged = isDamaged;
     }
 
     public LocalDateTime getActualArrival() {

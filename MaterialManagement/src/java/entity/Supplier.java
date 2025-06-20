@@ -13,19 +13,6 @@ public class Supplier {
     public Supplier() {
         
     }
-
-    public Supplier(int supplierId, String supplierName, String contactInfo, String address,
-                    String phoneNumber, String email, String description, String taxId) {
-        this.supplierId = supplierId;
-        this.supplierName = supplierName;
-        this.contactInfo = contactInfo;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.description = description;
-        this.taxId = taxId;
-    }
-
     // Getters và setters
     public int getSupplierId() {
         return supplierId;
@@ -74,19 +61,5 @@ public class Supplier {
     }
     public void setTaxId(String taxId) {
         this.taxId = taxId;
-    }
-
-    @Override
-    public String toString() {
-        return "Supplier{" +
-                "supplierId=" + supplierId +
-                ", supplierName='" + supplierName + '\'' +
-                ", contactInfo='" + contactInfo + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", description='" + description + '\'' +
-                ", taxId='" + taxId + '\'' +
-                '}';
     }
 }
