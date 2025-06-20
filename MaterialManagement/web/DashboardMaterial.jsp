@@ -54,22 +54,7 @@
     </style>
 </head>
 <body>
-<header class="container py-2">
-    <div class="row py-4 align-items-center">
-        <div class="col-sm-4 col-lg-3">
-            <a href="HomePage.jsp" class="text-decoration-none">
-                <h2 class="text-primary"><i class="fas fa-dollar-sign"></i> Material Management</h2>
-            </a>
-        </div>
-        <div class="col-sm-8 col-lg-9 d-flex justify-content-end align-items-center">
-            <div class="text-end">
-                <span class="fs-6 text-muted">Admin</span>
-                <h5 class="mb-0">admin@accessories.com</h5>
-            </div>
-            <a href="logout" class="btn btn-outline-dark btn-lg ms-4">Logout</a>
-        </div>
-    </div>
-</header>
+<jsp:include page="HeaderAdmin.jsp" />
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3 col-lg-2 bg-light p-0">
