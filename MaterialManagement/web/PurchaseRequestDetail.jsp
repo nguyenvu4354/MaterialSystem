@@ -217,6 +217,64 @@
                 color: #bfa000;
             }
             
+            .action-buttons {
+                margin: 2rem 0;
+                text-align: center;
+            }
+            
+            .btn-action {
+                padding: 12px 30px;
+                font-size: 1rem;
+                font-weight: 500;
+                border-radius: 8px;
+                margin: 0 10px;
+                transition: all 0.3s ease;
+                border: none;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .btn-approve {
+                background-color: #28a745;
+                color: white;
+            }
+            
+            .btn-approve:hover {
+                background-color: #218838;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+            }
+            
+            .btn-reject {
+                background-color: #dc3545;
+                color: white;
+            }
+            
+            .btn-reject:hover {
+                background-color: #c82333;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+            }
+            
+            .status-message {
+                padding: 15px 25px;
+                border-radius: 8px;
+                margin: 2rem 0;
+                text-align: center;
+                font-weight: 500;
+            }
+            
+            .status-approved {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            
+            .status-rejected {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+            
             @media (max-width: 768px) {
                 .page-title {
                     font-size: 2rem;
@@ -360,11 +418,48 @@
                     </c:choose>
                 </div>
 
+                <!-- Action Buttons and Status Messages -->
+                <div class="action-buttons">
+                    <c:choose>
+                        <c:when test="${purchaseRequest.status eq 'pending'}">
+                            <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
+                                <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn-action btn-approve" onclick="return confirm('Bạn có chắc chắn muốn phê duyệt yêu cầu mua hàng này?')">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Phê duyệt
+                                </button>
+                            </form>
+                            
+                            <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
+                                <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn-action btn-reject" onclick="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu mua hàng này?')">
+                                    <i class="fas fa-times-circle me-2"></i>
+                                    Từ chối
+                                </button>
+                            </form>
+                        </c:when>
+                        <c:when test="${purchaseRequest.status eq 'approved'}">
+                            <div class="status-message status-approved">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Yêu cầu này đã được phê duyệt
+                            </div>
+                        </c:when>
+                        <c:when test="${purchaseRequest.status eq 'rejected'}">
+                            <div class="status-message status-rejected">
+                                <i class="fas fa-times-circle me-2"></i>
+                                Yêu cầu này đã bị từ chối
+                            </div>
+                        </c:when>
+                    </c:choose>
+                </div>
+
                 <!-- Back Button -->
                 <div class="text-center">
-                    <a href="javascript:history.back()" class="btn-back">
+                    <a href="ListPurchaseRequestsServlet" class="btn-back">
                         <i class="fas fa-arrow-left"></i>
-                        Quay lại
+                        Quay lại danh sách
                     </a>
                 </div>
             </div>

@@ -64,7 +64,7 @@
                     <div class="col-12 bg-white p-4 rounded shadow purchase-list">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="display-4 fw-normal">Danh sách <span class="text-primary">Yêu Cầu Mua Hàng</span></h2>
-                            <a href="PurchaseRequestForm.jsp" class="btn btn-dark btn-lg rounded-1">
+                            <a href="CreatePurchaseRequestServlet" class="btn btn-dark btn-lg rounded-1">
                                 <i class="fas fa-plus"></i> Tạo yêu cầu mới
                             </a>
                         </div>
