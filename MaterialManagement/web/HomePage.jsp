@@ -1,1697 +1,1068 @@
 <!DOCTYPE html>
-<html lang="en">
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<html lang="en" >
+    <head>
+        <title>Material Management - Professional Inventory System</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="author" content="">
+        <meta name="keywords" content="inventory, material management, stock control, accessories">
+        <meta name="description" content="A professional material management system for tracking and managing computer accessories and inventory.">
+        <style>
+            body {
+                --primary: #2563eb;
+                --primary-dark: #1e40af;
+                --primary-light: #60a5fa;
+                --success: #22c55e;
+                --danger: #ef4444;
+                --bg-main: #f4f6fb;
+                --bg-light: #f1f5f9;
+                --border: #e5e7eb;
+                --white: #fff;
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg-main);
+                color: #222;
+                font-size: 16px;
+                line-height: 1.6;
+            }
+            .top-bar {
+                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                color: #fff;
+                font-size: 16px;
+                letter-spacing: 0.5px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+            }
+            .top-bar .contact-info span {
+                margin-right: 18px;
+            }
+            .login-buttons .btn {
+                border-radius: 20px;
+                border: 2px solid #fff;
+                color: #fff;
+                background: transparent;
+                transition: background 0.3s, color 0.3s;
+            }
+            .login-buttons .btn:hover {
+                background: #fff;
+                color: #3498db;
+            }
+            .header-main {
+                box-shadow: 0 6px 24px rgba(37,99,235,0.10);
+                border-radius: 0 0 24px 24px;
+                background: var(--white);
+                min-height: 80px;
+            }
+            .header-main .navbar-nav .nav-link {
+                font-weight: 700;
+                color: #3498db;
+                border-radius: 12px;
+                font-size: 17px;
+                transition: background 0.2s, color 0.2s;
+                padding: 10px 22px !important;
+                margin: 0 2px;
+            }
+            .header-main .navbar-nav .nav-link:hover, .header-main .navbar-nav .nav-link.active {
+                background: #3498db;
+                color: #fff;
+            }
+            .header-main .btn-main {
+                font-size: 18px;
+                border-radius: 22px;
+                padding: 12px 32px;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+            }
+            .header-main .btn-main:hover {
+                background: #2980b9;
+                color: #fff !important;
+                transform: scale(1.04);
+            }
+            .main-logo img {
+                height: 54px;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+            }
+            .navbar-nav .nav-link {
+                color: #3498db;
+                font-weight: 700;
+                margin: 0 10px;
+                border-radius: 8px;
+                transition: background 0.2s, color 0.2s;
+                font-size: 16px;
+            }
+            .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+                background: #3498db;
+                color: #fff;
+            }
+            .offcanvas-body .btn {
+                background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+                border: none;
+                color: #fff;
+                font-weight: 600;
+                box-shadow: 0 2px 8px rgba(52,152,219,0.12);
+                transition: background 0.2s, transform 0.2s;
+            }
+            .offcanvas-body .btn:hover {
+                background: #2980b9;
+                transform: translateY(-2px) scale(1.04);
+            }
+            .sidebar {
+                padding: 24px 18px;
+                border-radius: 18px;
+                background: var(--white);
+                box-shadow: 0 4px 18px rgba(37,99,235,0.08);
+                margin-top: 0;
+                border: 1px solid var(--border);
+            }
+            .sidebar h3 {
+                color: var(--primary);
+                font-weight: 800;
+                border-bottom: 2px solid var(--primary-light);
+                padding-bottom: 10px;
+                margin-bottom: 24px;
+                letter-spacing: 1px;
+                font-size: 20px;
+            }
+            .sidebar-item {
+                display: flex;
+                align-items: center;
+                padding: 13px 18px;
+                margin-bottom: 14px;
+                border-radius: 14px;
+                background: var(--bg-light);
+                box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+                text-decoration: none;
+                font-weight: 600;
+                color: var(--primary);
+                font-size: 16px;
+                gap: 10px;
+            }
+            .sidebar-item:hover {
+                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                color: #fff;
+                box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+                transform: translateX(6px) scale(1.04);
+            }
+            .sidebar-item:hover .category-icon {
+                color: #fff;
+                transform: scale(1.15);
+            }
+            .category-icon {
+                font-size: 1.5rem;
+                color: var(--primary);
+                transition: color 0.2s, transform 0.2s;
+                min-width: 28px;
+                text-align: center;
+            }
+            .sidebar-item h5 {
+                color: inherit;
+                font-weight: 700;
+                margin: 0;
+                font-size: 17px;
+                letter-spacing: 0.5px;
+            }
+            .card-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 28px;
+                justify-content: flex-start;
+            }
+            .product-card {
+                display: flex;
+                flex-direction: column;
+                width: 270px;
+                border-radius: 20px;
+                overflow: hidden;
+                background: var(--white);
+                box-shadow: 0 4px 18px rgba(37,99,235,0.10);
+                transition: box-shadow 0.3s, transform 0.3s;
+                margin-bottom: 0;
+                border: 1px solid var(--border);
+                position: relative;
+            }
+            .product-card:hover {
+                box-shadow: 0 10px 32px rgba(37,99,235,0.18);
+                transform: translateY(-8px) scale(1.04);
+            }
+            .product-card img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                border-bottom: 1px solid var(--border);
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+            }
+            .card-content {
+                padding: 20px 18px 18px 18px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background: var(--white);
+            }
+            .card-content h5 {
+                margin: 0 0 10px 0;
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--primary-dark);
+                min-height: 44px;
+                letter-spacing: 0.5px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .card-content p {
+                margin: 0 0 14px 0;
+                font-size: 1.08rem;
+                color: #22c55e;
+                font-weight: 700;
+            }
+            .btn-main {
+                background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+                color: #fff !important;
+                border: none;
+                border-radius: 24px;
+                font-weight: 700;
+                padding: 9px 28px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                font-size: 16px;
+                transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+            }
+            .btn-main:hover, .btn-main:focus {
+                background: linear-gradient(90deg, #60a5fa 0%, #2563eb 100%);
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+                transform: scale(1.05);
+            }
+            .btn-outline-main {
+                background: #fff;
+                color: #3498db !important;
+                border: 2px solid #3498db;
+                border-radius: 24px;
+                font-weight: 700;
+                padding: 9px 28px;
+                transition: background 0.2s, color 0.2s, border 0.2s;
+                font-size: 16px;
+            }
+            .btn-outline-main:hover, .btn-outline-main:focus {
+                background: #3498db;
+                color: #fff !important;
+                border: 2px solid #2980b9;
+            }
+            .btn-action {
+                background: #27ae60;
+                color: #fff !important;
+                border: none;
+                border-radius: 20px;
+                font-weight: 600;
+                padding: 8px 20px;
+                transition: background 0.2s, transform 0.2s;
+                font-size: 16px;
+            }
+            .btn-action:hover, .btn-action:focus {
+                background: #219150;
+                color: #fff !important;
+                transform: scale(1.05);
+            }
+            .btn-detail {
+                background: var(--primary);
+                color: #fff;
+                border: none;
+                border-radius: 18px;
+                font-weight: 600;
+                padding: 8px 20px;
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 15px;
+            }
+            .btn-detail:hover {
+                background: var(--primary-light);
+                color: #fff;
+                transform: scale(1.07);
+            }
+            .btn-contact-info {
+                border-radius: 24px;
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                font-weight: 600;
+                padding: 8px 22px;
+                box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+                font-size: 16px;
+            }
+            .btn-contact-info:hover {
+                background: #2563eb;
+                color: #fff !important;
+                transform: scale(1.05);
+            }
+            .btn-login {
+                border-radius: 50%;
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                font-weight: 700;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                box-shadow: 0 2px 12px rgba(37,99,235,0.13);
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                padding: 0;
+            }
+            .btn-login:hover, .btn-login:focus {
+                background: #2563eb;
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+            }
+            .section-header h2 {
+                color: #3498db;
+                font-weight: 800;
+                border-bottom: 2px solid #6dd5fa;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                letter-spacing: 1px;
+            }
+            .pagination .page-link {
+                color: #2563eb;
+                border-radius: 8px;
+                margin: 0 6px;
+                font-weight: 600;
+                transition: background 0.2s, color 0.2s;
+                font-size: 16px;
+                border: none;
+            }
+            .pagination .page-link:hover, .pagination .page-item.active .page-link {
+                background: #2563eb;
+                color: #fff;
+            }
+            footer {
+                background: #fff;
+                color: #222;
+                border-radius: 18px;
+                box-shadow: 0 4px 18px rgba(52,152,219,0.08);
+            }
+            .footer-menu h3 {
+                color: #3498db;
+                font-weight: 800;
+                margin-bottom: 18px;
+                font-size: 18px;
+            }
+            .footer-menu a {
+                color: #3498db;
+                font-weight: 600;
+                transition: color 0.2s;
+                font-size: 16px;
+            }
+            .footer-menu a:hover {
+                color: #2980b9;
+            }
+            .footer-menu ul {
+                padding-left: 0;
+            }
+            .footer-menu li {
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+            .footer-menu img {
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(52,152,219,0.12);
+            }
+            .social-links ul {
+                gap: 10px;
+            }
+            .social-icon {
+                font-size: 24px;
+                color: #3498db;
+                transition: color 0.2s;
+            }
+            .social-icon:hover {
+                color: #2980b9;
+            }
+            @media (max-width: 991px) {
+                .sidebar {
+                    margin-bottom: 32px;
+                }
+                .card-container {
+                    justify-content: center;
+                }
+                .header-main .navbar-nav {
+                    flex-direction: column !important;
+                    gap: 0 !important;
+                }
+                .header-main .navbar-nav .nav-link {
+                    margin-bottom: 8px;
+                }
+                .header-main .btn-main {
+                    width: 100%;
+                    margin-bottom: 8px;
+                }
+            }
+            @media (max-width: 767px) {
+                .header-main, .footer {
+                    border-radius: 0;
+                }
+                .main-logo img {
+                    height: 44px;
+                }
+                .product-card {
+                    width: 100%;
+                    min-width: 220px;
+                }
+            }
+            .search-bar-center {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .search-icon {
+                pointer-events: none;
+            }
+            .dropdown-menu .dropdown-item {
+                font-size: 16px;
+                font-weight: 500;
+                border-radius: 8px;
+                transition: background 0.2s, color 0.2s;
+                padding: 10px 18px;
+                color: var(--primary-dark);
+            }
+            .dropdown-menu .dropdown-item:hover {
+                background: var(--primary-light);
+                color: #fff;
+            }
+            .dropdown-menu .dropdown-item i {
+                color: var(--primary);
+                min-width: 22px;
+                text-align: center;
+            }
+            @media (max-width: 991px) {
+                .search-bar-center {
+                    position: static !important;
+                    transform: none !important;
+                    margin: 12px 0 0 0;
+                    width: 100%;
+                }
+                .dropdown {
+                    margin-left: 0 !important;
+                }
+            }
+            .footer-mms {
+                background: #23272f;
+                color: #f1f5f9;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+                font-size: 15px;
+            }
+            .footer-mms .footer-title {
+                color: #2563eb;
+                font-weight: 700;
+                margin-bottom: 16px;
+                font-size: 17px;
+                display: flex;
+                align-items: center;
+            }
+            .footer-mms .footer-desc {
+                color: #e5e7eb;
+                font-size: 15px;
+            }
+            .footer-mms .footer-list {
+                list-style: none;
+                padding-left: 0;
+                margin-bottom: 0;
+            }
+            .footer-mms .footer-list li {
+                margin-bottom: 10px;
+                color: #e5e7eb;
+                display: flex;
+                align-items: center;
+            }
+            .footer-mms .footer-list a {
+                color: #e5e7eb;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .footer-mms .footer-list a:hover {
+                color: #60a5fa;
+            }
+            .footer-mms .footer-list i {
+                color: #60a5fa;
+                min-width: 20px;
+                text-align: center;
+            }
+            @media (max-width: 991px) {
+                .footer-mms .row > div {
+                    margin-bottom: 24px;
+                }
+            }
+            .btn-topbar {
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                border-radius: 50%;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 12px rgba(37,99,235,0.13);
+                font-size: 20px;
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                padding: 0;
+            }
+            .btn-topbar:hover, .btn-topbar:focus {
+                background: #2563eb;
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+            }
+        </style>
 
-<head>
-  <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-  <title>Computer accessories - Free eCommerce accesories Shop HTML Website Template</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="author" content="">
-  <meta name="keywords" content="">
-  <meta name="description" content="">
-</head>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-
-<link rel="stylesheet" type="text/css" href="css/vendor.css">
-<link rel="stylesheet" type="text/css" href="style.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
-  rel="stylesheet">
-
-</head>
-
-<body>
-
-  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <defs>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="link" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M12 19a1 1 0 1 0-1-1a1 1 0 0 0 1 1Zm5 0a1 1 0 1 0-1-1a1 1 0 0 0 1 1Zm0-4a1 1 0 1 0-1-1a1 1 0 0 0 1 1Zm-5 0a1 1 0 1 0-1-1a1 1 0 0 0 1 1Zm7-12h-1V2a1 1 0 0 0-2 0v1H8V2a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3Zm1 17a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9h16Zm0-11H4V6a1 1 0 0 1 1-1h1v1a1 1 0 0 0 2 0V5h8v1a1 1 0 0 0 2 0V5h1a1 1 0 0 1 1 1ZM7 15a1 1 0 1 0-1-1a1 1 0 0 0 1 1Zm0 4a1 1 0 1 0-1-1a1 1 0 0 0 1 1Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="arrow-right" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="category" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M19 5.5h-6.28l-.32-1a3 3 0 0 0-2.84-2H5a3 3 0 0 0-3 3v13a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-10a3 3 0 0 0-3-3Zm1 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1h4.56a1 1 0 0 1 .95.68l.54 1.64a1 1 0 0 0 .95.68h7a1 1 0 0 1 1 1Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="calendar" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Zm1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="heart" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M20.16 4.61A6.27 6.27 0 0 0 12 4a6.27 6.27 0 0 0-8.16 9.48l7.45 7.45a1 1 0 0 0 1.42 0l7.45-7.45a6.27 6.27 0 0 0 0-8.87Zm-1.41 7.46L12 18.81l-6.75-6.74a4.28 4.28 0 0 1 3-7.3a4.25 4.25 0 0 1 3 1.25a1 1 0 0 0 1.42 0a4.27 4.27 0 0 1 6 6.05Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="plus" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M19 11h-6V5a1 1 0 0 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 0 0 2 0v-6h6a1 1 0 0 0 0-2Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="minus" viewBox="0 0 24 24">
-        <path fill="currentColor" d="M19 11H5a1 1 0 0 0 0 2h14a1 1 0 0 0 0-2Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="cart" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M8.5 19a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 8.5 19ZM19 16H7a1 1 0 0 1 0-2h8.491a3.013 3.013 0 0 0 2.885-2.176l1.585-5.55A1 1 0 0 0 19 5H6.74a3.007 3.007 0 0 0-2.82-2H3a1 1 0 0 0 0 2h.921a1.005 1.005 0 0 1 .962.725l.155.545v.005l1.641 5.742A3 3 0 0 0 7 18h12a1 1 0 0 0 0-2Zm-1.326-9l-1.22 4.274a1.005 1.005 0 0 1-.963.726H8.754l-.255-.892L7.326 7ZM16.5 19a1.5 1.5 0 1 0 1.5 1.5a1.5 1.5 0 0 0-1.5-1.5Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="check" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M18.71 7.21a1 1 0 0 0-1.42 0l-7.45 7.46l-3.13-3.14A1 1 0 1 0 5.29 13l3.84 3.84a1 1 0 0 0 1.42 0l8.16-8.16a1 1 0 0 0 0-1.47Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="trash" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M10 18a1 1 0 0 0 1-1v-6a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1ZM20 6h-4V5a3 3 0 0 0-3-3h-2a3 3 0 0 0-3 3v1H4a1 1 0 0 0 0 2h1v11a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8h1a1 1 0 0 0 0-2ZM10 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1h-4Zm7 14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8h10Zm-3-1a1 1 0 0 0 1-1v-6a1 1 0 0 0-2 0v6a1 1 0 0 0 1 1Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="star-outline" viewBox="0 0 15 15">
-        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-          d="M7.5 9.804L5.337 11l.413-2.533L4 6.674l2.418-.37L7.5 4l1.082 2.304l2.418.37l-1.75 1.793L9.663 11L7.5 9.804Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="star-solid" viewBox="0 0 15 15">
-        <path fill="currentColor"
-          d="M7.953 3.788a.5.5 0 0 0-.906 0L6.08 5.85l-2.154.33a.5.5 0 0 0-.283.843l1.574 1.613l-.373 2.284a.5.5 0 0 0 .736.518l1.92-1.063l1.921 1.063a.5.5 0 0 0 .736-.519l-.373-2.283l1.574-1.613a.5.5 0 0 0-.283-.844L8.921 5.85l-.968-2.062Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="search" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="user" viewBox="0 0 24 24">
-        <path fill="currentColor"
-          d="M15.71 12.71a6 6 0 1 0-7.42 0a10 10 0 0 0-6.22 8.18a1 1 0 0 0 2 .22a8 8 0 0 1 15.9 0a1 1 0 0 0 1 .89h.11a1 1 0 0 0 .88-1.1a10 10 0 0 0-6.25-8.19ZM12 12a4 4 0 1 1 4-4a4 4 0 0 1-4 4Z" />
-      </symbol>
-      <symbol xmlns="http://www.w3.org/2000/svg" id="close" viewBox="0 0 15 15">
-        <path fill="currentColor"
-          d="M7.953 3.788a.5.5 0 0 0-.906 0L6.08 5.85l-2.154.33a.5.5 0 0 0-.283.843l1.574 1.613l-.373 2.284a.5.5 0 0 0 .736.518l1.92-1.063l1.921 1.063a.5.5 0 0 0 .736-.519l-.373-2.283l1.574-1.613a.5.5 0 0 0-.283-.844L8.921 5.85l-.968-2.062Z" />
-      </symbol>
-
-    </defs>
-  </svg>
-
-  <div class="preloader-wrapper">
-    <div class="preloader">
-    </div>
-  </div>
-
-  <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
-    <div class="offcanvas-header justify-content-center">
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="order-md-last">
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-primary">Your cart</span>
-          <span class="badge bg-primary rounded-circle pt-2">3</span>
-        </h4>
-        <ul class="list-group mb-3">
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Grey Hoodie</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$12</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Dog Food</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$8</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Soft Toy</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$5</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            <span class="fw-bold">Total (USD)</span>
-            <strong>$20</strong>
-          </li>
-        </ul>
-
-        <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch"
-    aria-labelledby="Search">
-    <div class="offcanvas-header justify-content-center">
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-
-      <div class="order-md-last">
-        <h4 class="text-primary text-uppercase mb-3">
-          Search
-        </h4>
-        <div class="search-bar border rounded-2 border-dark-subtle">
-          <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
-            <input type="text" class="form-control border-0 bg-transparent" placeholder="Search Here" />
-            <iconify-icon icon="tabler:search" class="fs-4 me-3"></iconify-icon>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <header>
-    <div class="container py-2">
-      <div class="row py-4 pb-0 pb-sm-4 align-items-center ">
-
-        <div class="col-sm-4 col-lg-3 text-center text-sm-start">
-          <div class="main-logo">
-            <a href="HomePage.jsp">
-                <img src="images/loogo.jpg" alt="logo" class="img-fluid" width="300px">
-            </a>
-          </div>
-        </div>
-
-        <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
-          <div class="search-bar border rounded-2 px-3 border-dark-subtle">
-            <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
-              <input type="text" class="form-control border-0 bg-transparent"
-                placeholder="Search for more than 10,000 products" />
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path fill="currentColor"
-                  d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z" />
-              </svg>
-            </form>
-          </div>
-        </div>
-
-        <div
-          class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
-          <div class="support-box text-end d-none d-xl-block">
-            <span class="fs-6 secondary-font text-muted">Phone</span>
-            <h5 class="mb-0">+980-34984089</h5>
-          </div>
-          <div class="support-box text-end d-none d-xl-block">
-            <span class="fs-6 secondary-font text-muted">Email</span>
-            <h5 class="mb-0">accessoriess@gmail.com</h5>
-          </div>
-
-
-        </div>
-      </div>
-    </div>
-
-    <div class="container-fluid">
-      <hr class="m-0">
-    </div>
-
-    <div class="container">
-      <nav class="main-menu d-flex navbar navbar-expand-lg ">
-
-        <div class="d-flex d-lg-none align-items-end mt-3">
-          <ul class="d-flex justify-content-end list-unstyled m-0">
-            <li>
-              <a href="account.html" class="mx-3">
-                <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
-              </a>
-            </li>
-            <li>
-              <a href="wishlist.html" class="mx-3">
-                <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
-              </a>
-            </li>
-
-            <li>
-              <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
-                aria-controls="offcanvasCart">
-                <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
-                <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
-                  03
-                </span>
-              </a>
-            </li>
-
-            <li>
-              <a href="#" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearch"
-                aria-controls="offcanvasSearch">
-                <iconify-icon icon="tabler:search" class="fs-4"></iconify-icon>
-                </span>
-              </a>
-            </li>
-          </ul>
-
-        </div>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-          aria-controls="offcanvasNavbar">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-
-          <div class="offcanvas-header justify-content-center">
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-
-          <div class="offcanvas-body justify-content-between">
-            <select class="filter-categories border-0 mb-0 me-5">
-              <option>Shop by Category</option>
-              <option>storage device</option>
-              <option>network equipment</option>
-              <option>accessory</option>
-              <option>Gaming</option>
-            </select>
-
-            <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
-              <li class="nav-item">
-                <a href="HomePage.jsp" class="nav-link active">Home</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" role="button" id="pages" data-bs-toggle="dropdown"
-                  aria-expanded="false">Pages</a>
-                <ul class="dropdown-menu" aria-labelledby="pages">
-                  <li><a href="HomePage.jsp" class="dropdown-item">About Us</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Shop</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Single Product</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Cart</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Wishlist</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Checkout</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Blog</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Single Post</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Contact</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">FAQs</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Account</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Thankyou</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Error 404</a></li>
-                  <li><a href="HomePage.jsp" class="dropdown-item">Styles</a></li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="HomePage.jsp" class="nav-link">Shop</a>
-              </li>
-              <li class="nav-item">
-                <a href="HomePage.jsp" class="nav-link">Blog</a>
-              </li>
-              <li class="nav-item">
-                <a href="HomePage.jsp" class="nav-link">Contact</a>
-              </li>
-              <li class="nav-item">
-                <a href="HomePage.jsp" class="nav-link">Others</a>
-              </li>
-            </ul>
-
-            <div class="d-none d-lg-flex align-items-end">
-              <ul class="d-flex justify-content-end list-unstyled m-0">
-                <li>
-                  <a href="HomePage.jsp" class="mx-3">
-                    <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
-                  </a>
-                </li>
-                <li>
-                  <a href="HomePage.jsp" class="mx-3">
-                    <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
-                  </a>
-                </li>
-
-                <li class="">
-                  <a href="HomePage.jsp" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
-                    aria-controls="offcanvasCart">
-                    <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
-                    <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
-                      03
-                    </span>
-                  </a>
-                </li>
-              </ul>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </nav>
 
 
 
-    </div>
-  </header>
-
-  <section id="banner" style="background: #F9F3EC;">
-    <div class="container">
-      <div class="swiper main-swiper">
-        <div class="swiper-wrapper">
-
-          <div class="swiper-slide py-5">
-            <div class="row banner-content align-items-center">
-              <div class="img-wrapper col-md-5">
-                  <img src="images/banner-img.jpg" class="img-fluid" width="900px" height="300px">
-              </div>
-              <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">computer accessories</span>
-                </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
-              </div>
-
-            </div>
-          </div>
-          <div class="swiper-slide py-5">
-            <div class="row banner-content align-items-center">
-              <div class="img-wrapper col-md-5">
-                  <img src="images//banner-img3.jpg" class="img-fluid" height="300px">
-              </div>
-              <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
-                    accessories</span>
-                </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
-              </div>
-
-            </div>
-          </div>
-          <div class="swiper-slide py-5">
-            <div class="row banner-content align-items-center">
-              <div class="img-wrapper col-md-5">
-                <img src="images/banner-img4.jpg" class="img-fluid">
-              </div>
-                 
-              <div class="content-wrapper col-md-7 p-5 mb-5">
-                <div class="secondary-font text-primary text-uppercase mb-4">Save 10 - 20 % off</div>
-                <h2 class="banner-title display-1 fw-normal">Best destination for <span class="text-primary">
-                    accessories</span>
-                </h2>
-                <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                  shop now
-                  <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                    <use xlink:href="#arrow-right"></use>
-                  </svg></a>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="swiper-pagination mb-5"></div>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="categories">
-    <div class="container my-3 py-5">
-      <div class="row my-5">
-        <div class="col text-center">
-          <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="mdi:usb-port"></iconify-icon>
-            <h5>USB & OTG</h5>
-          </a>
-        </div>
-        <div class="col text-center">
-          <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="mdi:harddisk"></iconify-icon>
-            <h5>SSD</h5>
-          </a>
-        </div>
-        <div class="col text-center">
-          <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="mdi:nas"></iconify-icon>
-            <h5>NAS</h5>
-          </a>
-        </div>
-        <div class="col text-center">
-          <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="mdi:disc"></iconify-icon>
-            <h5>CD</h5>
-          </a>
-        </div>
-        <div class="col text-center">
-          <a href="#" class="categories-item">
-            <iconify-icon class="category-icon" icon="mdi:harddisk"></iconify-icon>
-            <h5>portable hard drive</h5>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="clothing" class="my-5 overflow-hidden">
-    <div class="container pb-5">
-
-      <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-        <h2 class="display-3 fw-normal">Accessories Clothing</h2>
-        <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
-        </div>
-      </div>
-
-      <div class="products-carousel swiper">
-        <div class="swiper-wrapper">
-
-          <div class="swiper-slide">
-            <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div>
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem1.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">LENOVO USB 21tb</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$1.02</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="top-bar py-2">
+            <div class="container d-flex justify-content-between align-items-center flex-wrap position-relative">
+                <div class="main-logo me-3 d-flex align-items-center" style="min-width:120px;">
+                    <a href="HomePage.jsp">
+                        <img src="images/loogo.jpg" alt="Logo">
                     </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
                 </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem2.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">CLUBLU</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$2.300</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
+                <div class="d-flex align-items-center ms-auto gap-2" style="z-index:3;">
+                    <!-- Nút search icon -->
+                    <button id="showSearchBtn" class="btn btn-topbar me-1"><i class="fas fa-search"></i></button>
+                    <!-- Nút menu -->
+                    <div class="dropdown">
+                        <button class="btn btn-topbar" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="menuDropdown" style="min-width:220px;">
+                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="view"><i class="fas fa-list"></i> Material List</a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="viewsupplier"><i class="fas fa-truck"></i> Suppliers</a></li>
+                            <li>
+                                <a href="#" class="dropdown-item d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#contactModal">
+                                    <i class="fas fa-user-shield me-2"></i>Contact
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-login ms-1" onclick="window.location.href = 'Login.jsp'">
+                        <i class="fas fa-user"></i>
+                    </button>
                 </div>
-              </div>
+                <!-- Thanh tìm kiếm overlay -->
+                <form id="searchOverlay" action="search" method="get" class="search-overlay-form position-absolute top-0 start-50 translate-middle-x d-none" style="z-index:20;max-width:400px;width:100%;">
+                    <div class="input-group" style="border-radius:24px;box-shadow:0 2px 8px rgba(52,152,219,0.18);background:#fff;">
+                        <span class="input-group-text bg-white border-0" style="border-radius:24px 0 0 24px;"><i class="fas fa-search"></i></span>
+                        <input class="form-control border-0" type="search" name="keyword" placeholder="Find material..." required style="border-radius:0 24px 24px 0;height:44px;">
+                        <button class="btn btn-main" type="submit" style="border-radius:24px;height:44px;min-width:44px;"><i class="fas fa-search"></i></button>
+                    </div>
+                </form>
             </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              -10%
-            </div>
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem3.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">ESSAGER USB</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$2.000</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem4.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">USB BLUETOOTH</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$1.300</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem7.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">SATA-USB</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$1.800</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem8.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">PC-USB</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$18.00</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div>
-      <!-- / products-carousel -->
+        <!-- Header -->
+       <jsp:include page="Header.jsp" />
+
+        <section class="module-links py-4">
+            <div class="container">
+                <div class="row g-4 justify-content-center text-center">
+                    <!-- Inventory Management -->
+                    <div class="col-6 col-md-3">
+                        <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                            <i class="fas fa-boxes-stacked fa-2x mb-2 text-primary"></i>
+                            <div class="fw-semibold text-dark">Inventory Management</div>
+                        </a>
+                    </div>
+
+                    <!-- Allocation Tracking -->
+                    <div class="col-6 col-md-3">
+                        <a href="allocation" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                            <i class="fas fa-share-alt fa-2x mb-2 text-info"></i>
+                            <div class="fw-semibold text-dark">Allocation Tracking</div>
+                        </a>
+                    </div>
+
+                    <!-- Maintenance Logs -->
+                    <div class="col-6 col-md-3">
+                        <a href="maintenance" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                            <i class="fas fa-tools fa-2x mb-2 text-warning"></i>
+                            <div class="fw-semibold text-dark">Maintenance Logs</div>
+                        </a>
+                    </div>
+
+                    <!-- Reporting Tools -->
+                    <div class="col-6 col-md-3">
+                        <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                            <i class="fas fa-chart-line fa-2x mb-2 text-success"></i>
+                            <div class="fw-semibold text-dark">Reporting Tools</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
-    </div>
-  </section>
 
-  <section id="foodies" class="my-5">
-    <div class="container my-5 py-5">
+        <section class="my-5">
+            <div class="container" style="padding-left: 82px">
+                <div class="section-header mb-4">
+                    <h2 class="display-6 fw-semibold">Inventory Summary</h2>
+                </div>
+                <div class="card-container">
+                    <div class="product-card">
+                        <div class="card-content">
+                            <h5>Total Items</h5>
+                            <p style="color: #27ae60; font-weight: bold;">20</p>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="card-content">
+                            <h5>Assigned Devices</h5>
+                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="card-content">
+                            <h5>Under Maintenance</h5>
+                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="card-content">
+                            <h5>Decommissioned</h5>
+                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      <div class="section-header d-md-flex justify-content-between align-items-center">
-        <h2 class="display-3 fw-normal">USB & OTG</h2>
-        <div class="mb-4 mb-md-0">
-          <p class="m-0">
-            <button class="filter-button me-4  active" data-filter="*">ALL</button>
-            <button class="filter-button me-4 " data-filter=".cat">BEST SELLER</button>
-            <button class="filter-button me-4 " data-filter=".dog">LATEST</button>
-            <button class="filter-button me-4 " data-filter=".bird">POPULAR</button>
-          </p>
-        </div>
-        <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
-        </div>
-      </div>
-
-      <div class="isotope-container row">
-
-        <div class="item cat col-md-4 col-lg-3 my-4">
-          <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div> -->
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem9.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB KINGSTON DATA</h3>
-              </a>
-
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$1.200</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
+        <div class="container-fluid my-5">
+            <div class="row">
+                <div class="col-md-2 sidebar-col mt-5" style="background-color: white">
+                    <div class="sidebar">
+                        <h3 class="mb-4">Categories</h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="filter?categoryId=1" class="sidebar-item">
+                                    <i class="fas fa-usb category-icon me-2"></i>
+                                    <h5>USB & OTG</h5>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="filter?categoryId=2" class="sidebar-item">
+                                    <i class="fas fa-microchip category-icon me-2"></i>
+                                    <h5>SSD</h5>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="filter?categoryId=5" class="sidebar-item">
+                                    <i class="fas fa-network-wired category-icon me-2"></i>
+                                    <h5>NAS</h5>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="filter?categoryId=4" class="sidebar-item">
+                                    <i class="fas fa-compact-disc category-icon me-2"></i>
+                                    <h5>CD/DVD</h5>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="filter?categoryId=3" class="sidebar-item">
+                                    <i class="fas fa-hdd category-icon me-2"></i>
+                                    <h5>Portable Hard Drive</h5>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
 
-              </div>
 
-            </div>
-          </div>
-        </div>
 
-        <div class="item dog col-md-4 col-lg-3 my-4">
-          <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div>
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem10.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB LEXAR</h3>
-              </a>
+                <div class="col-md-10 mb-1">
+                    <div class="content">
+                        <section id="clothing" class="my-5 overflow-hidden">
+                            <div class="container pb-5">
+                                <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+                                    <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material Inventory</h2>
+                                </div>
 
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$1.600</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
+                                <div class="card-container">
+                                    <c:forEach var="product" items="${productList}">
+                                        <div class="product-card">
+                                            <img src="${product.materialsUrl}" alt="${product.materialName}" width="200">
+                                            <div class="card-content">
+                                                <h5>${product.materialName}</h5>
+                                                <p style="color: #27ae60; font-weight: bold;">$${product.price}</p>
+                                                <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
+                                                    <i class="fas fa-eye me-1"></i> View Detail
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <!--                                    <div class="product-card">
+                                                                            <img src="images/iitem1.jpg" alt="LENOVO USB 21TB" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>LENOVO USB 21TB</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.02</p>
+                                                                                <a href="ProductDetail?id=1" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>-->
+                                    <!--                                    <div class="product-card">
+                                                                            <img src="images/iitem2.jpg" alt="CLUBLU" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>CLUBLU</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.300</p>
+                                                                                <a href="ProductDetail?id=2" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem3.jpg" alt="ESSAGER USB" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>ESSAGER USB</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.000</p>
+                                                                                <a href="ProductDetail?id=3" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem4.jpg" alt="USB BLUETOOTH" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB BLUETOOTH</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.300</p>
+                                                                                <a href="ProductDetail?id=4" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem7.jpg" alt="SATA-USB" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>SATA-USB</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.800</p>
+                                                                                <a href="ProductDetail?id=5" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem8.jpg" alt="PC-USB" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>PC-USB</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.800</p>
+                                                                                <a href="ProductDetail?id=6" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem9.jpg" alt="USB KINGSTON DATA" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB KINGSTON DATA</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.200</p>
+                                                                                <a href="ProductDetail?id=7" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem10.jpg" alt="USB LEXAR" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB LEXAR</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.600</p>
+                                                                                <a href="ProductDetail?id=8" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem11.jpg" alt="USB Drive" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB Drive</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.000</p>
+                                                                                <a href="ProductDetail?id=9" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem12.jpg" alt="Ugreen" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>Ugreen</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.800</p>
+                                                                                <a href="ProductDetail?id=10" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem13.jpg" alt="USB TO VGA" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB TO VGA</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.400</p>
+                                                                                <a href="ProductDetail?id=11" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem14.jpg" alt="USB K3 KINGSTON" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB K3 KINGSTON</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.800</p>
+                                                                                <a href="ProductDetail?id=12" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem15.jpg" alt="USB BLUETOOTH DONGLE" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>USB BLUETOOTH DONGLE</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.600</p>
+                                                                                <a href="ProductDetail?id=13" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem16.jpg" alt="FLASH 2TB" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>FLASH 2TB</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.800</p>
+                                                                                <a href="ProductDetail?id=14" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem5.jpg" alt="Power Cord" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>Power Cord</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.600</p>
+                                                                                <a href="ProductDetail?id=15" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem6.jpg" alt="Cooling Fan" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>Cooling Fan</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$2.300</p>
+                                                                                <a href="ProductDetail?id=16" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem17.jpg" alt="COOL MOON" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>COOL MOON</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$1.900</p>
+                                                                                <a href="ProductDetail?id=17" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem18.jpg" alt="RAM" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>RAM</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$18.00</p>
+                                                                                <a href="ProductDetail?id=18" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem19.jpg" alt="CPU" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>CPU</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$12.000</p>
+                                                                                <a href="ProductDetail?id=19" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="product-card">
+                                                                            <img src="images/iitem20.jpg" alt="Module Relay" width="200" class="rounded">
+                                                                            <div class="card-content">
+                                                                                <h5>Module Relay</h5>
+                                                                                <p style="color: #27ae60; font-weight: bold;">$18.00</p>
+                                                                                <a href="ProductDetail?id=20" class="btn-detail"><i class="fas fa-eye me-1"></i>View Detail</a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>-->
+                                    <nav aria-label="Page navigation" style="padding-left: 500px">
+                                        <ul class="pagination justify-content-center mt-4" id="pagination">
+                                            <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#" data-page="2">2</a></li>
+                                            <li class="page-item"><a class="page-link" href="#" data-page="3">3</a></li>
+                                            <!-- Thêm hoặc bớt số trang tùy số lượng sản phẩm -->
+                                        </ul>
+                                    </nav>
+                                </div>
+                        </section>
+                    </div>
                 </div>
-
-
-              </div>
-
             </div>
-          </div>
         </div>
 
-        <div class="item dog col-md-4 col-lg-3 my-4">
-          <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div> -->
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem11.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB drive</h3>
-              </a>
 
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
 
-                <h3 class="secondary-font text-primary">$2.000</h3>
 
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
+        <footer id="footer" class="footer-mms mt-5">
+            <div class="container py-4">
+                <div class="row">
+                    <div class="col-md-3 mb-4 mb-md-0">
+                        <h5 class="footer-title"><i class="fas fa-warehouse me-2"></i>About System</h5>
+                        <p class="footer-desc">
+                            This Material Management System is for internal company use only. All activities are monitored and restricted to authorized personnel.
+                        </p>
+                    </div>
+                    <div class="col-md-3 mb-4 mb-md-0">
+                        <h5 class="footer-title"><i class="fas fa-phone-alt me-2"></i>Internal Contact</h5>
+                        <ul class="footer-list">
+                            <li><i class="fas fa-envelope me-2"></i>it-support@company.com</li>
+                            <li><i class="fas fa-phone me-2"></i>Ext: 1234 (IT Dept.)</li>
+                            <li><i class="fas fa-user-tie me-2"></i>Warehouse Manager: John Doe</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3 mb-4 mb-md-0">
+                        <h5 class="footer-title"><i class="fas fa-file-alt me-2"></i>Internal Policies</h5>
+                        <ul class="footer-list">
+                            <li><a href="#"><i class="fas fa-shield-alt me-2"></i>Data Security Policy</a></li>
+                            <li><a href="#"><i class="fas fa-user-lock me-2"></i>System Usage Rules</a></li>
+                            <li><a href="#"><i class="fas fa-headset me-2"></i>IT Support Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h5 class="footer-title"><i class="fas fa-question-circle me-2"></i>Guides</h5>
+                        <ul class="footer-list">
+                            <li><a href="#"><i class="fas fa-user-cog me-2"></i>User Manual</a></li>
+                            <li><a href="#"><i class="fas fa-search me-2"></i>Check Inventory</a></li>
+                            <li><a href="#"><i class="fas fa-life-ring me-2"></i>Contact IT Support</a></li>
+                        </ul>
+                    </div>
                 </div>
-
-
-              </div>
-
+                <hr class="my-3" style="border-top:1.5px solid var(--primary-light);opacity:0.15;">
+                <div class="text-center small" style="color:#bbb;">&copy; 2024 Material Management System (Internal Use Only). All rights reserved.</div>
             </div>
-          </div>
-        </div>
+        </footer>
 
-        <div class="item cat col-md-4 col-lg-3 my-4">
-          <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            Sold
-          </div>
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem12.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">Ugreen</h3>
-              </a>
 
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
 
-                <h3 class="secondary-font text-primary">$1.800</h3>
 
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
+        <!-- Modal Contact Internal -->
+        <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="contactModalLabel"><i class="fas fa-user-shield me-2"></i>Internal Contact</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div><i class="fas fa-envelope me-2"></i> it-support@company.com</div>
+                        <div><i class="fas fa-phone me-2"></i> Ext: 1234 (IT Dept.)</div>
+                        <div><i class="fas fa-user-tie me-2"></i> Warehouse Manager: John Doe</div>
+                    </div>
                 </div>
-
-
-              </div>
-
             </div>
-          </div>
-        </div>
-
-        <div class="item bird col-md-4 col-lg-3 my-4">
-          <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div> -->
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem13.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB TO VGA</h3>
-              </a>
-
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$1.400</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
-                </div>
-
-
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="item bird col-md-4 col-lg-3 my-4">
-          <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div> -->
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem14.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB K3 KINGSTON</h3>
-              </a>
-
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$2.800</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
-                </div>
-
-
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="item dog col-md-4 col-lg-3 my-4">
-          <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            Sale
-          </div>
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem15.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">USB BLUETOOTH DONGLE</h3>
-              </a>
-
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$1.600</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
-                </div>
-
-
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="item cat col-md-4 col-lg-3 my-4">
-          <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-            New
-          </div> -->
-          <div class="card position-relative">
-            <a href="single-product.html"><img src="images/iitem16.jpg" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-product.html">
-                <h3 class="card-title pt-4 m-0">FLASH 2TB</h3>
-              </a>
-
-              <div class="card-text">
-                <span class="rating secondary-font">
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                  5.0</span>
-
-                <h3 class="secondary-font text-primary">$2.800</h3>
-
-                <div class="d-flex flex-wrap mt-3">
-                  <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                    <h5 class="text-uppercase m-0">Add to Cart</h5>
-                  </a>
-                  <a href="#" class="btn-wishlist px-4 pt-3 ">
-                    <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                  </a>
-                </div>
-
-
-              </div>
-
-            </div>
-          </div>
         </div>
 
 
-      </div>
 
 
-    </div>
-  </section>
-
-  <section id="banner-2" class="my-3" style="background: #F9F3EC;">
-    <div class="container">
-      <div class="row flex-row-reverse banner-content align-items-center">
-        <div class="img-wrapper col-12 col-md-6">
-            <img src="images/banner-img2.jpg" class="img-fluid" width="500px" height="500px">
-        </div>
-        <div class="content-wrapper col-12 offset-md-1 col-md-5 p-5">
-          <div class="secondary-font text-primary text-uppercase mb-3 fs-4">Upto 40% off</div>
-          <h2 class="banner-title display-1 fw-normal">Clearance sale !!!
-          </h2>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="testimonial">
-    <div class="container my-5 py-5">
-      <div class="row">
-        <div class="offset-md-1 col-md-10">
-          <div class="swiper testimonial-swiper">
-            <div class="swiper-wrapper">
-
-              <div class="swiper-slide">
-                <div class="row ">
-                  <div class="col-2">
-                    <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
-                  </div>
-                  <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
-                        productivity and upgrade your setup.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="swiper-slide">
-                <div class="row ">
-                  <div class="col-2">
-                    <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
-                  </div>
-                  <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
-                        productivity and upgrade your setup.</p>
-                  </div>
-                </div>
-              </div>
-              <div class="swiper-slide">
-                <div class="row ">
-                  <div class="col-2">
-                    <iconify-icon icon="ri:double-quotes-l" class="quote-icon text-primary"></iconify-icon>
-                  </div>
-                  <div class="col-md-10 mt-md-5 p-5 pt-0 pt-md-5">
-                    <p class="testimonial-content fs-2">We offer a wide range of high-quality computer accessories to enhance your
-                        productivity and upgrade your setup.</p>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="swiper-pagination"></div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </section>
-
-  <section id="bestselling" class="my-5 overflow-hidden">
-    <div class="container py-5 mb-5">
-
-      <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-        <h2 class="display-3 fw-normal">Best selling products</h2>
-        <div>
-          <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-            shop now
-            <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-              <use xlink:href="#arrow-right"></use>
-            </svg></a>
-        </div>
-      </div>
-
-      <div class=" swiper bestselling-swiper">
-        <div class="swiper-wrapper">
-
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem5.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">power cord</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$1.600</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem6.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">cooling fan</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$2.300</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              Sale
-            </div>
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem17.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">COOL MOON</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$1.900</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem18.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">RAM</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$18.00</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              -10%
-            </div>
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem19.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">CPU</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$12.000</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <!-- <div class="z-1 position-absolute rounded-3 m-3 px-3 border border-dark-subtle">
-              New
-            </div> -->
-            <div class="card position-relative">
-              <a href="single-product.html"><img src="images/iitem20.jpg" class="img-fluid rounded-4" alt="image"></a>
-              <div class="card-body p-0">
-                <a href="single-product.html">
-                  <h3 class="card-title pt-4 m-0">MODULE RELAY</h3>
-                </a>
-
-                <div class="card-text">
-                  <span class="rating secondary-font">
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                    5.0</span>
-
-                  <h3 class="secondary-font text-primary">$18.00</h3>
-
-                  <div class="d-flex flex-wrap mt-3">
-                    <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
-                      <h5 class="text-uppercase m-0">Add to Cart</h5>
-                    </a>
-                    <a href="#" class="btn-wishlist px-4 pt-3 ">
-                      <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-                    </a>
-                  </div>
-
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-
-
-        </div>
-      </div>
-      <!-- / category-carousel -->
-
-
-    </div>
-  </section>
-
-  <section id="register" style="background: url('images/background-img.png') no-repeat;">
-    <div class="container ">
-      <div class="row my-5 py-5">
-        <div class="offset-md-3 col-md-6 my-5 ">
-          <h2 class="display-3 fw-normal text-center">Get 20% Off on <span class="text-primary">first Purchase</span>
-          </h2>
-          <form>
-            <div class="mb-3">
-              <input type="email" class="form-control form-control-lg" name="email" id="email"
-                placeholder="Enter Your Email Address">
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control form-control-lg" name="email" id="password1"
-                placeholder="Create Password">
-            </div>
-            <div class="mb-3">
-              <input type="password" class="form-control form-control-lg" name="email" id="password2"
-                placeholder="Repeat Password">
-            </div>
-
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-dark btn-lg rounded-1">Register it now</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="latest-blog" class="my-5">
-    <div class="container py-5 my-5">
-      <div class="row mt-5">
-        <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-          <h2 class="display-3 fw-normal">Latest Blog Post</h2>
-          <div>
-            <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-              Read all
-              <svg width="24" height="24" viewBox="0 0 24 24" class="mb-1">
-                <use xlink:href="#arrow-right"></use>
-              </svg></a>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4 my-4 my-md-0">
-          <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0"></h3>
-            <p class="secondary-font fs-6 m-0"></p>
-
-          </div>
-          <div class="card position-relative">
-              <a href="single-post.html"><img src="images/bllog7.jpg" class="img-fluid rounded-4" alt="image" width="500px"></a>
-            <div class="card-body p-0">
-              <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">10 Must-Have Computer Accessories for Every Setup</h3>
-              </a>
-
-              <div class="card-text">
-                <p class="blog-paragraph fs-6">From ergonomic keyboards to high-speed USB hubs, discover the top accessories
-                    that will boost your productivity and enhance your workspace..</p>
-                <a href="single-post.html" class="blog-read">read more</a>
-              </div>
-
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 my-4 my-md-0">
-          <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0"></h3>
-            <p class="secondary-font fs-6 m-0"></p>
-
-          </div>
-          <div class="card position-relative">
-              <a href="single-post.html"><img src="images/bllog6.jpg" class="img-fluid rounded-4" alt="image" width="800px"></a>
-            <div class="card-body p-0">
-              <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">Choose the Right Mouse for Your Needs
-              </a>
-
-              <div class="card-text">
-                <p class="blog-paragraph fs-6">Whether you’re a gamer or a graphic designer, finding the perfect 
-                    mouse can make all the difference. Here’s how to pick the right one.</p>
-                <a href="single-post.html" class="blog-read">read more</a>
-              </div>
-
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 my-4 my-md-0">
-          <div class="z-1 position-absolute rounded-3 m-2 px-3 pt-1 bg-light">
-            <h3 class="secondary-font text-primary m-0"></h3>
-            <p class="secondary-font fs-6 m-0"></p>
-
-          </div>
-          <div class="card position-relative">
-              <a href="single-post.html"><img src="images/bllog5.jpg" width="900px" height="1000px" class="img-fluid rounded-4" alt="image"></a>
-            <div class="card-body p-0">
-              <a href="single-post.html">
-                <h3 class="card-title pt-4 pb-3 m-0">Best Accessories to Organize Your PC Setup</h3>
-              </a>
-
-              <div class="card-text">
-                <p class="blog-paragraph fs-6">A clutter-free desk boosts focus and comfort
-                    Explore smart accessories that keep your PC setup clean, efficient, and stylish.</p>
-                <a href="single-post.html" class="blog-read">read more</a>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="service">
-    <div class="container py-5 my-5">
-      <div class="row g-md-5 pt-4">
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:shopping-cart"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Free Delivery</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:user-check"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">100% secure payment</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:tag"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Daily Offer</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:award"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Quality guarantee</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="insta" class="my-5">
-    <div class="row g-0 py-5">
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta1.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta2.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta3.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta4.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta5.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-      <div class="col instagram-item  text-center position-relative">
-        <div class="icon-overlay d-flex justify-content-center position-absolute">
-          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-        </div>
-        <a href="#">
-          <img src="images/iinsta6.jpg" alt="insta-img" class="img-fluid rounded-3">
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <footer id="footer" class="my-5">
-    <div class="container py-5 my-5">
-      <div class="row">
-
-        <div class="col-md-3">
-          <div class="footer-menu">
-              <img src="images/loogo.jpg" alt="logo" width="300px" height="200px">
-            <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
-            <div class="social-links">
-              <ul class="d-flex list-unstyled gap-2">
-                <li class="social">
-                  <a href="#">
-                    <iconify-icon class="social-icon" icon="ri:facebook-fill"></iconify-icon>
-                  </a>
-                </li>
-                <li class="social">
-                  <a href="#">
-                    <iconify-icon class="social-icon" icon="ri:twitter-fill"></iconify-icon>
-                  </a>
-                </li>
-                <li class="social">
-                  <a href="#">
-                    <iconify-icon class="social-icon" icon="ri:pinterest-fill"></iconify-icon>
-                  </a>
-                </li>
-                <li class="social">
-                  <a href="#">
-                    <iconify-icon class="social-icon" icon="ri:instagram-fill"></iconify-icon>
-                  </a>
-                </li>
-                <li class="social">
-                  <a href="#">
-                    <iconify-icon class="social-icon" icon="ri:youtube-fill"></iconify-icon>
-                  </a>
-                </li>
-
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="footer-menu">
-            <h3>Quick Links</h3>
-            <ul class="menu-list list-unstyled">
-              <li class="menu-item">
-                <a href="#" class="nav-link">Home</a>
-              </li>
-              <li class="menu-item">
-                <a href="#" class="nav-link">About us</a>
-              </li>
-              <li class="menu-item">
-                <a href="#" class="nav-link">Offer </a>
-              </li>
-              <li class="menu-item">
-                <a href="#" class="nav-link">Services</a>
-              </li>
-              <li class="menu-item">
-                <a href="#" class="nav-link">Conatct Us</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="footer-menu">
-            <h3>Help Center</h5>
-              <ul class="menu-list list-unstyled">
-                <li class="menu-item">
-                  <a href="#" class="nav-link">FAQs</a>
-                </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Payment</a>
-                </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Returns & Refunds</a>
-                </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Checkout</a>
-                </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Delivery Information</a>
-                </li>
-              </ul>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div>
-            <h3>Our Newsletter</h3>
-            <p class="blog-paragraph fs-6">Subscribe to our newsletter to get updates about our grand offers.</p>
-            <div class="search-bar border rounded-pill border-dark-subtle px-2">
-              <form class="text-center d-flex align-items-center" action="" method="">
-                <input type="text" class="form-control border-0 bg-transparent" placeholder="Enter your email here" />
-                <iconify-icon class="send-icon" icon="tabler:location-filled"></iconify-icon>
-              </form>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </footer>
-
-  <div id="footer-bottom">
-    <div class="container">
-      <hr class="m-0">
-      <div class="row mt-3">
-        <div class="col-md-6 copyright">
-          <p class="secondary-font">© 2023 Waggy. All rights reserved.</p>
-        </div>
-        <div class="col-md-6 text-md-end">
-          <p class="secondary-font">Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
-              class="text-decoration-underline fw-bold text-black-50"> TemplatesJungle</a> Distributed by <a href="https://themewagon.com/" target="_blank"
-              class="text-decoration-underline fw-bold text-black-50"> ThemeWagon</a></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <script src="js/jquery-1.11.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-    crossorigin="anonymous"></script>
-  <script src="js/plugins.js"></script>
-  <script src="js/script.js"></script>
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-</body>
-
+        <!-- Modal Login/Register -->
+        <!-- Đã bỏ modal login/register vì nút login giờ chuyển trang -->
+
+
+
+
+        <script src="js/jquery-1.11.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/script.js"></script>
+        <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+        <script>
+                        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+                        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                            return new bootstrap.Popover(popoverTriggerEl);
+                        });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var showBtn = document.getElementById('showSearchBtn');
+                var overlay = document.getElementById('searchOverlay');
+                var input = overlay.querySelector('input');
+                showBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    overlay.classList.toggle('d-none');
+                    if (!overlay.classList.contains('d-none')) {
+                        setTimeout(function () {
+                            input.focus();
+                        }, 100);
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!overlay.classList.contains('d-none') && !overlay.contains(e.target) && e.target !== showBtn) {
+                        overlay.classList.add('d-none');
+                    }
+                });
+                overlay.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            });
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const products = document.querySelectorAll('.product-card');
+                const productsPerPage = 8;
+                const pagination = document.getElementById('pagination');
+                let currentPage = 1;
+                const totalPages = Math.ceil(products.length / productsPerPage);
+
+
+
+
+                function showPage(page) {
+                    currentPage = page;
+                    products.forEach((product, idx) => {
+                        if (idx >= (page - 1) * productsPerPage && idx < page * productsPerPage) {
+                            product.style.display = '';
+                        } else {
+                            product.style.display = 'none';
+                        }
+                    });
+                    // Cập nhật active cho nút
+                    document.querySelectorAll('#pagination .page-item').forEach((li, i) => {
+                        if (i === page - 1) {
+                            li.classList.add('active');
+                        } else {
+                            li.classList.remove('active');
+                        }
+                    });
+                }
+
+
+
+
+                // Gán sự kiện click cho các nút phân trang
+                if (pagination) {
+                    pagination.querySelectorAll('.page-link').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const page = parseInt(this.getAttribute('data-page'));
+                            showPage(page);
+                        });
+                    });
+                    // Hiển thị trang đầu tiên khi load
+                    showPage(1);
+                }
+            });
+        </script>
+    </body>
 </html>
+
+
+
+
+
+
+
+
