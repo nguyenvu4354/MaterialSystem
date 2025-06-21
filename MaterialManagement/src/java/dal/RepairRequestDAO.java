@@ -147,27 +147,51 @@ public class RepairRequestDAO extends DBContext {
         }
         return details;
     }
-    
-    public List<RepairRequestDetail> getAllRepairRequestDetails() throws SQLException {
-    List<RepairRequestDetail> details = new ArrayList<>();
-    String sql = "SELECT * FROM Repair_Request_Details";
 
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            RepairRequestDetail detail = new RepairRequestDetail();
-            detail.setDetailId(rs.getInt("detail_id"));
-            detail.setRepairRequestId(rs.getInt("repair_request_id"));
-            detail.setMaterialId(rs.getInt("material_id"));
-            detail.setQuantity(rs.getInt("quantity"));
-            detail.setDamageDescription(rs.getString("damage_description"));
-            detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
-            detail.setCreatedAt(rs.getTimestamp("created_at"));
-            detail.setUpdatedAt(rs.getTimestamp("updated_at"));
-            details.add(detail);
+    public List<RepairRequestDetail> getAllRepairRequestDetails() throws SQLException {
+        List<RepairRequestDetail> details = new ArrayList<>();
+        String sql = "SELECT * FROM Repair_Request_Details";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequestDetail detail = new RepairRequestDetail();
+                detail.setDetailId(rs.getInt("detail_id"));
+                detail.setRepairRequestId(rs.getInt("repair_request_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setDamageDescription(rs.getString("damage_description"));
+                detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
+                detail.setCreatedAt(rs.getTimestamp("created_at"));
+                detail.setUpdatedAt(rs.getTimestamp("updated_at"));
+                details.add(detail);
+            }
         }
+
+        return details;
     }
 
-    return details;
-}
+    public List<RepairRequest> getRepairRequestsByUser(int userId) {
+        List<RepairRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM RepairRequests WHERE user_id = ?";
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql);) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequest r = new RepairRequest();
+                r.setRepairRequestId(rs.getInt("repair_request_id"));
+                r.setRequestCode(rs.getString("request_code"));
+                r.setUserId(rs.getInt("user_id"));
+                r.setStatus(rs.getString("status"));
+                r.setRequestDate(rs.getTimestamp("request_date"));
+                r.setReason(rs.getString("reason"));
+                list.add(r);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }
