@@ -3,11 +3,13 @@ package controller;
 import dal.RepairRequestDAO;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.sql.Date;
@@ -22,20 +24,26 @@ public class RepairRequestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        try {
+         try {
+            // Lấy user từ session
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("loggedUser");
+            if (user == null) {
+                response.sendRedirect("Login.jsp");
+                return;
+            }
+            int userId = user.getUserId(); // hoặc getId()
+
             // Lấy thông tin từ form
             String requestCode = request.getParameter("requestCode");
-            int userId = Integer.parseInt(request.getParameter("userId"));
             String repairPhone = request.getParameter("repairPersonPhoneNumber");
             String repairEmail = request.getParameter("repairPersonEmail");
             String repairLocation = request.getParameter("repairLocation");
             String reason = request.getParameter("reason");
             Date estimatedReturnDate = Date.valueOf(request.getParameter("estimatedReturnDate"));
 
-            // Thời gian hiện tại
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
-            // Tạo đối tượng RepairRequest
             RepairRequest requestObj = new RepairRequest();
             requestObj.setRequestCode(requestCode);
             requestObj.setUserId(userId);
@@ -50,7 +58,7 @@ public class RepairRequestServlet extends HttpServlet {
             requestObj.setUpdatedAt(now);
             requestObj.setDisable(false);
 
-            // Lấy danh sách vật tư từ formrequestObj.setEstimatedReturnDate(estimatedReturnDate);v
+            // Chi tiết vật tư
             String[] materialIds = request.getParameterValues("materialId");
             String[] quantities = request.getParameterValues("quantity");
             String[] descriptions = request.getParameterValues("damageDescription");
@@ -78,16 +86,13 @@ public class RepairRequestServlet extends HttpServlet {
                 detailList.add(detail);
             }
 
-            // Gọi DAO để lưu cả yêu cầu và chi tiết
-            RepairRequestDAO repairDAO = new RepairRequestDAO();
-            repairDAO.createRepairRequest(requestObj, detailList);
+            new RepairRequestDAO().createRepairRequest(requestObj, detailList);
 
-            // Chuyển hướng sau khi thành công
             response.sendRedirect("RepairRequestSuccess.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "An error occurred while submitting a repair request.");
+            request.setAttribute("errorMessage", "Lỗi khi gửi yêu cầu sửa chữa.");
             request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
         }
     }
