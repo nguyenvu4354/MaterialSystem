@@ -70,7 +70,7 @@
 
                     <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                         <li class="nav-item">
-                            <a href="adminDashboard.jsp" class="nav-link active">Dashboard</a>
+                            <a href="HomePage.jsp" class="nav-link active">Home</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" role="button" id="adminPages" data-bs-toggle="dropdown" aria-expanded="false">Management</a>
@@ -83,18 +83,12 @@
                                 <li><a href="settings.jsp" class="dropdown-item">Settings</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a href="analytics.jsp" class="nav-link">Analytics</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="support.jsp" class="nav-link">Support</a>
-                        </li>
                     </ul>
 
                     <div class="d-none d-lg-flex align-items-end">
                         <ul class="d-flex justify-content-end list-unstyled m-0">
                             <li>
-                                <a href="Profile.jsp" class="mx-3">
+                                <a href="profile" class="mx-3">
                                     <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                                 </a>
                             </li>

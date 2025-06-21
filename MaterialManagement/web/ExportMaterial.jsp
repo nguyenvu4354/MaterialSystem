@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     User admin = (User) session.getAttribute("user");
-    if (admin == null || admin.getRoleId() != 1) {
+    if (admin == null || admin.getRoleId() != 3) {
         response.sendRedirect("Login.jsp");
         return;
     }
