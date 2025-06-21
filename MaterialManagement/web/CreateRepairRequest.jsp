@@ -144,14 +144,14 @@
     </style>
 
     <script>
-        function addRow() {
+       function addRow() {
             const table = document.getElementById("details").getElementsByTagName("tbody")[0];
             const newRow = table.insertRow();
             newRow.innerHTML = `
-                <td><input type="number" name="materialId[]" required></td>
-                <td><input type="number" name="quantity[]" required></td>
-                <td><input type="text" name="damageDescription[]" required></td>
-                <td><input type="number" name="repairCost[]" step="0.01" min="0"></td>
+                <td><input type="number" name="materialId" required></td>
+                <td><input type="number" name="quantity" required></td>
+                <td><input type="text" name="damageDescription" required></td>
+                <td><input type="number" name="repairCost" step="0.01" min="0"></td>
                 <td>
                     <button type="button" class="remove-btn" onclick="removeRow(this)">X</button>
                     <button type="button" class="edit-btn" onclick="editRow(this)">Save</button>
@@ -167,15 +167,12 @@
         function editRow(btn) {
             const row = btn.closest('tr');
             const inputs = row.querySelectorAll('input');
-
             if (btn.textContent === 'Edit') {
                 inputs.forEach(input => input.removeAttribute('readonly'));
                 btn.textContent = 'Save';
-                btn.style.backgroundColor = '#f1c40f';
             } else {
                 inputs.forEach(input => input.setAttribute('readonly', true));
                 btn.textContent = 'Edit';
-                btn.style.backgroundColor = '#3498db';
             }
         }
     </script>
@@ -185,6 +182,8 @@
     <h2>Form Repair Request</h2>
 
     <form action="repairrequest" method="post">
+        <!-- KHÔNG cần userId vì Servlet sẽ tự lấy từ session -->
+
         <div class="form-section table-section">
             <h3>List of materials to be repaired</h3>
             <table id="details">
@@ -199,10 +198,10 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><input type="number" name="materialId[]" required></td>
-                    <td><input type="number" name="quantity[]" required></td>
-                    <td><input type="text" name="damageDescription[]" required></td>
-                    <td><input type="number" name="repairCost[]" step="0.01" min="0"></td>
+                    <td><input type="number" name="materialId" required></td>
+                    <td><input type="number" name="quantity" required></td>
+                    <td><input type="text" name="damageDescription" required></td>
+                    <td><input type="number" name="repairCost" step="0.01" min="0"></td>
                     <td>
                         <button type="button" class="remove-btn" onclick="removeRow(this)">X</button>
                         <button type="button" class="edit-btn" onclick="editRow(this)">Save</button>
@@ -212,8 +211,6 @@
             </table>
             <button type="button" class="add-row-btn" onclick="addRow()">+ Add material</button>
         </div>
-
-        <br><br>
 
         <div class="form-section form-grid">
             <div>
@@ -233,7 +230,7 @@
                 <input type="text" name="repairLocation" required>
             </div>
             <div>
-                <label>Estimated return date (yyyy-mm-dd)</label>
+                <label>Estimated return date</label>
                 <input type="text" name="estimatedReturnDate" required>
             </div>
         </div>
