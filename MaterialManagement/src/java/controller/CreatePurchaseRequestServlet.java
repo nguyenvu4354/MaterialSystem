@@ -52,7 +52,20 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+
+        // User is logged in, now check for permissions
+        if (user.getRoleId() != 4) {
+            request.setAttribute("error", "You don't have permission to access this page. Only employees can create purchase requests.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         UserDAO userDAO = new UserDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
 
@@ -88,10 +101,16 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
         User user = (User) session.getAttribute("user");
 
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        // User is logged in, now check for permissions
+        if (user.getRoleId() != 4) {
+            request.setAttribute("error", "You don't have permission to access this page. Only employees can create purchase requests.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 

@@ -9,6 +9,7 @@ import dal.PurchaseRequestDAO;
 import dal.PurchaseRequestDetailDAO;
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
+import entity.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -61,16 +63,74 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+
+        // User is logged in, now check for permissions
+        if (user.getRoleId() != 2) {
+            request.setAttribute("error", "You don't have permission to access this page. Only directors can view purchase request details.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
-            
-            // Lấy thông tin chi tiết yêu cầu
-            PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
-            List<PurchaseRequestDetail> purchaseRequestDetailList = prdd.getPurchaseRequestDetailByPurchaseRequestId(purchaseRequestId);
             
             // Lấy thông tin yêu cầu
             PurchaseRequestDAO prd = new PurchaseRequestDAO();
             PurchaseRequest purchaseRequest = prd.getPurchaseRequestById(purchaseRequestId);
+            
+            if (purchaseRequest == null) {
+                request.setAttribute("error", "Purchase request not found.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+
+            // Xử lý phân trang
+            int pageSize = 10;
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            
+            if (pageParam != null && !pageParam.trim().isEmpty()) {
+                try {
+                    currentPage = Integer.parseInt(pageParam);
+                    if (currentPage < 1) currentPage = 1;
+                } catch (NumberFormatException e) {
+                    currentPage = 1;
+                }
+            }
+            
+            // Lấy thông tin chi tiết yêu cầu với phân trang
+            PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
+            
+            // Lấy tổng số chi tiết
+            int totalItems = prdd.count(purchaseRequestId);
+            int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+            
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+            
+            List<PurchaseRequestDetail> purchaseRequestDetailList;
+            
+            if (totalItems > pageSize) {
+                // Sử dụng phân trang
+                purchaseRequestDetailList = prdd.paginationOfDetails(
+                    purchaseRequestId, currentPage, pageSize);
+                
+                request.setAttribute("currentPage", currentPage);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("totalItems", totalItems);
+                request.setAttribute("showPagination", true);
+            } else {
+                // Không cần phân trang
+                purchaseRequestDetailList = prdd.getPurchaseRequestDetailByPurchaseRequestId(purchaseRequestId);
+                request.setAttribute("showPagination", false);
+            }
 
             request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
             request.setAttribute("purchaseRequest", purchaseRequest);
@@ -93,6 +153,20 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+
+        // User is logged in, now check for permissions
+        if (user.getRoleId() != 2) {
+            request.setAttribute("error", "You don't have permission to perform this action. Only directors can approve/reject purchase requests.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             String action = request.getParameter("action");
             int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
