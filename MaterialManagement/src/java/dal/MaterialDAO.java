@@ -25,10 +25,11 @@ public class MaterialDAO extends DBContext {
         List<Material> list = new ArrayList<>();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT m.*, c.category_name, u.unit_name ")
+            sql.append("SELECT m.*, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS quantity ")
                     .append("FROM materials m ")
                     .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
                     .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("LEFT JOIN inventory i ON m.material_id = i.material_id ")
                     .append("WHERE m.disable = 0 ");
 
             List<Object> params = new ArrayList<>();
@@ -94,6 +95,7 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialStatus(rs.getString("material_status"));
                 m.setConditionPercentage(rs.getInt("condition_percentage"));
                 m.setPrice(rs.getDouble("price"));
+                m.setQuantity(rs.getInt("quantity"));
 
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));

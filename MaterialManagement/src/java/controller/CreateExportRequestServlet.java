@@ -53,12 +53,19 @@ public class CreateExportRequestServlet extends HttpServlet {
             return;
         }
 
+        int roleId = user.getRoleId();
+        if (roleId != 2 && roleId != 3 && roleId != 4) {
+            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
+            response.sendRedirect("HomePage.jsp");
+            return;
+        }
+
         try {
             String requestCode = generateRequestCode();
             System.out.println("DEBUG: Generated requestCode: " + requestCode);
             request.setAttribute("requestCode", requestCode);
 
-            List<Material> materials = materialDAO.getMaterials();
+            List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
             System.out.println("DEBUG: Loaded " + materials.size() + " materials");
             request.setAttribute("materials", materials);
 
@@ -88,6 +95,13 @@ public class CreateExportRequestServlet extends HttpServlet {
         if (user == null) {
             System.out.println("DEBUG: User not logged in, redirecting to Login.jsp");
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
+            return;
+        }
+
+        int roleId = user.getRoleId();
+        if (roleId != 2 && roleId != 3 && roleId != 4) {
+            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
+            response.sendRedirect("HomePage.jsp");
             return;
         }
 
@@ -124,7 +138,7 @@ public class CreateExportRequestServlet extends HttpServlet {
             exportRequest.setReason(reason);
             exportRequest.setUserId(user.getUserId());
             exportRequest.setRecipientId(recipientId);
-            exportRequest.setStatus("draft");
+            exportRequest.setStatus("pending");
 
             String[] materialIds = request.getParameterValues("materials[]");
             String[] quantities = request.getParameterValues("quantities[]");
@@ -191,7 +205,7 @@ public class CreateExportRequestServlet extends HttpServlet {
             request.setAttribute("quantities", request.getParameterValues("quantities[]"));
             request.setAttribute("conditions", request.getParameterValues("conditions[]"));
             try {
-                List<Material> materials = materialDAO.getMaterials();
+                List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
                 System.out.println("DEBUG: Loaded " + materials.size() + " materials in error case");
                 request.setAttribute("materials", materials);
                 List<User> users = userDAO.getAllUsers();

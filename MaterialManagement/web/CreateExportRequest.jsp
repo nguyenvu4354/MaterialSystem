@@ -73,21 +73,26 @@
 
                     <h3 class="fw-normal mt-5 mb-3">Materials</h3>
                     <div id="materialList">
-                        <div class="row material-row">
-                            <div class="col-md-4">
+                        <div class="row material-row align-items-center gy-2">
+                            <div class="col-md-3">
                                 <label class="form-label text-muted">Material</label>
-                                <select class="form-select" name="materials[]" required>
+                                <select class="form-select material-select" name="materials[]" required>
                                     <option value="">Select Material</option>
                                     <c:forEach var="material" items="${materials}">
                                         <option value="${material.materialId}">${material.materialName}</option>
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-muted">Quantity</label>
-                                <input type="number" class="form-control" name="quantities[]" min="1" required>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted">In Stock</label>
+                                <input type="text" class="form-control stock-quantity" readonly value="0">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
+                                <label class="form-label text-muted">Quantity</label>
+                                <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required>
+                                <div class="invalid-feedback">Not enough stock!</div>
+                            </div>
+                            <div class="col-md-2">
                                 <label class="form-label text-muted">Condition</label>
                                 <select class="form-select" name="conditions[]" required>
                                     <option value="new">New</option>
@@ -95,7 +100,10 @@
                                     <option value="refurbished">Refurbished</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-2">
+                                <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
                                 <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                             </div>
                         </div>
@@ -107,7 +115,7 @@
 
                     <div class="mt-5 d-grid gap-2">
                         <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                        <a href="MaterialList" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
+                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
                     </div>
                 </form>
             </div>
@@ -118,13 +126,75 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Store materials data in a JavaScript variable
+    const materialsData = [
+        <c:forEach var="material" items="${materials}" varStatus="loop">
+            {
+                "id": "${material.materialId}",
+                "name": "${material.materialName}",
+                "imageUrl": "${material.materialsUrl}",
+                "stock": ${material.quantity}
+            }<c:if test="${not loop.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    function updateMaterialRow(selectElement) {
+        const selectedId = selectElement.value;
+        const material = materialsData.find(m => m.id === selectedId);
+        const row = selectElement.closest('.material-row');
+        const img = row.querySelector('.material-image');
+        const stockInput = row.querySelector('.stock-quantity');
+        const quantityInput = row.querySelector('.quantity-input');
+        
+        if (material) {
+            img.src = material.imageUrl && material.imageUrl !== 'null' ? material.imageUrl : 'images/placeholder.png';
+            stockInput.value = material.stock;
+            quantityInput.max = material.stock; // Set max attribute for validation
+        } else {
+            img.src = 'images/placeholder.png'; // Default image
+            stockInput.value = 0;
+            quantityInput.max = null;
+        }
+        validateQuantity(quantityInput); // Validate after selection changes
+    }
+    
+    function validateQuantity(quantityInput) {
+        const stock = parseInt(quantityInput.max, 10);
+        const quantity = parseInt(quantityInput.value, 10);
+
+        if (!isNaN(stock) && !isNaN(quantity) && quantity > stock) {
+            quantityInput.classList.add('is-invalid');
+        } else {
+            quantityInput.classList.remove('is-invalid');
+        }
+    }
+
     document.getElementById('addMaterial').addEventListener('click', function () {
         const materialList = document.getElementById('materialList');
-        const newRow = materialList.querySelector('.material-row').cloneNode(true);
+        const firstRow = materialList.querySelector('.material-row');
+        const newRow = firstRow.cloneNode(true);
+        
+        // Reset fields in the new row
         newRow.querySelector('select[name="materials[]"]').value = '';
         newRow.querySelector('input[name="quantities[]"]').value = '';
-        newRow.querySelector('select[name="conditions[]"]').value = '';
+        newRow.querySelector('input[name="quantities[]"]').classList.remove('is-invalid');
+        newRow.querySelector('.stock-quantity').value = '0';
+        newRow.querySelector('select[name="conditions[]"]').value = 'new';
+        newRow.querySelector('.material-image').src = 'images/placeholder.png';
+        
         materialList.appendChild(newRow);
+    });
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('material-select')) {
+            updateMaterialRow(e.target);
+        }
+    });
+    
+    document.addEventListener('input', function(e) {
+        if(e.target.classList.contains('quantity-input')) {
+            validateQuantity(e.target);
+        }
     });
 
     document.addEventListener('click', function (e) {
@@ -134,6 +204,22 @@
                 e.target.closest('.material-row').remove();
             }
         }
+    });
+
+    // Initial image setup for the first row if a material is pre-selected (e.g., on form error)
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.material-select').forEach(select => {
+            if (select.value) {
+                updateMaterialRow(select);
+            }
+        });
+        
+        // Also add listeners for quantity inputs that might have values on load
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            if (input.value) {
+                validateQuantity(input);
+            }
+        });
     });
 </script>
 </body>

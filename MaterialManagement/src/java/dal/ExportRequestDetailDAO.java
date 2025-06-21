@@ -16,7 +16,7 @@ public class ExportRequestDetailDAO extends DBContext {
         List<ExportRequestDetail> details = new ArrayList<>();
         String sql = "SELECT erd.detail_id, erd.export_request_id, erd.material_id, "
                 + "erd.quantity, erd.export_condition, erd.created_at, erd.updated_at, "
-                + "m.material_code, m.material_name, u.unit_name as material_unit "
+                + "m.material_code, m.material_name, m.materials_url, u.unit_name as material_unit "
                 + "FROM Export_Request_Details erd "
                 + "JOIN Materials m ON erd.material_id = m.material_id "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
@@ -35,6 +35,7 @@ public class ExportRequestDetailDAO extends DBContext {
                     detail.setMaterialUnit(rs.getString("material_unit"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setExportCondition(rs.getString("export_condition"));
+                    detail.setMaterialImageUrl(rs.getString("materials_url"));
                     detail.setCreatedAt(rs.getTimestamp("created_at"));
                     detail.setUpdatedAt(rs.getTimestamp("updated_at"));
                     details.add(detail);

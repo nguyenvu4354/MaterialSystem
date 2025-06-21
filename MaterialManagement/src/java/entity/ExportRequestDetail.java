@@ -11,25 +11,11 @@ public class ExportRequestDetail {
     private String materialUnit;
     private int quantity;
     private String exportCondition;
+    private String materialImageUrl;
     private Date createdAt;
     private Date updatedAt;
     
     public ExportRequestDetail() {
-    }
-
-    public ExportRequestDetail(int detailId, int exportRequestId, int materialId, 
-            String materialCode, String materialName, String materialUnit, int quantity, 
-            String exportCondition, Date createdAt, Date updatedAt) {
-        this.detailId = detailId;
-        this.exportRequestId = exportRequestId;
-        this.materialId = materialId;
-        this.materialCode = materialCode;
-        this.materialName = materialName;
-        this.materialUnit = materialUnit;
-        this.quantity = quantity;
-        this.exportCondition = exportCondition;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
@@ -95,6 +81,14 @@ public class ExportRequestDetail {
 
     public void setExportCondition(String exportCondition) {
         this.exportCondition = exportCondition;
+    }
+
+    public String getMaterialImageUrl() {
+        return materialImageUrl;
+    }
+
+    public void setMaterialImageUrl(String materialImageUrl) {
+        this.materialImageUrl = materialImageUrl;
     }
 
     public Date getCreatedAt() {

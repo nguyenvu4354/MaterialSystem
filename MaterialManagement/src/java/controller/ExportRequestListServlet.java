@@ -48,6 +48,13 @@ public class ExportRequestListServlet extends HttpServlet {
                 return;
             }
 
+            // Phân quyền: Chỉ role_id = 3 (Giám đốc) mới được truy cập
+            if (user.getRoleId() != 3) {
+                LOGGER.warning("Unauthorized access attempt by user: " + user.getUsername() + " with role_id: " + user.getRoleId());
+                response.sendRedirect("HomePage.jsp"); // Hoặc trang báo lỗi không có quyền
+                return;
+            }
+
             // Lấy và xử lý các tham số tìm kiếm
             String status = request.getParameter("status");
             String search = request.getParameter("search");
@@ -112,7 +119,7 @@ public class ExportRequestListServlet extends HttpServlet {
 
             if (exportRequests == null) {
                 LOGGER.severe("exportRequests is null from DAO");
-                request.setAttribute("error", "Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.");
+                request.setAttribute("error", "An error occurred while loading data. Please try again later.");
             } else if (exportRequests.isEmpty()) {
                 LOGGER.info("No export requests found");
             }
@@ -146,7 +153,7 @@ public class ExportRequestListServlet extends HttpServlet {
             
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error in ExportRequestListServlet: " + e.getMessage(), e);
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            request.setAttribute("error", "An error occurred: " + e.getMessage());
             try {
                 request.getRequestDispatcher("ExportRequestList.jsp").forward(request, response);
             } catch (Exception ex) {

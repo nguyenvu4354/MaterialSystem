@@ -33,7 +33,8 @@ public class RejectExportRequestServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
         System.out.println("User roleName: " + (user != null ? user.getRoleName() : "null"));
-        if (user == null || !"director".equalsIgnoreCase(user.getRoleName())) {
+        // Role check: Only users with role_id 3 (Director) can reject.
+        if (user == null || user.getRoleId() != 3) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
@@ -49,8 +50,8 @@ public class RejectExportRequestServlet extends HttpServlet {
                 return;
             }
             
-            if (!"draft".equals(req.getStatus())) {
-                request.setAttribute("error", "Only draft requests can be rejected.");
+            if (!"pending".equals(req.getStatus())) {
+                request.setAttribute("error", "Only pending requests can be rejected.");
                 response.sendRedirect(request.getContextPath() + "/ViewExportRequest?id=" + requestId);
                 return;
             }
