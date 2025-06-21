@@ -10,7 +10,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Waggy - Chi tiết yêu cầu mua hàng</title>
+        <title>Waggy - Purchase Request Details</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
@@ -275,6 +275,23 @@
                 border: 1px solid #f5c6cb;
             }
             
+            .access-denied {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: url('images/background-img.png') no-repeat;
+                background-size: cover;
+            }
+            .access-denied-card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                padding: 3rem;
+                text-align: center;
+                max-width: 500px;
+            }
+            
             @media (max-width: 768px) {
                 .page-title {
                     font-size: 2rem;
@@ -297,174 +314,260 @@
         </style>
     </head>
     <body>
-        <jsp:include page="HeaderAdmin.jsp"/>
-
-        <div class="main-content">
-            <div class="container">
-                <!-- Page Header -->
-                <div class="page-header text-center">
-                    <h1 class="page-title">
-                        <i class="fas fa-clipboard-list me-3"></i>
-                        Chi tiết yêu cầu mua hàng
-                    </h1>
-                    <p class="page-subtitle">Xem thông tin chi tiết về yêu cầu mua hàng</p>
-                </div>
-
-                <!-- Stats Card -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="stats-card text-center">
-                            <div class="stats-number">${purchaseRequestDetailList.size()}</div>
-                            <div class="stats-label">Tổng số vật tư</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="stats-card text-center">
-                            <div class="stats-number">
-                                <c:set var="totalQuantity" value="0"/>
-                                <c:forEach var="item" items="${purchaseRequestDetailList}">
-                                    <c:set var="totalQuantity" value="${totalQuantity + item.quantity}"/>
-                                </c:forEach>
-                                ${totalQuantity}
-                            </div>
-                            <div class="stats-label">Tổng số lượng</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="stats-card text-center">
-                            <div class="stats-number">
-                                <c:set var="uniqueCategories" value="0"/>
-                                <c:forEach var="item" items="${purchaseRequestDetailList}">
-                                    <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
-                                </c:forEach>
-                                ${uniqueCategories}
-                            </div>
-                            <div class="stats-label">Loại vật tư</div>
+        <c:choose>
+            <c:when test="${empty sessionScope.user}">
+                <!-- User not logged in -->
+                <div class="access-denied">
+                    <div class="access-denied-card">
+                        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;">🔒</div>
+                        <h2 class="text-danger mb-3">Login Required</h2>
+                        <p class="text-muted mb-4">You need to login to access this page.</p>
+                        <div class="d-grid gap-2">
+                            <a href="Login.jsp" class="btn btn-primary">Login</a>
+                            <a href="HomeServlet" class="btn btn-outline-secondary">Back to Home</a>
                         </div>
                     </div>
                 </div>
+            </c:when>
+            <c:when test="${sessionScope.user.roleId != 2}">
+                <!-- User doesn't have permission -->
+                <div class="access-denied">
+                    <div class="access-denied-card">
+                        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;">⚠️</div>
+                        <h2 class="text-danger mb-3">Access Denied</h2>
+                        <p class="text-muted mb-4">Only directors can view purchase request details.</p>
+                        <div class="d-grid gap-2">
+                            <a href="HomeServlet" class="btn btn-primary">Back to Home</a>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
+                        </div>
+                    </div>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <!-- User has permission - show details -->
+                <jsp:include page="HeaderAdmin.jsp"/>
 
-                <!-- Table Container -->
-                <div class="table-container">
-                    <c:choose>
-                        <c:when test="${not empty purchaseRequestDetailList}">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                                            <th><i class="fas fa-file-invoice me-2"></i>Mã yêu cầu</th>
-                                            <th><i class="fas fa-box me-2"></i>Tên vật tư</th>
-                                            <th><i class="fas fa-tags me-2"></i>Danh mục</th>
-                                            <th><i class="fas fa-sort-numeric-up me-2"></i>Số lượng</th>
-                                            <th><i class="fas fa-sticky-note me-2"></i>Ghi chú</th>
-                                            <th><i class="fas fa-calendar-plus me-2"></i>Ngày tạo</th>
-                                            <th><i class="fas fa-calendar-check me-2"></i>Ngày cập nhật</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="item" items="${purchaseRequestDetailList}" varStatus="status">
-                                        <tr>
-                                            <td>
-                                                <span class="badge badge-primary">#${item.purchaseRequestDetailId}</span>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-info">${item.purchaseRequestId}</span>
-                                            </td>
-                                            <td>
-                                                <strong>${item.materialName}</strong>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-warning">${item.categoryId}</span>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-success">${item.quantity}</span>
-                                            </td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${not empty item.notes}">
-                                                        <span class="text-muted">${item.notes}</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted fst-italic">Không có ghi chú</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-clock me-1"></i>
-                                                    ${item.createdAt}
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-edit me-1"></i>
-                                                    ${item.updatedAt}
-                                                </small>
-                                            </td>
-                                        </tr>
+                <div class="main-content">
+                    <div class="container">
+                        <!-- Page Header -->
+                        <div class="page-header text-center">
+                            <h1 class="page-title">
+                                <i class="fas fa-clipboard-list me-3"></i>
+                                Purchase Request Details
+                            </h1>
+                            <p class="page-subtitle">View detailed information about the purchase request</p>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="stats-card text-center">
+                                    <div class="stats-number">${purchaseRequestDetailList.size()}</div>
+                                    <div class="stats-label">Total Materials</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card text-center">
+                                    <div class="stats-number">
+                                        <c:set var="totalQuantity" value="0"/>
+                                        <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                            <c:set var="totalQuantity" value="${totalQuantity + item.quantity}"/>
                                         </c:forEach>
-                                    </tbody>
-                                </table>
+                                        ${totalQuantity}
+                                    </div>
+                                    <div class="stats-label">Total Quantity</div>
+                                </div>
                             </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <h4>Không có dữ liệu</h4>
-                                <p>Chưa có chi tiết yêu cầu mua hàng nào được tìm thấy.</p>
+                            <div class="col-md-4">
+                                <div class="stats-card text-center">
+                                    <div class="stats-number">
+                                        <c:set var="uniqueCategories" value="0"/>
+                                        <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                            <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
+                                        </c:forEach>
+                                        ${uniqueCategories}
+                                    </div>
+                                    <div class="stats-label">Material Types</div>
+                                </div>
                             </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
+                        </div>
 
-                <!-- Action Buttons and Status Messages -->
-                <div class="action-buttons">
-                    <c:choose>
-                        <c:when test="${purchaseRequest.status eq 'pending'}">
-                            <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
-                                <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="btn-action btn-approve" onclick="return confirm('Bạn có chắc chắn muốn phê duyệt yêu cầu mua hàng này?')">
-                                    <i class="fas fa-check-circle me-2"></i>
-                                    Phê duyệt
-                                </button>
-                            </form>
-                            
-                            <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
-                                <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                                <input type="hidden" name="action" value="reject">
-                                <button type="submit" class="btn-action btn-reject" onclick="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu mua hàng này?')">
-                                    <i class="fas fa-times-circle me-2"></i>
-                                    Từ chối
-                                </button>
-                            </form>
-                        </c:when>
-                        <c:when test="${purchaseRequest.status eq 'approved'}">
-                            <div class="status-message status-approved">
-                                <i class="fas fa-check-circle me-2"></i>
-                                Yêu cầu này đã được phê duyệt
-                            </div>
-                        </c:when>
-                        <c:when test="${purchaseRequest.status eq 'rejected'}">
-                            <div class="status-message status-rejected">
-                                <i class="fas fa-times-circle me-2"></i>
-                                Yêu cầu này đã bị từ chối
-                            </div>
-                        </c:when>
-                    </c:choose>
-                </div>
+                        <!-- Table Container -->
+                        <div class="table-container">
+                            <c:choose>
+                                <c:when test="${not empty purchaseRequestDetailList}">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                                                    <th><i class="fas fa-file-invoice me-2"></i>Request Code</th>
+                                                    <th><i class="fas fa-box me-2"></i>Material Name</th>
+                                                    <th><i class="fas fa-tags me-2"></i>Category</th>
+                                                    <th><i class="fas fa-sort-numeric-up me-2"></i>Quantity</th>
+                                                    <th><i class="fas fa-sticky-note me-2"></i>Notes</th>
+                                                    <th><i class="fas fa-calendar-plus me-2"></i>Created Date</th>
+                                                    <th><i class="fas fa-calendar-check me-2"></i>Updated Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="item" items="${purchaseRequestDetailList}" varStatus="status">
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge badge-primary">#${item.purchaseRequestDetailId}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info">${item.purchaseRequestId}</span>
+                                                    </td>
+                                                    <td>
+                                                        <strong>${item.materialName}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-warning">${item.categoryId}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-success">${item.quantity}</span>
+                                                    </td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${not empty item.notes}">
+                                                                <span class="text-muted">${item.notes}</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="text-muted fst-italic">No notes</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-clock me-1"></i>
+                                                            ${item.createdAt}
+                                                        </small>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-edit me-1"></i>
+                                                            ${item.updatedAt}
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Pagination -->
+                                    <c:if test="${showPagination}">
+                                        <nav aria-label="Page navigation" class="mt-4">
+                                            <ul class="pagination justify-content-center">
+                                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                    <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${currentPage - 1}">
+                                                        <i class="fas fa-chevron-left"></i> Previous
+                                                    </a>
+                                                </li>
+                                                
+                                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                                    <c:choose>
+                                                        <c:when test="${i == currentPage}">
+                                                            <li class="page-item active">
+                                                                <span class="page-link">${i}</span>
+                                                            </li>
+                                                        </c:when>
+                                                        <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${i}">${i}</a>
+                                                            </li>
+                                                        </c:when>
+                                                        <c:when test="${i == currentPage - 3 || i == currentPage + 3}">
+                                                            <li class="page-item disabled">
+                                                                <span class="page-link">...</span>
+                                                            </li>
+                                                        </c:when>
+                                                    </c:choose>
+                                                </c:forEach>
+                                                
+                                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                    <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${currentPage + 1}">
+                                                        Next <i class="fas fa-chevron-right"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                        
+                                        <!-- Page Info -->
+                                        <div class="text-center text-muted mt-2">
+                                            <small>
+                                                Showing ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} 
+                                                of ${totalItems} details
+                                            </small>
+                                        </div>
+                                    </c:if>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <h4>No Data</h4>
+                                        <p>No purchase request details found.</p>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                <!-- Back Button -->
-                <div class="text-center">
-                    <a href="ListPurchaseRequestsServlet" class="btn-back">
-                        <i class="fas fa-arrow-left"></i>
-                        Quay lại danh sách
-                    </a>
+                        <!-- Action Buttons and Status Messages -->
+                        <div class="action-buttons">
+                            <c:choose>
+                                <c:when test="${purchaseRequest.status eq 'pending'}">
+                                    <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn-action btn-approve" onclick="return confirm('Are you sure you want to approve this purchase request?')">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Approve
+                                        </button>
+                                    </form>
+                                    
+                                    <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="btn-action btn-reject" onclick="return confirm('Are you sure you want to reject this purchase request?')">
+                                            <i class="fas fa-times-circle me-2"></i>
+                                            Reject
+                                        </button>
+                                    </form>
+                                </c:when>
+                                <c:when test="${purchaseRequest.status eq 'approved'}">
+                                    <div class="status-message status-approved">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        This request has been approved
+                                    </div>
+                                </c:when>
+                                <c:when test="${purchaseRequest.status eq 'rejected'}">
+                                    <div class="status-message status-rejected">
+                                        <i class="fas fa-times-circle me-2"></i>
+                                        This request has been rejected
+                                    </div>
+                                </c:when>
+                            </c:choose>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div class="text-center">
+                            <a href="ListPurchaseRequestsServlet" class="btn-back">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to List
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </c:otherwise>
+        </c:choose>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Auto redirect to login if not logged in
+            <c:if test="${empty sessionScope.user}">
+                window.location.href = 'Login.jsp';
+            </c:if>
+        </script>
     </body>
 </html>

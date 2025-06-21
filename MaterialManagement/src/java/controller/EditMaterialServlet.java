@@ -6,12 +6,14 @@ import dal.UnitDAO;
 import entity.Category;
 import entity.Material;
 import entity.Unit;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,22 @@ public class EditMaterialServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Kiểm tra session và quyền truy cập
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
+        if (user.getRoleId() != 1) {
+            request.setAttribute("error", "Bạn không có quyền truy cập trang này. Chỉ Admin mới có thể chỉnh sửa vật tư.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             String materialId = request.getParameter("materialId");
             if (materialId == null || materialId.trim().isEmpty()) {
@@ -65,6 +83,22 @@ public class EditMaterialServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Kiểm tra session và quyền truy cập
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
+        if (user.getRoleId() != 1) {
+            request.setAttribute("error", "Bạn không có quyền thực hiện hành động này. Chỉ Admin mới có thể chỉnh sửa vật tư.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             request.setCharacterEncoding("UTF-8");
             response.setContentType("text/html;charset=UTF-8");

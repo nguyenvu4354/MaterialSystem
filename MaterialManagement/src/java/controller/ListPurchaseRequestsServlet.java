@@ -7,6 +7,7 @@ package controller;
 
 import dal.PurchaseRequestDAO;
 import entity.PurchaseRequest;
+import entity.User;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  *
@@ -33,6 +35,19 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        User user = (User) session.getAttribute("user");
+
+        // User is logged in, now check for permissions
+        if (user.getRoleId() != 2) {
+            request.setAttribute("error", "You don't have permission to access this page. Only directors can view the purchase request list.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
         
         try {
             
@@ -77,7 +92,7 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             
             e.printStackTrace();
             
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            request.setAttribute("error", "An error occurred: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     } 
@@ -102,7 +117,7 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Servlet xử lý danh sách yêu cầu mua hàng";
+        return "Servlet for handling purchase request list";
     }// </editor-fold>
 
 }
