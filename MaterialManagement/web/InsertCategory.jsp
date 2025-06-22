@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <style>
         .card-header {
-            background-color: #0d6efd;
+            background-color: #DEAD6F;
             color: white;
             padding: 0.75rem 1.25rem;
         }
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="mt-3">
-                        <button type="submit" name="submit" value="submit" class="btn btn-primary">
+                        <button type="submit" name="submit" value="submit" class="btn" style="background-color: #DEAD6F; color: white;">
                             <i class="fas fa-save"></i> Create Category
                         </button>
                         <a href="${pageContext.request.contextPath}/Category.jsp" class="btn btn-secondary ms-2">

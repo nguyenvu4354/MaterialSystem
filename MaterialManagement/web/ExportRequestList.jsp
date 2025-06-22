@@ -7,6 +7,8 @@
     <title>Export Request Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -20,7 +22,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        h1 {
+        h2 {
             font-size: 1.75rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
@@ -31,6 +33,13 @@
             flex-wrap: wrap;
             gap: 12px;
             margin: 20px 0;
+            align-items: center;
+        }
+        .filter-bar .form-control,
+        .filter-bar .form-select,
+        .filter-bar .btn {
+            height: 48px;
+            min-width: 120px;
         }
         .btn-export, .btn-print {
             padding: 6px 14px;
@@ -52,6 +61,11 @@
         }
         .custom-table tbody tr:hover {
             background-color: #f1f1f1;
+        }
+        .custom-table th,
+        .custom-table td {
+            vertical-align: middle;
+            min-height: 48px;
         }
         .status-badge {
             padding: 2px 10px;
@@ -84,8 +98,8 @@
             font-weight: 500;
         }
         .pagination .page-item.active .page-link {
-            background-color: #009966;
-            border-color: #009966;
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
         }
     </style>
 </head>
@@ -96,10 +110,10 @@
         <jsp:include page="DirectorSidebar.jsp"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="container-main">
-                <h1>Export Request Management</h1>
+                <h2 class="fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
                 <p class="text-muted">List and manage export requests in the system</p>
                 <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
-                    <input type="text" class="form-control" name="searchCode" value="${searchCode}" placeholder="Search by request code..." style="max-width:260px; min-width:200px;">
+                    <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
                     <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
                         <option value="">All Recipients</option>
                         <c:forEach var="recipient" items="${recipients}">
@@ -113,7 +127,7 @@
                         <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                         <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                     <button type="button" class="btn-export" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
                     <button type="button" class="btn-print" onclick="printTableList()">Print List</button>
                 </form>
@@ -217,6 +231,7 @@
         </main>
     </div>
 </div>
+<jsp:include page="Footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // Xuất Excel

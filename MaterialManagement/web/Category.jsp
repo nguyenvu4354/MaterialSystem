@@ -63,10 +63,12 @@
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-list-ul"></i> Category List</h2>
-                    <a href="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Create Category
-                    </a>
+                    <h2 class="fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;"><i class="bi bi-list-ul"></i> Category List</h2>
+                    <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 1}">
+                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" class="btn" style="background-color: #DEAD6F; color: white;">
+                            <i class="fas fa-plus me-1"></i> Create Category
+                        </a>
+                    </c:if>
                 </div>
 
                 <!-- Search and Filter Section -->
@@ -101,7 +103,7 @@
                                 <option value="code_asc" ${param.sortBy == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
                                 <option value="code_desc" ${param.sortBy == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
                             </select>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
+                            <button type="submit" class="btn d-flex align-items-center justify-content-center" style="width: 150px; height: 50px; background-color: #DEAD6F; color: white;">
                                 <i class="fas fa-search me-2"></i> Search
                             </button>
                             <a href="Category.jsp" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
@@ -119,13 +121,13 @@
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col" style="width: 150px">Code</th>
-                                <th scope="col" style="width: 150px">Name</th>
+                                <th scope="col" style="width: 300px">Name</th>
                                 <th scope="col" style="width: 150px">Parent ID</th>
-                                <th scope="col" style="width: 150px">Created Date</th>
+                                <th scope="col" style="width: 300px">Created Date</th>
                                 <th scope="col" style="width: 150px">Status</th>
-                                <th scope="col" style="width: 200px">Description</th>
+                                <th scope="col" style="width: 500px">Description</th>
                                 <th scope="col" style="width: 150px">Priority</th>
-                                <th scope="col">Actions</th>
+                                <th scope="col" style="width: 150px">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,17 +245,19 @@
                                             <td>${cat.priority}</td>
                                             <td>
                                                 <div class="d-flex justify-content-center">
-                                                    <a href="${pageContext.request.contextPath}/CategoryServlet?service=updateCategory&categoryID=${cat.category_id}" 
-                                                       class="btn btn-warning btn-action" 
-                                                       title="Edit">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/CategoryServlet?service=deleteCategory&categoryID=${cat.category_id}" 
-                                                       class="btn btn-danger btn-action" 
-                                                       onclick="return confirm('Are you sure you want to delete this category?');" 
-                                                       title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
+                                                    <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 1}">
+                                                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=updateCategory&categoryID=${cat.category_id}" 
+                                                           class="btn btn-warning btn-action" 
+                                                           title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=deleteCategory&categoryID=${cat.category_id}" 
+                                                           class="btn btn-danger btn-action" 
+                                                           onclick="return confirm('Are you sure you want to delete this category?');" 
+                                                           title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </c:if>
                                                 </div>
                                             </td>
                                         </tr>
