@@ -25,20 +25,28 @@ public class LoginServlet extends HttpServlet {
 
         if (user != null) {
             if (user.getStatus() != null && user.getStatus().toString().equalsIgnoreCase("inactive")) {
-                request.setAttribute("error", "Tài khoản đã bị vô hiệu hóa!");
+                request.setAttribute("error", "Your account has been disabled!");
                 request.getRequestDispatcher("Login.jsp").forward(request, response);
             } else {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
                 
-                if (user.getRoleId() == 1) {
-                    response.sendRedirect("UserList");
+                // Check for a redirect URL
+                String redirectURL = (String) session.getAttribute("redirectURL");
+                if (redirectURL != null && !redirectURL.isEmpty()) {
+                    session.removeAttribute("redirectURL"); // Remove the URL after using it
+                    response.sendRedirect(response.encodeRedirectURL(redirectURL));
                 } else {
-                    response.sendRedirect("HomePage.jsp");
+                    // Default redirection based on role
+                    if (user.getRoleId() == 1) {
+                        response.sendRedirect(response.encodeRedirectURL("UserList"));
+                    } else {
+                        response.sendRedirect(response.encodeRedirectURL("HomePage.jsp"));
+                    }
                 }
             }
         } else {
-            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            request.setAttribute("error", "Invalid username or password!");
             request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
     }
@@ -46,6 +54,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("Login.jsp");
+        request.getRequestDispatcher("Login.jsp").forward(request, response);
     }
 }

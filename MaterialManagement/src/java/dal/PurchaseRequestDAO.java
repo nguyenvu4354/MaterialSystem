@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import entity.PurchaseRequestDetail;
@@ -15,11 +11,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- *
- * @author Admin
- */
 public class PurchaseRequestDAO extends DBContext {
 
     public int countPurchaseRequest(String keyword, String status) {
@@ -188,7 +179,7 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUpdatedAt(rs.getTimestamp("updated_at"));
                 pr.setDisable(rs.getBoolean("disable"));
 
-                List<PurchaseRequestDetail> details = prdd.getPurchaseRequestDetailByPurchaseRequestId(pr.getPurchaseRequestId());
+                List<PurchaseRequestDetail> details = prdd.paginationOfDetails(pr.getPurchaseRequestId(), 1, Integer.MAX_VALUE);
                 pr.setDetails(details);
 
                 return pr;
@@ -199,18 +190,36 @@ public class PurchaseRequestDAO extends DBContext {
         return null;
     }
 
-    public boolean updatePurchaseRequestStatus(int requestId, String status, Integer userId) {
-        String sql = "UPDATE material_management.purchase_requests "
-                + "SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
-                + "WHERE purchase_request_id = ? AND disable = 0";
+    public boolean updatePurchaseRequestStatus(int requestId, String status, Integer userId, String reason) {
+        String sql;
+        if ("approved".equalsIgnoreCase(status)) {
+            sql = "UPDATE material_management.purchase_requests "
+                    + "SET status = ?, approved_by = ?, approval_reason = ?, approved_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
+                    + "WHERE purchase_request_id = ? AND disable = 0";
+        } else if ("rejected".equalsIgnoreCase(status)) {
+            sql = "UPDATE material_management.purchase_requests "
+                    + "SET status = ?, approved_by = ?, rejection_reason = ?, approved_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP "
+                    + "WHERE purchase_request_id = ? AND disable = 0";
+        } else {
+            return false;
+        }
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
+
             if (userId != null) {
                 ps.setInt(2, userId);
             } else {
                 ps.setNull(2, java.sql.Types.INTEGER);
             }
-            ps.setInt(3, requestId);
+
+            if (reason != null && !reason.trim().isEmpty()) {
+                ps.setString(3, reason);
+            } else {
+                ps.setNull(3, java.sql.Types.VARCHAR);
+            }
+
+            ps.setInt(4, requestId);
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -220,46 +229,13 @@ public class PurchaseRequestDAO extends DBContext {
         }
     }
 
-    
-    public int insertPurchaseRequest(PurchaseRequest request) {
-        int generatedId = -1;
-        String sql = "INSERT INTO Purchase_Requests (request_code, user_id, request_date, status, estimated_price, reason) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, request.getRequestCode());
-            ps.setInt(2, request.getUserId());
-            ps.setTimestamp(3, new Timestamp(request.getRequestDate().getTime()));
-            ps.setString(4, request.getStatus());
-
-            // Sử dụng setDouble vì estimatedPrice là kiểu double
-            ps.setDouble(5, request.getEstimatedPrice());
-
-            ps.setString(6, request.getReason());
-
-            ps.executeUpdate();
-
-            // Lấy ID tự động sinh
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedId = rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // hoặc log lỗi
-        }
-
-        return generatedId;
-    }
-
     public boolean createPurchaseRequestWithDetails(PurchaseRequest request, List<PurchaseRequestDetail> details) {
         String insertRequestSQL = "INSERT INTO material_management.purchase_requests (request_code, user_id, request_date, status, estimated_price, reason) VALUES (?, ?, ?, ?, ?, ?)";
         String insertDetailSQL = "INSERT INTO material_management.purchase_request_details (purchase_request_id, material_name, category_id, quantity, notes) VALUES (?, ?, ?, ?, ?)";
 
         try {
-            // Bắt đầu transaction
             connection.setAutoCommit(false);
 
-            // 1. Thêm yêu cầu chính và lấy ID được tạo
             try (PreparedStatement psRequest = connection.prepareStatement(insertRequestSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 psRequest.setString(1, request.getRequestCode());
                 psRequest.setInt(2, request.getUserId());
@@ -274,12 +250,10 @@ public class PurchaseRequestDAO extends DBContext {
                     return false;
                 }
 
-                // Lấy ID của yêu cầu vừa được tạo
                 try (ResultSet generatedKeys = psRequest.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int purchaseRequestId = generatedKeys.getInt(1);
                         
-                        // 2. Thêm các chi tiết yêu cầu
                         if (details != null && !details.isEmpty()) {
                             try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSQL)) {
                                 for (PurchaseRequestDetail detail : details) {
@@ -288,7 +262,6 @@ public class PurchaseRequestDAO extends DBContext {
                                     psDetail.setInt(3, detail.getCategoryId());
                                     psDetail.setInt(4, detail.getQuantity());
                                     
-                                    // Xử lý notes có thể null
                                     if (detail.getNotes() != null) {
                                         psDetail.setString(5, detail.getNotes());
                                     } else {
@@ -301,7 +274,6 @@ public class PurchaseRequestDAO extends DBContext {
                             }
                         }
 
-                        // Commit transaction
                         connection.commit();
                         return true;
                     } else {
@@ -314,67 +286,16 @@ public class PurchaseRequestDAO extends DBContext {
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
-                connection.rollback(); // Rollback nếu có lỗi
+                connection.rollback();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             return false;
         } finally {
             try {
-                connection.setAutoCommit(true); // Trả lại chế độ auto-commit
+                connection.setAutoCommit(true);
             } catch (SQLException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        PurchaseRequestDAO dao = new PurchaseRequestDAO();
-
-        // Test countPurchaseRequest
-        System.out.println("=== Test countPurchaseRequest ===");
-        int total = dao.countPurchaseRequest("", "");
-        System.out.println("Tổng số bản ghi: " + total);
-
-        // Test searchPurchaseRequest
-        System.out.println("\n=== Test searchPurchaseRequest ===");
-        List<PurchaseRequest> requests = dao.searchPurchaseRequest("", "", 1, 10, "date_desc");
-        for (PurchaseRequest request : requests) {
-            System.out.println("\nMã yêu cầu: " + request.getRequestCode());
-            System.out.println("ID yêu cầu: " + request.getPurchaseRequestId());
-            System.out.println("ID người yêu cầu: " + request.getUserId());
-            System.out.println("Ngày yêu cầu: " + request.getRequestDate());
-            System.out.println("Trạng thái: " + request.getStatus());
-            System.out.println("Giá dự kiến: " + request.getEstimatedPrice());
-            System.out.println("Lý do: " + request.getReason());
-            System.out.println("Người duyệt: " + request.getApprovedBy());
-            System.out.println("Lý do duyệt: " + request.getApprovalReason());
-            System.out.println("Thời gian duyệt: " + request.getApprovedAt());
-            System.out.println("Lý do từ chối: " + request.getRejectionReason());
-            System.out.println("Ngày tạo: " + request.getCreatedAt());
-            System.out.println("Ngày cập nhật: " + request.getUpdatedAt());
-            System.out.println("Trạng thái xóa: " + request.isDisable());
-        }
-
-        // Test getPurchaseRequestById
-        System.out.println("\n=== Test getPurchaseRequestById ===");
-        if (!requests.isEmpty()) {
-            PurchaseRequest request = dao.getPurchaseRequestById(requests.get(0).getPurchaseRequestId());
-            if (request != null) {
-                System.out.println("Mã yêu cầu: " + request.getRequestCode());
-                System.out.println("ID yêu cầu: " + request.getPurchaseRequestId());
-                System.out.println("ID người yêu cầu: " + request.getUserId());
-                System.out.println("Ngày yêu cầu: " + request.getRequestDate());
-                System.out.println("Trạng thái: " + request.getStatus());
-                System.out.println("Giá dự kiến: " + request.getEstimatedPrice());
-                System.out.println("Lý do: " + request.getReason());
-                System.out.println("Người duyệt: " + request.getApprovedBy());
-                System.out.println("Lý do duyệt: " + request.getApprovalReason());
-                System.out.println("Thời gian duyệt: " + request.getApprovedAt());
-                System.out.println("Lý do từ chối: " + request.getRejectionReason());
-                System.out.println("Ngày tạo: " + request.getCreatedAt());
-                System.out.println("Ngày cập nhật: " + request.getUpdatedAt());
-                System.out.println("Trạng thái xóa: " + request.isDisable());
             }
         }
     }
