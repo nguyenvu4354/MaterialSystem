@@ -316,7 +316,6 @@
     <body>
         <c:choose>
             <c:when test="${empty sessionScope.user}">
-                <!-- User not logged in -->
                 <div class="access-denied">
                     <div class="access-denied-card">
                         <div style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;">🔒</div>
@@ -329,22 +328,7 @@
                     </div>
                 </div>
             </c:when>
-            <c:when test="${sessionScope.user.roleId != 2}">
-                <!-- User doesn't have permission -->
-                <div class="access-denied">
-                    <div class="access-denied-card">
-                        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;">⚠️</div>
-                        <h2 class="text-danger mb-3">Access Denied</h2>
-                        <p class="text-muted mb-4">Only directors can view purchase request details.</p>
-                        <div class="d-grid gap-2">
-                            <a href="HomeServlet" class="btn btn-primary">Back to Home</a>
-                            <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
-                        </div>
-                    </div>
-                </div>
-            </c:when>
             <c:otherwise>
-                <!-- User has permission - show details -->
                 <jsp:include page="HeaderAdmin.jsp"/>
 
                 <div class="main-content">
@@ -515,9 +499,10 @@
 
                         <!-- Action Buttons and Status Messages -->
                         <div class="action-buttons">
-                            <c:choose>
-                                <c:when test="${purchaseRequest.status eq 'pending'}">
-                                    <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
+                            <c:if test="${sessionScope.user.roleId == 2 && purchaseRequest.status == 'pending'}">
+                                <div class="content-card">
+                                    <h4 class="mb-3">Take Action</h4>
+                                    <form id="actionForm" action="PurchaseRequestDetailServlet" method="POST">
                                         <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
                                         <input type="hidden" name="action" value="approve">
                                         <button type="submit" class="btn-action btn-approve" onclick="return confirm('Are you sure you want to approve this purchase request?')">
@@ -534,7 +519,9 @@
                                             Reject
                                         </button>
                                     </form>
-                                </c:when>
+                                </div>
+                            </c:if>
+                            <c:choose>
                                 <c:when test="${purchaseRequest.status eq 'approved'}">
                                     <div class="status-message status-approved">
                                         <i class="fas fa-check-circle me-2"></i>
