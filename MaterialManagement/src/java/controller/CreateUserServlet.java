@@ -22,7 +22,7 @@ import java.util.Map;
 public class CreateUserServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
-    private DepartmentDAO departmentDAO = new DepartmentDAO(); 
+    private DepartmentDAO departmentDAO = new DepartmentDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -71,7 +71,7 @@ public class CreateUserServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String description = request.getParameter("description");
             String roleIdStr = request.getParameter("roleId");
-            String departmentIdStr = request.getParameter("departmentId"); 
+            String departmentIdStr = request.getParameter("departmentId");
             int roleId = 0;
             int departmentId = 0;
 
@@ -137,12 +137,17 @@ public class CreateUserServlet extends HttpServlet {
             if (created) {
                 try {
                     String subject = "Your account has been created!";
-                    String content = "Hello " + newUser.getFullName() + ",\n\n"
-                            + "Your account has been successfully created.\n\n"
-                            + "Username: " + newUser.getUsername() + "\n"
-                            + "Password: " + password + "\n\n"
-                            + "Please log in and change your password after your first login to ensure security.\n\n"
-                            + "Best regards,\nSupport Team.";
+                    String content = "<html><body>"
+                            + "Hello " + newUser.getFullName() + ",<br><br>"
+                            + "Your account has been successfully created.<br><br>"
+                            + "Username: <b>" + newUser.getUsername() + "</b><br>"
+                            + "Password: <b>" + password + "</b><br><br>"
+                            + "Please log in and change your password after your first login to ensure security.<br><br>"
+                            + "You can <a href=\"http://localhost:8080/MaterialManagement/Login.jsp\">login</a> here.<br><br>"
+                            + "Best regards,<br>"
+                            + "Support Team."
+                            + "</body></html>";
+
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
                 } catch (Exception e) {
                     e.printStackTrace();

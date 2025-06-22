@@ -81,7 +81,7 @@
         </style>
     </head>
     <body>
-        <jsp:include page="HeaderAdmin.jsp" />
+        <jsp:include page="Header.jsp" />
 
         <section id="view-requests" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
             <div class="container">
@@ -91,7 +91,7 @@
                         <div class="text-center mb-4 nav-buttons">
                             <a href="profile" class="btn btn-primary">Profile</a>
                             <a href="change-password.jsp" class="btn btn-secondary">Change Password</a>
-                            <a href="ViewRequests.jsp" class="btn btn-success active">My Applications</a>
+                            <a href="ViewRequests" class="btn btn-success active">My Applications</a>
                         </div>
 
                         <h2 class="display-4 fw-normal text-center mb-4">My <span class="text-primary">Requests</span></h2>
@@ -111,7 +111,7 @@
                                     <label for="status" class="form-label text-muted">Status</label>
                                     <select name="status" id="status" class="form-select">
                                         <option value="">All</option>
-                                        <option value="draft" ${status == 'draft' ? 'selected' : ''}>Draft</option>
+                                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                                         <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                                         <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                         <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
@@ -178,7 +178,7 @@
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <c:if test="${request.status == 'draft'}">
+                                                        <c:if test="${request.status == 'pending'}">
                                                             <form action="${pageContext.request.contextPath}/ViewRequests" method="post" style="display:inline;">
                                                                 <input type="hidden" name="action" value="cancel">
                                                                 <input type="hidden" name="type" value="export">
@@ -195,16 +195,16 @@
                                 </div>
                                 <nav aria-label="Export Requests Pagination" class="mt-4">
                                     <ul class="pagination justify-content-center">
-                                        <li class="page-item ${exportCurrentPage == 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${exportCurrentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                         </li>
                                         <c:forEach begin="1" end="${exportTotalPages}" var="i">
-                                            <li class="page-item ${exportCurrentPage == i ? 'active' : ''}">
+                                            <li class="page-item ${currentPage == i ? 'active' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                             </li>
                                         </c:forEach>
-                                        <li class="page-item ${exportCurrentPage == exportTotalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${exportCurrentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                        <li class="page-item ${currentPage == exportTotalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -236,7 +236,7 @@
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <c:if test="${request.status == 'draft'}">
+                                                        <c:if test="${request.status == 'pending'}">
                                                             <form action="${pageContext.request.contextPath}/ViewRequests" method="post" style="display:inline;">
                                                                 <input type="hidden" name="action" value="cancel">
                                                                 <input type="hidden" name="type" value="purchase">
@@ -253,16 +253,16 @@
                                 </div>
                                 <nav aria-label="Purchase Requests Pagination" class="mt-4">
                                     <ul class="pagination justify-content-center">
-                                        <li class="page-item ${purchaseCurrentPage == 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${purchaseCurrentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                         </li>
                                         <c:forEach begin="1" end="${purchaseTotalPages}" var="i">
-                                            <li class="page-item ${purchaseCurrentPage == i ? 'active' : ''}">
+                                            <li class="page-item ${currentPage == i ? 'active' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                             </li>
                                         </c:forEach>
-                                        <li class="page-item ${purchaseCurrentPage == purchaseTotalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${purchaseCurrentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                        <li class="page-item ${currentPage == purchaseTotalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -294,7 +294,7 @@
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <c:if test="${request.status == 'draft'}">
+                                                        <c:if test="${request.status == 'pending'}">
                                                             <form action="${pageContext.request.contextPath}/ViewRequests" method="post" style="display:inline;">
                                                                 <input type="hidden" name="action" value="cancel">
                                                                 <input type="hidden" name="type" value="repair">
@@ -311,16 +311,16 @@
                                 </div>
                                 <nav aria-label="Repair Requests Pagination" class="mt-4">
                                     <ul class="pagination justify-content-center">
-                                        <li class="page-item ${repairCurrentPage == 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${repairCurrentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                         </li>
                                         <c:forEach begin="1" end="${repairTotalPages}" var="i">
-                                            <li class="page-item ${repairCurrentPage == i ? 'active' : ''}">
+                                            <li class="page-item ${currentPage == i ? 'active' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                             </li>
                                         </c:forEach>
-                                        <li class="page-item ${repairCurrentPage == repairTotalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${repairCurrentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                        <li class="page-item ${currentPage == repairTotalPages ? 'disabled' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -333,18 +333,18 @@
 
         <script src="js/jquery-1.11.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+                integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-                                                                            $(document).ready(function () {
-                                                                                const urlParams = new URLSearchParams(window.location.search);
-                                                                                const tab = urlParams.get('tab');
-                                                                                if (tab) {
-                                                                                    $('.nav-tabs a[href="#' + tab.charAt(0).toUpperCase() + tab.slice(1) + '"]').tab('show');
-                                                                                }
-                                                                            });
+            $(document).ready(function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tab = urlParams.get('tab');
+                if (tab) {
+                    $('.nav-tabs a[href="#' + tab.charAt(0).toUpperCase() + tab.slice(1) + '"]').tab('show');
+                }
+            });
         </script>
     </body>
 </html>
