@@ -68,11 +68,11 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-
+        
         UserDAO userDAO = new UserDAO();
         CategoryDAO categoryDAO = new CategoryDAO();
         
-        List<User> users = userDAO.getAllUsers();
+        List<User> users = userDAO.getAllUsers(); 
         List<Category> categories = categoryDAO.getAllCategories();
         
         String requestCode = "PR-" + new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date())
@@ -136,25 +136,25 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
 
         List<PurchaseRequestDetail> purchaseRequestDetails = new ArrayList<>();
         
-        for (int i = 0; i < materialNames.length; i++) {
-            String materialName = materialNames[i];
-            
-            if (materialName == null || materialName.trim().isEmpty()) {
-                continue;
-            }
-            
+            for (int i = 0; i < materialNames.length; i++) {
+                String materialName = materialNames[i];
+                
+                if (materialName == null || materialName.trim().isEmpty()) {
+                    continue;
+                }
+                
             int categoryId = Integer.parseInt(categoryIds[i]);
             int quantity = Integer.parseInt(quantities[i]);
             
-            PurchaseRequestDetail detail = new PurchaseRequestDetail();
-            detail.setMaterialName(materialName.trim());
-            detail.setCategoryId(categoryId);
-            detail.setQuantity(quantity);
-            
-            String note = (notes != null && notes.length > i) ? notes[i] : null;
-            detail.setNotes(note != null && !note.trim().isEmpty() ? note.trim() : null);
-            
-            purchaseRequestDetails.add(detail);
+                PurchaseRequestDetail detail = new PurchaseRequestDetail();
+                detail.setMaterialName(materialName.trim());
+                detail.setCategoryId(categoryId);
+                detail.setQuantity(quantity);
+                
+                String note = (notes != null && notes.length > i) ? notes[i] : null;
+                detail.setNotes(note != null && !note.trim().isEmpty() ? note.trim() : null);
+                
+                purchaseRequestDetails.add(detail);
         }
 
         try {
