@@ -89,7 +89,7 @@
                                     <ul class="dropdown-menu">
                                         <li><a href="CreateExportRequest" class="dropdown-item">Export Request</a></li>
                                         <li><a href="manageUsers.jsp" class="dropdown-item">Purchase Request</a></li>
-                                        <li><a href="manageOrders.jsp" class="dropdown-item">Repair Request</a></li>
+                                        <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
                                     </ul>
                                 </li>
                             </c:when>

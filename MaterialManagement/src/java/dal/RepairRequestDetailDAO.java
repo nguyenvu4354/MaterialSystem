@@ -43,29 +43,22 @@ public class RepairRequestDetailDAO extends DBContext {
         }
     }
 
-   
-
-    public List<RepairRequestDetail> getRepairRequestDetailsByUserId(int userId) {
+    public List<RepairRequestDetail> getAllRepairRequestDetails() {
         List<RepairRequestDetail> list = new ArrayList<>();
-        String query = """
-                SELECT rrd.* FROM RepairRequestDetail rrd
-                JOIN RepairRequest rr ON rrd.repairRequestId = rr.requestId
-                WHERE rr.createdBy = ?;
-                """;
+        String query = "SELECT * FROM Repair_Request_Details";
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 RepairRequestDetail detail = new RepairRequestDetail(
-                        rs.getInt("detailId"),
-                        rs.getInt("repairRequestId"),
-                        rs.getInt("materialId"),
+                        rs.getInt("detail_id"),
+                        rs.getInt("repair_request_id"),
+                        rs.getInt("material_id"),
                         rs.getInt("quantity"),
-                        rs.getString("damageDescription"),
-                        rs.getDouble("repairCost"),
-                        rs.getTimestamp("createdAt"),
-                        rs.getTimestamp("updatedAt")
+                        rs.getString("damage_description"),
+                        rs.getDouble("repair_cost"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
                 );
                 list.add(detail);
             }
@@ -73,5 +66,147 @@ public class RepairRequestDetailDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public List<RepairRequestDetail> getRepairRequestDetailsByUserId(int userId) {
+        List<RepairRequestDetail> list = new ArrayList<>();
+        String sql = """
+        SELECT 
+            rrd.detail_id,
+            rrd.repair_request_id,
+            rrd.material_id,
+            rrd.quantity,
+            rrd.damage_description,
+            rrd.repair_cost,
+            rrd.created_at AS detail_created_at,
+            rrd.updated_at AS detail_updated_at,
+            
+            rr.request_code,
+            rr.request_date,
+            rr.status,
+            rr.approved_by,
+            rr.approved_at,
+            rr.rejection_reason
+            
+        FROM Repair_Request_Details rrd
+        JOIN Repair_Requests rr ON rrd.repair_request_id = rr.repair_request_id
+        WHERE rr.user_id = ?
+        ORDER BY rr.request_date DESC
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequestDetail detail = new RepairRequestDetail();
+
+                // Thông tin chi tiết vật tư cần sửa
+                detail.setDetailId(rs.getInt("detail_id"));
+                detail.setRepairRequestId(rs.getInt("repair_request_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setDamageDescription(rs.getString("damage_description"));
+                detail.setRepairCost(rs.getDouble("repair_cost"));
+                detail.setCreatedAt(rs.getTimestamp("detail_created_at"));
+                detail.setUpdatedAt(rs.getTimestamp("detail_updated_at"));
+
+//                 Gợi ý mở rộng: Nếu bạn có DTO, bạn có thể set thêm:
+//                 detail.setStatus(rs.getString("status"));
+//                 detail.setRequestCode(rs.getString("request_code"));
+//                 detail.setApprovedAt(rs.getTimestamp("approved_at"));
+                list.add(detail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<RepairRequestDetail> getRepairRequestDetailsByRoleId(int roleId) {
+        List<RepairRequestDetail> list = new ArrayList<>();
+        String sql = """
+        SELECT 
+            rrd.detail_id,
+            rrd.repair_request_id,
+            rrd.material_id,
+            rrd.quantity,
+            rrd.damage_description,
+            rrd.repair_cost,
+            rrd.created_at AS detail_created_at,
+            rrd.updated_at AS detail_updated_at,
+
+            rr.request_code,
+            rr.request_date,
+            rr.status,
+            rr.approved_by,
+            rr.approved_at,
+            rr.rejection_reason
+
+        FROM Repair_Request_Details rrd
+        JOIN Repair_Requests rr ON rrd.repair_request_id = rr.repair_request_id
+        JOIN Users u ON rr.user_id = u.user_id
+        WHERE u.role_id = ?
+        ORDER BY rr.request_date DESC
+    """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequestDetail detail = new RepairRequestDetail();
+
+                detail.setDetailId(rs.getInt("detail_id"));
+                detail.setRepairRequestId(rs.getInt("repair_request_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setDamageDescription(rs.getString("damage_description"));
+                detail.setRepairCost(rs.getDouble("repair_cost"));
+                detail.setCreatedAt(rs.getTimestamp("detail_created_at"));
+                detail.setUpdatedAt(rs.getTimestamp("detail_updated_at"));
+
+                // Nếu cần, bạn có thể set thêm thông tin từ bảng Repair_Requests vào detail (hoặc tạo DTO)
+                list.add(detail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<RepairRequestDetail> getRepairRequestDetailsByRequestId(int repairRequestId) {
+        List<RepairRequestDetail> list = new ArrayList<>();
+        String sql = "SELECT * FROM Repair_Request_Details WHERE repair_request_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, repairRequestId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequestDetail detail = new RepairRequestDetail(
+                        rs.getInt("detail_id"),
+                        rs.getInt("repair_request_id"),
+                        rs.getInt("material_id"),
+                        rs.getInt("quantity"),
+                        rs.getString("damage_description"),
+                        rs.getDouble("repair_cost"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+                list.add(detail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public static void main(String[] args) {
+        RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
+        List<RepairRequestDetail> list = dao.getRepairRequestDetailsByRequestId(1); // ví dụ: role_id = 3 là "Thủ kho"
+        for (RepairRequestDetail d : list) {
+            System.out.println(d.toString());
+        }
     }
 }
