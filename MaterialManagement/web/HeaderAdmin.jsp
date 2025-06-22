@@ -60,13 +60,17 @@
                 </div>
 
                 <div class="offcanvas-body justify-content-between">
-                    <select class="filter-categories border-0 mb-0 me-5">
-                        <option>Admin Options</option>
-                        <option>Manage Products</option>
-                        <option>Manage Users</option>
-                        <option>Manage Orders</option>
-                        <option>Reports</option>
+                    <select class="filter-categories border-0 mb-0 me-5"
+                            onchange="location.href = this.value;">
+                        <option selected disabled>System Management</option>
+                        <option value="UserList">Manage Users</option>
+                        <option value="manageDepartments.jsp">Manage Departments</option>
+                        <option value="manageMaterials.jsp">Manage Materials</option>
+                        <option value="manageCategories.jsp">Manage Categories</option>
+                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="manageUnits.jsp">Manage Units</option>
                     </select>
+
 
                     <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                         <li class="nav-item">
@@ -75,12 +79,13 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" role="button" id="adminPages" data-bs-toggle="dropdown" aria-expanded="false">Management</a>
                             <ul class="dropdown-menu" aria-labelledby="adminPages">
-                                <li><a href="manageProducts.jsp" class="dropdown-item">Products</a></li>
-                                <li><a href="manageUsers.jsp" class="dropdown-item">Users</a></li>
-                                <li><a href="manageOrders.jsp" class="dropdown-item">Orders</a></li>
-                                <li><a href="manageCategories.jsp" class="dropdown-item">Categories</a></li>
-                                <li><a href="reports.jsp" class="dropdown-item">Reports</a></li>
-                                <li><a href="settings.jsp" class="dropdown-item">Settings</a></li>
+                                <li><a href="#" class="dropdown-item">Dashboard</a></li>
+                                <li><a href="UserList" class="dropdown-item">Users</a></li>
+                                <li><a href="#" class="dropdown-item">Departments</a></li>
+                                <li><a href="#" class="dropdown-item">Materials</a></li>
+                                <li><a href="#" class="dropdown-item">Categories</a></li>
+                                <li><a href="#" class="dropdown-item">Suppliers</a></li>
+                                <li><a href="#" class="dropdown-item">Units</a></li>
                             </ul>
                         </li>
                     </ul>

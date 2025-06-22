@@ -46,12 +46,15 @@
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas"></button>
                 </div>
                 <div class="offcanvas-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
-                    <select class="form-select w-auto mb-3 mb-lg-0 me-lg-4">
-                        <option selected disabled>Admin Options</option>
-                        <option>Manage Products</option>
-                        <option>Manage Users</option>
-                        <option>Manage Orders</option>
-                        <option>Reports</option>
+                    <select class="filter-categories border-0 mb-0 me-5"
+                            onchange="location.href = this.value;">
+                        <option selected disabled>System Management</option>
+                        <option value="UserList">Manage Users</option>
+                        <option value="manageDepartments.jsp">Manage Departments</option>
+                        <option value="manageMaterials.jsp">Manage Materials</option>
+                        <option value="manageCategories.jsp">Manage Categories</option>
+                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="manageUnits.jsp">Manage Units</option>
                     </select>
 
                     <ul class="navbar-nav d-flex flex-row flex-wrap gap-3 mb-3 mb-lg-0">
@@ -74,7 +77,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" id="stockPages" data-bs-toggle="dropdown">Stock</a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="exportStock.jsp" class="dropdown-item">Export Stock</a></li>
+                                        <li><a href="ExportMaterial" class="dropdown-item">Export Stock</a></li>
                                         <li><a href="importStock.jsp" class="dropdown-item">Import Stock</a></li>
                                     </ul>
                                 </li>
@@ -95,7 +98,7 @@
                     </ul>
 
                     <div class="d-none d-lg-flex align-items-center">
-                        <a href="Profile.jsp" class="text-dark mx-2">
+                        <a href="profile" class="text-dark mx-2">
                             <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                         </a>
                     </div>
