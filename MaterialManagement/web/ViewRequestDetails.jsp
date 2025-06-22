@@ -48,10 +48,25 @@
             font-size: 1rem;
             margin: 10px 0;
         }
-        .detail-container ul {
-            list-style-type: disc;
-            margin-left: 30px;
+        .detail-container table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .detail-container th, .detail-container td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .detail-container th {
+            background-color: #f2f2f2;
+            font-weight: 500;
+        }
+        .detail-container img {
+            max-width: 100px;
+            max-height: 100px;
+            vertical-align: middle;
         }
         .btn {
             font-size: 1rem;
@@ -89,7 +104,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="HeaderAdmin.jsp" />
+    <jsp:include page="Header.jsp" />
 
     <section id="request-details">
         <div class="detail-container">
@@ -126,29 +141,127 @@
             </c:if>
 
             <h3>Details</h3>
-            <ul>
-                <c:forEach var="detail" items="${request.details}">
-                    <c:choose>
-                        <c:when test="${requestType == 'Export'}">
-                            <li>${detail.materialName} (${detail.materialCode}): ${detail.quantity} ${detail.materialUnit} (${detail.exportCondition})</li>
-                        </c:when>
-                        <c:when test="${requestType == 'Purchase'}">
-                            <li>${detail.materialName}: ${detail.quantity} (Notes: ${detail.notes != null ? detail.notes : "N/A"})</li>
-                        </c:when>
-                        <c:when test="${requestType == 'Repair'}">
-                            <li>Material ID: ${detail.materialId}, Quantity: ${detail.quantity}, Damage: ${detail.damageDescription != null ? detail.damageDescription : "N/A"}, Repair Cost: ${detail.repairCost != null ? detail.repairCost : "N/A"}</li>
-                        </c:when>
-                    </c:choose>
-                </c:forEach>
-            </ul>
+            <c:choose>
+                <c:when test="${requestType == 'Export'}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Material Name</th>
+                                <th>Material Code</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Export Condition</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="detail" items="${request.details}">
+                                <tr>
+                                    <td>${detail.materialName}</td>
+                                    <td>${detail.materialCode}</td>
+                                    <td>${detail.quantity}</td>
+                                    <td>${detail.materialUnit}</td>
+                                    <td>${detail.exportCondition}</td>
+                                    <td>
+                                        <c:forEach var="material" items="${materials}">
+                                            <c:if test="${material.materialId == detail.materialId}">
+                                                <c:choose>
+                                                    <c:when test="${not empty material.materialsUrl}">
+                                                        <img src="${pageContext.request.contextPath}/images/${material.materialsUrl}" alt="${detail.materialName}" />
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span>No image available</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
+                                        </c:forEach>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:when>
+                <c:when test="${requestType == 'Purchase'}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Material Name</th>
+                                <th>Quantity</th>
+                                <th>Notes</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="detail" items="${request.details}">
+                                <tr>
+                                    <td>${detail.materialName}</td>
+                                    <td>${detail.quantity}</td>
+                                    <td>${detail.notes != null ? detail.notes : "N/A"}</td>
+                                    <td>
+                                        <c:forEach var="material" items="${materials}">
+                                            <c:if test="${material.materialId == detail.materialId}">
+                                                <c:choose>
+                                                    <c:when test="${not empty material.materialsUrl}">
+                                                        <img src="${pageContext.request.contextPath}/images/${material.materialsUrl}" alt="${detail.materialName}" />
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span>No image available</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
+                                        </c:forEach>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:when>
+                <c:when test="${requestType == 'Repair'}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Material ID</th>
+                                <th>Quantity</th>
+                                <th>Damage Description</th>
+                                <th>Repair Cost</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="detail" items="${request.details}">
+                                <tr>
+                                    <td>${detail.materialId}</td>
+                                    <td>${detail.quantity}</td>
+                                    <td>${detail.damageDescription != null ? detail.damageDescription : "N/A"}</td>
+                                    <td>${detail.repairCost != null ? detail.repairCost : "N/A"}</td>
+                                    <td>
+                                        <c:forEach var="material" items="${materials}">
+                                            <c:if test="${material.materialId == detail.materialId}">
+                                                <c:choose>
+                                                    <c:when test="${not empty material.materialsUrl}">
+                                                        <img src="${pageContext.request.contextPath}/images/${material.materialsUrl}" alt="Material Image" />
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span>No image available</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
+                                        </c:forEach>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:when>
+            </c:choose>
 
             <div class="mt-4">
                 <a href="${pageContext.request.contextPath}/ViewRequests" class="btn btn-secondary">Back to Requests</a>
-                <c:if test="${request.status == 'draft'}">
+                <c:if test="${request.status == 'pending'}">
                     <form action="${pageContext.request.contextPath}/ViewRequestDetails" method="post" style="display:inline;">
                         <input type="hidden" name="action" value="cancel">
                         <input type="hidden" name="type" value="${requestType.toLowerCase()}">
-                        <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.id : request.repairRequestId)}">
+                        <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel Request</button>
                     </form>
                 </c:if>
@@ -163,4 +276,4 @@
     <script src="js/script.js"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 </body>
-</html> 
+</html>

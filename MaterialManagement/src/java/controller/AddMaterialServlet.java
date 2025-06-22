@@ -7,12 +7,14 @@ import entity.Material;
 import entity.Category;
 import entity.Unit;
 import entity.User;
+import utils.MaterialValidator;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.servlet.ServletException;
@@ -37,18 +39,23 @@ public class AddMaterialServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra session và quyền truy cập
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+       
+        if (session == null || session.getAttribute("user") == null) {
+            String requestURI = request.getRequestURI();
+            String queryString = request.getQueryString();
+            if (queryString != null) {
+                requestURI += "?" + queryString;
+            }
+            session = request.getSession();
+            session.setAttribute("redirectURL", requestURI);
+            response.sendRedirect("LoginServlet");
             return;
         }
+        User user = (User) session.getAttribute("user");
 
-        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
         if (user.getRoleId() != 1) {
-            request.setAttribute("error", "Bạn không có quyền truy cập trang này. Chỉ Admin mới có thể thêm vật tư.");
+            request.setAttribute("error", "You do not have permission to access this page. Only Admins can add materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -71,24 +78,22 @@ public class AddMaterialServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra session và quyền truy cập
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
             return;
         }
 
-        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
+        User user = (User) session.getAttribute("user");
+        
         if (user.getRoleId() != 1) {
-            request.setAttribute("error", "Bạn không có quyền thực hiện hành động này. Chỉ Admin mới có thể thêm vật tư.");
+            request.setAttribute("error", "You do not have permission to perform this action. Only Admins can add materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
         
         try {
-            // Tạo thư mục upload nếu chưa có
             String applicationPath = request.getServletContext().getRealPath("");
             String uploadPath = applicationPath + File.separator + UPLOAD_DIRECTORY;
             File uploadDir = new File(uploadPath);
@@ -96,10 +101,27 @@ public class AddMaterialServlet extends HttpServlet {
                 uploadDir.mkdirs();
             }
 
-            // Lấy dữ liệu từ form
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
+            String priceStr = request.getParameter("price");
+            String conditionPercentageStr = request.getParameter("conditionPercentage");
+            String categoryIdStr = request.getParameter("categoryId");
+            String unitIdStr = request.getParameter("unitId");
+
+            Map<String, String> errors = MaterialValidator.validateMaterialFormData(
+                materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
+
+            if (!errors.isEmpty()) {
+                String firstError = errors.values().iterator().next();
+                CategoryDAO cd = new CategoryDAO();
+                UnitDAO ud = new UnitDAO();
+                request.setAttribute("categories", cd.getAllCategories());
+                request.setAttribute("units", ud.getAllUnits());
+                request.setAttribute("error", firstError);
+                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
+                return;
+            }
 
             Part filePart = request.getPart("imageFile");
             String filePath = null;
@@ -115,27 +137,11 @@ public class AddMaterialServlet extends HttpServlet {
                 filePath = "material_images/default.jpg";
             }
 
-            // Xử lý giá
-            String priceStr = request.getParameter("price");
-            BigDecimal price;
-            if (priceStr == null || priceStr.trim().isEmpty()) {
-                throw new IllegalArgumentException("Price is required.");
-            }
-            try {
-                price = new BigDecimal(priceStr);
-                if (price.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new IllegalArgumentException("Price must be greater than $0.");
-                }
-                price = price.setScale(2, BigDecimal.ROUND_HALF_UP);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid price format.");
-            }
+            BigDecimal price = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
+            int categoryId = Integer.parseInt(categoryIdStr);
+            int unitId = Integer.parseInt(unitIdStr);
+            int conditionPercentage = Integer.parseInt(conditionPercentageStr);
 
-            int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            int unitId = Integer.parseInt(request.getParameter("unitId"));
-            int conditionPercentage = Integer.parseInt(request.getParameter("conditionPercentage"));
-
-            // Tạo đối tượng Material
             Material m = new Material();
             m.setMaterialCode(materialCode);
             m.setMaterialName(materialName);
@@ -157,13 +163,12 @@ public class AddMaterialServlet extends HttpServlet {
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             MaterialDAO md = new MaterialDAO();
-            // Kiểm tra trùng mã vật tư
             if (md.isMaterialCodeExists(materialCode)) {
                 CategoryDAO cd = new CategoryDAO();
                 UnitDAO ud = new UnitDAO();
                 request.setAttribute("categories", cd.getAllCategories());
                 request.setAttribute("units", ud.getAllUnits());
-                request.setAttribute("error", "Mã vật tư đã tồn tại, vui lòng nhập mã khác!");
+                request.setAttribute("error", "Material code already exists, please enter a different code!");
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }

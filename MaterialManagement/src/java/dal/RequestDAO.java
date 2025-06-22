@@ -570,7 +570,7 @@ public class RequestDAO extends DBContext {
     // Cancel an export request
     public boolean cancelExportRequest(int exportRequestId, int userId) {
         String sql = "UPDATE Export_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
-                + "WHERE export_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+                + "WHERE export_request_id = ? AND user_id = ? AND status = 'pending' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, exportRequestId);
             ps.setInt(2, userId);
@@ -587,7 +587,7 @@ public class RequestDAO extends DBContext {
     // Cancel a purchase request
     public boolean cancelPurchaseRequest(int purchaseRequestId, int userId) {
         String sql = "UPDATE Purchase_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
-                + "WHERE purchase_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+                + "WHERE purchase_request_id = ? AND user_id = ? AND status = 'pending' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, purchaseRequestId);
             ps.setInt(2, userId);
@@ -604,7 +604,7 @@ public class RequestDAO extends DBContext {
     // Cancel a repair request
     public boolean cancelRepairRequest(int repairRequestId, int userId) {
         String sql = "UPDATE Repair_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
-                + "WHERE repair_request_id = ? AND user_id = ? AND status = 'draft' AND disable = 0";
+                + "WHERE repair_request_id = ? AND user_id = ? AND status = 'pending' AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
             ps.setInt(2, userId);

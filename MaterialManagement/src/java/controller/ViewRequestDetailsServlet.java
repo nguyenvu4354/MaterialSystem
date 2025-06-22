@@ -1,9 +1,12 @@
 package controller;
 
-import dal.ExportRequestDAO;
-import dal.ExportRequestDetailDAO;
+import dal.DepartmentDAO;
+import dal.RequestDAO;
 import entity.ExportRequest;
+import entity.PurchaseRequest;
+import entity.RepairRequest;
 import entity.User;
+import entity.Material;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,17 +14,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 @WebServlet(name = "ViewRequestDetailsServlet", urlPatterns = {"/ViewRequestDetails"})
 public class ViewRequestDetailsServlet extends HttpServlet {
 
-    private ExportRequestDAO exportRequestDAO;
-    private ExportRequestDetailDAO exportRequestDetailDAO;
+    private RequestDAO requestDAO;
 
     @Override
     public void init() throws ServletException {
-        exportRequestDAO = new ExportRequestDAO();
-        exportRequestDetailDAO = new ExportRequestDetailDAO();
+        requestDAO = new RequestDAO();
     }
 
     @Override
@@ -36,30 +39,55 @@ public class ViewRequestDetailsServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         try {
             int requestId = Integer.parseInt(request.getParameter("id"));
-            ExportRequest exportRequest = exportRequestDAO.getById(requestId);
+            String type = request.getParameter("type");
+            Object requestObj = null;
 
-            if (exportRequest == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Export request not found");
+            // Fetch the request based on type
+            switch (type.toLowerCase()) {
+                case "export":
+                    requestObj = requestDAO.getExportRequestById(requestId);
+                    break;
+                case "purchase":
+                    requestObj = requestDAO.getPurchaseRequestById(requestId);
+                    break;
+                case "repair":
+                    requestObj = requestDAO.getRepairRequestById(requestId);
+                    break;
+                default:
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request type");
+                    return;
+            }
+
+            if (requestObj == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Request not found");
                 return;
             }
 
-            boolean hasAccess = exportRequest.getUserId() == user.getUserId() || "Director".equals(user.getRoleName());
+            // Check access permissions
+            int requestUserId = getRequestUserId(requestObj);
+            boolean hasAccess = requestUserId == user.getUserId() || "Director".equalsIgnoreCase(user.getRoleName());
             if (!hasAccess) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                 return;
             }
+
+            // Lấy danh sách vật tư từ DepartmentDAO
+            DepartmentDAO departmentDAO = new DepartmentDAO();
+            List<Material> materials = departmentDAO.getMaterials();
+            request.setAttribute("materials", materials);
 
             String message = request.getParameter("message");
             if (message != null) {
                 request.setAttribute("message", message);
             }
 
-            request.setAttribute("request", exportRequest);
-            request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
-            request.setAttribute("isDirector", "director".equals(user.getRoleName()));
+            request.setAttribute("request", requestObj);
+            request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
             request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
+        } catch (SQLException e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
     }
 
@@ -73,58 +101,109 @@ public class ViewRequestDetailsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (!"Director".equals(user.getRoleName())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
-
         try {
-            int requestId = Integer.parseInt(request.getParameter("requestId"));
+            int requestId = Integer.parseInt(request.getParameter("id"));
             String action = request.getParameter("action");
-            ExportRequest exportRequest = exportRequestDAO.getById(requestId);
+            String type = request.getParameter("type");
+            Object requestObj = null;
 
-            if (exportRequest == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Export request not found");
+            // Fetch the request based on type
+            switch (type.toLowerCase()) {
+                case "export":
+                    requestObj = requestDAO.getExportRequestById(requestId);
+                    break;
+                case "purchase":
+                    requestObj = requestDAO.getPurchaseRequestById(requestId);
+                    break;
+                case "repair":
+                    requestObj = requestDAO.getRepairRequestById(requestId);
+                    break;
+                default:
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request type");
+                    return;
+            }
+
+            if (requestObj == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Request not found");
                 return;
             }
 
-            if (!"pending".equals(exportRequest.getStatus())) {
-                request.setAttribute("error", "Only pending requests can be processed.");
-                request.setAttribute("request", exportRequest);
-                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
-                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+            // Check if user is the request owner
+            int requestUserId = getRequestUserId(requestObj);
+            if (requestUserId != user.getUserId()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only the request owner can cancel it");
                 return;
             }
 
-            String reason = request.getParameter("reason");
-            if (reason == null || reason.trim().isEmpty()) {
-                request.setAttribute("error", "Reason is required.");
-                request.setAttribute("request", exportRequest);
-                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
-                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
-                return;
-            }
+            // Handle cancellation
+            if ("cancel".equals(action)) {
+                String status = getRequestStatus(requestObj);
+                if (!"pending".equals(status)) {
+                    request.setAttribute("message", "Error: Only pending requests can be cancelled.");
+                    request.setAttribute("request", requestObj);
+                    request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+                    // Lấy lại danh sách vật tư để hiển thị lại JSP
+                    DepartmentDAO departmentDAO = new DepartmentDAO();
+                    List<Material> materials = departmentDAO.getMaterials();
+                    request.setAttribute("materials", materials);
+                    request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                    return;
+                }
 
-            if ("approve".equals(action)) {
-                exportRequest.setStatus("approved");
-                exportRequest.setApprovedBy(user.getUserId());
-                exportRequest.setApprovalReason(reason);
-            } else if ("reject".equals(action)) {
-                exportRequest.setStatus("rejected");
-                exportRequest.setApprovedBy(user.getUserId());
-                exportRequest.setRejectionReason(reason);
-            }
+                boolean cancelled = false;
+                switch (type.toLowerCase()) {
+                    case "export":
+                        cancelled = requestDAO.cancelExportRequest(requestId, user.getUserId());
+                        break;
+                    case "purchase":
+                        cancelled = requestDAO.cancelPurchaseRequest(requestId, user.getUserId());
+                        break;
+                    case "repair":
+                        cancelled = requestDAO.cancelRepairRequest(requestId, user.getUserId());
+                        break;
+                }
 
-            if (exportRequestDAO.update(exportRequest)) {
-                response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?id=" + requestId);
+                if (cancelled) {
+                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + requestId + "&message=Request+cancelled+successfully");
+                } else {
+                    request.setAttribute("message", "Error: Failed to cancel request.");
+                    request.setAttribute("request", requestObj);
+                    request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+                    // Lấy lại danh sách vật tư để hiển thị lại JSP
+                    DepartmentDAO departmentDAO = new DepartmentDAO();
+                    List<Material> materials = departmentDAO.getMaterials();
+                    request.setAttribute("materials", materials);
+                    request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                }
             } else {
-                request.setAttribute("error", "Failed to process request.");
-                request.setAttribute("request", exportRequest);
-                request.setAttribute("details", exportRequestDetailDAO.getByRequestId(requestId));
-                request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
             }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
+        } catch (SQLException e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
+    }
+
+    private int getRequestUserId(Object request) {
+        if (request instanceof ExportRequest) {
+            return ((ExportRequest) request).getUserId();
+        } else if (request instanceof PurchaseRequest) {
+            return ((PurchaseRequest) request).getUserId();
+        } else if (request instanceof RepairRequest) {
+            return ((RepairRequest) request).getUserId();
+        }
+        return 0;
+    }
+
+    private String getRequestStatus(Object request) {
+        if (request instanceof ExportRequest) {
+            return ((ExportRequest) request).getStatus();
+        } else if (request instanceof PurchaseRequest) {
+            return ((PurchaseRequest) request).getStatus();
+        } else if (request instanceof RepairRequest) {
+            return ((RepairRequest) request).getStatus();
+        }
+        return "";
     }
 }

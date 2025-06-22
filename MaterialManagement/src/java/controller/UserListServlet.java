@@ -1,6 +1,6 @@
 package controller;
 
-import dal.DepartmentDAO; 
+import dal.DepartmentDAO;
 import dal.UserDAO;
 import dal.RoleDAO;
 import entity.Department;
@@ -23,7 +23,11 @@ public class UserListServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null || currentUser.getRoleId() != 1) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập trang này.");
+            return;
+        }
         int page = 1;
         int pageSize = 5;
         String pageStr = request.getParameter("page");
