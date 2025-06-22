@@ -30,6 +30,8 @@ import java.util.Map;
 )
 public class EditMaterialServlet extends HttpServlet {
 
+    private static final String UPLOAD_DIRECTORY = "material_images";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -108,6 +110,15 @@ public class EditMaterialServlet extends HttpServlet {
         try {
             request.setCharacterEncoding("UTF-8");
             response.setContentType("text/html;charset=UTF-8");
+            
+            String realPath = request.getServletContext().getRealPath("/");
+            String sourceWebPath = realPath.replace("build" + File.separator + "web", "web");
+            String uploadPath = sourceWebPath + File.separator + UPLOAD_DIRECTORY;
+
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
 
             String materialId = request.getParameter("materialId");
             String materialCode = request.getParameter("materialCode");
@@ -147,13 +158,8 @@ public class EditMaterialServlet extends HttpServlet {
 
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                String uploadPath = getServletContext().getRealPath("/material_images");
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
                 filePart.write(uploadPath + File.separator + fileName);
-                imageUrl = "material_images/" + fileName;
+                imageUrl = UPLOAD_DIRECTORY + "/" + fileName;
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 imageUrl = urlInput.trim();
             }

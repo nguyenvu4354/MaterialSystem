@@ -94,8 +94,10 @@ public class AddMaterialServlet extends HttpServlet {
         }
         
         try {
-            String applicationPath = request.getServletContext().getRealPath("");
-            String uploadPath = applicationPath + File.separator + UPLOAD_DIRECTORY;
+            String realPath = request.getServletContext().getRealPath("/");
+            String sourceWebPath = realPath.replace("build" + File.separator + "web", "web");
+            String uploadPath = sourceWebPath + File.separator + UPLOAD_DIRECTORY;
+
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
@@ -124,17 +126,19 @@ public class AddMaterialServlet extends HttpServlet {
             }
 
             Part filePart = request.getPart("imageFile");
-            String filePath = null;
+            String relativeFilePath = null;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
-                filePath = UPLOAD_DIRECTORY + "/" + newFileName;
-                filePart.write(filePath);
+                
+                filePart.write(uploadPath + File.separator + newFileName);
+                
+                relativeFilePath = UPLOAD_DIRECTORY + "/" + newFileName;
             } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
-                filePath = request.getParameter("materialsUrl").trim();
+                relativeFilePath = request.getParameter("materialsUrl").trim();
             } else {
-                filePath = "material_images/default.jpg";
+                relativeFilePath = "material_images/default.jpg";
             }
 
             BigDecimal price = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -145,7 +149,7 @@ public class AddMaterialServlet extends HttpServlet {
             Material m = new Material();
             m.setMaterialCode(materialCode);
             m.setMaterialName(materialName);
-            m.setMaterialsUrl(filePath);
+            m.setMaterialsUrl(relativeFilePath);
             m.setMaterialStatus(materialStatus);
             m.setConditionPercentage(conditionPercentage);
             m.setPrice(price.doubleValue());
