@@ -4,10 +4,8 @@
  */
 package controller;
 
-import dal.RepairRequestDAO;
-import entity.RepairRequest;
+import dal.RepairRequestDetailDAO;
 import entity.RepairRequestDetail;
-import entity.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,16 +13,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author Nhat Anh
  */
-@WebServlet(name = "RepairRequestListServlet", urlPatterns = {"/repairrequestlist"})
-public class RepairRequestListServlet extends HttpServlet {
+@WebServlet(name = "RepairRequestDetailByRepairID", urlPatterns = {"/repairrequestdetailbyID"})
+public class RepairRequestDetailByRepairID extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,10 +40,10 @@ public class RepairRequestListServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet RepairRequestListServlet</title>");
+            out.println("<title>Servlet RepairRequestDetailByRepairID</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet RepairRequestListServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet RepairRequestDetailByRepairID at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -65,36 +62,23 @@ public class RepairRequestListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            RepairRequestDAO dao = new RepairRequestDAO();
+            int requestId = Integer.parseInt(request.getParameter("requestId"));
+            RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
+            List<RepairRequestDetail> details = dao.getRepairRequestDetailsByRequestId(requestId);
 
-            // Lấy user từ session
-            User currentUser = (User) request.getSession().getAttribute("user");
+            // Lấy thông tin người dùng từ session
+            HttpSession session = request.getSession();
+            entity.User user = (entity.User) session.getAttribute("user");
+            int roleId = user.getRoleId();
 
-            List<RepairRequest> requests;
-
-            // Nếu là Admin hoặc Role khác → lấy tất cả
-            if (currentUser.getRoleId() == 1) { // 1 = Admin, tùy hệ thống của bạn
-                requests = dao.getAllRepairRequests();
-            } else {
-                // Nếu là nhân viên, chỉ lấy yêu cầu của chính họ
-                requests = dao.getRepairRequestsByUser(currentUser.getUserId());
-            }
-
-            // Map chi tiết vật tư
-            Map<Integer, List<RepairRequestDetail>> detailMap = new HashMap<>();
-            for (RepairRequest r : requests) {
-                List<RepairRequestDetail> details = dao.getRepairRequestDetails(r.getRepairRequestId());
-                detailMap.put(r.getRepairRequestId(), details);
-            }
-
-            request.setAttribute("requests", requests);
-            request.setAttribute("detailMap", detailMap);
+            request.setAttribute("details", details);
+            request.setAttribute("requestId", requestId);
+            request.setAttribute("roleId", roleId); // Gửi roleId sang JSP
+            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tải danh sách.");
+            response.sendRedirect("error.jsp");
         }
-
-        request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
     }
 
     /**

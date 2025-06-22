@@ -22,33 +22,7 @@ import java.sql.Statement;
  */
 public class RepairRequestDAO extends DBContext {
 
-    public void insertRepairRequest(RepairRequest req) {
-        String sql = "INSERT INTO RepairRequests (request_code, user_id, request_date, repair_person_phone_number, "
-                + "repair_person_email, repair_location, estimated_return_date, status, reason, created_at, updated_at, disable) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setString(1, req.getRequestCode());
-            stmt.setInt(2, req.getUserId());
-            stmt.setTimestamp(3, req.getRequestDate());
-            stmt.setString(4, req.getRepairPersonPhoneNumber());
-            stmt.setString(5, req.getRepairPersonEmail());
-            stmt.setString(6, req.getRepairLocation());
-            stmt.setDate(7, req.getEstimatedReturnDate());
-            stmt.setString(8, req.getStatus());
-            stmt.setString(9, req.getReason());
-            stmt.setTimestamp(10, req.getCreatedAt());
-            stmt.setTimestamp(11, req.getUpdatedAt());
-            stmt.setBoolean(12, req.isDisable());
-
-            stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
+    public boolean createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
         String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, repair_person_phone_number, repair_person_email, "
                 + "repair_location, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -94,6 +68,7 @@ public class RepairRequestDAO extends DBContext {
             e.printStackTrace();
             throw e;
         }
+        return false;
     }
 
     public List<RepairRequest> getAllRepairRequests() throws SQLException {
@@ -194,4 +169,25 @@ public class RepairRequestDAO extends DBContext {
         return list;
     }
 
+    public void updateStatus(int repairRequestId, String status, Integer approvedBy, String reason) throws SQLException {
+        String sql;
+        if ("approve".equalsIgnoreCase(status)) {
+            sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, approval_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
+        } else if ("reject".equalsIgnoreCase(status)) {
+            sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
+        } else {
+            throw new IllegalArgumentException("Invalid status: " + status);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, approvedBy);
+            ps.setString(3, reason);
+            ps.setInt(4, repairRequestId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }
