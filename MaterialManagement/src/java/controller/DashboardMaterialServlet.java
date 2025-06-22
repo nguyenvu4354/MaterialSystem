@@ -10,26 +10,26 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import entity.Material;
+import entity.User;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 
 @WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboardmaterial"})
 public class DashboardMaterialServlet extends HttpServlet {
 
     @Override
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         try {
             int pageIndex = 1;
             int pageSize = 10;
 
-            // Lấy trang hiện tại
             String pageParam = request.getParameter("page");
             if (pageParam != null && !pageParam.isEmpty()) {
                 pageIndex = Integer.parseInt(pageParam);
             }
 
-            // Lấy từ khóa tìm kiếm
             String keyword = request.getParameter("keyword");
             if (keyword == null) {
                 keyword = "";
@@ -52,7 +52,6 @@ public class DashboardMaterialServlet extends HttpServlet {
 
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
 
-            // Truyền dữ liệu ra JSP
             request.setAttribute("list", list);
             request.setAttribute("currentPage", pageIndex);
             request.setAttribute("totalPages", totalPages);

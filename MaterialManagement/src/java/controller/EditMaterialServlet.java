@@ -7,6 +7,7 @@ import entity.Category;
 import entity.Material;
 import entity.Unit;
 import entity.User;
+import utils.MaterialValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,30 +20,37 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 1024 * 1024 * 10, // 10 MB
-        maxRequestSize = 1024 * 1024 * 100 // 100 MB
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 100
 )
 public class EditMaterialServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra session và quyền truy cập
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
 
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        if (session == null || session.getAttribute("user") == null) {
+            String requestURI = request.getRequestURI();
+            String queryString = request.getQueryString();
+            if (queryString != null) {
+                requestURI += "?" + queryString;
+            }
+            session = request.getSession();
+            session.setAttribute("redirectURL", requestURI);
+            response.sendRedirect("LoginServlet");
             return;
         }
 
-        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
+        User user = (User) session.getAttribute("user");
+        
         if (user.getRoleId() != 1) {
-            request.setAttribute("error", "Bạn không có quyền truy cập trang này. Chỉ Admin mới có thể chỉnh sửa vật tư.");
+            request.setAttribute("error", "You do not have permission to access this page. Only Admins can edit materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -62,7 +70,6 @@ public class EditMaterialServlet extends HttpServlet {
                 return;
             }
 
-            // Lấy danh sách categories và units
             CategoryDAO categoryDAO = new CategoryDAO();
             UnitDAO unitDAO = new UnitDAO();
             
@@ -83,18 +90,17 @@ public class EditMaterialServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra session và quyền truy cập
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
             return;
         }
+        
+        User user = (User) session.getAttribute("user");
 
-        // Kiểm tra quyền truy cập - chỉ cho phép Admin (role_id = 1)
         if (user.getRoleId() != 1) {
-            request.setAttribute("error", "Bạn không có quyền thực hiện hành động này. Chỉ Admin mới có thể chỉnh sửa vật tư.");
+            request.setAttribute("error", "You do not have permission to perform this action. Only Admins can edit materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -103,7 +109,6 @@ public class EditMaterialServlet extends HttpServlet {
             request.setCharacterEncoding("UTF-8");
             response.setContentType("text/html;charset=UTF-8");
 
-            // Lấy thông tin từ form
             String materialId = request.getParameter("materialId");
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
@@ -113,16 +118,29 @@ public class EditMaterialServlet extends HttpServlet {
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
 
-            // Validate dữ liệu
-            if (materialId == null || materialCode == null || materialName == null || 
-                materialStatus == null || conditionPercentage == null || price == null || 
-                categoryId == null || unitId == null || categoryId.trim().isEmpty() || unitId.trim().isEmpty()) {
-                request.setAttribute("error", "Vui lòng điền đầy đủ thông tin bắt buộc");
+            Map<String, String> errors = MaterialValidator.validateMaterialFormData(
+                materialCode, materialName, materialStatus, price, conditionPercentage, categoryId, unitId);
+            
+            if (materialId == null || materialId.trim().isEmpty()) {
+                errors.put("materialId", "Material ID cannot be empty.");
+            } else {
+                try {
+                    int id = Integer.parseInt(materialId);
+                    if (id <= 0) {
+                        errors.put("materialId", "Invalid Material ID.");
+                    }
+                } catch (NumberFormatException e) {
+                    errors.put("materialId", "Invalid Material ID.");
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                String firstError = errors.values().iterator().next();
+                request.setAttribute("error", firstError);
                 doGet(request, response);
                 return;
             }
 
-            // Xử lý upload ảnh
             String imageUrl = null;
             Part filePart = request.getPart("materialImage");
             String urlInput = request.getParameter("materialsUrl");
@@ -140,27 +158,29 @@ public class EditMaterialServlet extends HttpServlet {
                 imageUrl = urlInput.trim();
             }
 
-            // Tạo đối tượng Material
+            int materialIdInt = Integer.parseInt(materialId);
+            int conditionPercentageInt = Integer.parseInt(conditionPercentage);
+            double priceDouble = Double.parseDouble(price);
+            int categoryIdInt = Integer.parseInt(categoryId);
+            int unitIdInt = Integer.parseInt(unitId);
+
             Material material = new Material();
-            material.setMaterialId(Integer.parseInt(materialId));
+            material.setMaterialId(materialIdInt);
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
             material.setMaterialsUrl(imageUrl);
             material.setMaterialStatus(materialStatus);
-            material.setConditionPercentage(Integer.parseInt(conditionPercentage));
-            material.setPrice(Double.parseDouble(price));
+            material.setConditionPercentage(conditionPercentageInt);
+            material.setPrice(priceDouble);
             
-            // Set category
             Category category = new Category();
-            category.setCategory_id(Integer.parseInt(categoryId));
+            category.setCategory_id(categoryIdInt);
             material.setCategory(category);
             
-            // Set unit
             Unit unit = new Unit();
-            unit.setId(Integer.parseInt(unitId));
+            unit.setId(unitIdInt);
             material.setUnit(unit);
             
-            // Xử lý URL ảnh
             MaterialDAO materialDAO = new MaterialDAO();
             Material oldMaterial = materialDAO.getInformation(material.getMaterialId());
             
@@ -173,39 +193,13 @@ public class EditMaterialServlet extends HttpServlet {
             material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             material.setDisable(oldMaterial.isDisable());
 
-            // In log các giá trị nhận được từ request
-            System.out.println("materialId: " + materialId);
-            System.out.println("materialCode: " + materialCode);
-            System.out.println("materialName: " + materialName);
-            System.out.println("materialStatus: " + materialStatus);
-            System.out.println("conditionPercentage: " + conditionPercentage);
-            System.out.println("price: " + price);
-            System.out.println("categoryId: " + categoryId);
-            System.out.println("unitId: " + unitId);
-
-            // In log đối tượng Material trước khi update
-            System.out.println("Material update: materialId=" + material.getMaterialId()
-                + ", materialCode=" + material.getMaterialCode()
-                + ", materialName=" + material.getMaterialName()
-                + ", status=" + material.getMaterialStatus()
-                + ", condition=" + material.getConditionPercentage()
-                + ", price=" + material.getPrice()
-                + ", categoryId=" + material.getCategory().getCategory_id()
-                + ", unitId=" + material.getUnit().getId()
-                + ", disable=" + material.isDisable()
-                + ", url=" + material.getMaterialsUrl()
-                + ", updatedAt=" + material.getUpdatedAt()
-            );
-
-            // Gọi hàm update
             materialDAO.updateMaterial(material);
 
-            // Chuyển hướng về dashboardmaterial
             response.sendRedirect("dashboardmaterial?success=Material updated successfully");
             
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            request.setAttribute("error", "An error occurred: " + e.getMessage());
             doGet(request, response);
         }
     }
