@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import utils.EmailUtils;
 
 @WebServlet(name = "CreateExportRequestServlet", urlPatterns = {"/CreateExportRequest"})
 public class CreateExportRequestServlet extends HttpServlet {
@@ -193,6 +194,34 @@ public class CreateExportRequestServlet extends HttpServlet {
             System.out.println("DEBUG: Export request creation " + (success ? "successful" : "failed"));
 
             if (success) {
+                // Gửi email cho giám đốc
+                List<User> allUsers = userDAO.getAllUsers();
+                List<User> directors = new ArrayList<>();
+                for (User u : allUsers) {
+                    if (u.getRoleId() == 2) {
+                        directors.add(u);
+                    }
+                }
+                if (!directors.isEmpty()) {
+                    String subject = "[Notification] A new export request has been created";
+                    StringBuilder content = new StringBuilder();
+                    content.append("Dear Director,<br><br>");
+                    content.append("A new export request has just been created.<br>");
+                    content.append("<b>Request Code:</b> ").append(exportRequest.getRequestCode()).append("<br>");
+                    content.append("<b>Creator:</b> ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")<br>");
+                    content.append("<b>Delivery Date:</b> ").append(exportRequest.getDeliveryDate()).append("<br>");
+                    content.append("<b>Reason:</b> ").append(exportRequest.getReason()).append("<br>");
+                    content.append("<br>Please log in to the system to view details and approve.<br>");
+                    for (User director : directors) {
+                        if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
+                            try {
+                                utils.EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/HomePage.jsp");
             } else {
                 throw new Exception("Failed to create export request.");
