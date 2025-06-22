@@ -54,7 +54,7 @@ public class CreateExportRequestServlet extends HttpServlet {
         }
 
         int roleId = user.getRoleId();
-        if (roleId != 2 && roleId != 3 && roleId != 4) {
+        if (roleId != 4) {
             System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
             response.sendRedirect("HomePage.jsp");
             return;
@@ -69,9 +69,9 @@ public class CreateExportRequestServlet extends HttpServlet {
             System.out.println("DEBUG: Loaded " + materials.size() + " materials");
             request.setAttribute("materials", materials);
 
-            List<User> users = userDAO.getAllUsers();
-            System.out.println("DEBUG: Loaded " + users.size() + " users");
-            request.setAttribute("users", users);
+            List<User> staffUsers = userDAO.getUsersByRoleId(3);
+            System.out.println("DEBUG: Loaded " + staffUsers.size() + " staff users");
+            request.setAttribute("users", staffUsers);
 
             System.out.println("DEBUG: Forwarding to CreateExportRequest.jsp");
             request.getRequestDispatcher("CreateExportRequest.jsp").forward(request, response);
@@ -99,7 +99,7 @@ public class CreateExportRequestServlet extends HttpServlet {
         }
 
         int roleId = user.getRoleId();
-        if (roleId != 2 && roleId != 3 && roleId != 4) {
+        if (roleId != 4) {
             System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
             response.sendRedirect("HomePage.jsp");
             return;
@@ -127,8 +127,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             int recipientId = 0;
             if (recipientIdStr != null && !recipientIdStr.trim().isEmpty()) {
                 recipientId = Integer.parseInt(recipientIdStr);
-                if (userDAO.getUserById(recipientId) == null) {
+                User recipient = userDAO.getUserById(recipientId);
+                if (recipient == null) {
                     throw new Exception("Invalid recipient selected.");
+                }
+                if (recipient.getRoleId() != 3) {
+                    throw new Exception("Recipient must be a staff member.");
                 }
             }
 
@@ -208,9 +212,9 @@ public class CreateExportRequestServlet extends HttpServlet {
                 List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
                 System.out.println("DEBUG: Loaded " + materials.size() + " materials in error case");
                 request.setAttribute("materials", materials);
-                List<User> users = userDAO.getAllUsers();
-                System.out.println("DEBUG: Loaded " + users.size() + " users in error case");
-                request.setAttribute("users", users);
+                List<User> staffUsers = userDAO.getUsersByRoleId(3);
+                System.out.println("DEBUG: Loaded " + staffUsers.size() + " staff users in error case");
+                request.setAttribute("users", staffUsers);
             } catch (Exception ex) {
                 System.out.println("ERROR: Failed to load materials/users in error case: " + ex.getMessage());
                 ex.printStackTrace();

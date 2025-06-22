@@ -142,8 +142,8 @@
                                         <select class="form-select <% if(errors != null && errors.containsKey("roleId")) { %>is-invalid<% } %>" 
                                                 name="roleId" id="roleId" required>
                                             <option value="" <%= enteredRoleId == null || enteredRoleId.isEmpty() ? "selected" : "" %>>Select Role</option>
-                                            <option value="2" <%= "2".equals(enteredRoleId) ? "selected" : "" %>>Warehouse staff</option>
-                                            <option value="3" <%= "3".equals(enteredRoleId) ? "selected" : "" %>>Director</option>
+                                            <option value="2" <%= "2".equals(enteredRoleId) ? "selected" : "" %>>Director</option>
+                                            <option value="3" <%= "3".equals(enteredRoleId) ? "selected" : "" %>>Staff</option>
                                             <option value="4" <%= "4".equals(enteredRoleId) ? "selected" : "" %>>Employee</option>
                                         </select>
                                         <% if (errors != null && errors.containsKey("roleId")) { %>

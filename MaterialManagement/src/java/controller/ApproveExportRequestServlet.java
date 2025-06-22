@@ -33,8 +33,8 @@ public class ApproveExportRequestServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
         System.out.println("User roleName: " + (user != null ? user.getRoleName() : "null"));
-        // Role check: Only users with role_id 3 (Director) can approve.
-        if (user == null || user.getRoleId() != 3) {
+        // Role check: Only users with role_id 2 (Director) can approve.
+        if (user == null || user.getRoleId() != 2) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }

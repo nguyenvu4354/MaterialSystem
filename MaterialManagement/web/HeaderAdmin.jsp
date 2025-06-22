@@ -66,7 +66,7 @@
                         <option value="UserList">Manage Users</option>
                         <option value="manageDepartments.jsp">Manage Departments</option>
                         <option value="manageMaterials.jsp">Manage Materials</option>
-                        <option value="manageCategories.jsp">Manage Categories</option>
+                        <option value="Category.jsp">Manage Categories</option>
                         <option value="manageSuppliers.jsp">Manage Suppliers</option>
                         <option value="manageUnits.jsp">Manage Units</option>
                     </select>
@@ -83,7 +83,7 @@
                                 <li><a href="UserList" class="dropdown-item">Users</a></li>
                                 <li><a href="#" class="dropdown-item">Departments</a></li>
                                 <li><a href="#" class="dropdown-item">Materials</a></li>
-                                <li><a href="#" class="dropdown-item">Categories</a></li>
+                                <li><a href="Category.jsp"" class="dropdown-item">Categories</a></li>
                                 <li><a href="#" class="dropdown-item">Suppliers</a></li>
                                 <li><a href="#" class="dropdown-item">Units</a></li>
                             </ul>

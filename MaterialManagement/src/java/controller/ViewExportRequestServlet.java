@@ -35,7 +35,7 @@ public class ViewExportRequestServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        if (user == null || user.getRoleId() != 3) {
+        if (user == null || user.getRoleId() != 2) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
