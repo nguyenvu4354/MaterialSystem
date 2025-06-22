@@ -20,13 +20,6 @@ import java.util.List;
 @WebServlet(name = "ViewRequestDetailsServlet", urlPatterns = {"/ViewRequestDetails"})
 public class ViewRequestDetailsServlet extends HttpServlet {
 
-    private RequestDAO requestDAO;
-
-    @Override
-    public void init() throws ServletException {
-        requestDAO = new RequestDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,6 +34,9 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             int requestId = Integer.parseInt(request.getParameter("id"));
             String type = request.getParameter("type");
             Object requestObj = null;
+
+            // Khởi tạo RequestDAO
+            RequestDAO requestDAO = new RequestDAO();
 
             // Fetch the request based on type
             switch (type.toLowerCase()) {
@@ -106,6 +102,9 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             String action = request.getParameter("action");
             String type = request.getParameter("type");
             Object requestObj = null;
+
+            // Khởi tạo RequestDAO
+            RequestDAO requestDAO = new RequestDAO();
 
             // Fetch the request based on type
             switch (type.toLowerCase()) {
