@@ -213,10 +213,7 @@
                 </div>
 
                 <div class="form-section form-grid">
-                    <div>
-                        <label>Request Code</label>
-                        <input type="text" name="requestCode" required>
-                    </div>
+                   
                     <div>
                         <label>Phone Number of the Repairer</label>
                         <input type="text" name="repairPersonPhoneNumber" required>

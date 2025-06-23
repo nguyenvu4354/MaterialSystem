@@ -169,14 +169,35 @@ public class RepairRequestDAO extends DBContext {
         return list;
     }
 
-    public void updateStatus(int repairRequestId, String status, Integer approvedBy, String reason) throws SQLException {
+    public void updateStatus(int repairRequestId, String action, Integer approvedBy, String reason) throws SQLException {
+        // Kiểm tra trạng thái hiện tại
+        String checkSql = "SELECT status FROM Repair_Requests WHERE repair_request_id = ?";
+        try (PreparedStatement checkPs = connection.prepareStatement(checkSql)) {
+            checkPs.setInt(1, repairRequestId);
+            ResultSet rs = checkPs.executeQuery();
+            if (rs.next()) {
+                String currentStatus = rs.getString("status");
+                if (!"pending".equalsIgnoreCase(currentStatus)) {
+                    // Đã được duyệt hoặc từ chối rồi
+                    throw new IllegalStateException("Yêu cầu đã được xử lý. Không thể duyệt hoặc từ chối thêm lần nữa.");
+                }
+            } else {
+                throw new SQLException("Không tìm thấy yêu cầu sửa chữa với ID: " + repairRequestId);
+            }
+        }
+
+        // Nếu status vẫn là "pending" thì tiến hành cập nhật
         String sql;
-        if ("approve".equalsIgnoreCase(status)) {
+        String status;
+
+        if ("approve".equalsIgnoreCase(action)) {
+            status = "approved";
             sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, approval_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
-        } else if ("reject".equalsIgnoreCase(status)) {
+        } else if ("reject".equalsIgnoreCase(action)) {
+            status = "rejected";
             sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
         } else {
-            throw new IllegalArgumentException("Invalid status: " + status);
+            throw new IllegalArgumentException("Hành động không hợp lệ: " + action);
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -185,10 +206,7 @@ public class RepairRequestDAO extends DBContext {
             ps.setString(3, reason);
             ps.setInt(4, repairRequestId);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw e;
         }
     }
-    
+
 }
