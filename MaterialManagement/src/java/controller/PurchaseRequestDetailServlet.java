@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
-@WebServlet(name="ListPurchaseDetailServlet", urlPatterns={"/PurchaseRequestDetailServlet"})
+@WebServlet(name="ListPurchaseDetailServlet", urlPatterns={"/PurchaseRequestDetail"})
 public class PurchaseRequestDetailServlet extends HttpServlet {
 
     @Override

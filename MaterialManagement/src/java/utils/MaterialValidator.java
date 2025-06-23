@@ -21,6 +21,8 @@ public class MaterialValidator {
         // Validate materialName
         if (material.getMaterialName() == null || material.getMaterialName().trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
+        } else if (!material.getMaterialName().matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+            errors.put("materialName", "Material name cannot contain special characters.");
         }
 
         // Validate materialStatus
@@ -67,6 +69,8 @@ public class MaterialValidator {
         // Validate materialName
         if (material.getMaterialName() == null || material.getMaterialName().trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
+        } else if (!material.getMaterialName().matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+            errors.put("materialName", "Material name cannot contain special characters.");
         }
 
         // Validate materialStatus
@@ -111,6 +115,8 @@ public class MaterialValidator {
         // Validate materialName
         if (materialName == null || materialName.trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
+        } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+            errors.put("materialName", "Material name cannot contain special characters.");
         }
 
         // Validate materialStatus

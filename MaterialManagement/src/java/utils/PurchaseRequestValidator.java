@@ -77,6 +77,9 @@ public class PurchaseRequestValidator {
             // Skip if material name is empty
             if (materialName == null || materialName.trim().isEmpty()) {
                 continue;
+            } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+                errors.put("materialName", "Material name cannot contain special characters.");
+                return errors;
             }
 
             // Validate categoryId
@@ -119,6 +122,8 @@ public class PurchaseRequestValidator {
         // Validate materialName
         if (detail.getMaterialName() == null || detail.getMaterialName().trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
+        } else if (!detail.getMaterialName().matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+            errors.put("materialName", "Material name cannot contain special characters.");
         }
 
         // Validate categoryId
@@ -140,6 +145,8 @@ public class PurchaseRequestValidator {
         // Validate materialName
         if (materialName == null || materialName.trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
+        } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+            errors.put("materialName", "Material name cannot contain special characters.");
         }
 
         // Validate categoryId

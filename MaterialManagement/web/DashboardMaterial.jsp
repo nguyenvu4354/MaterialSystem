@@ -190,17 +190,19 @@
                                                        title="View Details">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="editmaterial?materialId=${material.materialId}" 
-                                                       class="btn btn-warning btn-action" 
-                                                       title="Edit Material">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <form method="post" action="deletematerial" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vật tư này?');">
-                                                        <input type="hidden" name="materialId" value="${material.materialId}" />
-                                                        <button type="submit" class="btn btn-danger btn-action" title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <c:if test="${!readonly}">
+                                                        <a href="editmaterial?materialId=${material.materialId}" 
+                                                           class="btn btn-warning btn-action" 
+                                                           title="Edit Material">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <form method="post" action="deletematerial" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vật tư này?');">
+                                                            <input type="hidden" name="materialId" value="${material.materialId}" />
+                                                            <button type="submit" class="btn btn-danger btn-action" title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </c:if>
                                                 </div>
                                             </td>
                                         </tr>

@@ -11,8 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import java.util.ArrayList;
 
-@WebServlet(name = "ListPurchaseRequestsServlet", urlPatterns = {"/ListPurchaseRequestsServlet"})
+@WebServlet(name = "ListPurchaseRequestsServlet", urlPatterns = {"/ListPurchaseRequests"})
 public class ListPurchaseRequestsServlet extends HttpServlet {
 
     @Override
@@ -51,10 +52,25 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             sortOption = "date_desc";
         }
 
-        int totalItems = prd.countPurchaseRequest(keyword, status);
+        List<PurchaseRequest> list;
+        int totalItems;
+        if (user.getRoleId() == 4) {
+            // Nhân viên chỉ xem yêu cầu của chính mình
+            list = new ArrayList<>();
+            totalItems = 0;
+            List<PurchaseRequest> all = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
+            for (PurchaseRequest pr : all) {
+                if (pr.getUserId() == user.getUserId()) {
+                    list.add(pr);
+                    totalItems++;
+                }
+            }
+        } else {
+            // Giám đốc xem tất cả
+            list = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
+            totalItems = prd.countPurchaseRequest(keyword, status);
+        }
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
-
-        List<PurchaseRequest> list = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
 
         request.setAttribute("purchaseRequests", list);
         request.setAttribute("totalPages", totalPages);
@@ -62,6 +78,7 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.setAttribute("status", status);
         request.setAttribute("sortOption", sortOption);
+        request.setAttribute("canApprove", user.getRoleId() == 2);
 
         request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
     }

@@ -445,7 +445,7 @@
                                         <nav aria-label="Page navigation" class="mt-4">
                                             <ul class="pagination justify-content-center">
                                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                    <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${currentPage - 1}">
+                                                    <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage - 1}">
                                                         <i class="fas fa-chevron-left"></i> Previous
                                                     </a>
                                                 </li>
@@ -459,7 +459,7 @@
                                                         </c:when>
                                                         <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
                                                             <li class="page-item">
-                                                                <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${i}">${i}</a>
+                                                                <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${i}">${i}</a>
                                                             </li>
                                                         </c:when>
                                                         <c:when test="${i == currentPage - 3 || i == currentPage + 3}">
@@ -471,7 +471,7 @@
                                                 </c:forEach>
                                                 
                                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                    <a class="page-link" href="PurchaseRequestDetailServlet?id=${purchaseRequest.purchaseRequestId}&page=${currentPage + 1}">
+                                                    <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage + 1}">
                                                         Next <i class="fas fa-chevron-right"></i>
                                                     </a>
                                                 </li>
@@ -509,7 +509,7 @@
                             <c:if test="${sessionScope.user.roleId == 2 && purchaseRequest.status == 'pending'}">
                                 <div class="content-card">
                                     <h4 class="mb-3">Approval Action</h4>
-                                    <form id="actionForm" action="PurchaseRequestDetailServlet" method="POST" style="display:inline-block;">
+                                    <form id="actionForm" action="PurchaseRequestDetail" method="POST" style="display:inline-block;">
                                         <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
                                         <input type="hidden" id="actionType" name="action" value="">
                                         <div class="mb-2">
@@ -556,7 +556,7 @@
 
                         <!-- Back Button -->
                         <div class="text-center">
-                            <a href="ListPurchaseRequestsServlet" class="btn-back">
+                            <a href="ListPurchaseRequests" class="btn-back">
                                 <i class="fas fa-arrow-left"></i>
                                 Back to List
                             </a>

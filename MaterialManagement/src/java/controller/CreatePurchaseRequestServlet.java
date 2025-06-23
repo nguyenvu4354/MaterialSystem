@@ -24,7 +24,7 @@ import utils.PurchaseRequestValidator;
  *
  * @author Admin
  */
-@WebServlet(name = "CreatePurchaseRequestServlet", urlPatterns = {"/CreatePurchaseRequestServlet"})
+@WebServlet(name = "CreatePurchaseRequestServlet", urlPatterns = {"/CreatePurchaseRequest"})
 public class CreatePurchaseRequestServlet extends HttpServlet {
 
     /**
@@ -205,7 +205,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                         }
                     }
                 }
-                response.sendRedirect("ListPurchaseRequestsServlet?success=created");
+                response.sendRedirect("ListPurchaseRequests?success=created");
             } else {
                 request.setAttribute("error", "Could not create purchase request. Please try again.");
                 doGet(request, response);

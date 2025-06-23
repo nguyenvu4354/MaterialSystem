@@ -9,7 +9,17 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/PurchaseRequestList">
+
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/ImportRequestList">
+          <i class="fas fa-file-import fs-4 me-3"></i>
+          Import Requests
+        </a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/ListPurchaseRequests">
+
+
+
           <i class="fas fa-shopping-cart fs-4 me-3"></i>
           Purchase Requests
         </a>
