@@ -27,7 +27,7 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             return;
         }
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 2 && user.getRoleId() != 4) {
+        if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4) {
             request.setAttribute("error", "You do not have permission to view this page.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
@@ -54,8 +54,8 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
 
         List<PurchaseRequest> list;
         int totalItems;
-        if (user.getRoleId() == 4) {
-            // Nhân viên chỉ xem yêu cầu của chính mình
+        if (user.getRoleId() == 3 || user.getRoleId() == 4) {
+            // Staff và Employee chỉ xem yêu cầu của chính mình
             list = new ArrayList<>();
             totalItems = 0;
             List<PurchaseRequest> all = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);

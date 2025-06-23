@@ -63,8 +63,8 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
 
-        if (user.getRoleId() != 4) {
-            request.setAttribute("error", "You don't have permission to access this page. Only employees can create purchase requests.");
+        if (user.getRoleId() != 3 && user.getRoleId() != 4) {
+            request.setAttribute("error", "You don't have permission to access this page. Only Staff and Employees can create purchase requests.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -106,8 +106,8 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
 
-        if (user.getRoleId() != 4) {
-            request.setAttribute("error", "You don't have permission to access this page. Only employees can create purchase requests.");
+        if (user.getRoleId() != 3 && user.getRoleId() != 4) {
+            request.setAttribute("error", "You don't have permission to access this page. Only Staff and Employees can create purchase requests.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }

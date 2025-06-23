@@ -34,7 +34,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         }
         User user = (User) session.getAttribute("user");
 
-        if (user.getRoleId() != 2 && user.getRoleId() != 4) {
+        if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4) {
             request.setAttribute("error", "You do not have permission to view this page.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
