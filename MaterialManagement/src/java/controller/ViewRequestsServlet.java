@@ -95,7 +95,7 @@ public class ViewRequestsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1) {
+        if (user.getRoleId() != 4) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
