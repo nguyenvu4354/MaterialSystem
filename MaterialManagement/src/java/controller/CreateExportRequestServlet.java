@@ -159,6 +159,8 @@ public class CreateExportRequestServlet extends HttpServlet {
                 throw new Exception("At least one material is required.");
             }
 
+            // Cộng dồn quantity cho từng materialId
+            java.util.Map<Integer, Integer> materialQuantityMap = new java.util.HashMap<>();
             List<ExportRequestDetail> details = new ArrayList<>();
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
@@ -174,11 +176,24 @@ public class CreateExportRequestServlet extends HttpServlet {
                     throw new Exception("Invalid export condition.");
                 }
 
+                // Cộng dồn quantity cho từng materialId
+                materialQuantityMap.put(materialId, materialQuantityMap.getOrDefault(materialId, 0) + quantity);
+
                 ExportRequestDetail detail = new ExportRequestDetail();
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 detail.setExportCondition(condition);
                 details.add(detail);
+            }
+
+            // Kiểm tra tồn kho cho từng materialId
+            for (Integer materialId : materialQuantityMap.keySet()) {
+                int totalQuantity = materialQuantityMap.get(materialId);
+                entity.Material material = materialDAO.getInformation(materialId);
+                int stock = material.getQuantity();
+                if (totalQuantity > stock) {
+                    throw new Exception("Material '" + material.getMaterialName() + "' only has " + stock + " in stock, but requested total is " + totalQuantity + ".");
+                }
             }
 
             System.out.println("DEBUG: Export Request details:");

@@ -173,10 +173,12 @@ public class MaterialDAO extends DBContext {
                     + "m.material_status, m.condition_percentage, m.price, "
                     + "c.category_id, c.category_name, c.description AS category_description, "
                     + "u.unit_id, u.unit_name, u.symbol, u.description AS unit_description, "
-                    + "m.created_at, m.updated_at, m.disable "
+                    + "m.created_at, m.updated_at, m.disable, "
+                    + "IFNULL(i.stock, 0) AS quantity "
                     + "FROM materials m "
                     + "LEFT JOIN categories c ON m.category_id = c.category_id "
                     + "LEFT JOIN units u ON m.unit_id = u.unit_id "
+                    + "LEFT JOIN inventory i ON m.material_id = i.material_id "
                     + "WHERE m.material_id = ?";
 
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -193,6 +195,7 @@ public class MaterialDAO extends DBContext {
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
                 m.setDisable(rs.getBoolean("disable"));
+                m.setQuantity(rs.getInt("quantity"));
 
                 Category c = new Category();
                 c.setCategory_id(rs.getInt("category_id"));
