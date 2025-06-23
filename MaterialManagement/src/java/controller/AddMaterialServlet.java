@@ -67,6 +67,10 @@ public class AddMaterialServlet extends HttpServlet {
             request.setAttribute("categories", cd.getAllCategories());
             request.setAttribute("units", ud.getAllUnits());
 
+            // Sinh mã code tự động
+            String code = "MTL-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(new java.util.Date()) + "-" + (int)(Math.random()*900+100);
+            request.setAttribute("materialCode", code);
+
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();

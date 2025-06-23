@@ -52,9 +52,14 @@
             transition: all 0.2s ease;
         }
 
-        .back-btn:hover {
-            background-color: #343a40;
-            color: white;
+        .btn-brown {
+            background-color: #DEB887 !important;
+            color: #fff !important;
+            border: none;
+        }
+        .btn-brown:hover, .btn-brown:focus {
+            background-color: #c49b63 !important;
+            color: #fff !important;
         }
 
         .status-new { color: #28a745; }
@@ -75,7 +80,7 @@
                         <div class="col-md-5">
                             <c:choose>
                                 <c:when test="${not empty product.materialsUrl}">
-                                    <img src="${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
+                                    <img src="${pageContext.request.contextPath}/${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="images/default.jpg" alt="No Image" class="product-image img-fluid">
@@ -136,8 +141,8 @@
     </c:if>
 
     <div class="text-center mt-4">
-        <a href="view" class="btn btn-outline-secondary back-btn me-2">⬅ Back to Material List</a>
-        <a href="index.html" class="btn btn-outline-secondary back-btn">🏠 Back to Home</a>
+        <a href="view" class="btn btn-brown back-btn me-2">⬅ Back to Material List</a>
+        <a href="index.html" class="btn btn-brown back-btn">🏠 Back to Home</a>
     </div>
 </div>
 </body>

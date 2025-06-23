@@ -34,6 +34,17 @@
                 height: 150px;
                 object-fit: cover;
             }
+
+            .btn-brown {
+                background-color: #DEB887 !important;
+                color: #fff !important;
+                border: none;
+            }
+
+            .btn-brown:hover, .btn-brown:focus {
+                background-color: #c49b63 !important;
+                color: #fff !important;
+            }
         </style>
     </head>
     <body class="bg-light">
@@ -43,7 +54,7 @@
             <div class="card shadow">
 
                 <!-- Header card màu xanh, tiêu đề -->
-                <div class="card-header bg-primary text-white">
+                <div class="card-header btn-brown text-white">
                     <h3 class="mb-0">Edit Material</h3>
                 </div>
 
@@ -74,7 +85,7 @@
                             <div class="col-md-6">
                                 <label for="materialCode" class="form-label">Material Code</label>
                                 <input type="text" class="form-control" id="materialCode" name="materialCode" 
-                                       value="${m.materialCode}" required>
+                                       value="${m.materialCode}" readonly required>
                             </div>
                             <div class="col-md-6">
                                 <label for="materialName" class="form-label">Material Name</label>
@@ -170,7 +181,7 @@
 
                         <!-- Nút lưu và hủy -->
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-brown">
                                 <i class="fas fa-save"></i> Save Changes
                             </button>
                             <a href="dashboardmaterial" class="btn btn-secondary ms-2">

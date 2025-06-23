@@ -22,6 +22,15 @@ public class DashboardMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
+            HttpSession session = request.getSession(false);
+            User user = (session != null) ? (User) session.getAttribute("user") : null;
+            if (user == null || (user.getRoleId() != 1 && user.getRoleId() != 4)) {
+                response.sendRedirect("error.jsp");
+                return;
+            }
+            boolean readonly = user.getRoleId() == 4;
+            request.setAttribute("readonly", readonly);
+
             int pageIndex = 1;
             int pageSize = 10;
 

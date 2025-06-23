@@ -45,7 +45,7 @@
                                     </div>
                                 </c:if>
                                 
-                    <form action="CreatePurchaseRequestServlet" method="post">
+                    <form action="CreatePurchaseRequest" method="post">
                                     <h4 class="fw-normal mt-3 mb-3">Material List</h4>
                         <div id="materialList">
                             <div class="row material-row">

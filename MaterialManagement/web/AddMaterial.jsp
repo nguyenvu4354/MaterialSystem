@@ -18,12 +18,21 @@
         .form-select:focus { border-color: #86b7fe; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
         .form-select option { padding: 8px; }
         .required-field::after { content: "*"; color: red; margin-left: 4px; } /* Red asterisk for required fields */
+        .btn-brown {
+            background-color: #DEB887 !important;
+            color: #fff !important;
+            border: none;
+        }
+        .btn-brown:hover, .btn-brown:focus {
+            background-color: #c49b63 !important;
+            color: #fff !important;
+        }
     </style>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header btn-brown text-white">
                 <h3 class="mb-0">Add New Material</h3>
             </div>
 
@@ -48,7 +57,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" required>
+                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode != null ? materialCode : ''}" readonly required>
                             <div class="invalid-feedback">Please enter a material code.</div>
                         </div>
                         <div class="col-md-6">
@@ -149,7 +158,7 @@
 
                     <!-- Submit and Cancel Buttons -->
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-brown">
                             <i class="fas fa-save"></i> Save Material
                         </button>
                         <a href="dashboardmaterial" class="btn btn-secondary ms-2">
