@@ -83,7 +83,6 @@ public class ProfileServlet extends HttpServlet {
             // Validate user input
             Map<String, String> errors = UserValidator.validateProfile(user, userDAO);
 
-            // If there are validation errors, return to the form
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
                 request.setAttribute("user", user);
@@ -92,18 +91,21 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
-            // Handle image upload without validation
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
-                String uploadPath = getServletContext().getRealPath("/") + "images" + File.separator + "profiles" + File.separator;
-                Path uploadDir = Paths.get(uploadPath);
+
+                String buildPath = getServletContext().getRealPath("/"); 
+                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
+
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
-                String filePath = uploadPath + fileName;
-                filePart.write(filePath);
+
+                Path savePath = uploadDir.resolve(fileName);
+                filePart.write(savePath.toString());
                 user.setUserPicture(fileName);
             }
 

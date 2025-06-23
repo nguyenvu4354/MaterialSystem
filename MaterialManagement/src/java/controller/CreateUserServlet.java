@@ -93,7 +93,7 @@ public class CreateUserServlet extends HttpServlet {
             newUser.setPhoneNumber(phoneNumber);
             newUser.setAddress(address);
             newUser.setRoleId(roleId);
-            newUser.setDepartmentId(departmentId); // Set departmentId
+            newUser.setDepartmentId(departmentId);
             newUser.setDescription(description);
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
@@ -124,12 +124,17 @@ public class CreateUserServlet extends HttpServlet {
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uploadPath = getServletContext().getRealPath("") + "images/profiles/";
-                Path uploadDir = Paths.get(uploadPath);
+
+                String buildPath = getServletContext().getRealPath("/");
+                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
+
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
-                filePart.write(uploadPath + fileName);
+
+                Path savePath = uploadDir.resolve(fileName);
+                filePart.write(savePath.toString());
                 newUser.setUserPicture(fileName);
             }
 

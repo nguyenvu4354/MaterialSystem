@@ -88,11 +88,17 @@
                 </form>
 
                 <!-- Messages -->
+                <c:if test="${not empty successMessage}">
+                    <div class="alert alert-success">${successMessage}</div>
+                    <% session.removeAttribute("successMessage"); %>
+                </c:if>
                 <c:if test="${not empty message}">
                     <div class="alert alert-success">${message}</div>
+                    <% session.removeAttribute("message"); %>
                 </c:if>
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
+                    <% session.removeAttribute("error"); %>
                 </c:if>
 
                 <!-- User Table -->
@@ -177,8 +183,8 @@
                                                 <input type="hidden" name="action" value="delete"/>
                                                 <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
                                                 <input type="hidden" name="statusFilter" value="${statusFilter}"/>
-                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
-                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                <input type="hidden" name="roleIdFilter value="${roleIdFilter}"/>
+                                                <input type="hidden" name="departmentIdFilter value="${departmentIdFilter}"/>
                                                 <input type="hidden" name="page" value="${currentPage}"/>
                                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
                                             </form>
