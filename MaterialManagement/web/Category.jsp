@@ -65,7 +65,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;"><i class="bi bi-list-ul"></i> Category List</h2>
                     <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 1}">
-                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" class="btn" style="background-color: #DEAD6F; color: white;">
+                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" class="btn" style="width: 180px; height: 50px; background-color: #DEAD6F; color: white;">
                             <i class="fas fa-plus me-1"></i> Create Category
                         </a>
                     </c:if>

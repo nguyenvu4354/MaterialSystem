@@ -42,17 +42,18 @@
             min-width: 120px;
         }
         .btn-export, .btn-print {
+            background-color: #DEAD6F;
+            color: #fff;
+            border: none;
             padding: 6px 14px;
             border-radius: 6px;
             font-weight: 500;
+            height:50px;
+            transition: background 0.2s;
         }
-        .btn-export {
-            background-color: #009966;
-            color: white;
-        }
-        .btn-print {
-            background-color: #6c757d;
-            color: white;
+        .btn-export:hover, .btn-print:hover {
+            background-color: #cfa856;
+            color: #fff;
         }
         .custom-table thead th {
             background-color: #f9f5f0;
@@ -110,8 +111,13 @@
         <jsp:include page="SidebarDirector.jsp"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="container-main">
-                <h2 class="fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
-                <p class="text-muted">List and manage export requests in the system</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
+                        <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
+                    </div>
+                </div>
                 <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
                     <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
                     <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
@@ -128,8 +134,6 @@
                         <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
                     <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                    <button type="button" class="btn-export" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
-                    <button type="button" class="btn-print" onclick="printTableList()">Print List</button>
                 </form>
                 <c:if test="${not empty exportRequests}">
                     <div class="table-responsive" id="printTableListArea">

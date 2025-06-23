@@ -26,7 +26,7 @@
             margin-bottom: 20px;
         }
         .card-header {
-            background-color: #e9ecef;
+            background-color: #DEAD6F;
             border-bottom: none;
             font-weight: bold;
         }
@@ -35,6 +35,8 @@
         }
         .btn {
             margin-right: 10px;
+            background-color:#DEAD6F;
+        
         }
         .alert {
             margin-top: 20px;
@@ -69,8 +71,8 @@
                     <p><strong>Address:</strong> Hanoi</p>
                 </div>
                 <div style="flex: 0 0 100px; margin-left: 20px;">
-                    <img src="${not empty sender.userPicture ? sender.userPicture : 'images/placeholder.png'}" 
-                         alt="${sender.fullName}" class="img-fluid rounded-circle">
+                    <c:set var="senderImg" value="${empty sender.userPicture ? 'images/placeholder.png' : (sender.userPicture.startsWith('http') || sender.userPicture.startsWith('/') ? sender.userPicture : 'images/profiles/' += sender.userPicture)}" />
+                    <img src="${senderImg}" alt="${sender.fullName}" class="img-fluid rounded-circle">
                 </div>
             </div>
         </div>
@@ -85,8 +87,8 @@
                     <p><strong>Address:</strong> Hanoi</p>
                 </div>
                 <div style="flex: 0 0 100px; margin-left: 20px;">
-                    <img src="${not empty recipient.userPicture ? recipient.userPicture : 'images/placeholder.png'}" 
-                         alt="${recipient.fullName}" class="img-fluid rounded-circle">
+                    <c:set var="recipientImg" value="${empty recipient.userPicture ? 'images/placeholder.png' : (recipient.userPicture.startsWith('http') || recipient.userPicture.startsWith('/') ? recipient.userPicture : 'images/profiles/' += recipient.userPicture)}" />
+                    <img src="${recipientImg}" alt="${recipient.fullName}" class="img-fluid rounded-circle">
                 </div>
             </div>
         </div>
