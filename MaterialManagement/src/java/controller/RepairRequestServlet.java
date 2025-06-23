@@ -38,8 +38,10 @@ public class RepairRequestServlet extends HttpServlet {
             }
             int userId = user.getUserId();
 
+            // Sinh tự động requestCode
+            String requestCode = generateRequestCode();
+
             // Lấy thông tin từ form
-            String requestCode = request.getParameter("requestCode");
             String repairPhone = request.getParameter("repairPersonPhoneNumber");
             String repairEmail = request.getParameter("repairPersonEmail");
             String repairLocation = request.getParameter("repairLocation");
@@ -125,10 +127,11 @@ public class RepairRequestServlet extends HttpServlet {
                             try {
                                 EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
                             } catch (Exception e) {
-                                e.printStackTrace(); // Có thể ghi log
+                                e.printStackTrace();
                             }
                         }
                     }
+
                     if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
                         try {
                             EmailUtils.sendEmail(user.getEmail(), subject, content.toString());
@@ -144,8 +147,16 @@ public class RepairRequestServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi khi gửi yêu cầu sửa chữa.");
+            request.setAttribute("errorMessage", "Error sending repair request.");
             request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
         }
+    }
+
+    // Phương thức sinh requestCode tự động
+    private String generateRequestCode() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+        String timestamp = sdf.format(new java.util.Date());
+        int random = (int)(Math.random() * 9000) + 1000;
+        return "RR-" + timestamp + "-" + random;
     }
 }

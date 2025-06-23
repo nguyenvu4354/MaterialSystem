@@ -39,6 +39,9 @@ public class ApproveRepairRequestServlet extends HttpServlet {
 
             response.sendRedirect("repairrequestlist");
 
+        } catch (IllegalStateException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("ErrorRepair.jsp").forward(request, response);
         } catch (SQLException | NumberFormatException ex) {
             Logger.getLogger(ApproveRepairRequestServlet.class.getName()).log(Level.SEVERE, null, ex);
             response.sendRedirect("error.jsp");
