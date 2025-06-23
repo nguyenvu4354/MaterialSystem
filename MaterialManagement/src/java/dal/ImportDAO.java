@@ -96,7 +96,8 @@ public class ImportDAO extends DBContext {
                     detail.setUnitPrice(rs.getDouble("unit_price"));
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
-                    detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
                     return detail;
                 }
             }
@@ -105,7 +106,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void updateImportDetailQuantity(int importDetailId, int newQuantity) throws SQLException {
-        String sql = "UPDATE Import_Details SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE import_detail_id = ?";
+        String sql = "UPDATE Import_Details SET quantity = ? WHERE import_detail_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, newQuantity);
             stmt.setInt(2, importDetailId);
@@ -117,7 +118,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void confirmImport(int importId) throws SQLException {
-        String sql = "UPDATE Import_Details SET status = 'imported', updated_at = CURRENT_TIMESTAMP WHERE import_id = ? AND status = 'draft'";
+        String sql = "UPDATE Import_Details SET status = 'imported' WHERE import_id = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             int affectedRows = stmt.executeUpdate();
@@ -142,7 +143,8 @@ public class ImportDAO extends DBContext {
                     detail.setUnitPrice(rs.getDouble("unit_price"));
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
-                    detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
                     details.add(detail);
                 }
             }
@@ -165,7 +167,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void updateImportDetailsStatus(int importId, String status) throws SQLException {
-        String sql = "UPDATE Import_Details SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE import_id = ?";
+        String sql = "UPDATE Import_Details SET status = ? WHERE import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setInt(2, importId);
@@ -225,7 +227,8 @@ public class ImportDAO extends DBContext {
                     detail.setUnitPrice(rs.getDouble("unit_price"));
                     detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
-                    detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
                     details.add(detail);
                 }
             }
