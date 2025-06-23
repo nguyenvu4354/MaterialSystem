@@ -48,8 +48,8 @@ public class ExportRequestListServlet extends HttpServlet {
                 return;
             }
 
-            // Phân quyền: Chỉ role_id = 2 (Giám đốc) mới được truy cập
-            if (user.getRoleId() != 2) {
+            // Phân quyền: Cho phép role_id = 2, 3, 4 (Giám đốc, nhân viên, staff) được truy cập
+            if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4) {
                 LOGGER.warning("Unauthorized access attempt by user: " + user.getUsername() + " with role_id: " + user.getRoleId());
                 response.sendRedirect("HomePage.jsp"); // Hoặc trang báo lỗi không có quyền
                 return;
