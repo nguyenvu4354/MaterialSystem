@@ -439,6 +439,46 @@ public class UserDAO extends DBContext {
         return 0;
     }
 
+    public List<User> getUsersByRoleId(int roleId) {
+        List<User> userList = new ArrayList<>();
+        String sql = "SELECT u.*, r.role_name, d.department_name " +
+                     "FROM Users u " +
+                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
+                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
+                     "WHERE u.role_id = ? AND u.status != 'deleted'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setAddress(rs.getString("address"));
+                user.setUserPicture(rs.getString("user_picture"));
+                user.setRoleId(rs.getInt("role_id"));
+                user.setRoleName(rs.getString("role_name"));
+                user.setDepartmentId(rs.getObject("department_id") != null ? rs.getInt("department_id") : null);
+                user.setDepartmentName(rs.getString("department_name"));
+                user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
+                user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
+                user.setDescription(rs.getString("description"));
+                user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
+                user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
+                user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                userList.add(user);
+            }
+            System.out.println("✅ Lấy danh sách user theo role_id " + roleId + " thành công, số lượng: " + userList.size());
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi getUsersByRoleId: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return userList;
+    }
+
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
         User user = new User();

@@ -50,7 +50,7 @@
         <jsp:include page="HeaderAdmin.jsp" />
         
         
-        <section id="create-user" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+        <section id="CreateUser" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
             <div class="container">
                 <div class="row my-5 py-5">
                     <div class="col-12 bg-white p-4 rounded shadow two-column-form">
@@ -65,7 +65,7 @@
                         <% if (error != null) { %>
                         <div class="alert alert-danger"><%= error %></div>
                         <% } %>
-                        <form action="${pageContext.request.contextPath}/create-user" method="post" enctype="multipart/form-data">
+                        <form action="${pageContext.request.contextPath}/CreateUser" method="post" enctype="multipart/form-data">
                             <div class="row">
                                 <!-- Cột bên trái -->
                                 <div class="col-md-6">
@@ -142,8 +142,8 @@
                                         <select class="form-select <% if(errors != null && errors.containsKey("roleId")) { %>is-invalid<% } %>" 
                                                 name="roleId" id="roleId" required>
                                             <option value="" <%= enteredRoleId == null || enteredRoleId.isEmpty() ? "selected" : "" %>>Select Role</option>
-                                            <option value="2" <%= "2".equals(enteredRoleId) ? "selected" : "" %>>Warehouse staff</option>
-                                            <option value="3" <%= "3".equals(enteredRoleId) ? "selected" : "" %>>Director</option>
+                                            <option value="2" <%= "2".equals(enteredRoleId) ? "selected" : "" %>>Director</option>
+                                            <option value="3" <%= "3".equals(enteredRoleId) ? "selected" : "" %>>Staff</option>
                                             <option value="4" <%= "4".equals(enteredRoleId) ? "selected" : "" %>>Employee</option>
                                         </select>
                                         <% if (errors != null && errors.containsKey("roleId")) { %>

@@ -14,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import utils.UserValidator;
 
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/profile"})
 @MultipartConfig
@@ -61,7 +63,7 @@ public class ProfileServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String description = request.getParameter("description");
 
-            // Update user object
+            // Update user 
             user.setFullName(fullName);
             user.setEmail(email);
             user.setPhoneNumber(phoneNumber);
@@ -78,17 +80,32 @@ public class ProfileServlet extends HttpServlet {
             }
             user.setDescription(description);
 
-            // Handle image upload
+            // Validate user input
+            Map<String, String> errors = UserValidator.validateProfile(user, userDAO);
+
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                request.setAttribute("user", user);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("Profile.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
+
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uploadPath = getServletContext().getRealPath("/") + "images" + File.separator + "profiles" + File.separator;
-                Path uploadDir = Paths.get(uploadPath);
+                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+                String buildPath = getServletContext().getRealPath("/"); 
+                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
+
                 if (!Files.exists(uploadDir)) {
                     Files.createDirectories(uploadDir);
                 }
-                String filePath = uploadPath + fileName;
-                filePart.write(filePath);
+
+                Path savePath = uploadDir.resolve(fileName);
+                filePart.write(savePath.toString());
                 user.setUserPicture(fileName);
             }
 
@@ -97,14 +114,14 @@ public class ProfileServlet extends HttpServlet {
             if (updated) {
                 user = userDAO.getUserById(user.getUserId());
                 session.setAttribute("user", user);
-                request.setAttribute("message", "✔️ Cập nhật hồ sơ thành công!");
+                request.setAttribute("message", "Profile updated successfully!");
             } else {
-                request.setAttribute("error", "❌ Không thể cập nhật hồ sơ. Vui lòng thử lại.");
+                request.setAttribute("error", "Failed to update profile. Please try again.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "❌ Lỗi khi cập nhật hồ sơ: " + e.getMessage());
+            request.setAttribute("error", "An error occurred while updating the profile: " + e.getMessage());
         }
 
         request.setAttribute("user", user);

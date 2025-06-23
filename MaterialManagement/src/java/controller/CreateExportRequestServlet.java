@@ -19,6 +19,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import utils.EmailUtils;
 
 @WebServlet(name = "CreateExportRequestServlet", urlPatterns = {"/CreateExportRequest"})
 public class CreateExportRequestServlet extends HttpServlet {
@@ -53,18 +54,25 @@ public class CreateExportRequestServlet extends HttpServlet {
             return;
         }
 
+        int roleId = user.getRoleId();
+        if (roleId != 4) {
+            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
+            response.sendRedirect("HomePage.jsp");
+            return;
+        }
+
         try {
             String requestCode = generateRequestCode();
             System.out.println("DEBUG: Generated requestCode: " + requestCode);
             request.setAttribute("requestCode", requestCode);
 
-            List<Material> materials = materialDAO.getMaterials();
+            List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
             System.out.println("DEBUG: Loaded " + materials.size() + " materials");
             request.setAttribute("materials", materials);
 
-            List<User> users = userDAO.getAllUsers();
-            System.out.println("DEBUG: Loaded " + users.size() + " users");
-            request.setAttribute("users", users);
+            List<User> staffUsers = userDAO.getUsersByRoleId(3);
+            System.out.println("DEBUG: Loaded " + staffUsers.size() + " staff users");
+            request.setAttribute("users", staffUsers);
 
             System.out.println("DEBUG: Forwarding to CreateExportRequest.jsp");
             request.getRequestDispatcher("CreateExportRequest.jsp").forward(request, response);
@@ -91,6 +99,13 @@ public class CreateExportRequestServlet extends HttpServlet {
             return;
         }
 
+        int roleId = user.getRoleId();
+        if (roleId != 4) {
+            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
+            response.sendRedirect("HomePage.jsp");
+            return;
+        }
+
         try {
             String requestCode = request.getParameter("requestCode");
             String deliveryDateStr = request.getParameter("deliveryDate");
@@ -113,8 +128,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             int recipientId = 0;
             if (recipientIdStr != null && !recipientIdStr.trim().isEmpty()) {
                 recipientId = Integer.parseInt(recipientIdStr);
-                if (userDAO.getUserById(recipientId) == null) {
+                User recipient = userDAO.getUserById(recipientId);
+                if (recipient == null) {
                     throw new Exception("Invalid recipient selected.");
+                }
+                if (recipient.getRoleId() != 3) {
+                    throw new Exception("Recipient must be a staff member.");
                 }
             }
 
@@ -124,7 +143,7 @@ public class CreateExportRequestServlet extends HttpServlet {
             exportRequest.setReason(reason);
             exportRequest.setUserId(user.getUserId());
             exportRequest.setRecipientId(recipientId);
-            exportRequest.setStatus("draft");
+            exportRequest.setStatus("pending");
 
             String[] materialIds = request.getParameterValues("materials[]");
             String[] quantities = request.getParameterValues("quantities[]");
@@ -140,6 +159,8 @@ public class CreateExportRequestServlet extends HttpServlet {
                 throw new Exception("At least one material is required.");
             }
 
+            // Cộng dồn quantity cho từng materialId
+            java.util.Map<Integer, Integer> materialQuantityMap = new java.util.HashMap<>();
             List<ExportRequestDetail> details = new ArrayList<>();
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
@@ -155,11 +176,24 @@ public class CreateExportRequestServlet extends HttpServlet {
                     throw new Exception("Invalid export condition.");
                 }
 
+                // Cộng dồn quantity cho từng materialId
+                materialQuantityMap.put(materialId, materialQuantityMap.getOrDefault(materialId, 0) + quantity);
+
                 ExportRequestDetail detail = new ExportRequestDetail();
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 detail.setExportCondition(condition);
                 details.add(detail);
+            }
+
+            // Kiểm tra tồn kho cho từng materialId
+            for (Integer materialId : materialQuantityMap.keySet()) {
+                int totalQuantity = materialQuantityMap.get(materialId);
+                entity.Material material = materialDAO.getInformation(materialId);
+                int stock = material.getQuantity();
+                if (totalQuantity > stock) {
+                    throw new Exception("Material '" + material.getMaterialName() + "' only has " + stock + " in stock, but requested total is " + totalQuantity + ".");
+                }
             }
 
             System.out.println("DEBUG: Export Request details:");
@@ -175,6 +209,34 @@ public class CreateExportRequestServlet extends HttpServlet {
             System.out.println("DEBUG: Export request creation " + (success ? "successful" : "failed"));
 
             if (success) {
+                // Gửi email cho giám đốc
+                List<User> allUsers = userDAO.getAllUsers();
+                List<User> directors = new ArrayList<>();
+                for (User u : allUsers) {
+                    if (u.getRoleId() == 2) {
+                        directors.add(u);
+                    }
+                }
+                if (!directors.isEmpty()) {
+                    String subject = "[Notification] A new export request has been created";
+                    StringBuilder content = new StringBuilder();
+                    content.append("Dear Director,<br><br>");
+                    content.append("A new export request has just been created.<br>");
+                    content.append("<b>Request Code:</b> ").append(exportRequest.getRequestCode()).append("<br>");
+                    content.append("<b>Creator:</b> ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")<br>");
+                    content.append("<b>Delivery Date:</b> ").append(exportRequest.getDeliveryDate()).append("<br>");
+                    content.append("<b>Reason:</b> ").append(exportRequest.getReason()).append("<br>");
+                    content.append("<br>Please log in to the system to view details and approve.<br>");
+                    for (User director : directors) {
+                        if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
+                            try {
+                                utils.EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/HomePage.jsp");
             } else {
                 throw new Exception("Failed to create export request.");
@@ -191,12 +253,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             request.setAttribute("quantities", request.getParameterValues("quantities[]"));
             request.setAttribute("conditions", request.getParameterValues("conditions[]"));
             try {
-                List<Material> materials = materialDAO.getMaterials();
+                List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
                 System.out.println("DEBUG: Loaded " + materials.size() + " materials in error case");
                 request.setAttribute("materials", materials);
-                List<User> users = userDAO.getAllUsers();
-                System.out.println("DEBUG: Loaded " + users.size() + " users in error case");
-                request.setAttribute("users", users);
+                List<User> staffUsers = userDAO.getUsersByRoleId(3);
+                System.out.println("DEBUG: Loaded " + staffUsers.size() + " staff users in error case");
+                request.setAttribute("users", staffUsers);
             } catch (Exception ex) {
                 System.out.println("ERROR: Failed to load materials/users in error case: " + ex.getMessage());
                 ex.printStackTrace();

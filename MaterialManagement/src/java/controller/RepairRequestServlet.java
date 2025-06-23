@@ -1,17 +1,23 @@
 package controller;
 
 import dal.RepairRequestDAO;
+import dal.UserDAO;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import utils.EmailUtils;
+
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +29,27 @@ public class RepairRequestServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            // Lấy user từ session
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                response.sendRedirect("Login.jsp");
+                return;
+            }
+            int userId = user.getUserId();
+
+            // Sinh tự động requestCode
+            String requestCode = generateRequestCode();
+
             // Lấy thông tin từ form
-            String requestCode = request.getParameter("requestCode");
-            int userId = Integer.parseInt(request.getParameter("userId"));
             String repairPhone = request.getParameter("repairPersonPhoneNumber");
             String repairEmail = request.getParameter("repairPersonEmail");
             String repairLocation = request.getParameter("repairLocation");
             String reason = request.getParameter("reason");
             Date estimatedReturnDate = Date.valueOf(request.getParameter("estimatedReturnDate"));
-
-            // Thời gian hiện tại
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
-            // Tạo đối tượng RepairRequest
+            // Tạo yêu cầu sửa chữa
             RepairRequest requestObj = new RepairRequest();
             requestObj.setRequestCode(requestCode);
             requestObj.setUserId(userId);
@@ -50,7 +64,7 @@ public class RepairRequestServlet extends HttpServlet {
             requestObj.setUpdatedAt(now);
             requestObj.setDisable(false);
 
-            // Lấy danh sách vật tư từ formrequestObj.setEstimatedReturnDate(estimatedReturnDate);v
+            // Lấy danh sách chi tiết vật tư
             String[] materialIds = request.getParameterValues("materialId");
             String[] quantities = request.getParameterValues("quantity");
             String[] descriptions = request.getParameterValues("damageDescription");
@@ -67,6 +81,7 @@ public class RepairRequestServlet extends HttpServlet {
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 detail.setDamageDescription(description);
+
                 Double repairCost = null;
                 if (repairCosts[i] != null && !repairCosts[i].isEmpty()) {
                     repairCost = Double.parseDouble(repairCosts[i]);
@@ -78,17 +93,70 @@ public class RepairRequestServlet extends HttpServlet {
                 detailList.add(detail);
             }
 
-            // Gọi DAO để lưu cả yêu cầu và chi tiết
-            RepairRequestDAO repairDAO = new RepairRequestDAO();
-            repairDAO.createRepairRequest(requestObj, detailList);
+            // Lưu yêu cầu vào DB
+            boolean success = new RepairRequestDAO().createRepairRequest(requestObj, detailList);
 
-            // Chuyển hướng sau khi thành công
+            // Nếu thành công thì gửi email cho giám đốc
+            if (success) {
+                UserDAO userDAO = new UserDAO();
+                List<User> allUsers = userDAO.getAllUsers();
+                List<User> managers = new ArrayList<>();
+
+                for (User u : allUsers) {
+                    if (u.getRoleId() == 2) {
+                        managers.add(u);
+                    }
+                }
+
+                if (!managers.isEmpty()) {
+                    String subject = "[Thông báo] Có yêu cầu sửa chữa mới";
+
+                    StringBuilder content = new StringBuilder();
+                    content.append("Xin chào Giám đốc,\n\n");
+                    content.append("Một yêu cầu sửa chữa mới đã được tạo trên hệ thống.\n\n");
+                    content.append("Mã yêu cầu: ").append(requestCode).append("\n");
+                    content.append("Người tạo: ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")\n");
+                    content.append("Lý do: ").append(reason).append("\n");
+                    content.append("Địa điểm sửa chữa: ").append(repairLocation).append("\n");
+                    content.append("Ngày dự kiến hoàn trả: ").append(estimatedReturnDate).append("\n");
+                    content.append("Thời gian gửi yêu cầu: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)).append("\n\n");
+                    content.append("Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý yêu cầu.");
+
+                    for (User manager : managers) {
+                        if (manager.getEmail() != null && !manager.getEmail().trim().isEmpty()) {
+                            try {
+                                EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
+                        try {
+                            EmailUtils.sendEmail(user.getEmail(), subject, content.toString());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            // Chuyển đến trang thông báo thành công
             response.sendRedirect("RepairRequestSuccess.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "An error occurred while submitting a repair request.");
+            request.setAttribute("errorMessage", "Error sending repair request.");
             request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
         }
+    }
+
+    // Phương thức sinh requestCode tự động
+    private String generateRequestCode() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
+        String timestamp = sdf.format(new java.util.Date());
+        int random = (int)(Math.random() * 9000) + 1000;
+        return "RR-" + timestamp + "-" + random;
     }
 }

@@ -22,33 +22,7 @@ import java.sql.Statement;
  */
 public class RepairRequestDAO extends DBContext {
 
-    public void insertRepairRequest(RepairRequest req) {
-        String sql = "INSERT INTO RepairRequests (request_code, user_id, request_date, repair_person_phone_number, "
-                + "repair_person_email, repair_location, estimated_return_date, status, reason, created_at, updated_at, disable) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setString(1, req.getRequestCode());
-            stmt.setInt(2, req.getUserId());
-            stmt.setTimestamp(3, req.getRequestDate());
-            stmt.setString(4, req.getRepairPersonPhoneNumber());
-            stmt.setString(5, req.getRepairPersonEmail());
-            stmt.setString(6, req.getRepairLocation());
-            stmt.setDate(7, req.getEstimatedReturnDate());
-            stmt.setString(8, req.getStatus());
-            stmt.setString(9, req.getReason());
-            stmt.setTimestamp(10, req.getCreatedAt());
-            stmt.setTimestamp(11, req.getUpdatedAt());
-            stmt.setBoolean(12, req.isDisable());
-
-            stmt.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
+    public boolean createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
         String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, repair_person_phone_number, repair_person_email, "
                 + "repair_location, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -94,6 +68,7 @@ public class RepairRequestDAO extends DBContext {
             e.printStackTrace();
             throw e;
         }
+        return false;
     }
 
     public List<RepairRequest> getAllRepairRequests() throws SQLException {
@@ -147,27 +122,91 @@ public class RepairRequestDAO extends DBContext {
         }
         return details;
     }
-    
-    public List<RepairRequestDetail> getAllRepairRequestDetails() throws SQLException {
-    List<RepairRequestDetail> details = new ArrayList<>();
-    String sql = "SELECT * FROM Repair_Request_Details";
 
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            RepairRequestDetail detail = new RepairRequestDetail();
-            detail.setDetailId(rs.getInt("detail_id"));
-            detail.setRepairRequestId(rs.getInt("repair_request_id"));
-            detail.setMaterialId(rs.getInt("material_id"));
-            detail.setQuantity(rs.getInt("quantity"));
-            detail.setDamageDescription(rs.getString("damage_description"));
-            detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
-            detail.setCreatedAt(rs.getTimestamp("created_at"));
-            detail.setUpdatedAt(rs.getTimestamp("updated_at"));
-            details.add(detail);
+    public List<RepairRequestDetail> getAllRepairRequestDetails() throws SQLException {
+        List<RepairRequestDetail> details = new ArrayList<>();
+        String sql = "SELECT * FROM Repair_Request_Details";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequestDetail detail = new RepairRequestDetail();
+                detail.setDetailId(rs.getInt("detail_id"));
+                detail.setRepairRequestId(rs.getInt("repair_request_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setDamageDescription(rs.getString("damage_description"));
+                detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
+                detail.setCreatedAt(rs.getTimestamp("created_at"));
+                detail.setUpdatedAt(rs.getTimestamp("updated_at"));
+                details.add(detail);
+            }
+        }
+
+        return details;
+    }
+
+    public List<RepairRequest> getRepairRequestsByUser(int userId) {
+        List<RepairRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM RepairRequests WHERE user_id = ?";
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql);) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequest r = new RepairRequest();
+                r.setRepairRequestId(rs.getInt("repair_request_id"));
+                r.setRequestCode(rs.getString("request_code"));
+                r.setUserId(rs.getInt("user_id"));
+                r.setStatus(rs.getString("status"));
+                r.setRequestDate(rs.getTimestamp("request_date"));
+                r.setReason(rs.getString("reason"));
+                list.add(r);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void updateStatus(int repairRequestId, String action, Integer approvedBy, String reason) throws SQLException {
+        // Kiểm tra trạng thái hiện tại
+        String checkSql = "SELECT status FROM Repair_Requests WHERE repair_request_id = ?";
+        try (PreparedStatement checkPs = connection.prepareStatement(checkSql)) {
+            checkPs.setInt(1, repairRequestId);
+            ResultSet rs = checkPs.executeQuery();
+            if (rs.next()) {
+                String currentStatus = rs.getString("status");
+                if (!"pending".equalsIgnoreCase(currentStatus)) {
+                    // Đã được duyệt hoặc từ chối rồi
+                    throw new IllegalStateException("Yêu cầu đã được xử lý. Không thể duyệt hoặc từ chối thêm lần nữa.");
+                }
+            } else {
+                throw new SQLException("Không tìm thấy yêu cầu sửa chữa với ID: " + repairRequestId);
+            }
+        }
+
+        // Nếu status vẫn là "pending" thì tiến hành cập nhật
+        String sql;
+        String status;
+
+        if ("approve".equalsIgnoreCase(action)) {
+            status = "approved";
+            sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, approval_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
+        } else if ("reject".equalsIgnoreCase(action)) {
+            status = "rejected";
+            sql = "UPDATE Repair_Requests SET status = ?, approved_by = ?, approved_at = CURRENT_TIMESTAMP, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE repair_request_id = ?";
+        } else {
+            throw new IllegalArgumentException("Hành động không hợp lệ: " + action);
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, approvedBy);
+            ps.setString(3, reason);
+            ps.setInt(4, repairRequestId);
+            ps.executeUpdate();
         }
     }
 
-    return details;
-}
 }

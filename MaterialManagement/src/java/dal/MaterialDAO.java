@@ -25,10 +25,11 @@ public class MaterialDAO extends DBContext {
         List<Material> list = new ArrayList<>();
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("SELECT m.*, c.category_name, u.unit_name ")
+            sql.append("SELECT m.*, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS quantity ")
                     .append("FROM materials m ")
                     .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
                     .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("LEFT JOIN inventory i ON m.material_id = i.material_id ")
                     .append("WHERE m.disable = 0 ");
 
             List<Object> params = new ArrayList<>();
@@ -94,6 +95,7 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialStatus(rs.getString("material_status"));
                 m.setConditionPercentage(rs.getInt("condition_percentage"));
                 m.setPrice(rs.getDouble("price"));
+                m.setQuantity(rs.getInt("quantity"));
 
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
@@ -171,10 +173,12 @@ public class MaterialDAO extends DBContext {
                     + "m.material_status, m.condition_percentage, m.price, "
                     + "c.category_id, c.category_name, c.description AS category_description, "
                     + "u.unit_id, u.unit_name, u.symbol, u.description AS unit_description, "
-                    + "m.created_at, m.updated_at, m.disable "
+                    + "m.created_at, m.updated_at, m.disable, "
+                    + "IFNULL(i.stock, 0) AS quantity "
                     + "FROM materials m "
                     + "LEFT JOIN categories c ON m.category_id = c.category_id "
                     + "LEFT JOIN units u ON m.unit_id = u.unit_id "
+                    + "LEFT JOIN inventory i ON m.material_id = i.material_id "
                     + "WHERE m.material_id = ?";
 
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -191,6 +195,7 @@ public class MaterialDAO extends DBContext {
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
                 m.setDisable(rs.getBoolean("disable"));
+                m.setQuantity(rs.getInt("quantity"));
 
                 Category c = new Category();
                 c.setCategory_id(rs.getInt("category_id"));
@@ -256,14 +261,12 @@ public class MaterialDAO extends DBContext {
     }
 
     // Phương thức lấy chi tiết sản phẩm theo materialId
-    public Material getProductById(int materialId) {
+     public Material getProductById(int materialId) {
         Material product = null;
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+        String sql = "SELECT m.*, u.unit_name, c.category_name "
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
                 + "WHERE m.material_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -311,12 +314,10 @@ public class MaterialDAO extends DBContext {
     // Phương thức lấy danh sách tất cả sản phẩm
     public List<Material> getAllProducts() {
         List<Material> list = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+        String sql = "SELECT m.*, u.unit_name, c.category_name "
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
-                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id";
+                + "LEFT JOIN Categories c ON m.category_id = c.category_id";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
@@ -362,12 +363,10 @@ public class MaterialDAO extends DBContext {
     // Phương thức tìm kiếm sản phẩm theo tên (có thể chứa một phần tên)
     public List<Material> searchProductsByName(String keyword) {
         List<Material> products = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
+        String sql = "SELECT m.*, u.unit_name, c.category_name "
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
                 + "WHERE m.material_name LIKE ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -415,13 +414,11 @@ public class MaterialDAO extends DBContext {
     // Phương thức tìm kiếm sản phẩm theo mã
     public List<Material> searchProductsByCode(String materialCode) {
         List<Material> products = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
-                + "FROM Materials m "
-                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
-                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
-                + "WHERE m.material_code LIKE ?";
+        String sql ="SELECT m.*, u.unit_name, c.category_name "
+           + "FROM Materials m "
+           + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+           + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+           + "WHERE m.material_code LIKE ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + materialCode + "%");
@@ -469,13 +466,11 @@ public class MaterialDAO extends DBContext {
     // Phương thức tìm kiếm sản phẩm theo categoryId
     public List<Material> searchMaterialsByCategoriesID(int categoryId) {
         List<Material> products = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
-                + "FROM Materials m "
-                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
-                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
-                + "WHERE m.category_id = ?";
+        String sql =  "SELECT m.*, u.unit_name, c.category_name "
+               + "FROM Materials m "
+               + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+               + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+               + "WHERE m.category_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, categoryId);
@@ -523,13 +518,11 @@ public class MaterialDAO extends DBContext {
     // Phương thức sắp xếp sản phẩm theo tên
     public List<Material> sortMaterialsByName() {
         List<Material> products = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name, s.supplier_name, s.contact_info, s.address, "
-                + "s.created_at AS supplier_created_at, s.phone_number, s.email, s.description, s.tax_id, s.disable AS supplier_disable "
-                + "FROM Materials m "
-                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
-                + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "LEFT JOIN Suppliers s ON m.supplier_id = s.supplier_id "
-                + "ORDER BY m.material_name ASC";
+        String sql = "SELECT m.*, u.unit_name, c.category_name "
+               + "FROM Materials m "
+               + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+               + "LEFT JOIN Categories c ON m.category_id = c.category_id "
+               + "ORDER BY m.material_name ASC";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 

@@ -1,12 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý yêu cầu xuất vật tư</title>
+    <title>Export Request Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -20,7 +22,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        h1 {
+        h2 {
             font-size: 1.75rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
@@ -31,19 +33,27 @@
             flex-wrap: wrap;
             gap: 12px;
             margin: 20px 0;
+            align-items: center;
+        }
+        .filter-bar .form-control,
+        .filter-bar .form-select,
+        .filter-bar .btn {
+            height: 48px;
+            min-width: 120px;
         }
         .btn-export, .btn-print {
+            background-color: #DEAD6F;
+            color: #fff;
+            border: none;
             padding: 6px 14px;
             border-radius: 6px;
             font-weight: 500;
+            height:50px;
+            transition: background 0.2s;
         }
-        .btn-export {
-            background-color: #009966;
-            color: white;
-        }
-        .btn-print {
-            background-color: #6c757d;
-            color: white;
+        .btn-export:hover, .btn-print:hover {
+            background-color: #cfa856;
+            color: #fff;
         }
         .custom-table thead th {
             background-color: #f9f5f0;
@@ -53,15 +63,20 @@
         .custom-table tbody tr:hover {
             background-color: #f1f1f1;
         }
+        .custom-table th,
+        .custom-table td {
+            vertical-align: middle;
+            min-height: 48px;
+        }
         .status-badge {
             padding: 2px 10px;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 500;
         }
-        .status-draft {
-            background-color: #fff3cd;
-            color: #856404;
+        .status-pending {
+            background-color: #6c757d;
+            color: #fff;
         }
         .status-approved {
             background-color: #d4edda;
@@ -84,51 +99,54 @@
             font-weight: 500;
         }
         .pagination .page-item.active .page-link {
-            background-color: #009966;
-            border-color: #009966;
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
         }
     </style>
 </head>
 <body>
-<jsp:include page="HeaderAdmin.jsp" />
+<jsp:include page="Header.jsp" />
 <div class="container-fluid">
     <div class="row">
-        <jsp:include page="DirectorSidebar.jsp"/>
+        <jsp:include page="SidebarDirector.jsp"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="container-main">
-                <h1>Quản lý yêu cầu xuất vật tư</h1>
-                <p class="text-muted">Danh sách và quản lý các yêu cầu xuất vật tư trong hệ thống</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
+                        <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
+                    </div>
+                </div>
                 <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
-                    <input type="text" class="form-control" name="searchCode" value="${searchCode}" placeholder="Tìm theo mã yêu cầu..." style="max-width:260px; min-width:200px;">
+                    <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
                     <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
-                        <option value="">Tất cả người nhận</option>
+                        <option value="">All Recipients</option>
                         <c:forEach var="recipient" items="${recipients}">
                             <option value="${recipient.userId}" ${searchRecipient == recipient.userId ? 'selected' : ''}>${recipient.fullName}</option>
                         </c:forEach>
                     </select>
                     <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="draft" ${status == 'draft' ? 'selected' : ''}>Nháp</option>
-                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Phê duyệt</option>
-                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Từ chối</option>
-                        <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Hủy</option>
+                        <option value="">All Statuses</option>
+                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                        <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                    <button type="button" class="btn-export" onclick="exportTableToExcel('exportRequestTable', 'DanhSachYeuCauXuat')">Xuất Excel</button>
-                    <button type="button" class="btn-print" onclick="printTableList()">In danh sách</button>
+                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                 </form>
                 <c:if test="${not empty exportRequests}">
                     <div class="table-responsive" id="printTableListArea">
                         <table id="exportRequestTable" class="table custom-table">
                             <thead>
                             <tr>
-                                <th>Mã YC</th>
-                                <th>Ngày Yêu Cầu</th>
-                                <th>Trạng Thái</th>
-                                <th>Ngày Giao</th>
-                                <th>Người Gửi</th>
-                                <th>Người Nhận</th>
-                                <th>Thao Tác</th>
+                                <th>Request Code</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Delivery Date</th>
+                                <th>Sender</th>
+                                <th>Recipient</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -139,16 +157,16 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${request.status == 'approved'}">
-                                                <span class="status-badge status-approved">Phê duyệt</span>
+                                                <span class="status-badge status-approved">Approved</span>
                                             </c:when>
                                             <c:when test="${request.status == 'rejected'}">
-                                                <span class="status-badge status-rejected">Từ chối</span>
+                                                <span class="status-badge status-rejected">Rejected</span>
                                             </c:when>
                                             <c:when test="${request.status == 'cancel'}">
-                                                <span class="status-badge status-cancel">Hủy</span>
+                                                <span class="status-badge status-cancel">Cancelled</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="status-badge status-draft">Nháp</span>
+                                                <span class="status-badge status-pending">Pending</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -158,7 +176,7 @@
                                                 ${request.deliveryDate}
                                             </c:when>
                                             <c:otherwise>
-                                                Chưa có
+                                                Not available
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -168,7 +186,7 @@
                                                 ${request.userName}
                                             </c:when>
                                             <c:otherwise>
-                                                Chưa rõ
+                                                Unknown
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -178,13 +196,13 @@
                                                 ${request.recipientName}
                                             </c:when>
                                             <c:otherwise>
-                                                Chưa rõ
+                                                Unknown
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td>
                                       <a href="${pageContext.request.contextPath}/ViewExportRequest?id=${request.exportRequestId}&status=${status}&search=${search}" class="btn-detail" style="pointer-events:auto;z-index:9999;position:relative;">
-                                            <i class="fas fa-eye"></i> Chi tiết
+                                            <i class="fas fa-eye"></i> Details
                                         </a>
                                     </td>
                                 </tr>
@@ -195,7 +213,7 @@
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Trước</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
@@ -203,20 +221,21 @@
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Sau</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
                             </li>
                         </ul>
                     </nav>
                 </c:if>
                 <c:if test="${empty exportRequests}">
                     <div class="alert alert-info mt-4">
-                        Không tìm thấy yêu cầu xuất kho nào.
+                        No export request found.
                     </div>
                 </c:if>
             </div>
         </main>
     </div>
 </div>
+<jsp:include page="Footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // Xuất Excel

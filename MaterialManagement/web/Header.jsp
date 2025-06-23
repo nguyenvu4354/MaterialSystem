@@ -20,7 +20,15 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
-                <a href="logout" class="btn btn-outline-dark btn-sm">Logout</a>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        <a href="logout" class="btn btn-outline-dark btn-sm">Logout</a>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="Login.jsp" class="btn btn-outline-primary btn-sm">Login</a>
+                    </c:otherwise>
+                </c:choose>
+
             </div>
         </div>
         <hr class="my-2">
@@ -38,36 +46,63 @@
                     <button type="button" class="btn-close ms-auto" data-bs-dismiss="offcanvas"></button>
                 </div>
                 <div class="offcanvas-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
-                    <select class="form-select w-auto mb-3 mb-lg-0 me-lg-4">
-                        <option selected disabled>Admin Options</option>
-                        <option>Manage Products</option>
-                        <option>Manage Users</option>
-                        <option>Manage Orders</option>
-                        <option>Reports</option>
+                    <select class="filter-categories border-0 mb-0 me-5"
+                            onchange="location.href = this.value;">
+                        <option selected disabled>System Management</option>
+                        <option value="UserList">Manage Users</option>
+                        <option value="manageDepartments.jsp">Manage Departments</option>
+                        <option value="dashboardmaterial">Manage Materials</option>
+                        <option value="Category.jsp">Manage Categories</option>
+                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="manageUnits.jsp">Manage Units</option>
                     </select>
 
                     <ul class="navbar-nav d-flex flex-row flex-wrap gap-3 mb-3 mb-lg-0">
                         <li class="nav-item">
-                            <a href="adminDashboard.jsp" class="nav-link active">Dashboard</a>
+                            <a href="HomePage.jsp" class="nav-link active">Home</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="adminPages" data-bs-toggle="dropdown">Request</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="manageProducts.jsp" class="dropdown-item">Export Request</a></li>
-                                <li><a href="manageUsers.jsp" class="dropdown-item">Purchase Request</a></li>
-                                <li><a href="manageOrders.jsp" class="dropdown-item">Repair Request</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="profile" class="nav-link">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="support.jsp" class="nav-link">Support</a>
-                        </li>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user and sessionScope.user.roleId == 2}">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="requestListPages" data-bs-toggle="dropdown">Request List</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
+                                        <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
+                                        <li><a href="repairrequestlist" class="dropdown-item">Repair Request List</a></li>
+
+                                    </ul>
+                                </li>
+                            </c:when>
+
+                            <c:when test="${not empty sessionScope.user and sessionScope.user.roleId == 3}">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="stockPages" data-bs-toggle="dropdown">Stock</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="ExportMaterial" class="dropdown-item">Export Stock</a></li>
+                                        <li><a href="ImportMaterial" class="dropdown-item">Import Stock</a></li>
+                                    </ul>
+                                </li>
+                            </c:when>
+
+                            <c:when test="${not empty sessionScope.user and sessionScope.user.roleId == 4}">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="adminPages" data-bs-toggle="dropdown">Request</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="CreateExportRequest" class="dropdown-item">Export Request</a></li>
+                                        <li><a href="CreatePurchaseRequestServlet" class="dropdown-item">Purchase Request</a></li>
+                                        <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
+                                        <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
+                                        <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
+                                        <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
+                                    </ul>
+                                </li>
+                            </c:when>
+                        </c:choose>
+
                     </ul>
 
                     <div class="d-none d-lg-flex align-items-center">
-                        <a href="Profile.jsp" class="text-dark mx-2">
+                        <a href="profile" class="text-dark mx-2">
                             <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                         </a>
                     </div>

@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     User admin = (User) session.getAttribute("user");
-    if (admin == null || admin.getRoleId() != 1) {
+    if (admin == null || admin.getRoleId() != 3) {
         response.sendRedirect("Login.jsp");
         return;
     }
@@ -57,7 +57,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="HeaderAdmin.jsp" />
+    <jsp:include page="Header.jsp" />
 
     <section id="export-material" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
         <div class="container">

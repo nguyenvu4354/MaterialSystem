@@ -60,41 +60,40 @@
                 </div>
 
                 <div class="offcanvas-body justify-content-between">
-                    <select class="filter-categories border-0 mb-0 me-5">
-                        <option>Admin Options</option>
-                        <option>Manage Products</option>
-                        <option>Manage Users</option>
-                        <option>Manage Orders</option>
-                        <option>Reports</option>
+                    <select class="filter-categories border-0 mb-0 me-5"
+                            onchange="location.href = this.value;">
+                        <option selected disabled>System Management</option>
+                        <option value="UserList">Manage Users</option>
+                        <option value="manageDepartments.jsp">Manage Departments</option>
+                        <option value="manageMaterials.jsp">Manage Materials</option>
+                        <option value="Category.jsp">Manage Categories</option>
+                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="manageUnits.jsp">Manage Units</option>
                     </select>
+
 
                     <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                         <li class="nav-item">
-                            <a href="adminDashboard.jsp" class="nav-link active">Dashboard</a>
+                            <a href="HomePage.jsp" class="nav-link active">Home</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" role="button" id="adminPages" data-bs-toggle="dropdown" aria-expanded="false">Management</a>
                             <ul class="dropdown-menu" aria-labelledby="adminPages">
-                                <li><a href="manageProducts.jsp" class="dropdown-item">Products</a></li>
-                                <li><a href="manageUsers.jsp" class="dropdown-item">Users</a></li>
-                                <li><a href="manageOrders.jsp" class="dropdown-item">Orders</a></li>
-                                <li><a href="manageCategories.jsp" class="dropdown-item">Categories</a></li>
-                                <li><a href="reports.jsp" class="dropdown-item">Reports</a></li>
-                                <li><a href="settings.jsp" class="dropdown-item">Settings</a></li>
+                                <li><a href="#" class="dropdown-item">Dashboard</a></li>
+                                <li><a href="UserList" class="dropdown-item">Users</a></li>
+                                <li><a href="#" class="dropdown-item">Departments</a></li>
+                                <li><a href="#" class="dropdown-item">Materials</a></li>
+                                <li><a href="Category.jsp"" class="dropdown-item">Categories</a></li>
+                                <li><a href="#" class="dropdown-item">Suppliers</a></li>
+                                <li><a href="#" class="dropdown-item">Units</a></li>
                             </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="analytics.jsp" class="nav-link">Analytics</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="support.jsp" class="nav-link">Support</a>
                         </li>
                     </ul>
 
                     <div class="d-none d-lg-flex align-items-end">
                         <ul class="d-flex justify-content-end list-unstyled m-0">
                             <li>
-                                <a href="Profile.jsp" class="mx-3">
+                                <a href="profile" class="mx-3">
                                     <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
                                 </a>
                             </li>

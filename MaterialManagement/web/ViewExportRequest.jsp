@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <title>Waggy - Request Details</title>
     <meta charset="utf-8">
@@ -26,7 +26,7 @@
             margin-bottom: 20px;
         }
         .card-header {
-            background-color: #e9ecef;
+            background-color: #DEAD6F;
             border-bottom: none;
             font-weight: bold;
         }
@@ -35,6 +35,8 @@
         }
         .btn {
             margin-right: 10px;
+            background-color:#DEAD6F;
+        
         }
         .alert {
             margin-top: 20px;
@@ -49,7 +51,7 @@
             border-radius: 5px;
             color: #fff;
         }
-        .status-draft { background-color: #6c757d; }
+        .status-pending { background-color: #6c757d; }
         .status-approved { background-color: #198754; }
         .status-rejected { background-color: #dc3545; }
     </style>
@@ -57,58 +59,71 @@
 <body>
     <div class="container">
         <h2>${exportRequest.requestCode} <span class="status-tag status-${exportRequest.status}">${exportRequest.status}</span></h2>
-        <p>Tạo lúc: ${exportRequest.requestDate}</p>
+        <p>Created at: ${exportRequest.requestDate}</p>
 
         <div class="card">
-            <div class="card-header">Người gửi</div>
-            <div class="card-body">
-                <p><strong>Họ tên:</strong> ${sender.fullName}</p>
-                <p><strong>Email:</strong> ${sender.email}</p>
-                <p><strong>Điện thoại:</strong> ${sender.phoneNumber}</p>
-                <p><strong>Địa chỉ:</strong> Hà Nội</p>
+            <div class="card-header">Sender</div>
+            <div class="card-body d-flex align-items-center">
+                <div style="flex: 1;">
+                    <p><strong>Full Name:</strong> ${sender.fullName}</p>
+                    <p><strong>Email:</strong> ${sender.email}</p>
+                    <p><strong>Phone Number:</strong> ${sender.phoneNumber}</p>
+                    <p><strong>Address:</strong> Hanoi</p>
+                </div>
+                <div style="flex: 0 0 100px; margin-left: 20px;">
+                    <c:set var="senderImg" value="${empty sender.userPicture ? 'images/placeholder.png' : (sender.userPicture.startsWith('http') || sender.userPicture.startsWith('/') ? sender.userPicture : 'images/profiles/' += sender.userPicture)}" />
+                    <img src="${senderImg}" alt="${sender.fullName}" class="img-fluid rounded-circle">
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header">Người nhận</div>
-            <div class="card-body">
-                <p><strong>Họ tên:</strong> ${recipient.fullName}</p>
-                <p><strong>Email:</strong> ${recipient.email}</p>
-                <p><strong>Điện thoại:</strong> ${recipient.phoneNumber}</p>
-                <p><strong>Địa chỉ:</strong> Hà Nội</p>
+            <div class="card-header">Recipient</div>
+            <div class="card-body d-flex align-items-center">
+                <div style="flex: 1;">
+                    <p><strong>Full Name:</strong> ${recipient.fullName}</p>
+                    <p><strong>Email:</strong> ${recipient.email}</p>
+                    <p><strong>Phone Number:</strong> ${recipient.phoneNumber}</p>
+                    <p><strong>Address:</strong> Hanoi</p>
+                </div>
+                <div style="flex: 0 0 100px; margin-left: 20px;">
+                    <c:set var="recipientImg" value="${empty recipient.userPicture ? 'images/placeholder.png' : (recipient.userPicture.startsWith('http') || recipient.userPicture.startsWith('/') ? recipient.userPicture : 'images/profiles/' += recipient.userPicture)}" />
+                    <img src="${recipientImg}" alt="${recipient.fullName}" class="img-fluid rounded-circle">
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header">Thông tin đơn</div>
+            <div class="card-header">Order Information</div>
             <div class="card-body">
-                <p><strong>Ngày giao đơn:</strong> ${exportRequest.deliveryDate}</p>
-                <p>Lý do thực hiện đơn:</p>
+                <p><strong>Delivery Date:</strong> ${exportRequest.deliveryDate}</p>
+                <p>Request Reason:</p>
                 <p>${exportRequest.reason != null ? exportRequest.reason : "N/A"}</p>
                 <c:if test="${not empty exportRequest.approvalReason}">
-                    <p><strong>Lý do phê duyệt:</strong> ${exportRequest.approvalReason}</p>
-                    <p><strong>Phê duyệt lúc:</strong> ${exportRequest.approvedAt}</p>
+                    <p><strong>Approval Reason:</strong> ${exportRequest.approvalReason}</p>
+                    <p><strong>Approved At:</strong> ${exportRequest.approvedAt}</p>
                 </c:if>
                 <c:if test="${not empty exportRequest.rejectionReason}">
-                    <p><strong>Lý do từ chối:</strong> ${exportRequest.rejectionReason}</p>
+                    <p><strong>Rejection Reason:</strong> ${exportRequest.rejectionReason}</p>
                 </c:if>
             </div>
         </div>
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Danh sách vật tư</span>
+                <span>Material List</span>
             </div>
             <div class="card-body">
                 <div class="table-responsive" id="printTableArea">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Mã vật tư</th>
-                                <th>Tên vật tư</th>
-                                <th>Số lượng</th>
-                                <th>Đơn vị</th>
-                                <th>Trạng thái xuất</th>
+                                <th>Material Code</th>
+                                <th>Material Name</th>
+                                <th>Image</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Export Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,6 +131,11 @@
                                 <tr>
                                     <td>${detail.materialCode}</td>
                                     <td>${detail.materialName}</td>
+                                    <td>
+                                        <img src="${not empty detail.materialImageUrl ? detail.materialImageUrl : 'images/placeholder.png'}" 
+                                             alt="${detail.materialName}" 
+                                             style="width: 100px; height: auto; object-fit: cover;">
+                                    </td>
                                     <td>${detail.quantity}</td>
                                     <td>${detail.materialUnit}</td>
                                     <td>${detail.exportCondition}</td>
@@ -134,25 +154,25 @@
             <div class="alert alert-success">${message}</div>
         </c:if>
 
-        <c:if test="${isDirector && exportRequest.status == 'draft'}">
+        <c:if test="${roleId == 2 && exportRequest.status == 'pending'}">
             <div class="d-flex gap-2 mb-2">
-                <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Phê duyệt</button>
-                <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Từ chối</button>
-                <button type="button" class="btn btn-warning" onclick="window.history.back()">Quay lại</button>
+                <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Approve</button>
+                <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Reject</button>
+                <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
             </div>
-            <!-- Box nhập lý do phê duyệt -->
+            <!-- Approval reason box -->
             <form id="approveForm" action="${pageContext.request.contextPath}/ApproveExportRequest" method="post" style="display:none; margin-top:10px;">
                 <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
-                <input type="text" name="approvalReason" placeholder="Nhập lý do phê duyệt" required class="form-control mb-2">
-                <button type="submit" class="btn btn-success">Xác nhận phê duyệt</button>
-                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Hủy</button>
+                <input type="text" name="approvalReason" placeholder="Enter approval reason" required class="form-control mb-2">
+                <button type="submit" class="btn btn-success">Confirm Approval</button>
+                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Cancel</button>
             </form>
-            <!-- Box nhập lý do từ chối -->
+            <!-- Rejection reason box -->
             <form id="rejectForm" action="${pageContext.request.contextPath}/RejectExportRequest" method="post" style="display:none; margin-top:10px;">
                 <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
-                <input type="text" name="rejectionReason" placeholder="Nhập lý do từ chối" required class="form-control mb-2">
-                <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
-                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Hủy</button>
+                <input type="text" name="rejectionReason" placeholder="Enter rejection reason" required class="form-control mb-2">
+                <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Cancel</button>
             </form>
             <script>
                 function showReasonBox(type) {
@@ -164,6 +184,12 @@
                     document.getElementById('rejectForm').style.display = 'none';
                 }
             </script>
+        </c:if>
+
+        <c:if test="${!(roleId == 2 && exportRequest.status == 'pending')}">
+            <div class="mb-2">
+                <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
+            </div>
         </c:if>
     </div>
     <script>

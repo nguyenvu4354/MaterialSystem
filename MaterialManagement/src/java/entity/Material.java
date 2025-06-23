@@ -23,6 +23,7 @@ public class Material {
 
     private Category category;
     private Unit unit;
+    private int quantity;
 
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -135,6 +136,14 @@ public class Material {
 
     public void setUnit(Unit unit) {
         this.unit = unit;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public boolean isDisable() {

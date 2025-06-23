@@ -35,7 +35,7 @@ public class ViewExportRequestServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        if (user == null || !"director".equalsIgnoreCase(user.getRoleName())) {
+        if (user == null || (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4)) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
@@ -57,7 +57,7 @@ public class ViewExportRequestServlet extends HttpServlet {
             request.setAttribute("details", details);
             request.setAttribute("sender", sender);
             request.setAttribute("recipient", recipient);
-            request.setAttribute("isDirector", "director".equalsIgnoreCase(user.getRoleName()));
+            request.setAttribute("roleId", user.getRoleId());
             request.setAttribute("user", user);
             request.getRequestDispatcher("ViewExportRequest.jsp").forward(request, response);
         } catch (Exception e) {

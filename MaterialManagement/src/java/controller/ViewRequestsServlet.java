@@ -19,13 +19,6 @@ import java.util.List;
 @WebServlet(name = "ViewRequestsServlet", urlPatterns = {"/ViewRequests"})
 public class ViewRequestsServlet extends HttpServlet {
 
-    private RequestDAO requestDAO;
-
-    @Override
-    public void init() throws ServletException {
-        requestDAO = new RequestDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,12 +29,14 @@ public class ViewRequestsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1) {
+        if (user.getRoleId() != 4) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
 
         try {
+            // Khởi tạo RequestDAO
+            RequestDAO requestDAO = new RequestDAO();
             Integer userId = user.getUserId();
 
             int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
@@ -100,12 +95,14 @@ public class ViewRequestsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1) {
+        if (user.getRoleId() != 4) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
 
         try {
+            // Khởi tạo RequestDAO
+            RequestDAO requestDAO = new RequestDAO();
             String action = request.getParameter("action");
             if ("cancel".equalsIgnoreCase(action)) {
                 String type = request.getParameter("type");
