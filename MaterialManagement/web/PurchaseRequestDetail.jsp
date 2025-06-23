@@ -499,39 +499,56 @@
 
                         <!-- Action Buttons and Status Messages -->
                         <div class="action-buttons">
+                            <!-- Hiển thị lý do nhân viên gửi lên -->
+                            <c:if test="${not empty purchaseRequest.reason}">
+                                <div class="content-card mb-3">
+                                    <strong>Employee's request reason:</strong>
+                                    <div class="text-muted">${purchaseRequest.reason}</div>
+                                </div>
+                            </c:if>
                             <c:if test="${sessionScope.user.roleId == 2 && purchaseRequest.status == 'pending'}">
                                 <div class="content-card">
-                                    <h4 class="mb-3">Take Action</h4>
-                                    <form id="actionForm" action="PurchaseRequestDetailServlet" method="POST">
+                                    <h4 class="mb-3">Approval Action</h4>
+                                    <form id="actionForm" action="PurchaseRequestDetailServlet" method="POST" style="display:inline-block;">
                                         <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                                        <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn-action btn-approve" onclick="return confirm('Are you sure you want to approve this purchase request?')">
+                                        <input type="hidden" id="actionType" name="action" value="">
+                                        <div class="mb-2">
+                                            <textarea name="reason" id="reasonInput" class="form-control" placeholder="Enter reason..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn-action btn-approve" onclick="return setActionType('approve')">
                                             <i class="fas fa-check-circle me-2"></i>
                                             Approve
                                         </button>
-                                    </form>
-                                    
-                                    <form action="PurchaseRequestDetailServlet" method="post" style="display: inline;">
-                                        <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                                        <input type="hidden" name="action" value="reject">
-                                        <button type="submit" class="btn-action btn-reject" onclick="return confirm('Are you sure you want to reject this purchase request?')">
+                                        <button type="submit" class="btn-action btn-reject" onclick="return setActionType('reject')">
                                             <i class="fas fa-times-circle me-2"></i>
                                             Reject
                                         </button>
                                     </form>
+                                    <script>
+                                        function setActionType(type) {
+                                            document.getElementById('actionType').value = type;
+                                            if(type === 'approve') {
+                                                return confirm('Are you sure you want to approve this request?');
+                                            } else {
+                                                return confirm('Are you sure you want to reject this request?');
+                                            }
+                                        }
+                                    </script>
                                 </div>
                             </c:if>
                             <c:choose>
                                 <c:when test="${purchaseRequest.status eq 'approved'}">
                                     <div class="status-message status-approved">
                                         <i class="fas fa-check-circle me-2"></i>
-                                        This request has been approved
+                                        Request approved.<br>
+                                        <strong>Approval reason:</strong> ${purchaseRequest.approvalReason}
                                     </div>
                                 </c:when>
                                 <c:when test="${purchaseRequest.status eq 'rejected'}">
                                     <div class="status-message status-rejected">
                                         <i class="fas fa-times-circle me-2"></i>
-                                        This request has been rejected
+                                        Request rejected.<br>
+                                        <strong>Rejection reason:</strong> ${purchaseRequest.rejectionReason}
                                     </div>
                                 </c:when>
                             </c:choose>
