@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -74,8 +75,23 @@
                         </div>
                     </c:if>
 
+                    <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                       String nameError = (errors != null) ? errors.get("materialName") : null;
+                       String priceError = (errors != null) ? errors.get("price") : null;
+                    %>
+
+                    <% if (errors != null && !errors.isEmpty()) { %>
+                        <div class="alert alert-danger" style="margin-bottom: 16px;">
+                            <ul style="margin-bottom: 0;">
+                            <% for (String err : errors.values()) { %>
+                                <li><%= err %></li>
+                            <% } %>
+                            </ul>
+                        </div>
+                    <% } %>
+
                     <!-- Form gửi POST lên servlet xử lý 'editmaterial', enctype để upload file ảnh -->
-                    <form action="${pageContext.request.contextPath}/editmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+                    <form action="${pageContext.request.contextPath}/editmaterial" method="POST" enctype="multipart/form-data">
 
                         <!-- Ẩn input chứa ID vật tư để biết sửa cái nào -->
                         <input type="hidden" name="materialId" value="${m.materialId}">
@@ -85,12 +101,15 @@
                             <div class="col-md-6">
                                 <label for="materialCode" class="form-label">Material Code</label>
                                 <input type="text" class="form-control" id="materialCode" name="materialCode" 
-                                       value="${m.materialCode}" readonly required>
+                                       value="${m.materialCode}" readonly>
                             </div>
                             <div class="col-md-6">
                                 <label for="materialName" class="form-label">Material Name</label>
-                                <input type="text" class="form-control" id="materialName" name="materialName" 
-                                       value="${m.materialName}" required>
+                                <input type="text" class="form-control<%= (nameError != null ? " is-invalid" : "") %>" id="materialName" name="materialName" 
+                                       value="${m.materialName}">
+                                <% if (nameError != null) { %>
+                                    <div class="invalid-feedback"><%= nameError %></div>
+                                <% } %>
                             </div>
                         </div>
 
@@ -130,12 +149,14 @@
                             <div class="col-md-6">
                                 <label for="conditionPercentage" class="form-label">Condition (%)</label>
                                 <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" 
-                                       value="${m.conditionPercentage}" min="0" max="100" required>
+                                       value="${m.conditionPercentage}" min="0" max="100">
                             </div>
                             <div class="col-md-6">
                                 <label for="price" class="form-label">Price (VNĐ)</label>
-                                <input type="number" class="form-control" id="price" name="price" 
-                                       value="${m.price}" min="0.01" step="0.01" required>
+                                <input type="number" id="price" name="price" class="form-control<%= (priceError != null ? " is-invalid" : "") %>" value="${m.price}">
+                                <% if (priceError != null) { %>
+                                    <div class="invalid-feedback"><%= priceError %></div>
+                                <% } %>
                             </div>
                         </div>
 
@@ -143,7 +164,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="categoryId" class="form-label">Category</label>
-                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                <select class="form-select" id="categoryId" name="categoryId">
                                     <option value="">Select Category</option>
                                     <c:forEach items="${categories}" var="category">
                                         <option value="${category.category_id}"
@@ -155,7 +176,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="unitId" class="form-label">Unit</label>
-                                <select class="form-select" id="unitId" name="unitId" required>
+                                <select class="form-select" id="unitId" name="unitId">
                                     <option value="">Select Unit</option>
                                     <c:forEach items="${units}" var="unit">
                                         <option value="${unit.id}"
@@ -171,7 +192,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="materialStatus" class="form-label">Status</label>
-                                <select class="form-select" id="materialStatus" name="materialStatus" required>
+                                <select class="form-select" id="materialStatus" name="materialStatus">
                                     <option value="NEW" <c:if test="${m.materialStatus == 'NEW'}">selected</c:if>>New</option>
                                     <option value="USED" <c:if test="${m.materialStatus == 'USED'}">selected</c:if>>Used</option>
                                     <option value="DAMAGED" <c:if test="${m.materialStatus == 'DAMAGED'}">selected</c:if>>Damaged</option>
@@ -198,114 +219,6 @@
 
         <!-- Bootstrap JS Bundle (chứa Popper.js) để hỗ trợ tương tác JS của Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-                                (function () {
-                                    'use strict'
-
-                                    // Validate form khi submit
-                                    var forms = document.querySelectorAll('.needs-validation')
-                                    Array.prototype.slice.call(forms).forEach(function (form) {
-                                        form.addEventListener('submit', function (event) {
-                                            if (!form.checkValidity() || !validatePriceOnSubmit()) {
-                                                event.preventDefault()
-                                                event.stopPropagation()
-                                            }
-                                            form.classList.add('was-validated')
-                                        }, false)
-                                    })
-                                })()
-
-                                // Validate giá > 0
-                                function validatePrice(input) {
-                                    const price = parseFloat(input.value)
-                                    if (isNaN(price) || price <= 0) {
-                                        input.setCustomValidity('Price must be greater than $0')
-                                        return false
-                                    }
-                                    input.setCustomValidity('')
-                                    return true
-                                }
-
-                                function validatePriceOnSubmit() {
-                                    const priceInput = document.getElementById('price')
-                                    return validatePrice(priceInput)
-                                }
-
-                                // Khi chọn file upload ảnh
-                                document.getElementById('materialImage').addEventListener('change', function (event) {
-                                    const file = event.target.files[0]
-                                    if (file) {
-                                        // Xóa giá trị URL nếu có
-                                        document.getElementById('materialsUrl').value = ''
-
-                                        // Đọc file ảnh và hiển thị preview
-                                        const reader = new FileReader()
-                                        reader.onload = function (e) {
-                                            document.getElementById('previewImage').src = e.target.result
-                                        }
-                                        reader.readAsDataURL(file)
-
-                                        // Chuyển sang tab Upload
-                                        const uploadTab = document.getElementById('upload-tab')
-                                        bootstrap.Tab.getOrCreateInstance(uploadTab).show()
-                                    }
-                                })
-
-                                // Khi nhập URL ảnh
-                                document.getElementById('materialsUrl').addEventListener('input', function (event) {
-                                    const url = event.target.value.trim()
-
-                                    if (url) {
-                                        // Xóa file upload nếu có
-                                        document.getElementById('materialImage').value = ''
-
-                                        // Cập nhật ảnh preview với URL
-                                        const previewImage = document.getElementById('previewImage')
-
-                                        // Thử load ảnh, nếu lỗi sẽ không đổi src
-                                        const img = new Image()
-                                        img.onload = function () {
-                                            previewImage.src = url
-                                        }
-                                        img.onerror = function () {
-                                            // Có thể báo lỗi hoặc reset ảnh preview về mặc định
-                                            // Ví dụ:
-                                            // previewImage.src = 'path/to/default-image.png'
-                                            console.warn('Image URL is not valid or cannot be loaded.')
-                                        }
-                                        img.src = url
-
-                                        // Chuyển sang tab URL
-                                        const urlTab = document.getElementById('url-tab')
-                                        bootstrap.Tab.getOrCreateInstance(urlTab).show()
-                                    }
-                                })
-
-                                // Khi chuyển tab ảnh (upload hoặc URL)
-                                document.getElementById('imageInputTabs').addEventListener('shown.bs.tab', function (event) {
-                                    if (event.target.id === 'upload-tab') {
-                                        document.getElementById('materialsUrl').value = ''
-                                    } else if (event.target.id === 'url-tab') {
-                                        document.getElementById('materialImage').value = ''
-                                    }
-                                })
-
-                                // Xác nhận xóa vật tư
-                                function confirmDelete() {
-                                    if (confirm("Are you sure you want to delete this material? This action cannot be undone.")) {
-                                        const form = document.createElement('form')
-                                        form.method = 'POST'
-                                        form.action = 'deletematerial'
-                                        const input = document.createElement('input')
-                                        input.type = 'hidden'
-                                        input.name = 'materialId'
-                                        input.value = '${m.materialId}'  // Bạn nhớ xử lý đúng giá trị này ở JSP
-                                        form.appendChild(input)
-                                        document.body.appendChild(form)
-                                        form.submit()
-                                    }
-                                }
-        </script>
 
     </body>
 </html>

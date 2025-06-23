@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.Map" %>
 <!-- JSP page using JSTL for dynamic data display -->
 
 <!DOCTYPE html>
@@ -51,19 +52,28 @@
                     </div>
                 </c:if>
 
+                <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                   if (errors != null && !errors.isEmpty()) { %>
+                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                        <ul style="margin-bottom: 0;">
+                        <% for (String err : errors.values()) { %>
+                            <li><%= err %></li>
+                        <% } %>
+                        </ul>
+                    </div>
+                <% } %>
+
                 <!-- Form for adding new material -->
-                <form action="addmaterial" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+                <form action="addmaterial" method="POST" enctype="multipart/form-data">
                     <!-- Material Code and Name -->
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode != null ? materialCode : ''}" readonly required>
-                            <div class="invalid-feedback">Please enter a material code.</div>
+                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode != null ? materialCode : ''}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="materialName" class="form-label required-field">Material Name</label>
-                            <input type="text" class="form-control" id="materialName" name="materialName" required>
-                            <div class="invalid-feedback">Please enter a material name.</div>
+                            <input type="text" class="form-control" id="materialName" name="materialName" value="${m.materialName}">
                         </div>
                     </div>
 
@@ -108,24 +118,22 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="categoryId" class="form-label required-field">Category</label>
-                            <select class="form-select" id="categoryId" name="categoryId" required>
+                            <select class="form-select" id="categoryId" name="categoryId">
                                 <option value="">Select Category</option>
                                 <!-- Loop through category list -->
                                 <c:forEach items="${categories}" var="category">
                                     <option value="${category.category_id}">${category.category_name}</option>
                                 </c:forEach>
                             </select>
-                            <div class="invalid-feedback">Please select a category.</div>
                         </div>
                         <div class="col-md-6">
                             <label for="unitId" class="form-label required-field">Unit</label>
-                            <select class="form-select" id="unitId" name="unitId" required>
+                            <select class="form-select" id="unitId" name="unitId">
                                 <option value="" selected disabled>Select Unit</option>
                                 <c:forEach items="${units}" var="unit">
                                     <option value="${unit.id}">${unit.unitName}</option>
                                 </c:forEach>
                             </select>
-                            <div class="invalid-feedback">Please select a unit.</div>
                         </div>
                     </div>
 
@@ -133,13 +141,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="price" class="form-label required-field">Price ($)</label>
-                            <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01" required oninput="validatePrice(this)" onchange="validatePrice(this)">
-                            <div class="invalid-feedback">Price must be greater than $0</div>
+                            <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01">
                         </div>
                         <div class="col-md-6">
                             <label for="conditionPercentage" class="form-label required-field">Condition (%)</label>
-                            <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" min="0" max="100" value="100" required>
-                            <div class="invalid-feedback">Please enter a condition between 0 and 100.</div>
+                            <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" min="0" max="100" value="100">
                         </div>
                     </div>
 
@@ -147,12 +153,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialStatus" class="form-label required-field">Status</label>
-                            <select class="form-select" id="materialStatus" name="materialStatus" required>
+                            <select class="form-select" id="materialStatus" name="materialStatus">
                                 <option value="NEW">New</option>
                                 <option value="USED">Used</option>
                                 <option value="DAMAGED">Damaged</option>
                             </select>
-                            <div class="invalid-feedback">Please select a status.</div>
                         </div>
                     </div>
 
@@ -174,37 +179,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Validate form on submit
-        (function () {
-            'use strict'
-            var forms = document.querySelectorAll('.needs-validation')
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity() || !validatePriceOnSubmit()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-        })()
-
-        // Check for valid price (> 0)
-        function validatePrice(input) {
-            const price = parseFloat(input.value);
-            if (isNaN(price) || price <= 0) {
-                input.setCustomValidity('Price must be greater than $0');
-                return false;
-            }
-            input.setCustomValidity('');
-            return true;
-        }
-
-        function validatePriceOnSubmit() {
-            const priceInput = document.getElementById('price');
-            return validatePrice(priceInput);
-        }
-
         // Handle image file selection -> display preview + switch tab
         document.getElementById('imageFile').addEventListener('change', function(event) {
             const file = event.target.files[0];

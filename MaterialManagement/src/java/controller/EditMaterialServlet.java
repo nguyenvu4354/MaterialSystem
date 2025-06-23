@@ -125,30 +125,35 @@ public class EditMaterialServlet extends HttpServlet {
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
             String conditionPercentage = request.getParameter("conditionPercentage");
-            String price = request.getParameter("price");
+            String priceStr = request.getParameter("price");
+            System.out.println("Giá tiền nhập vào: " + priceStr);
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
-                materialCode, materialName, materialStatus, price, conditionPercentage, categoryId, unitId);
-            
-            if (materialId == null || materialId.trim().isEmpty()) {
-                errors.put("materialId", "Material ID cannot be empty.");
-            } else {
-                try {
-                    int id = Integer.parseInt(materialId);
-                    if (id <= 0) {
-                        errors.put("materialId", "Invalid Material ID.");
-                    }
-                } catch (NumberFormatException e) {
-                    errors.put("materialId", "Invalid Material ID.");
-                }
-            }
-
+                materialCode, materialName, materialStatus, priceStr, conditionPercentage, categoryId, unitId);
+            System.out.println(errors);
             if (!errors.isEmpty()) {
-                String firstError = errors.values().iterator().next();
-                request.setAttribute("error", firstError);
-                doGet(request, response);
+                request.setAttribute("errors", errors);
+                Material m = new Material();
+                try { m.setMaterialId(Integer.parseInt(materialId)); } catch (Exception ex) { m.setMaterialId(0); }
+                m.setMaterialCode(materialCode);
+                m.setMaterialName(materialName);
+                m.setMaterialStatus(materialStatus);
+                m.setConditionPercentage(0);
+                m.setPrice(0);
+                Category category = new Category();
+                category.setCategory_id(0);
+                m.setCategory(category);
+                Unit unit = new Unit();
+                unit.setId(0);
+                m.setUnit(unit);
+                request.setAttribute("m", m);
+                CategoryDAO categoryDAO = new CategoryDAO();
+                UnitDAO unitDAO = new UnitDAO();
+                request.setAttribute("categories", categoryDAO.getAllCategories());
+                request.setAttribute("units", unitDAO.getAllUnits());
+                request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
                 return;
             }
 
@@ -166,7 +171,6 @@ public class EditMaterialServlet extends HttpServlet {
 
             int materialIdInt = Integer.parseInt(materialId);
             int conditionPercentageInt = Integer.parseInt(conditionPercentage);
-            double priceDouble = Double.parseDouble(price);
             int categoryIdInt = Integer.parseInt(categoryId);
             int unitIdInt = Integer.parseInt(unitId);
 
@@ -177,7 +181,7 @@ public class EditMaterialServlet extends HttpServlet {
             material.setMaterialsUrl(imageUrl);
             material.setMaterialStatus(materialStatus);
             material.setConditionPercentage(conditionPercentageInt);
-            material.setPrice(priceDouble);
+            material.setPrice(Double.parseDouble(priceStr));
             
             Category category = new Category();
             category.setCategory_id(categoryIdInt);
@@ -200,7 +204,7 @@ public class EditMaterialServlet extends HttpServlet {
             material.setDisable(oldMaterial.isDisable());
 
             materialDAO.updateMaterial(material);
-
+            
             response.sendRedirect("dashboardmaterial?success=Material updated successfully");
             
         } catch (Exception e) {
