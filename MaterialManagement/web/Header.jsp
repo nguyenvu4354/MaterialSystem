@@ -69,6 +69,7 @@
                                         <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
                                         <li><a href="purchaseRequestList.jsp" class="dropdown-item">Purchase Request List</a></li>
                                         <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
+
                                     </ul>
                                 </li>
                             </c:when>
@@ -90,6 +91,9 @@
                                         <li><a href="CreateExportRequest" class="dropdown-item">Export Request</a></li>
                                         <li><a href="manageUsers.jsp" class="dropdown-item">Purchase Request</a></li>
                                         <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
+                                        <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
+                                        <li><a href="purchaseRequestList.jsp" class="dropdown-item">Purchase Request List</a></li>
+                                        <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
                                     </ul>
                                 </li>
                             </c:when>
