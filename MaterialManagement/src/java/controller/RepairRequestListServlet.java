@@ -94,6 +94,7 @@ public class RepairRequestListServlet extends HttpServlet {
             request.setAttribute("error", "Lỗi khi tải danh sách.");
         }
 
+        
         request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
     }
 
