@@ -64,49 +64,30 @@ public class RepairRequestListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        RepairRequestDAO dao = new RepairRequestDAO();
         try {
-            RepairRequestDAO dao = new RepairRequestDAO();
-
-            // Lấy user từ session
-            User currentUser = (User) request.getSession().getAttribute("user");
-
-            List<RepairRequest> requests;
-
-            // Nếu là Admin hoặc Role khác → lấy tất cả
-            if (currentUser.getRoleId() == 1) { // 1 = Admin, tùy hệ thống của bạn
-                requests = dao.getAllRepairRequests();
-            } else {
-                // Nếu là nhân viên, chỉ lấy yêu cầu của chính họ
-                requests = dao.getRepairRequestsByUser(currentUser.getUserId());
-            }
-
-            // Map chi tiết vật tư
-            Map<Integer, List<RepairRequestDetail>> detailMap = new HashMap<>();
-            for (RepairRequest r : requests) {
-                List<RepairRequestDetail> details = dao.getRepairRequestDetails(r.getRepairRequestId());
-                detailMap.put(r.getRepairRequestId(), details);
-            }
-
-            request.setAttribute("requests", requests);
-            request.setAttribute("detailMap", detailMap);
+            List<RepairRequest> list = dao.getAllRepairRequests();
+            request.setAttribute("repairRequests", list);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tải danh sách.");
+            request.setAttribute("error", "Lỗi khi truy xuất dữ liệu!");
         }
 
         request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+
+/**
+ * Handles the HTTP <code>POST</code> method.
+ *
+ * @param request servlet request
+ * @param response servlet response
+ * @throws ServletException if a servlet-specific error occurs
+ * @throws IOException if an I/O error occurs
+ */
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
@@ -117,7 +98,7 @@ public class RepairRequestListServlet extends HttpServlet {
      * @return a String containing servlet description
      */
     @Override
-    public String getServletInfo() {
+public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
 
