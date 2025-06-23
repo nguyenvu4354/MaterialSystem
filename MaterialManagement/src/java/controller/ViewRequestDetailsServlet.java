@@ -67,7 +67,6 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // Lấy danh sách vật tư từ DepartmentDAO
             DepartmentDAO departmentDAO = new DepartmentDAO();
             List<Material> materials = departmentDAO.getMaterials();
             request.setAttribute("materials", materials);
@@ -134,7 +133,6 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // Handle cancellation
             if ("cancel".equals(action)) {
                 String status = getRequestStatus(requestObj);
                 if (!"pending".equals(status)) {
@@ -168,7 +166,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                     request.setAttribute("message", "Error: Failed to cancel request.");
                     request.setAttribute("request", requestObj);
                     request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
-                    // Lấy lại danh sách vật tư để hiển thị lại JSP
+
                     DepartmentDAO departmentDAO = new DepartmentDAO();
                     List<Material> materials = departmentDAO.getMaterials();
                     request.setAttribute("materials", materials);
