@@ -51,7 +51,7 @@
                         <option selected disabled>System Management</option>
                         <option value="UserList">Manage Users</option>
                         <option value="manageDepartments.jsp">Manage Departments</option>
-                        <option value="manageMaterials.jsp">Manage Materials</option>
+                        <option value="dashboardmaterial">Manage Materials</option>
                         <option value="Category.jsp">Manage Categories</option>
                         <option value="manageSuppliers.jsp">Manage Suppliers</option>
                         <option value="manageUnits.jsp">Manage Units</option>
@@ -67,8 +67,8 @@
                                     <a class="nav-link dropdown-toggle" id="requestListPages" data-bs-toggle="dropdown">Request List</a>
                                     <ul class="dropdown-menu">
                                         <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
-                                        <li><a href="purchaseRequestList.jsp" class="dropdown-item">Purchase Request List</a></li>
-                                        <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
+                                        <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
+                                        <li><a href="repairrequestlist" class="dropdown-item">Repair Request List</a></li>
 
                                     </ul>
                                 </li>
@@ -79,7 +79,7 @@
                                     <a class="nav-link dropdown-toggle" id="stockPages" data-bs-toggle="dropdown">Stock</a>
                                     <ul class="dropdown-menu">
                                         <li><a href="ExportMaterial" class="dropdown-item">Export Stock</a></li>
-                                        <li><a href="importStock.jsp" class="dropdown-item">Import Stock</a></li>
+                                        <li><a href="ImportMaterial" class="dropdown-item">Import Stock</a></li>
                                     </ul>
                                 </li>
                             </c:when>
@@ -89,10 +89,10 @@
                                     <a class="nav-link dropdown-toggle" id="adminPages" data-bs-toggle="dropdown">Request</a>
                                     <ul class="dropdown-menu">
                                         <li><a href="CreateExportRequest" class="dropdown-item">Export Request</a></li>
-                                        <li><a href="manageUsers.jsp" class="dropdown-item">Purchase Request</a></li>
+                                        <li><a href="CreatePurchaseRequestServlet" class="dropdown-item">Purchase Request</a></li>
                                         <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
                                         <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
-                                        <li><a href="purchaseRequestList.jsp" class="dropdown-item">Purchase Request List</a></li>
+                                        <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
                                         <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
                                     </ul>
                                 </li>

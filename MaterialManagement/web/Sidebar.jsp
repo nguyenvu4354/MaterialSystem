@@ -1,19 +1,27 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="entity.User" %>
 <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0" id="sidebarMenu">
   <div class="position-sticky pt-4">
     <ul class="nav flex-column menu-list list-unstyled">
-      <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/AdminDashboard.jsp">
-          <i class="fas fa-tachometer-alt fs-4 me-3"></i>
-          Dashboard
-        </a>
-      </li>
+      
+      <% 
+        HttpSession ses = request.getSession();
+        User user = (User) ses.getAttribute("user");
+        if (user != null && user.getRoleId() == 1) {
+      %>
       <li class="nav-item mb-2">
         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UserList">
           <i class="fas fa-users fs-4 me-3"></i>
           Users
         </a>
       </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/AdminDashboard.jsp">
+          <i class="fas fa-tachometer-alt fs-4 me-3"></i>
+          Dashboard
+        </a>
+      </li>
+      <% } %>
       <li class="nav-item mb-2">
         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/dashboardmaterial">
           <i class="fas fa-shopping-cart fs-4 me-3"></i>
