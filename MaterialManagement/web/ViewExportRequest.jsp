@@ -152,11 +152,11 @@
             <div class="alert alert-success">${message}</div>
         </c:if>
 
-        <c:if test="${isDirector && exportRequest.status == 'pending'}">
+        <c:if test="${roleId == 2 && exportRequest.status == 'pending'}">
             <div class="d-flex gap-2 mb-2">
                 <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Approve</button>
                 <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Reject</button>
-                <button type="button" class="btn btn-warning" onclick="window.history.back()">Back</button>
+                <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
             </div>
             <!-- Approval reason box -->
             <form id="approveForm" action="${pageContext.request.contextPath}/ApproveExportRequest" method="post" style="display:none; margin-top:10px;">
@@ -184,7 +184,7 @@
             </script>
         </c:if>
 
-        <c:if test="${isDirector && (exportRequest.status == 'approved' || exportRequest.status == 'rejected')}">
+        <c:if test="${!(roleId == 2 && exportRequest.status == 'pending')}">
             <div class="mb-2">
                 <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
             </div>
