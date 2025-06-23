@@ -52,12 +52,11 @@
             .btn:hover {
                 background-color: #1976D2;
             }
-            
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="success">🛠️ Yêu cầu sửa chữa đã được tạo thành công</div>
+            <div class="success">🛠️ Yêu cầu sửa chữa đã được tạo thành công!</div>
             <div class="status">⏳ Trạng thái hiện tại: <strong>Đang chờ sếp xét duyệt (Pending)</strong></div>
             <a href="home" class="btn">Quay về trang chủ</a>
             <a href="repairrequestlist" class="btn">List</a>
