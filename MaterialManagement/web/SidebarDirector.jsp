@@ -3,12 +3,6 @@
   <div class="position-sticky pt-4">
     <ul class="nav flex-column menu-list list-unstyled">
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/Home">
-          <i class="fas fa-home fs-4 me-3"></i>
-          Home
-        </a>
-      </li>
-      <li class="nav-item mb-2">
         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/ExportRequestList">
           <i class="fas fa-file-export fs-4 me-3"></i>
           Export Requests
