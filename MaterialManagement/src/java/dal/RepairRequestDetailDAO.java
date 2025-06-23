@@ -7,7 +7,6 @@ package dal;
 import entity.DBContext;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
-import entity.RepairRequestDetailDTO;
 import java.sql.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -203,46 +202,9 @@ public class RepairRequestDetailDAO extends DBContext {
         return list;
     }
 
-    public List<RepairRequestDetailDTO> getDetailDTOsByRequestId(int repairRequestId) {
-        List<RepairRequestDetailDTO> list = new ArrayList<>();
-        String sql = """
-        SELECT 
-            rrd.*,
-            rr.request_code,
-            rr.status
-        FROM Repair_Request_Details rrd
-        JOIN Repair_Requests rr ON rrd.repair_request_id = rr.repair_request_id
-        WHERE rr.repair_request_id = ?
-    """;
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, repairRequestId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                RepairRequestDetailDTO dto = new RepairRequestDetailDTO();
-                dto.setDetailId(rs.getInt("detail_id"));
-                dto.setRepairRequestId(rs.getInt("repair_request_id"));
-                dto.setMaterialId(rs.getInt("material_id"));
-                dto.setQuantity(rs.getInt("quantity"));
-                dto.setDamageDescription(rs.getString("damage_description"));
-                dto.setRepairCost(rs.getDouble("repair_cost"));
-                dto.setCreatedAt(rs.getTimestamp("created_at"));
-                dto.setUpdatedAt(rs.getTimestamp("updated_at"));
-                dto.setRequestCode(rs.getString("request_code"));
-                dto.setStatus(rs.getString("status"));
-
-                list.add(dto);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
     public static void main(String[] args) {
         RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
-        List<RepairRequestDetail> list = dao.getRepairRequestDetailsByRoleId(2); // ví dụ: role_id = 3 là "Thủ kho"
+        List<RepairRequestDetail> list = dao.getRepairRequestDetailsByRequestId(1); // ví dụ: role_id = 3 là "Thủ kho"
         for (RepairRequestDetail d : list) {
             System.out.println(d.toString());
         }
