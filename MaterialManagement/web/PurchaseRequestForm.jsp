@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,11 +40,16 @@
                                 <h2 class="display-5 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
                                 
                                 <!-- Display error message if any -->
-                                <c:if test="${not empty error}">
-                                    <div class="alert alert-danger" role="alert">
-                                        ${error}
+                                <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                                   if (errors != null && !errors.isEmpty()) { %>
+                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                        <ul style="margin-bottom: 0;">
+                                        <% for (String err : errors.values()) { %>
+                                            <li><%= err %></li>
+                                        <% } %>
+                                        </ul>
                                     </div>
-                                </c:if>
+                                <% } %>
                                 
                     <form action="CreatePurchaseRequest" method="post">
                                     <h4 class="fw-normal mt-3 mb-3">Material List</h4>
@@ -51,11 +57,11 @@
                             <div class="row material-row">
                                 <div class="col-md-3 mb-2">
                                                 <label class="form-label text-muted">Material Name</label>
-                                    <input type="text" class="form-control" name="materialName" required>
+                                    <input type="text" class="form-control" name="materialName">
                                 </div>
                                 <div class="col-md-2 mb-2">
                                                 <label class="form-label text-muted">Quantity</label>
-                                    <input type="number" class="form-control" name="quantity" min="1" required>
+                                    <input type="number" class="form-control" name="quantity">
                                 </div>
                                 <div class="col-md-3 mb-2">
                                                 <label class="form-label text-muted">Category</label>
@@ -80,11 +86,11 @@
                         <div class="row mt-4">
                             <div class="col-md-6 mb-3">
                                             <label for="estimatedPrice" class="form-label text-muted">Total Estimated Price ($)</label>
-                                <input type="number" class="form-control" name="estimatedPrice" id="estimatedPrice" step="0.01" required>
+                                <input type="number" class="form-control" name="estimatedPrice" id="estimatedPrice" step="0.01">
                             </div>
                             <div class="col-md-6 mb-3">
                                             <label for="reason" class="form-label text-muted">Purchase Reason</label>
-                                <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
+                                <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="mt-5 d-grid gap-2">

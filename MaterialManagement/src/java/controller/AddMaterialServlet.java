@@ -119,12 +119,27 @@ public class AddMaterialServlet extends HttpServlet {
                 materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
 
             if (!errors.isEmpty()) {
-                String firstError = errors.values().iterator().next();
-                CategoryDAO cd = new CategoryDAO();
-                UnitDAO ud = new UnitDAO();
-                request.setAttribute("categories", cd.getAllCategories());
-                request.setAttribute("units", ud.getAllUnits());
-                request.setAttribute("error", firstError);
+                request.setAttribute("errors", errors);
+                // Gửi lại dữ liệu đã nhập để giữ lại trên form nếu cần
+                Material m = new Material();
+                m.setMaterialCode(materialCode);
+                m.setMaterialName(materialName);
+                m.setMaterialStatus(materialStatus);
+                m.setConditionPercentage(0);
+                m.setPrice(0);
+                Category category = new Category();
+                category.setCategory_id(0);
+                m.setCategory(category);
+                Unit unit = new Unit();
+                unit.setId(0);
+                m.setUnit(unit);
+                request.setAttribute("m", m);
+                CategoryDAO categoryDAO = new CategoryDAO();
+                UnitDAO unitDAO = new UnitDAO();
+                request.setAttribute("categories", categoryDAO.getAllCategories());
+                request.setAttribute("units", unitDAO.getAllUnits());
+                // Truyền lại materialCode về JSP để không bị trống
+                request.setAttribute("materialCode", materialCode);
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
@@ -145,7 +160,7 @@ public class AddMaterialServlet extends HttpServlet {
                 relativeFilePath = "material_images/default.jpg";
             }
 
-            BigDecimal price = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal priceBD = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
             int categoryId = Integer.parseInt(categoryIdStr);
             int unitId = Integer.parseInt(unitIdStr);
             int conditionPercentage = Integer.parseInt(conditionPercentageStr);
@@ -156,7 +171,7 @@ public class AddMaterialServlet extends HttpServlet {
             m.setMaterialsUrl(relativeFilePath);
             m.setMaterialStatus(materialStatus);
             m.setConditionPercentage(conditionPercentage);
-            m.setPrice(price.doubleValue());
+            m.setPrice(priceBD.doubleValue());
 
             Category category = new Category();
             category.setCategory_id(categoryId);

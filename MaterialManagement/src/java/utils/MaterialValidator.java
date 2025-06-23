@@ -115,7 +115,7 @@ public class MaterialValidator {
         // Validate materialName
         if (materialName == null || materialName.trim().isEmpty()) {
             errors.put("materialName", "Material name cannot be empty.");
-        } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
+        } else if (!materialName.matches("^[a-zA-Z0-9\s\u00c0-\u1ef9\u00e0-\u1ef9.,-]+$")) {
             errors.put("materialName", "Material name cannot contain special characters.");
         }
 
@@ -129,8 +129,8 @@ public class MaterialValidator {
             errors.put("price", "Price cannot be empty.");
         } else {
             try {
-                BigDecimal price = new BigDecimal(priceStr);
-                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                java.math.BigDecimal price = new java.math.BigDecimal(priceStr);
+                if (price.compareTo(java.math.BigDecimal.ZERO) <= 0) {
                     errors.put("price", "Price must be greater than 0.");
                 }
             } catch (NumberFormatException e) {
@@ -180,6 +180,7 @@ public class MaterialValidator {
             }
         }
 
+        // Chỉ return errors 1 lần cuối, không return sớm!
         return errors;
     }
 } 

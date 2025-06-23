@@ -122,17 +122,14 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
 
         Map<String, String> formErrors = PurchaseRequestValidator.validatePurchaseRequestFormData(reason, estimatedPriceStr);
         Map<String, String> detailErrors = PurchaseRequestValidator.validatePurchaseRequestDetails(materialNames, categoryIds, quantities);
-        
         formErrors.putAll(detailErrors);
-        
+
         if (!formErrors.isEmpty()) {
-            String firstError = formErrors.values().iterator().next();
-            request.setAttribute("error", firstError);
-            doGet(request, response);
+            request.setAttribute("errors", formErrors);
+            // Gửi lại dữ liệu đã nhập để giữ lại trên form nếu cần
+            request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
             return;
         }
-
-        double estimatedPrice = Double.parseDouble(estimatedPriceStr);
 
         List<PurchaseRequestDetail> purchaseRequestDetails = new ArrayList<>();
         
@@ -166,7 +163,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             purchaseRequest.setUserId(user.getUserId());
             purchaseRequest.setRequestDate(new Timestamp(System.currentTimeMillis()));
             purchaseRequest.setStatus("PENDING");
-            purchaseRequest.setEstimatedPrice(estimatedPrice);
+            purchaseRequest.setEstimatedPrice(Double.parseDouble(estimatedPriceStr));
             purchaseRequest.setReason(reason.trim());
 
             PurchaseRequestDAO prd = new PurchaseRequestDAO();
@@ -191,7 +188,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                     content.append("Request Code: ").append(requestCode).append("\n");
                     content.append("Creator: ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")\n");
                     content.append("Reason: ").append(reason).append("\n");
-                    content.append("Estimated Price: ").append(estimatedPrice).append("\n");
+                    content.append("Estimated Price: ").append(estimatedPriceStr).append("\n");
                     content.append("Time: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("\n\n");
                     content.append("Please log in to the system to view details and approve.");
                     
