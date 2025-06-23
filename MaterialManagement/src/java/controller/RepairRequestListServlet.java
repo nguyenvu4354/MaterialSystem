@@ -74,7 +74,6 @@ public class RepairRequestListServlet extends HttpServlet {
             request.setAttribute("error", "Lỗi khi truy xuất dữ liệu!");
         }
 
-        
         request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
     }
 
