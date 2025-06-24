@@ -19,6 +19,7 @@ import java.util.Map;
 public class StaticInventoryServlet extends HttpServlet {
     private InventoryDAO inventoryDAO;
     private UserDAO userDAO;
+    private static final int PAGE_SIZE = 5; 
 
     @Override
     public void init() throws ServletException {
@@ -30,9 +31,23 @@ public class StaticInventoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            List<Inventory> inventoryList = inventoryDAO.getAllInventory();
-            Map<Integer, User> userMap = new HashMap<>();
             
+            String pageStr = request.getParameter("page");
+            int currentPage = pageStr != null ? Integer.parseInt(pageStr) : 1;
+            if (currentPage < 1) currentPage = 1;           
+            List<Inventory> allInventoryList = inventoryDAO.getAllInventory();
+            int totalItems = allInventoryList.size();
+            int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            int start = (currentPage - 1) * PAGE_SIZE;
+            int end = Math.min(start + PAGE_SIZE, totalItems);
+            List<Inventory> inventoryList;        
+            if (start < totalItems) {
+                inventoryList = allInventoryList.subList(start, end);
+            } else {
+                inventoryList = allInventoryList;
+            }
+            Map<Integer, User> userMap = new HashMap<>();
             for (Inventory inv : inventoryList) {
                 if (inv.getUpdatedBy() != null && inv.getUpdatedBy() > 0 && !userMap.containsKey(inv.getUpdatedBy())) {
                     User user = userDAO.getUserById(inv.getUpdatedBy());
@@ -44,6 +59,10 @@ public class StaticInventoryServlet extends HttpServlet {
             
             request.setAttribute("inventoryList", inventoryList);
             request.setAttribute("userMap", userMap);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalItems", totalItems);
+            request.setAttribute("pageSize", PAGE_SIZE);
             
         } catch (SQLException e) {
             request.setAttribute("error", "Error loading inventory data: " + e.getMessage());
@@ -54,7 +73,6 @@ public class StaticInventoryServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Redirect to GET method for POST requests
         doGet(request, response);
     }
 } 
