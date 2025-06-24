@@ -190,7 +190,7 @@
                     <table id="details">
                         <thead>
                             <tr>
-                                 <th>Material Name</th>
+                                <th>Material Name</th>
                                 <th>Quantity</th>
                                 <th>Description of damage</th>
                                 <th>Repair cost</th>
@@ -214,7 +214,7 @@
                 </div>
 
                 <div class="form-section form-grid">
-                   
+
                     <div>
                         <label>Phone Number of the Repairer</label>
                         <input type="text" name="repairPersonPhoneNumber" required>
@@ -229,7 +229,8 @@
                     </div>
                     <div>
                         <label>Estimated return date</label>
-                        <input type="text" name="estimatedReturnDate" required>
+                        <input type="date" name="estimatedReturnDate" required
+                               value="<fmt:formatDate value='${repairRequest.estimatedReturnDate}' pattern='yyyy-MM-dd'"/>
                     </div>
                 </div>
 
