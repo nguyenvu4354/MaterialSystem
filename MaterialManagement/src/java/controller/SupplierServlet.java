@@ -10,7 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
-@WebServlet(name = "SupplierServlet", urlPatterns = {"/SupplierServlet"})
+@WebServlet(name = "SupplierServlet", urlPatterns = {"/Supplier"})
 public class SupplierServlet extends HttpServlet {
     private SupplierDAO supplierDAO;
     private static final int PAGE_SIZE = 5; 
@@ -45,7 +45,7 @@ public class SupplierServlet extends HttpServlet {
     private void listSuppliers(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
-        String phone = request.getParameter("phone");
+        String code = request.getParameter("code");
         String sortBy = request.getParameter("sortBy");
         String pageStr = request.getParameter("page");
         int currentPage = pageStr != null ? Integer.parseInt(pageStr) : 1;
@@ -54,25 +54,20 @@ public class SupplierServlet extends HttpServlet {
         List<Supplier> list;
         int totalSuppliers;
 
-        if (phone != null && !phone.trim().isEmpty()) {
-            Supplier supplier = supplierDAO.getSupplierByPhone(phone);
-            if (supplier != null) {
-                list = Collections.singletonList(supplier);
-                totalSuppliers = 1;
-            } else {
-                list = Collections.emptyList();
-                totalSuppliers = 0;
-                request.setAttribute("error", "No find the phone: " + phone);
-            }
-            request.setAttribute("phone", phone);
-    } else if (keyword != null && !keyword.trim().isEmpty()) {
-        list = supplierDAO.searchSuppliers(keyword);
-        totalSuppliers = list.size();
-        request.setAttribute("keyword", keyword);
-    } else {
-        list = supplierDAO.getAllSuppliers();
-        totalSuppliers = list.size();
-    }
+        if (code != null && !code.trim().isEmpty()) {
+            // Search by code
+            list = supplierDAO.searchSuppliersByCode(code);
+            totalSuppliers = list.size();
+            request.setAttribute("code", code);
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
+            // Search by name, contact info, phone
+            list = supplierDAO.searchSuppliers(keyword);
+            totalSuppliers = list.size();
+            request.setAttribute("keyword", keyword);
+        } else {
+            list = supplierDAO.getAllSuppliers();
+            totalSuppliers = list.size();
+        }
 
         // Sorting
         if (sortBy != null && !sortBy.isEmpty()) {
@@ -103,7 +98,7 @@ public class SupplierServlet extends HttpServlet {
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
-        request.setAttribute("phone", phone);
+        request.setAttribute("code", code);
         request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
     }
 
@@ -118,6 +113,10 @@ public class SupplierServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 request.setAttribute("error", "ID erorr.");
             }
+        } else {
+            // Generate new supplier code for adding new supplier
+            String newSupplierCode = supplierDAO.generateNextSupplierCode();
+            request.setAttribute("newSupplierCode", newSupplierCode);
         }
         request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
     }
@@ -133,13 +132,14 @@ public class SupplierServlet extends HttpServlet {
                 
             }
         }
-        response.sendRedirect("SupplierServlet?action=list");
+        response.sendRedirect("Supplier?action=list");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String idStr = request.getParameter("supplier_id");
+        String code = request.getParameter("supplier_code");
         String name = request.getParameter("supplier_name");
         String contactInfo = request.getParameter("contact_info");
         String address = request.getParameter("address");
@@ -149,6 +149,7 @@ public class SupplierServlet extends HttpServlet {
         String taxId = request.getParameter("tax_id");
 
         Supplier supplier = new Supplier();
+        supplier.setSupplierCode(code);
         supplier.setSupplierName(name);
         supplier.setContactInfo(contactInfo);
         supplier.setAddress(address);
@@ -168,7 +169,7 @@ public class SupplierServlet extends HttpServlet {
                 
             }
         }
-        response.sendRedirect("SupplierServlet?action=list");
+        response.sendRedirect("Supplier?action=list");
     }
 
     @Override

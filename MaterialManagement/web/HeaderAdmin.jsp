@@ -67,7 +67,7 @@
                         <option value="manageDepartments.jsp">Manage Departments</option>
                         <option value="manageMaterials.jsp">Manage Materials</option>
                         <option value="Category.jsp">Manage Categories</option>
-                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="Supplier">Manage Suppliers</option>
                         <option value="manageUnits.jsp">Manage Units</option>
                     </select>
 
@@ -79,12 +79,12 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" role="button" id="adminPages" data-bs-toggle="dropdown" aria-expanded="false">Management</a>
                             <ul class="dropdown-menu" aria-labelledby="adminPages">
-                                <li><a href="#" class="dropdown-item">Dashboard</a></li>
+                                <li><a href="StaticInventory" class="dropdown-item">Dashboard</a></li>
                                 <li><a href="UserList" class="dropdown-item">Users</a></li>
                                 <li><a href="#" class="dropdown-item">Departments</a></li>
                                 <li><a href="#" class="dropdown-item">Materials</a></li>
                                 <li><a href="Category.jsp"" class="dropdown-item">Categories</a></li>
-                                <li><a href="#" class="dropdown-item">Suppliers</a></li>
+                                <li><a href="Supplier" class="dropdown-item">Suppliers</a></li>
                                 <li><a href="#" class="dropdown-item">Units</a></li>
                             </ul>
                         </li>

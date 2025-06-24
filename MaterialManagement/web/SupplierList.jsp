@@ -59,7 +59,7 @@
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-person-fill-up"></i> Supplier List</h2>
-                    <a href="SupplierServlet?action=edit" class="btn btn-primary">
+                    <a href="Supplier?action=edit" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i> Add New Supplier
                     </a>
                 </div>
@@ -67,16 +67,17 @@
                 <!-- Search and Filter Section -->
                 <div class="row search-box" style=" ">
                     <div class="col-md-8">
-                        <form action="SupplierServlet" method="GET" class="d-flex gap-2">
+                        <form action="Supplier" method="GET" class="d-flex gap-2">
                             <input type="hidden" name="action" value="list" />
+                            <input type="text" name="code" class="form-control" 
+                                   placeholder="Search by code" 
+                                   value="${code != null ? code : ''}" 
+                                   style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="text" name="keyword" class="form-control" 
-                                   placeholder="Search by name..." 
+                                   placeholder="Search by name" 
                                    value="${keyword != null ? keyword : ''}" 
                                    style="width: 200px; height: 50px; border: 2px solid gray" />
-                            <input type="text" name="phone" class="form-control" 
-                                   placeholder="Search by phone..." 
-                                   value="${phone != null ? phone : ''}" 
-                                   style="width: 200px; height: 50px; border: 2px solid gray" />
+                            
                             <select name="sortBy" class="form-select" style="width: 150px;height: 50px; border: 2px solid gray">
                                 <option value="">Sort By</option>
                                 <option value="name_asc" ${sortBy == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
@@ -85,7 +86,7 @@
                             <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
                                  <i class="fas fa-search me-2"></i> Search
                             </button>
-                            <a href="SupplierServlet?action=list" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
+                            <a href="Supplier?action=list" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
                         </form>
                     </div>
                 </div>
@@ -101,10 +102,11 @@
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col"style="width: 150px">Supplier Name</th>
-                                <th scope="col"style="width: 150px">Contact Info</th>
+                                <th scope="col"style="width: 120px">Code</th>
+                                <th scope="col"style="width: 150px">Name</th>
+                                <th scope="col"style="width: 150px">Contact</th>
                                 <th scope="col"style="width: 150px">Address</th>
-                                <th scope="col"style="width: 150px">Phone Number</th>
+                                <th scope="col"style="width: 150px">Phone</th>
                                 <th scope="col"style="width: 200px">Email</th>
                                 <th scope="col"style="width: 150px">Description</th>
                                 <th scope="col">Tax ID</th>
@@ -115,29 +117,30 @@
                             <c:forEach var="s" items="${supplierList}">
                                 <tr>
                                     <td>${s.supplierId}</td>
+                                    <td><span class="badge bg-primary">${s.supplierCode}</span></td>
                                     <td>${s.supplierName}</td>
                                     <td>${s.contactInfo}</td>
                                     <td>${s.address}</td>
                                     <td>
                                         <a href="tel:${s.phoneNumber}" class="text-decoration-none">
-                                            <i class="fas fa-phone me-1"></i>${s.phoneNumber}
+                                            ${s.phoneNumber}
                                         </a>
                                     </td>
                                     <td>
                                         <a href="mailto:${s.email}" class="text-decoration-none">
-                                            <i class="fas fa-envelope me-1"></i>${s.email}
+                                            ${s.email}
                                         </a>
                                     </td>
                                     <td>${s.description}</td>
                                     <td>${s.taxId}</td>
                                     <td>
                                         <div class="d-flex justify-content-center">
-                                            <a href="SupplierServlet?action=edit&id=${s.supplierId}" 
+                                            <a href="Supplier?action=edit&id=${s.supplierId}" 
                                                class="btn btn-warning btn-action" 
                                                title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="SupplierServlet?action=delete&id=${s.supplierId}" 
+                                            <a href="Supplier?action=delete&id=${s.supplierId}" 
                                                class="btn btn-danger btn-action" 
                                                onclick="return confirm('Are you sure you want to delete this supplier?');" 
                                                title="Delete">
@@ -149,7 +152,7 @@
                             </c:forEach>
                             <c:if test="${empty supplierList}">
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">No suppliers found.</td>
+                                    <td colspan="10" class="text-center text-muted">No suppliers found.</td>
                                 </tr>
                             </c:if>
                         </tbody>
@@ -161,15 +164,15 @@
                     <nav>
                         <ul class="pagination">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage - 1}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">Previous</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage - 1}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="SupplierServlet?action=list&page=${i}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">${i}</a>
+                                    <a class="page-link" href="Supplier?action=list&page=${i}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierServlet?action=list&page=${currentPage + 1}&keyword=${keyword}&phone=${phone}&sortBy=${sortBy}">Next</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage + 1}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">Next</a>
                             </li>
                         </ul>
                     </nav>
