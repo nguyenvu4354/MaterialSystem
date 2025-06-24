@@ -101,21 +101,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <c:choose>
-                                    <c:when test="${not empty material.materialsUrl}">
-                                        <c:choose>
-                                            <c:when test="${material.materialsUrl.startsWith('http') || material.materialsUrl.startsWith('/')}">
-                                                <img src="${material.materialsUrl}" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <img src="images/materials/${material.materialsUrl}" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
-                                    </c:otherwise>
-                                </c:choose>
+                                <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
                             </div>
                             <div class="col-md-1 d-flex align-items-end">
                                 <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
@@ -146,7 +132,7 @@
             {
                 "id": "${material.materialId}",
                 "name": "${material.materialName}",
-                "imageUrl": "<c:choose><c:when test='${not empty material.materialsUrl}'><c:choose><c:when test='${material.materialsUrl.startsWith('http') || material.materialsUrl.startsWith('/') }'>${material.materialsUrl}</c:when><c:otherwise>images/materials/${material.materialsUrl}</c:otherwise></c:choose></c:when><c:otherwise>images/placeholder.png</c:otherwise></c:choose>",
+                "imageUrl": "${material.materialsUrl}",
                 "stock": ${material.quantity}
             }<c:if test="${not loop.last}">,</c:if>
         </c:forEach>
