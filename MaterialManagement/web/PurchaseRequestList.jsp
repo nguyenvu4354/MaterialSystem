@@ -133,7 +133,7 @@
                                             <tr>
                                                 <td>${request.purchaseRequestId}</td>
                                                 <td>${request.requestCode}</td>
-                                                <td>${request.userId}</td>
+                                                <td>${userIdToName[request.userId]}</td>
                                                 <td>${request.requestDate}</td>
                                                 <td>${request.estimatedPrice}</td>
                                                 <td>${request.reason}</td>

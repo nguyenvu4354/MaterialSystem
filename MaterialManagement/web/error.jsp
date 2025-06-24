@@ -50,7 +50,7 @@
             </c:if>
             
             <div class="d-grid gap-2">
-                <a href="HomeServlet" class="btn btn-primary">Go to Homepage</a>
+                <a href="http://localhost:8080/MaterialManagement/home" class="btn btn-primary">Go to Homepage</a>
                 <a href="javascript:history.back()" class="btn btn-outline-secondary">Go Back</a>
             </div>
         </div>
