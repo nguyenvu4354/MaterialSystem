@@ -19,6 +19,7 @@ public class SupplierDAO extends DBContext {
             while (rs.next()) {
                 Supplier s = new Supplier();
                 s.setSupplierId(rs.getInt("supplier_id"));
+                s.setSupplierCode(rs.getString("supplier_code"));
                 s.setSupplierName(rs.getString("supplier_name"));
                 s.setContactInfo(rs.getString("contact_info"));
                 s.setAddress(rs.getString("address"));
@@ -42,6 +43,7 @@ public class SupplierDAO extends DBContext {
                 if (rs.next()) {
                     Supplier s = new Supplier();
                     s.setSupplierId(rs.getInt("supplier_id"));
+                    s.setSupplierCode(rs.getString("supplier_code"));
                     s.setSupplierName(rs.getString("supplier_name"));
                     s.setContactInfo(rs.getString("contact_info"));
                     s.setAddress(rs.getString("address"));
@@ -59,15 +61,16 @@ public class SupplierDAO extends DBContext {
     }
 
     public void addSupplier(Supplier supplier) {
-        String sql = "INSERT INTO Suppliers (supplier_name, contact_info, address, phone_number, email, description, tax_id, disable) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        String sql = "INSERT INTO Suppliers (supplier_code, supplier_name, contact_info, address, phone_number, email, description, tax_id, disable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, supplier.getSupplierName());
-            ps.setString(2, supplier.getContactInfo());
-            ps.setString(3, supplier.getAddress());
-            ps.setString(4, supplier.getPhoneNumber());
-            ps.setString(5, supplier.getEmail());
-            ps.setString(6, supplier.getDescription());
-            ps.setString(7, supplier.getTaxId());
+            ps.setString(1, supplier.getSupplierCode());
+            ps.setString(2, supplier.getSupplierName());
+            ps.setString(3, supplier.getContactInfo());
+            ps.setString(4, supplier.getAddress());
+            ps.setString(5, supplier.getPhoneNumber());
+            ps.setString(6, supplier.getEmail());
+            ps.setString(7, supplier.getDescription());
+            ps.setString(8, supplier.getTaxId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -75,16 +78,17 @@ public class SupplierDAO extends DBContext {
     }
 
     public void updateSupplier(Supplier supplier) {
-        String sql = "UPDATE Suppliers SET supplier_name=?, contact_info=?, address=?, phone_number=?, email=?, description=?, tax_id=? WHERE supplier_id=?";
+        String sql = "UPDATE Suppliers SET supplier_code=?, supplier_name=?, contact_info=?, address=?, phone_number=?, email=?, description=?, tax_id=? WHERE supplier_id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, supplier.getSupplierName());
-            ps.setString(2, supplier.getContactInfo());
-            ps.setString(3, supplier.getAddress());
-            ps.setString(4, supplier.getPhoneNumber());
-            ps.setString(5, supplier.getEmail());
-            ps.setString(6, supplier.getDescription());
-            ps.setString(7, supplier.getTaxId());
-            ps.setInt(8, supplier.getSupplierId());
+            ps.setString(1, supplier.getSupplierCode());
+            ps.setString(2, supplier.getSupplierName());
+            ps.setString(3, supplier.getContactInfo());
+            ps.setString(4, supplier.getAddress());
+            ps.setString(5, supplier.getPhoneNumber());
+            ps.setString(6, supplier.getEmail());
+            ps.setString(7, supplier.getDescription());
+            ps.setString(8, supplier.getTaxId());
+            ps.setInt(9, supplier.getSupplierId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -103,15 +107,17 @@ public class SupplierDAO extends DBContext {
 
     public List<Supplier> searchSuppliers(String keyword) {
         List<Supplier> list = new ArrayList<>();
-        String sql = "SELECT * FROM Suppliers WHERE disable=0 AND (supplier_name LIKE ? OR contact_info LIKE ?)";
+        String sql = "SELECT * FROM Suppliers WHERE disable=0 AND (supplier_name LIKE ? OR contact_info LIKE ? OR phone_number LIKE ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             String kw = "%" + keyword + "%";
             ps.setString(1, kw);
             ps.setString(2, kw);
+            ps.setString(3, kw);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Supplier s = new Supplier();
                     s.setSupplierId(rs.getInt("supplier_id"));
+                    s.setSupplierCode(rs.getString("supplier_code"));
                     s.setSupplierName(rs.getString("supplier_name"));
                     s.setContactInfo(rs.getString("contact_info"));
                     s.setAddress(rs.getString("address"));
@@ -135,6 +141,7 @@ public class SupplierDAO extends DBContext {
                 if (rs.next()) {
                     Supplier s = new Supplier();
                     s.setSupplierId(rs.getInt("supplier_id"));
+                    s.setSupplierCode(rs.getString("supplier_code"));
                     s.setSupplierName(rs.getString("supplier_name"));
                     s.setContactInfo(rs.getString("contact_info"));
                     s.setAddress(rs.getString("address"));
@@ -150,13 +157,67 @@ public class SupplierDAO extends DBContext {
         }
         return null;
     }
+
+    public List<Supplier> searchSuppliersByCode(String code) {
+        List<Supplier> list = new ArrayList<>();
+        String sql = "SELECT * FROM Suppliers WHERE disable=0 AND supplier_code LIKE ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            String searchCode = "%" + code + "%";
+            ps.setString(1, searchCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Supplier s = new Supplier();
+                    s.setSupplierId(rs.getInt("supplier_id"));
+                    s.setSupplierCode(rs.getString("supplier_code"));
+                    s.setSupplierName(rs.getString("supplier_name"));
+                    s.setContactInfo(rs.getString("contact_info"));
+                    s.setAddress(rs.getString("address"));
+                    s.setPhoneNumber(rs.getString("phone_number"));
+                    s.setEmail(rs.getString("email"));
+                    s.setDescription(rs.getString("description"));
+                    s.setTaxId(rs.getString("tax_id"));
+                    list.add(s);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public String generateNextSupplierCode() {
+        String sql = "SELECT supplier_code FROM Suppliers WHERE disable = 0 ORDER BY supplier_code DESC LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String lastCode = rs.getString("supplier_code");
+                // Extract number from code like "SUP001" -> "001"
+                if (lastCode != null && lastCode.matches("SUP\\d+")) {
+                    String numberStr = lastCode.substring(3); // Remove "SUP" prefix
+                    int nextNumber = Integer.parseInt(numberStr) + 1;
+                    return String.format("SUP%03d", nextNumber); // Format as SUP001, SUP002, etc.
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // If no existing codes or error, start with SUP001
+        return "SUP001";
+    }
+
     // Hàm main để test
     public static void main(String[] args) {
         SupplierDAO dao = new SupplierDAO();
+        
+        // Test generate next supplier code
+        String nextCode = dao.generateNextSupplierCode();
+        System.out.println("Next supplier code: " + nextCode);
+        
         List<Supplier> list = dao.getAllSuppliers();
         System.out.println("===== Danh sách nhà cung cấp =====");
         for (Supplier s : list) {
             System.out.println("ID: " + s.getSupplierId());
+            System.out.println("Code: " + s.getSupplierCode());
             System.out.println("Tên: " + s.getSupplierName());
             System.out.println("Liên hệ: " + s.getContactInfo());
             System.out.println("Địa chỉ: " + s.getAddress());
