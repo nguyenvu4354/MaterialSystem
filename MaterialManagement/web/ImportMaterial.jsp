@@ -143,6 +143,8 @@
     </style>
 </head>
 <body>
+    <jsp:include page="HeaderAdmin.jsp" />
+    
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10">
@@ -152,16 +154,16 @@
                 </h2>
                 <!-- Alert Messages -->
                 <c:if test="${not empty error}">
-                    <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${error}</div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-exclamation-triangle me-2"></i>${error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 </c:if>
                 <c:if test="${not empty success}">
-                    <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>${success}</div>
-                </c:if>
-                <c:if test="${empty materials}">
-                    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>No materials available in the system!</div>
-                </c:if>
-                <c:if test="${empty suppliers}">
-                    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>No suppliers available in the system!</div>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="fas fa-check-circle me-2"></i>${success}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 </c:if>
 
                 <!-- Add Material Form -->
@@ -356,6 +358,36 @@
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Auto-hide alerts after 3 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                // Auto-hide after 3 seconds
+                setTimeout(function() {
+                    if (alert.style.display !== 'none') {
+                        alert.style.transition = 'all 0.5s ease-out';
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateY(-10px)';
+                        setTimeout(function() {
+                            alert.style.display = 'none';
+                        }, 500);
+                    }
+                }, 3000);
+                
+                // Add click to dismiss functionality
+                alert.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn-close') || e.target.classList.contains('alert')) {
+                        this.style.transition = 'all 0.3s ease-out';
+                        this.style.opacity = '0';
+                        this.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            this.style.display = 'none';
+                        }, 300);
+                    }
+                });
+            });
+        });
+
         // Calculate total value when quantity or unit price changes
         function calculateTotal() {
             const quantity = document.querySelector('input[name="quantity"]').value;
