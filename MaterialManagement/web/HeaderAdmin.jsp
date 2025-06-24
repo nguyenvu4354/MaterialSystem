@@ -4,7 +4,7 @@
         <div class="row py-4 pb-0 pb-sm-4 align-items-center">
             <div class="col-sm-4 col-lg-3 text-center text-sm-start">
                 <div class="main-logo">
-                    <a href="HomePage.jsp">
+                    <a href="home">
                         <img src="images/AdminLogo.png" alt="logo" class="img-fluid" width="300px">
                     </a>
                 </div>
@@ -47,6 +47,7 @@
                             <iconify-icon icon="tabler:search" class="fs-4"></iconify-icon>
                         </a>
                     </li>
+                    
                 </ul>
             </div>
 
@@ -74,7 +75,7 @@
 
                     <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                         <li class="nav-item">
-                            <a href="HomePage.jsp" class="nav-link active">Home</a>
+                            <a href="home" class="nav-link active">Home</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" role="button" id="adminPages" data-bs-toggle="dropdown" aria-expanded="false">Management</a>
