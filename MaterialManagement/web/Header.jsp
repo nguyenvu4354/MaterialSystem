@@ -80,16 +80,10 @@
                                         <li><a href="CreateExportRequest" class="dropdown-item">Export Request</a></li>
                                         <li><a href="CreatePurchaseRequest" class="dropdown-item">Purchase Request</a></li>
                                         <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
-
-                                        <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
-                                        <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
-                                        <li><a href="repairrequestlist" class="dropdown-item">Repair Request List</a></li>
-
                                     </ul>
                                 </li>
                             </c:when>
                         </c:choose>
-
                     </ul>
 
                     <div class="d-none d-lg-flex align-items-center gap-3">
@@ -101,8 +95,8 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="requestDropdownBtn">
                                     <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
-                                    <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
-                                    <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
+                                    <li><a href="ListPurchaseRequests" class="dropdown-item">Purchase Request List</a></li>
+                                    <li><a href="repairrequestlist" class="dropdown-item">Repair Request List</a></li>
                                 </ul>
                             </div>
                         </c:if>
