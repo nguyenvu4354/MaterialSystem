@@ -1,5 +1,6 @@
 package controller;
 
+import dal.MaterialDAO;
 import dal.RepairRequestDAO;
 import dal.UserDAO;
 import entity.RepairRequest;
@@ -65,15 +66,24 @@ public class RepairRequestServlet extends HttpServlet {
             requestObj.setDisable(false);
 
             // Lấy danh sách chi tiết vật tư
-            String[] materialIds = request.getParameterValues("materialId");
+            String[] materialNames = request.getParameterValues("materialName");
             String[] quantities = request.getParameterValues("quantity");
             String[] descriptions = request.getParameterValues("damageDescription");
             String[] repairCosts = request.getParameterValues("repairCost");
 
             List<RepairRequestDetail> detailList = new ArrayList<>();
+            MaterialDAO materialDAO = new MaterialDAO(); // thêm bên ngoài vòng for
 
-            for (int i = 0; i < materialIds.length; i++) {
-                int materialId = Integer.parseInt(materialIds[i]);
+            for (int i = 0; i < materialNames.length; i++) {
+                String materialName = materialNames[i].trim();
+                int materialId = materialDAO.getMaterialIdByName(materialName);
+
+                if (materialId == -1) {
+                    request.setAttribute("errorMessage", "Không tìm thấy vật tư có tên: " + materialName);
+                    request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                    return;
+                }
+
                 int quantity = Integer.parseInt(quantities[i]);
                 String description = descriptions[i];
 
@@ -156,7 +166,7 @@ public class RepairRequestServlet extends HttpServlet {
     private String generateRequestCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
         String timestamp = sdf.format(new java.util.Date());
-        int random = (int)(Math.random() * 9000) + 1000;
+        int random = (int) (Math.random() * 9000) + 1000;
         return "RR-" + timestamp + "-" + random;
     }
 }

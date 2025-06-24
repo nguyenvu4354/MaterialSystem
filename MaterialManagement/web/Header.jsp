@@ -93,7 +93,7 @@
                                         <li><a href="CreateRepairRequest.jsp" class="dropdown-item">Repair Request</a></li>
                                         <li><a href="ExportRequestList" class="dropdown-item">Export Request List</a></li>
                                         <li><a href="ListPurchaseRequestsServlet" class="dropdown-item">Purchase Request List</a></li>
-                                        <li><a href="repairRequestList.jsp" class="dropdown-item">Repair Request List</a></li>
+                                        <li><a href="repairrequestlist" class="dropdown-item">Repair Request List</a></li>
                                     </ul>
                                 </li>
                             </c:when>

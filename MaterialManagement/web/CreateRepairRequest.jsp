@@ -1,21 +1,23 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>Create Repair Request</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
                 background-color: #f5f6fa;
                 padding: 40px;
             }
 
             h2, h3 {
                 color: #2f3640;
+                font-family: "Roboto", sans-serif;
             }
 
             .container {
+                font-family: 'Arial', sans-serif;
                 max-width: 1000px;
                 margin: auto;
                 background: white;
@@ -64,7 +66,7 @@
             }
 
             input[type="submit"], button {
-                background-color: #27ae60;
+                background-color: #e0ad69;
                 color: white;
                 padding: 10px 25px;
                 border: none;
@@ -74,7 +76,7 @@
             }
 
             button:hover, input[type="submit"]:hover {
-                background-color: #219653;
+                background-color: #e0ad69;
             }
 
             .table-section {
@@ -148,7 +150,7 @@
                 const table = document.getElementById("details").getElementsByTagName("tbody")[0];
                 const newRow = table.insertRow();
                 newRow.innerHTML = `
-                    <td><input type="number" name="materialId" required></td>
+                    <td><input type="text" name="materialName" required></td>
                     <td><input type="number" name="quantity" required></td>
                     <td><input type="text" name="damageDescription" required></td>
                     <td><input type="number" name="repairCost" step="0.01" min="0"></td>
@@ -182,14 +184,13 @@
             <h2>Form Repair Request</h2>
 
             <form action="repairrequest" method="post">
-                <!-- KHÔNG cần userId vì Servlet sẽ tự lấy từ session -->
 
                 <div class="form-section table-section">
                     <h3>List of materials to be repaired</h3>
                     <table id="details">
                         <thead>
                             <tr>
-                                <th>Material ID</th>
+                                 <th>Material Name</th>
                                 <th>Quantity</th>
                                 <th>Description of damage</th>
                                 <th>Repair cost</th>
@@ -198,7 +199,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="number" name="materialId" required></td>
+                                <td><input type="text" name="materialName" required></td>
                                 <td><input type="number" name="quantity" required></td>
                                 <td><input type="text" name="damageDescription" required></td>
                                 <td><input type="number" name="repairCost" step="0.01" min="0"></td>

@@ -27,8 +27,9 @@ public class RepairRequestDAO extends DBContext {
                 + "repair_location, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String detailSql = "INSERT INTO Repair_Request_Details (repair_request_id, material_id, quantity, damage_description, created_at, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String detailSql = "INSERT INTO Repair_Request_Details "
+                + "(repair_request_id, material_id, quantity, damage_description, repair_cost, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (
                 PreparedStatement psRequest = connection.prepareStatement(requestSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement psDetail = connection.prepareStatement(detailSql)) {
@@ -59,8 +60,9 @@ public class RepairRequestDAO extends DBContext {
                     psDetail.setInt(2, detail.getMaterialId());
                     psDetail.setInt(3, detail.getQuantity());
                     psDetail.setString(4, detail.getDamageDescription());
-                    psDetail.setTimestamp(5, detail.getCreatedAt());
-                    psDetail.setTimestamp(6, detail.getUpdatedAt());
+                    psDetail.setDouble(5, detail.getRepairCost());
+                    psDetail.setTimestamp(6, detail.getCreatedAt());
+                    psDetail.setTimestamp(7, detail.getUpdatedAt());
                     psDetail.executeUpdate();
                 }
             }
@@ -186,7 +188,6 @@ public class RepairRequestDAO extends DBContext {
             }
         }
 
-        // Nếu status vẫn là "pending" thì tiến hành cập nhật
         String sql;
         String status;
 
