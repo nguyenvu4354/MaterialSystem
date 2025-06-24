@@ -56,9 +56,9 @@
     </head>
     <body>
         <div class="container">
-            <div class="success">🛠️ Yêu cầu sửa chữa đã được tạo thành công!</div>
-            <div class="status">⏳ Trạng thái hiện tại: <strong>Đang chờ sếp xét duyệt (Pending)</strong></div>
-            <a href="home" class="btn">Quay về trang chủ</a>
+            <div class="success">🛠 ️Repair request created successfully!</div>
+            <div class="status">⏳ Trạng thái hiện tại: <strong> Waiting for boss approval (Pending)</strong></div>
+            <a href="home" class="btn">Back To Home</a>
             <a href="repairrequestlist" class="btn">List</a>
 
         </div>
