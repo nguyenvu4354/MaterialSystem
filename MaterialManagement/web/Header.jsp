@@ -3,7 +3,7 @@
     <div class="container py-2">
         <div class="row align-items-center">
             <div class="col-12 col-sm-4 text-center text-sm-start mb-3 mb-sm-0">
-                <a href="HomePage.jsp">
+                <a href="home">
                     <img src="images/AdminLogo.png" alt="logo" class="img-fluid" style="max-width: 180px;">
                 </a>
             </div>
@@ -59,7 +59,7 @@
 
                     <ul class="navbar-nav d-flex flex-row flex-wrap gap-3 mb-3 mb-lg-0">
                         <li class="nav-item">
-                            <a href="HomePage.jsp" class="nav-link active">Home</a>
+                            <a href="home" class="nav-link active">Home</a>
                         </li>
                         <c:choose>
 
