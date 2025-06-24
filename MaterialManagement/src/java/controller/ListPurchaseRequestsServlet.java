@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.ArrayList;
+import dal.UserDAO;
 
 @WebServlet(name = "ListPurchaseRequestsServlet", urlPatterns = {"/ListPurchaseRequests"})
 public class ListPurchaseRequestsServlet extends HttpServlet {
@@ -72,7 +73,19 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
         }
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
 
+        // Tạo Map userId -> tên requester
+        UserDAO userDAO = new UserDAO();
+        java.util.Map<Integer, String> userIdToName = new java.util.HashMap<>();
+        for (PurchaseRequest pr : list) {
+            int uid = pr.getUserId();
+            if (!userIdToName.containsKey(uid)) {
+                User requester = userDAO.getUserById(uid);
+                userIdToName.put(uid, requester != null ? requester.getFullName() : "Không xác định");
+            }
+        }
+
         request.setAttribute("purchaseRequests", list);
+        request.setAttribute("userIdToName", userIdToName);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", pageIndex);
         request.setAttribute("keyword", keyword);

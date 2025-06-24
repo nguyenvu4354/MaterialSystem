@@ -89,7 +89,12 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
 
             request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
             request.setAttribute("purchaseRequest", purchaseRequest);
-            
+            // Lấy tên người yêu cầu
+            dal.UserDAO userDAO = new dal.UserDAO();
+            entity.User requester = userDAO.getUserById(purchaseRequest.getUserId());
+            String requesterName = requester != null ? requester.getFullName() : "Không xác định";
+            request.setAttribute("requesterName", requesterName);
+            request.setAttribute("requester", requester);
             request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
         } catch(Exception ex) {
             System.out.println("Error in PurchaseRequestDetailServlet: " + ex.getMessage());
