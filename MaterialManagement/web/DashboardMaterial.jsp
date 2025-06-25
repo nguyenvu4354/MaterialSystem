@@ -164,7 +164,7 @@
                                 <c:when test="${not empty list}">
                                     <c:forEach items="${list}" var="material">
                                         <tr>
-                                            <td><img src="${pageContext.request.contextPath}/${material.materialsUrl}" alt="${material.materialCode}" class="material-image"></td>
+                                            <td><img src="images/material/${material.materialsUrl}" alt="${material.materialCode}" class="material-image"></td>
                                             <td>${material.materialCode}</td>
                                             <td>${material.materialName}</td>
                                             <td>

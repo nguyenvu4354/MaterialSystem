@@ -150,11 +150,11 @@ public class AddMaterialServlet extends HttpServlet {
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
                 filePart.write(uploadPath + newFileName);
-                relativeFilePath = UPLOAD_DIRECTORY + "/" + newFileName;
+                relativeFilePath = newFileName;
             } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
                 relativeFilePath = request.getParameter("materialsUrl").trim();
             } else {
-                relativeFilePath = UPLOAD_DIRECTORY + "/default.jpg";
+                relativeFilePath = "default.jpg";
             }
 
             BigDecimal priceBD = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);

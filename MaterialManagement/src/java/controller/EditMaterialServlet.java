@@ -181,35 +181,15 @@ public class EditMaterialServlet extends HttpServlet {
 
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                System.out.println("Debug - Uploading file: " + fileName);
-                System.out.println("Debug - Upload path: " + uploadPath);
-                
-                String fullFilePath = uploadPath + fileName;
-                System.out.println("Debug - Full file path: " + fullFilePath);
-                
-                try {
-                    filePart.write(fullFilePath);
-                    System.out.println("Debug - File written successfully to: " + fullFilePath);
-                    
-                    // Kiểm tra xem file có tồn tại không
-                    File uploadedFile = new File(fullFilePath);
-                    if (uploadedFile.exists()) {
-                        System.out.println("Debug - File exists after writing: " + uploadedFile.length() + " bytes");
-                    } else {
-                        System.out.println("Debug - ERROR: File does not exist after writing!");
-                    }
-                } catch (Exception e) {
-                    System.out.println("Debug - ERROR writing file: " + e.getMessage());
-                    e.printStackTrace();
-                }
-                
-                imageUrl = UPLOAD_DIRECTORY + "/" + fileName;
+                filePart.write(uploadPath + File.separator + fileName);
+                imageUrl = fileName;
                 System.out.println("Debug - Image URL set to: " + imageUrl);
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 imageUrl = urlInput.trim();
                 System.out.println("Debug - Using URL input: " + imageUrl);
             } else {
-                System.out.println("Debug - No new image provided, will keep old image");
+                imageUrl = "default.jpg";
+                System.out.println("Debug - No new image provided, using default.jpg");
             }
 
             int materialIdInt = Integer.parseInt(materialId);
