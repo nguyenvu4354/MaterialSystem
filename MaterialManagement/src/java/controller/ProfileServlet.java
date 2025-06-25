@@ -7,13 +7,13 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 import utils.UserValidator;
 
@@ -80,8 +80,12 @@ public class ProfileServlet extends HttpServlet {
             }
             user.setDescription(description);
 
-            // Validate user input
-            Map<String, String> errors = UserValidator.validateProfile(user, userDAO);
+            Map<String, String> errors = new HashMap<>();
+            if (userDAO.isEmailExist(email, user.getUserId())) {
+                errors.put("email", "This email is already in use.");
+            }
+
+            errors.putAll(UserValidator.validateProfile(user, userDAO));
 
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
@@ -109,7 +113,6 @@ public class ProfileServlet extends HttpServlet {
                 user.setUserPicture(fileName);
             }
 
-            // Update user in database
             boolean updated = userDAO.updateUser(user);
             if (updated) {
                 user = userDAO.getUserById(user.getUserId());
