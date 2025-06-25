@@ -7,66 +7,76 @@
     <title>Material Detail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    body {
+        background-color: #fff5e6;
+        font-family: 'Inter', sans-serif;
+    }
 
-        .product-card {
-            border-radius: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            transition: transform 0.3s ease-in-out;
-        }
+    .product-card {
+        border-radius: 20px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 18px rgba(244,161,97,0.10);
+        padding: 30px;
+        transition: transform 0.3s ease-in-out;
+    }
 
-        .product-card:hover {
-            transform: translateY(-3px);
-        }
+    .product-card:hover {
+        transform: translateY(-3px);
+    }
 
-        .product-image {
-            width: 100%;
-            height: auto;
-            max-height: 320px;
-            object-fit: contain;
-            background-color: #f8f9fa;
-            border-radius: 15px;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-        }
+    .product-image {
+        width: 100%;
+        height: auto;
+        max-height: 320px;
+        object-fit: contain;
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+    }
 
-        .product-info p {
-            font-size: 1.05rem;
-            margin-bottom: 12px;
-            color: #333;
-        }
+    .product-info p {
+        font-size: 1.05rem;
+        margin-bottom: 12px;
+        color: #2a2a2a;
+    }
 
-        .product-info strong {
-            color: #555;
-        }
+    .product-info strong {
+        color: #4a4a4a;
+    }
 
-        .back-btn {
-            border-radius: 30px;
-            padding: 10px 30px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+    .back-btn {
+        border-radius: 30px;
+        padding: 10px 30px;
+        font-weight: 500;
+        background: #fff;
+        color: #f4a261;
+        border: 2px solid #f4a261;
+        transition: all 0.2s ease;
+    }
 
-        .btn-brown {
-            background-color: #DEB887 !important;
-            color: #fff !important;
-            border: none;
-        }
-        .btn-brown:hover, .btn-brown:focus {
-            background-color: #c49b63 !important;
-            color: #fff !important;
-        }
+    .back-btn:hover {
+        background-color: #f4a261;
+        color: #fff;
+    }
 
-        .status-new { color: #28a745; }
-        .status-used { color: #ffc107; }
-        .status-damaged { color: #dc3545; }
-        .condition-text { font-style: italic; color: #6c757d; }
-    </style>
+    .status-new { color: #27ae60; }
+    .status-used { color: #ffc107; }
+    .status-damaged { color: #dc3545; }
+    .condition-text { font-style: italic; color: #6c757d; }
+
+    h2 {
+        color: #f4a261;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        border-radius: 15px;
+        box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+    }
+</style>
 </head>
 <body>
 <div class="container my-5">
@@ -80,7 +90,7 @@
                         <div class="col-md-5">
                             <c:choose>
                                 <c:when test="${not empty product.materialsUrl}">
-                                    <img src="${pageContext.request.contextPath}/${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
+                                    <img src="${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="images/default.jpg" alt="No Image" class="product-image img-fluid">
@@ -141,8 +151,8 @@
     </c:if>
 
     <div class="text-center mt-4">
-        <a href="view" class="btn btn-brown back-btn me-2">⬅ Back to Material List</a>
-        <a href="index.html" class="btn btn-brown back-btn">🏠 Back to Home</a>
+        <a href="view" class="btn btn-outline-secondary back-btn me-2">⬅ Back to Material List</a>
+        <a href="home" class="btn btn-outline-secondary back-btn">🏠 Back to Home</a>
     </div>
 </div>
 </body>

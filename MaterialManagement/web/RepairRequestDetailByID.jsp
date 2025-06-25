@@ -7,109 +7,125 @@
     <meta charset="UTF-8">
     <title>Chi tiết yêu cầu sửa chữa</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
 
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 30px auto;
-            background-color: white;
-            padding: 25px 30px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
+    .container {
+        width: 92%;
+        max-width: 1100px;
+        margin: 30px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
 
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 25px;
-        }
+    h2 {
+        text-align: center;
+        color: #d59f39;
+        font-size: 26px;
+        margin-bottom: 25px;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 15px;
+    }
 
-        th, td {
-            border: 1px solid #dcdcdc;
-            padding: 12px;
-            text-align: center;
-        }
+    th, td {
+        border: 1px solid #eee;
+        padding: 12px;
+        text-align: center;
+    }
 
-        th {
-            background-color: #3498db;
-            color: white;
-        }
+    th {
+        background-color: #f4f2ef;
+        color: #2c3e50;
+        font-weight: 600;
+    }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    tr:nth-child(even) {
+        background-color: #fafafa;
+    }
 
-        .btn-group {
-            margin-top: 30px;
-            text-align: center;
-        }
+    tr:hover {
+        background-color: #f1f9ff;
+    }
 
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px;
-            background-color: #2980b9;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-        }
+    .btn-group {
+        margin-top: 30px;
+        text-align: center;
+    }
 
-        .btn:hover {
-            background-color: #1c5980;
-        }
+    .btn {
+        display: inline-block;
+        padding: 10px 22px;
+        margin: 10px;
+        background-color: #d59f39;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
 
-        .form-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 30px auto 0 auto;
-            background-color: #fdfdfd;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
+    .btn:hover {
+        background-color: #c4892a;
+    }
 
-        .textarea-reason {
-            width: 100%;
-            height: 60px;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            resize: vertical;
-            font-size: 14px;
-        }
+    .form-container {
+        width: 100%;
+        max-width: 650px;
+        margin: 30px auto 0 auto;
+        background-color: #fff9f2;
+        padding: 20px 25px;
+        border-radius: 10px;
+        border: 1px solid #f1d9b5;
+    }
 
-        .no-data {
-            text-align: center;
-            color: #888;
-            font-style: italic;
-            padding: 15px 0;
-        }
+    .textarea-reason {
+        width: 100%;
+        height: 70px;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        font-size: 14px;
+        font-family: inherit;
+    }
 
-        .note {
-            text-align: center;
-            color: #888;
-            font-style: italic;
-            margin-top: 20px;
-        }
-        
-    </style>
+    .no-data {
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        padding: 15px 0;
+        font-size: 16px;
+    }
+
+    .note {
+        text-align: center;
+        color: #999;
+        font-style: italic;
+        margin-top: 20px;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+</style>
+
 </head>
 <body>
 <div class="container">
@@ -120,7 +136,7 @@
         String error = (String) request.getAttribute("error");
     %>
 
-    <h2>Chi tiết yêu cầu sửa chữa - Mã yêu cầu: <%= requestId %></h2>
+    <h2>Repair Request Details - Request Code: <%= requestId %></h2>
 
     <%-- Hiển thị thông báo lỗi nếu có --%>
     <% if (error != null && !error.isEmpty()) { %>
@@ -128,17 +144,17 @@
     <% } %>
 
     <% if (details == null || details.isEmpty()) { %>
-        <div class="no-data">Không có chi tiết nào cho yêu cầu sửa chữa này.</div>
+        <div class="no-data">There are no details for this repair request.</div>
     <% } else { %>
         <table>
             <tr>
-                <th>ID</th>
-                <th>Mã vật tư</th>
-                <th>Số lượng</th>
-                <th>Mô tả hư hỏng</th>
-                <th>Chi phí sửa chữa</th>
-                <th>Ngày tạo</th>
-                <th>Ngày cập nhật</th>
+                <th>Detail ID</th>
+                <th>Material code</th>
+                <th>Quantity</th>
+                <th>Description of damage</th>
+                <th>Repair costs</th>
+                <th>Date created</th>
+                <th>Update date</th>
             </tr>
             <% for (RepairRequestDetail d : details) { %>
             <tr>
@@ -157,30 +173,30 @@
             <div class="form-container">
                 <form action="approve" method="post" class="form">
                     <input type="hidden" name="requestId" value="<%= requestId %>">
-                    <textarea class="textarea-reason" name="reason" placeholder="Nhập lý do phê duyệt..." required></textarea>
+                    <textarea class="textarea-reason" name="reason" placeholder="Enter reason approve..." required></textarea>
                     <div class="btn-group">
-                        <button class="btn" type="submit">✅ Duyệt yêu cầu</button>
+                        <button class="btn" type="submit">✅ Approve </button>
                     </div>
                 </form>
 
                 <form action="reject" method="post" class="form">
                     <input type="hidden" name="requestId" value="<%= requestId %>">
-                    <textarea class="textarea-reason" name="reason" placeholder="Nhập lý do từ chối..." required></textarea>
+                    <textarea class="textarea-reason" name="reason" placeholder="Enter reason reject..." required></textarea>
                     <div class="btn-group">
-                        <button class="btn" type="submit">❌ Từ chối yêu cầu</button>
+                        <button class="btn" type="submit">❌ Reject</button>
                     </div>
                 </form>
             </div>
         <% } else { %>
             <div class="note">
-                <i>Bạn chỉ có quyền xem chi tiết yêu cầu sửa chữa.</i>
+                <i>You only have the right to view the repair request details.</i>
             </div>
         <% } %>
     <% } %>
 
     <div class="btn-group">
-        <a href="repairrequestlist" class="btn">← Quay lại danh sách</a>
-        <a href="home" class="btn">Trang chủ</a>
+        <a href="repairrequestlist" class="btn">← Back To List</a>
+        <a href="home" class="btn">Home</a>
     </div>
 </div>
 </body>

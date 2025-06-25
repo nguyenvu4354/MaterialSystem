@@ -1,253 +1,174 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Create Repair Request</title>
+        <title>Waggy - Create Repair Request</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Bootstrap & Fonts -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/vendor.css">
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
         <style>
-            body {
-                background-color: #f5f6fa;
-                padding: 40px;
+            .repair-form .form-control, .repair-form .form-select {
+                height: 48px;
+                font-size: 1rem;
             }
-
-            h2, h3 {
-                color: #2f3640;
-                font-family: "Roboto", sans-serif;
+            .repair-form .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
             }
-
-            .container {
-                font-family: 'Arial', sans-serif;
-                max-width: 1000px;
-                margin: auto;
-                background: white;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            .repair-form .btn {
+                font-size: 1rem;
+                padding: 0.75rem 1.25rem;
             }
-
-            .form-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 20px;
-            }
-
-            label {
-                font-weight: bold;
-                margin-bottom: 5px;
-                display: block;
-            }
-
-            input[type="text"],
-            input[type="number"],
-            input[type="email"],
-            textarea,
-            select {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #dcdde1;
-                border-radius: 5px;
-                font-size: 14px;
-            }
-
-            textarea {
-                resize: vertical;
-            }
-
-            .form-section {
-                margin-top: 30px;
-            }
-
-            .form-footer {
-                margin-top: 30px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            input[type="submit"], button {
-                background-color: #e0ad69;
-                color: white;
-                padding: 10px 25px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: bold;
-            }
-
-            button:hover, input[type="submit"]:hover {
-                background-color: #e0ad69;
-            }
-
-            .table-section {
-                margin-top: 20px;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                background-color: #f9f9f9;
-                border: 1px solid #dcdde1;
-            }
-
-            th, td {
-                padding: 12px;
-                text-align: left;
-                border-bottom: 1px solid #dcdde1;
-            }
-
-            th {
-                background-color: #2f3640;
-                color: white;
-            }
-
-            .remove-btn {
-                background-color: #e74c3c;
-                color: white;
-                border: none;
-                padding: 5px 10px;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer;
-            }
-
-            .remove-btn:hover {
-                background-color: #c0392b;
-            }
-
-            .edit-btn {
-                background-color: #f1c40f;
-                color: white;
-                border: none;
-                padding: 5px 10px;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer;
-                margin-left: 5px;
-            }
-
-            .edit-btn:hover {
-                background-color: #d4ac0d;
-            }
-
-            .add-row-btn {
-                margin-top: 10px;
-                background-color: #3498db;
-            }
-
-            .add-row-btn:hover {
-                background-color: #2980b9;
-            }
-
-            .error {
-                color: red;
-                margin-top: 10px;
+            .repair-form .material-row {
+                margin-bottom: 1rem;
+                border-bottom: 1px solid #dee2e6;
+                padding-bottom: 1rem;
             }
         </style>
-
-        <script>
-            function addRow() {
-                const table = document.getElementById("details").getElementsByTagName("tbody")[0];
-                const newRow = table.insertRow();
-                newRow.innerHTML = `
-                    <td><input type="text" name="materialName" required></td>
-                    <td><input type="number" name="quantity" required></td>
-                    <td><input type="text" name="damageDescription" required></td>
-                    <td><input type="number" name="repairCost" step="0.01" min="0"></td>
-                    <td>
-                        <button type="button" class="remove-btn" onclick="removeRow(this)">X</button>
-                        <button type="button" class="edit-btn" onclick="editRow(this)">Save</button>
-                    </td>
-                `;
-            }
-
-            function removeRow(btn) {
-                const row = btn.parentNode.parentNode;
-                row.parentNode.removeChild(row);
-            }
-
-            function editRow(btn) {
-                const row = btn.closest('tr');
-                const inputs = row.querySelectorAll('input');
-                if (btn.textContent === 'Edit') {
-                    inputs.forEach(input => input.removeAttribute('readonly'));
-                    btn.textContent = 'Save';
-                } else {
-                    inputs.forEach(input => input.setAttribute('readonly', true));
-                    btn.textContent = 'Edit';
-                }
-            }
-        </script>
     </head>
     <body>
-        <div class="container">
-            <h2>Form Repair Request</h2>
+        <jsp:include page="Header.jsp"/>
 
-            <form action="repairrequest" method="post">
+        <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+            <div class="container">
+                <div class="row my-5 py-5">
+                    <div class="col-12 bg-white p-4 rounded shadow repair-form">
+                        <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Repair Request</span></h2>
 
-                <div class="form-section table-section">
-                    <h3>List of materials to be repaired</h3>
-                    <table id="details">
-                        <thead>
-                            <tr>
-                                <th>Material Name</th>
-                                <th>Quantity</th>
-                                <th>Description of damage</th>
-                                <th>Repair cost</th>
-                                <th>Operation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" name="materialName" required></td>
-                                <td><input type="number" name="quantity" required></td>
-                                <td><input type="text" name="damageDescription" required></td>
-                                <td><input type="number" name="repairCost" step="0.01" min="0"></td>
-                                <td>
-                                    <button type="button" class="remove-btn" onclick="removeRow(this)">X</button>
-                                    <button type="button" class="edit-btn" onclick="editRow(this)">Save</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <button type="button" class="add-row-btn" onclick="addRow()">+ Add material</button>
-                </div>
+                        <c:if test="${not empty errorMessage}">
+                            <div class="alert alert-danger">${errorMessage}</div>
+                        </c:if>
 
-                <div class="form-section form-grid">
+                        <form action="repairrequest" method="post">
+                            <h3 class="fw-normal mt-4 mb-3">Materials for Repair</h3>
+                            <div id="materialList">
+                                <!-- Initial Material Row -->
+                                <div class="row material-row align-items-end gy-2">
+                                    <div class="col-md-3">
+                                        <label class="form-label text-muted">Material Name</label>
+                                        <select class="form-select" name="materialName" required>
+                                            <c:forEach var="m" items="${materialList}">
+                                                <option value="${m.materialName}">${m.materialName}</option>
+                                            </c:forEach>
+                                        </select>
 
-                    <div>
-                        <label>Phone Number of the Repairer</label>
-                        <input type="text" name="repairPersonPhoneNumber" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label text-muted">Quantity</label>
+                                        <input type="number" class="form-control" name="quantity" required min="1" value="1">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-muted">Description of Damage</label>
+                                        <input type="text" class="form-control" name="damageDescription" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label text-muted">Repair Cost (€)</label>
+                                        <input type="number" class="form-control" name="repairCost" step="0.01" min="0" value="0">
+                                    </div>
+                                    <div class="col-auto d-flex flex-row gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-primary edit-btn px-2" onclick="toggleEdit(this)">Save</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-material px-2">X</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 mb-4">
+                                <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
+                            </div>
+
+                            <h3 class="fw-normal mt-5 mb-3">Repairer and Schedule Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Repairer's Phone Number</label>
+                                    <input type="text" class="form-control" name="repairPersonPhoneNumber" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Repairer's Email</label>
+                                    <input type="email" class="form-control" name="repairPersonEmail" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Repair Location</label>
+                                    <input type="text" class="form-control" name="repairLocation" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted">Estimated Return Date</label>
+                                    <input type="date" class="form-control" name="estimatedReturnDate" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted">Reason for Repair</label>
+                                    <textarea name="reason" rows="3" class="form-control" required></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 d-grid gap-2">
+                                <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                                <a href="HomePage.jsp" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
+                            </div>
+                        </form>
                     </div>
-                    <div>
-                        <label>Email</label>
-                        <input type="email" name="repairPersonEmail" required>
-                    </div>
-                    <div>
-                        <label>Repair location</label>
-                        <input type="text" name="repairLocation" required>
-                    </div>
-                    <div>
-                        <label>Estimated return date</label>
-                        <input type="date" name="estimatedReturnDate" required
-                               value="<fmt:formatDate value='${repairRequest.estimatedReturnDate}' pattern='yyyy-MM-dd'"/>
-                    </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="form-section">
-                    <label>Reason for repair</label>
-                    <textarea name="reason" rows="3" required></textarea>
-                </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+                                            // Thêm hàng mới
+                                            document.getElementById('addMaterial').addEventListener('click', function () {
+                                                const materialList = document.getElementById('materialList');
+                                                const firstRow = materialList.querySelector('.material-row');
+                                                const newRow = firstRow.cloneNode(true);
 
-                <div class="form-footer">
-                    <input type="submit" value="Submit">
-                    <a href="home"><button type="button">Home</button></a>
-                </div>
-            </form>
+                                                newRow.querySelectorAll('input').forEach(input => {
+                                                    input.removeAttribute('readonly');
+                                                    input.value = (input.name === 'repairCost') ? '0' : (input.name === 'quantity' ? '1' : '');
+                                                });
 
-            <c:if test="${not empty errorMessage}">
-                <p class="error">${errorMessage}</p>
-            </c:if>
-        </div>
+                                                const editBtn = newRow.querySelector('.edit-btn');
+                                                editBtn.textContent = 'Save';
+                                                editBtn.classList.remove('btn-outline-secondary');
+                                                editBtn.classList.add('btn-outline-primary');
+
+                                                materialList.appendChild(newRow);
+                                            });
+
+                                            // Xóa hàng vật tư
+                                            document.addEventListener('click', function (e) {
+                                                const removeBtn = e.target.closest('.remove-material');
+                                                if (removeBtn) {
+                                                    const rows = document.querySelectorAll('.material-row');
+                                                    if (rows.length > 1) {
+                                                        removeBtn.closest('.material-row').remove();
+                                                    } else {
+                                                        alert("At least one material is required.");
+                                                    }
+                                                }
+                                            });
+
+                                            // Toggle giữa Save và Edit
+                                            function toggleEdit(btn) {
+                                                const row = btn.closest('.material-row');
+                                                const inputs = row.querySelectorAll('input');
+                                                if (btn.textContent === 'Save') {
+                                                    inputs.forEach(input => input.setAttribute('readonly', true));
+                                                    btn.textContent = 'Edit';
+                                                    btn.classList.remove('btn-outline-primary');
+                                                    btn.classList.add('btn-outline-secondary');
+                                                } else {
+                                                    inputs.forEach(input => input.removeAttribute('readonly'));
+                                                    btn.textContent = 'Save';
+                                                    btn.classList.remove('btn-outline-secondary');
+                                                    btn.classList.add('btn-outline-primary');
+                                                }
+                                            }
+        </script>
     </body>
 </html>
