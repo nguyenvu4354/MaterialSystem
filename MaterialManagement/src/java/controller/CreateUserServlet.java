@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,14 +74,16 @@ public class CreateUserServlet extends HttpServlet {
             String roleIdStr = request.getParameter("roleId");
             String departmentIdStr = request.getParameter("departmentId");
             int roleId = 0;
-            int departmentId = 0;
+            Integer departmentId = null;
 
             try {
                 roleId = Integer.parseInt(roleIdStr);
             } catch (NumberFormatException ignored) {
             }
             try {
-                departmentId = Integer.parseInt(departmentIdStr);
+                if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
+                    departmentId = Integer.parseInt(departmentIdStr);
+                }
             } catch (NumberFormatException ignored) {
             }
 
@@ -106,7 +109,14 @@ public class CreateUserServlet extends HttpServlet {
                 }
             }
 
-            Map<String, String> errors = UserValidator.validate(newUser, userDAO);
+            // Check if email exists
+            Map<String, String> errors = new HashMap<>();
+            if (userDAO.isEmailExist(email, 0)) {
+                errors.put("email", "This email is already in use.");
+            }
+
+            // Validate other user inputs
+            errors.putAll(UserValidator.validate(newUser, userDAO));
 
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
@@ -124,9 +134,10 @@ public class CreateUserServlet extends HttpServlet {
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
                 String buildPath = getServletContext().getRealPath("/");
-                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path projectRoot = Paths.get(buildPath).getParent().getParent();
                 Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
 
                 if (!Files.exists(uploadDir)) {

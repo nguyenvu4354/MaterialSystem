@@ -52,7 +52,7 @@
         </style>
     </head>
     <body>
-        <jsp:include page="HeaderAdmin.jsp" />
+        <jsp:include page="Header.jsp" />
 
         <section class="py-5">
             <div class="container">
@@ -60,7 +60,7 @@
                     <div class="col-md-10 p-4 bg-white rounded shadow profile-section">
                         <!-- Navigation buttons -->
                         <div class="text-center mb-4 nav-buttons">
-                            <a href="Profile.jsp" class="btn btn-primary">Profile</a>
+                            <a href="profile" class="btn btn-primary">Profile</a>
                             <a href="change-password.jsp" class="btn btn-secondary">Change Password</a>
                             <c:if test="${not empty sessionScope.user and sessionScope.user.roleId == 4}">
                                 <a href="ViewRequests" class="btn btn-success">My Applications</a>
@@ -90,7 +90,7 @@
                             <ul class="mb-0">
                                 <% for (Map.Entry<String, String> entry : errors.entrySet()) { %>
                                 <li><strong><%= entry.getKey() %>:</strong> <%= entry.getValue() %></li>
-                                    <% } %>
+                                <% } %>
                             </ul>
                         </div>
                         <% } %>
@@ -99,10 +99,10 @@
                             <!-- Avatar -->
                             <div class="col-md-4 text-center">
                                 <% if (user.getUserPicture() != null && !user.getUserPicture().isEmpty()) { %>
-                                <img id="previewImage" src="images/profiles/<%= user.getUserPicture() %>"
+                                <img id="previewImage" src="images/profiles/<%= user.getUserPicture() %>?t=<%= System.currentTimeMillis() %>"
                                      class="img-thumbnail rounded-circle mb-3" alt="Profile Picture"/>
                                 <% } else { %>
-                                <img id="previewImage" src="images/default-avatar.png"
+                                <img id="previewImage" src="images/profiles/DefaultUser.jpg"
                                      class="img-thumbnail rounded-circle mb-3" alt="Profile Picture"/>
                                 <% } %>
                                 <div class="mb-3">
@@ -117,43 +117,55 @@
                                 <form id="profileForm" action="profile" method="post" enctype="multipart/form-data">
                                     <div class="mb-3">
                                         <label for="fullName" class="form-label text-muted">Full Name</label>
-                                        <input type="text" class="form-control" id="fullName" name="fullName"
+                                        <input type="text" class="form-control <%= errors != null && errors.containsKey("fullName") ? "is-invalid" : "" %>" id="fullName" name="fullName"
                                                value="<%= user.getFullName() != null ? user.getFullName() : "" %>" required>
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("fullName")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("fullName") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="email" class="form-label text-muted">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email"
+                                        <input type="email" class="form-control <%= errors != null && errors.containsKey("email") ? "is-invalid" : "" %>" id="email" name="email"
                                                value="<%= user.getEmail() != null ? user.getEmail() : "" %>" required>
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("email")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("email") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="phoneNumber" class="form-label text-muted">Phone Number</label>
-                                        <input type="text" class="form-control" id="phoneNumber" name="phoneNumber"
+                                        <input type="text" class="form-control <%= errors != null && errors.containsKey("phoneNumber") ? "is-invalid" : "" %>" id="phoneNumber" name="phoneNumber"
                                                value="<%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "" %>" required>
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("phoneNumber")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("phoneNumber") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="address" class="form-label text-muted">Address</label>
-                                        <input type="text" class="form-control" id="address" name="address"
+                                        <input type="text" class="form-control <%= errors != null && errors.containsKey("address") ? "is-invalid" : "" %>" id="address" name="address"
                                                value="<%= user.getAddress() != null ? user.getAddress() : "" %>">
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("address")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("address") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="dateOfBirth" class="form-label text-muted">Date of Birth</label>
-                                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
+                                        <input type="date" class="form-control <%= errors != null && errors.containsKey("dateOfBirth") ? "is-invalid" : "" %>" id="dateOfBirth" name="dateOfBirth"
                                                value="<%= user.getDateOfBirth() != null ? user.getDateOfBirth() : "" %>">
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("dateOfBirth")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("dateOfBirth") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="gender" class="form-label text-muted">Gender</label>
-                                        <select class="form-select" id="gender" name="gender">
+                                        <select class="form-select <%= errors != null && errors.containsKey("gender") ? "is-invalid" : "" %>" id="gender" name="gender">
                                             <option value="">Select</option>
                                             <option value="male" <%= "male".equals(genderStr) ? "selected" : "" %>>Male</option>
                                             <option value="female" <%= "female".equals(genderStr) ? "selected" : "" %>>Female</option>
                                             <option value="other" <%= "other".equals(genderStr) ? "selected" : "" %>>Other</option>
                                         </select>
-                                        <div class="invalid-feedback"></div>
+                                        <% if (errors != null && errors.containsKey("gender")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("gender") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="mb-3">
                                         <label for="department" class="form-label text-muted">Department</label>
@@ -162,8 +174,10 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="description" class="form-label text-muted">Description</label>
-                                        <textarea class="form-control" id="description" name="description" rows="3"><%= user.getDescription() != null ? user.getDescription() : "" %></textarea>
-                                        <div class="invalid-feedback"></div>
+                                        <textarea class="form-control <%= errors != null && errors.containsKey("description") ? "is-invalid" : "" %>" id="description" name="description" rows="3"><%= user.getDescription() != null ? user.getDescription() : "" %></textarea>
+                                        <% if (errors != null && errors.containsKey("description")) { %>
+                                        <div class="invalid-feedback"><%= errors.get("description") %></div>
+                                        <% } %>
                                     </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary btn-lg rounded-1">Update Profile</button>
@@ -180,183 +194,183 @@
         <script src="js/jquery-1.11.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
+                crossorigin="anonymous"></script>
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-                                               // Preview image
-                                               function previewImage(event) {
-                                                   const input = event.target;
-                                                   const preview = document.getElementById('previewImage');
-                                                   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                                                   const maxSize = 5 * 1024 * 1024; // 5MB
+            // Preview image
+            function previewImage(event) {
+                const input = event.target;
+                const preview = document.getElementById('previewImage');
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
 
-                                                   if (input.files && input.files[0]) {
-                                                       const file = input.files[0];
-                                                       if (!allowedTypes.includes(file.type)) {
-                                                           alert('Only JPEG, PNG, or GIF images are allowed.');
-                                                           input.value = '';
-                                                           preview.src = '<%= user.getUserPicture() != null && !user.getUserPicture().isEmpty() ? "images/profiles/" + user.getUserPicture() : "images/default-avatar.png" %>';
-                                                           return;
-                                                       }
-                                                       if (file.size > maxSize) {
-                                                           alert('Image file size must not exceed 5MB.');
-                                                           input.value = '';
-                                                           preview.src = '<%= user.getUserPicture() != null && !user.getUserPicture().isEmpty() ? "images/profiles/" + user.getUserPicture() : "images/default-avatar.png" %>';
-                                                           return;
-                                                       }
-                                                       const reader = new FileReader();
-                                                       reader.onload = function (e) {
-                                                           preview.src = e.target.result;
-                                                       };
-                                                       reader.readAsDataURL(file);
-                                                   }
-                                               }
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Only JPEG, PNG, or GIF images are allowed.');
+                        input.value = '';
+                        preview.src = '<%= user.getUserPicture() != null && !user.getUserPicture().isEmpty() ? "images/profiles/" + user.getUserPicture() + "?t=" + System.currentTimeMillis() : "images/default-avatar.png" %>';
+                        return;
+                    }
+                    if (file.size > maxSize) {
+                        alert('Image file size must not exceed 5MB.');
+                        input.value = '';
+                        preview.src = '<%= user.getUserPicture() != null && !user.getUserPicture().isEmpty() ? "images/profiles/" + user.getUserPicture() + "?t=" + System.currentTimeMillis() : "images/default-avatar.png" %>';
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
 
-                                               // Real-time validation for full name
-                                               document.getElementById('fullName').addEventListener('input', function () {
-                                                   const fullName = this.value;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (!fullName) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Full name is required.';
-                                                   } else if (fullName.length > 100) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Full name must not exceed 100 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for full name
+            document.getElementById('fullName').addEventListener('input', function () {
+                const fullName = this.value;
+                const feedback = this.nextElementSibling;
+                if (!fullName) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Full name is required.';
+                } else if (fullName.length > 100) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Full name must not exceed 100 characters.';
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Real-time validation for email
-                                               document.getElementById('email').addEventListener('input', function () {
-                                                   const email = this.value;
-                                                   const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (!email) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Email is required.';
-                                                   } else if (!emailRegex.test(email)) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Invalid email format.';
-                                                   } else if (email.length > 100) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Email must not exceed 100 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for email
+            document.getElementById('email').addEventListener('input', function () {
+                const email = this.value;
+                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                const feedback = this.nextElementSibling;
+                if (!email) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Email is required.';
+                } else if (!emailRegex.test(email)) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Invalid email format.';
+                } else if (email.length > 100) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Email must not exceed 100 characters.';
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Real-time validation for phone number
-                                               document.getElementById('phoneNumber').addEventListener('input', function () {
-                                                   const phone = this.value;
-                                                   const phoneRegex = /^\+?[0-9]{1,15}$/;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (!phone) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Phone number is required.';
-                                                   } else if (!phoneRegex.test(phone)) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Phone number must be 1-15 digits, optionally starting with "+".';
-                                                   } else if (phone.length > 15) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Phone number must not exceed 15 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for phone number
+            document.getElementById('phoneNumber').addEventListener('input', function () {
+                const phone = this.value;
+                const phoneRegex = /^\+?[0-9]{1,15}$/;
+                const feedback = this.nextElementSibling;
+                if (!phone) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Phone number is required.';
+                } else if (!phoneRegex.test(phone)) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Phone number must be 1-15 digits, optionally starting with "+".';
+                } else if (phone.length > 15) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Phone number must not exceed 15 characters.';
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Real-time validation for address
-                                               document.getElementById('address').addEventListener('input', function () {
-                                                   const address = this.value;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (address.length > 255) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Address must not exceed 255 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for address
+            document.getElementById('address').addEventListener('input', function () {
+                const address = this.value;
+                const feedback = this.nextElementSibling;
+                if (address.length > 255) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Address must not exceed 255 characters.';
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Real-time validation for date of birth
-                                               document.getElementById('dateOfBirth').addEventListener('input', function () {
-                                                   const date = this.value;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (date) {
-                                                       const inputDate = new Date(date);
-                                                       const today = new Date();
-                                                       if (inputDate > today) {
-                                                           this.classList.add('is-invalid');
-                                                           feedback.textContent = 'Date of birth cannot be in the future.';
-                                                       } else {
-                                                           this.classList.remove('is-invalid');
-                                                           feedback.textContent = '';
-                                                       }
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for date of birth
+            document.getElementById('dateOfBirth').addEventListener('input', function () {
+                const date = this.value;
+                const feedback = this.nextElementSibling;
+                if (date) {
+                    const inputDate = new Date(date);
+                    const today = new Date();
+                    if (inputDate > today) {
+                        this.classList.add('is-invalid');
+                        feedback.textContent = 'Date of birth cannot be in the future.';
+                    } else {
+                        this.classList.remove('is-invalid');
+                        feedback.textContent = '';
+                    }
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Real-time validation for description
-                                               document.getElementById('description').addEventListener('input', function () {
-                                                   const description = this.value;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (description.length > 1000) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Description must not exceed 1000 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
+            // Real-time validation for description
+            document.getElementById('description').addEventListener('input', function () {
+                const description = this.value;
+                const feedback = this.nextElementSibling;
+                if (description.length > 1000) {
+                    this.classList.add('is-invalid');
+                    feedback.textContent = 'Description must not exceed 1000 characters.';
+                } else {
+                    this.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                }
+            });
 
-                                               // Form submission validation
-                                               document.getElementById('profileForm').addEventListener('submit', function (event) {
-                                                   let valid = true;
-                                                   const fullName = document.getElementById('fullName').value;
-                                                   const email = document.getElementById('email').value;
-                                                   const phone = document.getElementById('phoneNumber').value;
-                                                   const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                                   const phoneRegex = /^\+?[0-9]{1,15}$/;
+            // Form submission validation
+            document.getElementById('profileForm').addEventListener('submit', function (event) {
+                let valid = true;
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phoneNumber').value;
+                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                const phoneRegex = /^\+?[0-9]{1,15}$/;
 
-                                                   const fullNameFeedback = document.getElementById('fullName').nextElementSibling;
-                                                   const emailFeedback = document.getElementById('email').nextElementSibling;
-                                                   const phoneFeedback = document.getElementById('phoneNumber').nextElementSibling;
+                const fullNameFeedback = document.getElementById('fullName').nextElementSibling;
+                const emailFeedback = document.getElementById('email').nextElementSibling;
+                const phoneFeedback = document.getElementById('phoneNumber').nextElementSibling;
 
-                                                   if (!fullName) {
-                                                       valid = false;
-                                                       document.getElementById('fullName').classList.add('is-invalid');
-                                                       fullNameFeedback.textContent = 'Full name is required.';
-                                                   }
-                                                   if (!email) {
-                                                       valid = false;
-                                                       document.getElementById('email').classList.add('is-invalid');
-                                                       emailFeedback.textContent = 'Email is required.';
-                                                   } else if (!emailRegex.test(email)) {
-                                                       valid = false;
-                                                       document.getElementById('email').classList.add('is-invalid');
-                                                       emailFeedback.textContent = 'Invalid email format.';
-                                                   }
-                                                   if (!phone) {
-                                                       valid = false;
-                                                       document.getElementById('phoneNumber').classList.add('is-invalid');
-                                                       phoneFeedback.textContent = 'Phone number is required.';
-                                                   } else if (!phoneRegex.test(phone)) {
-                                                       valid = false;
-                                                       document.getElementById('phoneNumber').classList.add('is-invalid');
-                                                       phoneFeedback.textContent = 'Phone number must be 1-15 digits.';
-                                                   }
+                if (!fullName) {
+                    valid = false;
+                    document.getElementById('fullName').classList.add('is-invalid');
+                    fullNameFeedback.textContent = 'Full name is required.';
+                }
+                if (!email) {
+                    valid = false;
+                    document.getElementById('email').classList.add('is-invalid');
+                    emailFeedback.textContent = 'Email is required.';
+                } else if (!emailRegex.test(email)) {
+                    valid = false;
+                    document.getElementById('email').classList.add('is-invalid');
+                    emailFeedback.textContent = 'Invalid email format.';
+                }
+                if (!phone) {
+                    valid = false;
+                    document.getElementById('phoneNumber').classList.add('is-invalid');
+                    phoneFeedback.textContent = 'Phone number is required.';
+                } else if (!phoneRegex.test(phone)) {
+                    valid = false;
+                    document.getElementById('phoneNumber').classList.add('is-invalid');
+                    phoneFeedback.textContent = 'Phone number must be 1-15 digits.';
+                }
 
-                                                   if (!valid) {
-                                                       event.preventDefault();
-                                                   }
-                                               });
+                if (!valid) {
+                    event.preventDefault();
+                }
+            });
         </script>
     </body>
 </html>

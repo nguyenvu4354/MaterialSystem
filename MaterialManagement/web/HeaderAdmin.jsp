@@ -1,4 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
 <header>
     <div class="container py-2">
         <div class="row py-4 pb-0 pb-sm-4 align-items-center">
@@ -38,8 +41,8 @@
             <div class="d-flex d-lg-none align-items-end mt-3">
                 <ul class="d-flex justify-content-end list-unstyled m-0">
                     <li>
-                        <a href="adminAccount.jsp" class="mx-3">
-                            <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
+                        <a href="profile" class="mx-3">
+                            <i class="fas fa-user fs-4"></i>
                         </a>
                     </li>
                     <li>
@@ -47,7 +50,6 @@
                             <iconify-icon icon="tabler:search" class="fs-4"></iconify-icon>
                         </a>
                     </li>
-                    
                 </ul>
             </div>
 
@@ -72,7 +74,6 @@
                         <option value="manageUnits.jsp">Manage Units</option>
                     </select>
 
-
                     <ul class="navbar-nav menu-list list-unstyled d-flex gap-md-3 mb-0">
                         <li class="nav-item">
                             <a href="home" class="nav-link active">Home</a>
@@ -84,7 +85,7 @@
                                 <li><a href="UserList" class="dropdown-item">Users</a></li>
                                 <li><a href="#" class="dropdown-item">Departments</a></li>
                                 <li><a href="#" class="dropdown-item">Materials</a></li>
-                                <li><a href="Category.jsp"" class="dropdown-item">Categories</a></li>
+                                <li><a href="Category.jsp" class="dropdown-item">Categories</a></li>
                                 <li><a href="Supplier" class="dropdown-item">Suppliers</a></li>
                                 <li><a href="#" class="dropdown-item">Units</a></li>
                             </ul>
@@ -95,7 +96,7 @@
                         <ul class="d-flex justify-content-end list-unstyled m-0">
                             <li>
                                 <a href="profile" class="mx-3">
-                                    <iconify-icon icon="healthicons:person" class="fs-4"></iconify-icon>
+                                    <i class="fas fa-user fs-4"></i>
                                 </a>
                             </li>
                         </ul>

@@ -27,11 +27,11 @@ public class UserDAO extends DBContext {
     }
 
     public User login(String username, String password) {
-        String sql = "SELECT u.*, r.role_name, d.department_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
-                     "WHERE u.username = ? AND u.password = ?";
+        String sql = "SELECT u.*, r.role_name, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.username = ? AND u.password = ?";
 
         String md5Password = md5(password);
 
@@ -72,11 +72,11 @@ public class UserDAO extends DBContext {
 
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name, d.department_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
-                     "WHERE u.status != 'deleted'";
+        String sql = "SELECT u.*, r.role_name, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.status != 'deleted'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -109,11 +109,11 @@ public class UserDAO extends DBContext {
     }
 
     public User getUserById(int userId) {
-        String sql = "SELECT u.*, r.role_name, d.department_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
-                     "WHERE u.user_id = ? AND u.status != 'deleted'";
+        String sql = "SELECT u.*, r.role_name, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.user_id = ? AND u.status != 'deleted'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -192,8 +192,8 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
@@ -247,6 +247,24 @@ public class UserDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("❌ Lỗi khi kiểm tra username tồn tại: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isEmailExist(String email, int excludeUserId) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND user_id != ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, excludeUserId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                boolean exists = rs.getInt(1) > 0;
+                System.out.println(exists ? "❌ Email đã tồn tại: " + email : "✅ Email có thể sử dụng: " + email);
+                return exists;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi khi kiểm tra email tồn tại: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -330,11 +348,11 @@ public class UserDAO extends DBContext {
     public List<User> getUsersByPageAndFilter(int page, int pageSize, String username, String status, Integer roleId, Integer departmentId) {
         List<User> userList = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT u.*, r.role_name, d.department_name " +
-                "FROM Users u " +
-                "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                "LEFT JOIN Departments d ON u.department_id = d.department_id " +
-                "WHERE u.status != 'deleted' ");
+                "SELECT u.*, r.role_name, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.status != 'deleted' ");
 
         List<Object> params = new ArrayList<>();
 
@@ -441,11 +459,11 @@ public class UserDAO extends DBContext {
 
     public List<User> getUsersByRoleId(int roleId) {
         List<User> userList = new ArrayList<>();
-        String sql = "SELECT u.*, r.role_name, d.department_name " +
-                     "FROM Users u " +
-                     "LEFT JOIN Roles r ON u.role_id = r.role_id " +
-                     "LEFT JOIN Departments d ON u.department_id = d.department_id " +
-                     "WHERE u.role_id = ? AND u.status != 'deleted'";
+        String sql = "SELECT u.*, r.role_name, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Roles r ON u.role_id = r.role_id "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.role_id = ? AND u.status != 'deleted'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, roleId);
@@ -483,14 +501,14 @@ public class UserDAO extends DBContext {
         UserDAO userDAO = new UserDAO();
         User user = new User();
         user.setUsername("Admin2");
-        user.setPassword(userDAO.md5("123")); 
+        user.setPassword(userDAO.md5("123"));
         user.setFullName("User");
         user.setEmail("testuser@example.com");
         user.setPhoneNumber("0123456789");
         user.setAddress("123 Test Street");
         user.setUserPicture("test.jpg");
         user.setRoleId(1);
-        user.setDepartmentId(1); 
+        user.setDepartmentId(1);
         user.setDateOfBirth(LocalDate.of(1990, 1, 1));
         user.setGender(User.Gender.male);
         user.setDescription("Test user for DAO");
