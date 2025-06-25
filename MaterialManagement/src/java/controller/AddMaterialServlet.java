@@ -34,7 +34,7 @@ import jakarta.servlet.http.Part;
 )
 public class AddMaterialServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIRECTORY = "material_images";
+    private static final String UPLOAD_DIRECTORY = "images/material";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -99,8 +99,7 @@ public class AddMaterialServlet extends HttpServlet {
         
         try {
             String realPath = request.getServletContext().getRealPath("/");
-            String sourceWebPath = realPath.replace("build" + File.separator + "web", "web");
-            String uploadPath = sourceWebPath + File.separator + UPLOAD_DIRECTORY;
+            String uploadPath = realPath + UPLOAD_DIRECTORY + File.separator;
 
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
@@ -150,14 +149,12 @@ public class AddMaterialServlet extends HttpServlet {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 String fileExtension = fileName.substring(fileName.lastIndexOf("."));
                 String newFileName = UUID.randomUUID().toString() + fileExtension;
-                
-                filePart.write(uploadPath + File.separator + newFileName);
-                
+                filePart.write(uploadPath + newFileName);
                 relativeFilePath = UPLOAD_DIRECTORY + "/" + newFileName;
             } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
                 relativeFilePath = request.getParameter("materialsUrl").trim();
             } else {
-                relativeFilePath = "material_images/default.jpg";
+                relativeFilePath = UPLOAD_DIRECTORY + "/default.jpg";
             }
 
             BigDecimal priceBD = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
