@@ -30,7 +30,7 @@ import java.util.Map;
 )
 public class EditMaterialServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIRECTORY = "material_images";
+    private static final String UPLOAD_DIRECTORY = "images/material";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -112,12 +112,17 @@ public class EditMaterialServlet extends HttpServlet {
             response.setContentType("text/html;charset=UTF-8");
             
             String realPath = request.getServletContext().getRealPath("/");
-            String sourceWebPath = realPath.replace("build" + File.separator + "web", "web");
-            String uploadPath = sourceWebPath + File.separator + UPLOAD_DIRECTORY;
+            String uploadPath = realPath + UPLOAD_DIRECTORY + File.separator;
+
+            System.out.println("Debug - Real path: " + realPath);
+            System.out.println("Debug - Upload path: " + uploadPath);
 
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
+                System.out.println("Debug - Created upload directory: " + uploadPath);
+            } else {
+                System.out.println("Debug - Upload directory already exists: " + uploadPath);
             }
 
             String materialId = request.getParameter("materialId");
@@ -126,9 +131,18 @@ public class EditMaterialServlet extends HttpServlet {
             String materialStatus = request.getParameter("materialStatus");
             String conditionPercentage = request.getParameter("conditionPercentage");
             String priceStr = request.getParameter("price");
-            System.out.println("Giá tiền nhập vào: " + priceStr);
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
+
+            System.out.println("Debug - Form parameters:");
+            System.out.println("  materialId: " + materialId);
+            System.out.println("  materialCode: " + materialCode);
+            System.out.println("  materialName: " + materialName);
+            System.out.println("  materialStatus: " + materialStatus);
+            System.out.println("  conditionPercentage: " + conditionPercentage);
+            System.out.println("  price: " + priceStr);
+            System.out.println("  categoryId: " + categoryId);
+            System.out.println("  unitId: " + unitId);
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                 materialCode, materialName, materialStatus, priceStr, conditionPercentage, categoryId, unitId);
@@ -161,12 +175,41 @@ public class EditMaterialServlet extends HttpServlet {
             Part filePart = request.getPart("materialImage");
             String urlInput = request.getParameter("materialsUrl");
 
+            System.out.println("Debug - File part: " + (filePart != null ? "exists" : "null"));
+            System.out.println("Debug - File size: " + (filePart != null ? filePart.getSize() : "N/A"));
+            System.out.println("Debug - URL input: " + urlInput);
+
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                filePart.write(uploadPath + File.separator + fileName);
+                System.out.println("Debug - Uploading file: " + fileName);
+                System.out.println("Debug - Upload path: " + uploadPath);
+                
+                String fullFilePath = uploadPath + fileName;
+                System.out.println("Debug - Full file path: " + fullFilePath);
+                
+                try {
+                    filePart.write(fullFilePath);
+                    System.out.println("Debug - File written successfully to: " + fullFilePath);
+                    
+                    // Kiểm tra xem file có tồn tại không
+                    File uploadedFile = new File(fullFilePath);
+                    if (uploadedFile.exists()) {
+                        System.out.println("Debug - File exists after writing: " + uploadedFile.length() + " bytes");
+                    } else {
+                        System.out.println("Debug - ERROR: File does not exist after writing!");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Debug - ERROR writing file: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                
                 imageUrl = UPLOAD_DIRECTORY + "/" + fileName;
+                System.out.println("Debug - Image URL set to: " + imageUrl);
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 imageUrl = urlInput.trim();
+                System.out.println("Debug - Using URL input: " + imageUrl);
+            } else {
+                System.out.println("Debug - No new image provided, will keep old image");
             }
 
             int materialIdInt = Integer.parseInt(materialId);
@@ -178,7 +221,6 @@ public class EditMaterialServlet extends HttpServlet {
             material.setMaterialId(materialIdInt);
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
-            material.setMaterialsUrl(imageUrl);
             material.setMaterialStatus(materialStatus);
             material.setConditionPercentage(conditionPercentageInt);
             material.setPrice(Double.parseDouble(priceStr));
@@ -194,15 +236,22 @@ public class EditMaterialServlet extends HttpServlet {
             MaterialDAO materialDAO = new MaterialDAO();
             Material oldMaterial = materialDAO.getInformation(material.getMaterialId());
             
-            if (imageUrl != null) {
+            // Xử lý URL ảnh: ưu tiên ảnh mới upload, sau đó là URL nhập tay, cuối cùng giữ ảnh cũ
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
                 material.setMaterialsUrl(imageUrl);
+                System.out.println("Debug - Final image URL set to: " + imageUrl);
             } else if (oldMaterial != null && oldMaterial.getMaterialsUrl() != null) {
                 material.setMaterialsUrl(oldMaterial.getMaterialsUrl());
+                System.out.println("Debug - Keeping old image URL: " + oldMaterial.getMaterialsUrl());
+            } else {
+                System.out.println("Debug - No image URL available");
             }
 
             material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             material.setDisable(oldMaterial.isDisable());
 
+            System.out.println("Debug - About to update material with ID: " + material.getMaterialId());
+            System.out.println("Debug - Material image URL: " + material.getMaterialsUrl());
             materialDAO.updateMaterial(material);
             
             response.sendRedirect("dashboardmaterial?success=Material updated successfully");
