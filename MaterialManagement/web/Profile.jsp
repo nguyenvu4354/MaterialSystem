@@ -102,7 +102,7 @@
                                 <img id="previewImage" src="images/profiles/<%= user.getUserPicture() %>?t=<%= System.currentTimeMillis() %>"
                                      class="img-thumbnail rounded-circle mb-3" alt="Profile Picture"/>
                                 <% } else { %>
-                                <img id="previewImage" src="images/default-avatar.png"
+                                <img id="previewImage" src="images/profiles/DefaultUser.jpg"
                                      class="img-thumbnail rounded-circle mb-3" alt="Profile Picture"/>
                                 <% } %>
                                 <div class="mb-3">
