@@ -13,15 +13,17 @@
             }
 
             h2 {
-                color: #2c3e50;
+                color: #d59f39;
                 text-align: center;
+                font-size: 28px;
+                margin-bottom: 10px;
             }
 
             .container {
                 background-color: #ffffff;
-                padding: 20px 30px;
+                padding: 30px;
                 border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
                 max-width: 1100px;
                 margin: 0 auto;
             }
@@ -34,22 +36,23 @@
             }
 
             th, td {
-                border: 1px solid #ddd;
-                padding: 10px 14px;
+                border: 1px solid #eee;
+                padding: 12px;
                 text-align: left;
             }
 
             th {
-                background-color: #2c3e50;
-                color: #ffffff;
+                background-color: #f4f2ef;
+                color: #2c3e50;
+                font-weight: bold;
             }
 
             tr:nth-child(even) {
-                background-color: #f9f9f9;
+                background-color: #fbfbfb;
             }
 
             tr:hover {
-                background-color: #e0f7fa;
+                background-color: #f1f9ff;
             }
 
             .error {
@@ -60,42 +63,71 @@
             }
 
             .status {
-                padding: 4px 8px;
-                border-radius: 6px;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 13px;
                 font-weight: bold;
+                text-align: center;
                 display: inline-block;
+                min-width: 80px;
             }
 
-            .btn {
-                margin-left: 1048px;
-                padding: 10px 4px;
+            .status.pending {
+                background-color: #d6d6d6;
+                color: #333;
             }
+
+            .status.approved {
+                background-color: #b7e4c7;
+                color: #1b5e20;
+            }
+
+            .status.rejected {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+
             .home-btn-container {
                 display: flex;
                 justify-content: flex-end;
-                margin-top: 10px
-                  
+                margin-top: 20px;
             }
+
             .home-btn {
-                background-color: #2c3e50;
+                background-color: #d59f39;
                 color: white;
-                padding: 10px 20px;
+                padding: 10px 22px;
                 border: none;
                 border-radius: 6px;
                 cursor: pointer;
                 font-weight: bold;
                 text-decoration: none;
-                display: inline-block;
                 transition: background-color 0.2s;
             }
 
             .home-btn:hover {
-                background-color: #34495e;
+                background-color: #c5892c;
+            }
+
+            form button {
+                background-color: #f8c471;
+                color: #fff;
+                border: none;
+                border-radius: 20px;
+                padding: 6px 14px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background-color 0.2s;
+            }
+
+            form button:hover {
+                background-color: #e67e22;
             }
         </style>
+
     </head>
     <body>
-
+        <jsp:include page="Header.jsp" />
         <div class="container">
             <h2>List repair request</h2>
 
@@ -111,7 +143,7 @@
                     <th>Request Date</th>
                     <th>Status</th>
                     <th>Reason</th>
-                    <th>Action</th> <!-- Thêm cột cho nút -->
+                    <th>Action</th> 
                 </tr>
                 <c:forEach var="r" items="${repairRequests}">
                     <tr>
@@ -140,9 +172,11 @@
                     </tr>
                 </c:forEach>
             </table>
-                <a href="home" class="home-btn-container"><button type="button" class="home-btn">Home</button></a>
+            <a href="home" class="home-btn-container"><button type="button" class="home-btn">Home</button></a>
 
         </div>
+        <jsp:include page="Footer.jsp" />
+
 
     </body>
 </html>
