@@ -30,7 +30,7 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix
   </head>
   <body>
     <!-- Header -->
-    <jsp:include page="HeaderAdmin.jsp" />
+    <jsp:include page="Header.jsp" />
     <!-- Main content -->
     <div class="container-fluid">
       <div class="row">
@@ -44,6 +44,24 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix
             <h2 class="text-primary fw-bold display-6 border-bottom pb-2">
               <i class="fas fa-boxes me-2"></i>Static Inventory
             </h2>
+            <div>
+              <button class="btn btn-primary" id="viewReportBtn">View Report</button>
+            </div>
+          </div>
+          <div id="reportSection" style="display: none;" class="mb-4">
+            <div class="row mb-4">
+              <div class="col-md-6 mb-3">
+                <canvas id="pieChart"></canvas>
+              </div>
+              <div class="col-md-6 mb-3 d-flex flex-column justify-content-center">
+                <h5 class="fw-bold">Tỉ lệ Xuất / Nhập / Tồn kho</h5>
+                <ul class="list-group">
+                  <li class="list-group-item">Tổng số lượng đã nhập: <strong>${totalImported}</strong></li>
+                  <li class="list-group-item">Tổng số lượng đã xuất: <strong>${totalExported}</strong></li>
+                  <li class="list-group-item">Tổng số lượng tồn kho: <strong>${totalStock}</strong></li>
+                </ul>
+              </div>
+            </div>
           </div>
           <!-- Alert Messages -->
           <c:if test="${not empty error}">
@@ -206,20 +224,6 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix
               </nav>
             </div>
           </c:if>
-          <!-- Nút và section báo cáo -->
-          <div class="d-flex gap-2 mb-3">
-            <button class="btn btn-primary" id="viewReportBtn">View Report</button>
-            <c:if test="${not empty sessionScope.user and sessionScope.user.roleId == 3}">
-              <a href="ImportMaterial" class="btn btn-success">Import Material</a>
-              <a href="ExportMaterial" class="btn btn-info">Export Material</a>
-            </c:if>
-          </div>
-          <div id="reportSection" style="display: none">
-            <div class="row mb-4">
-              <div class="col-md-6 mb-3"><canvas id="barChart"></canvas></div>
-              <div class="col-md-6 mb-3"><canvas id="lineChart"></canvas></div>
-            </div>
-          </div>
         </div>
         <!-- end content -->
       </div>
@@ -291,54 +295,27 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix
         }
       });
       function renderCharts() {
-        var inventoryData = [];
-        <c:forEach var="inv" items="${inventoryList}">
-          inventoryData.push({
-            name: "${inv.materialName}",
-            category: "${inv.categoryName}",
-            stock: ${inv.stock}
-          });
-        </c:forEach>
-        var categoryMap = {};
-        inventoryData.forEach(function(item) {
-          if (!categoryMap[item.category]) categoryMap[item.category] = 0;
-          categoryMap[item.category] += item.stock;
-        });
-        var barLabels = Object.keys(categoryMap);
-        var barData = Object.values(categoryMap);
-        var lineLabels = inventoryData.map(function(item) { return item.name; });
-        var lineData = inventoryData.map(function(item) { return item.stock; });
-        var barCtx = document.getElementById('barChart').getContext('2d');
-        new Chart(barCtx, {
-          type: 'bar',
+        // Pie chart: Xuất/Nhập/Tồn
+        var totalImported = parseInt('${totalImported}', 10) || 0;
+        var totalExported = parseInt('${totalExported}', 10) || 0;
+        var totalStock = parseInt('${totalStock}', 10) || 0;
+        var pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+          type: 'pie',
           data: {
-            labels: barLabels,
+            labels: ['Đã nhập', 'Đã xuất', 'Tồn kho'],
             datasets: [{
-              label: 'Total Stock by Category',
-              data: barData,
-              backgroundColor: 'rgba(54, 162, 235, 0.7)'
+              data: [totalImported, totalExported, totalStock],
+              backgroundColor: [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(40, 167, 69, 0.7)'
+              ]
             }]
           },
           options: {
             responsive: true,
-            plugins: { legend: { display: false } }
-          }
-        });
-        var lineCtx = document.getElementById('lineChart').getContext('2d');
-        new Chart(lineCtx, {
-          type: 'line',
-          data: {
-            labels: lineLabels,
-            datasets: [{
-              label: 'Stock by Material',
-              data: lineData,
-              fill: false,
-              borderColor: 'rgba(255, 99, 132, 0.7)',
-              tension: 0.1
-            }]
-          },
-          options: {
-            responsive: true
+            plugins: { legend: { position: 'bottom' } }
           }
         });
       }
