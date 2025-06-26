@@ -33,6 +33,13 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
+        // Lấy thông báo nếu có từ session sau redirect
+        String message = (String) session.getAttribute("message");
+        if (message != null) {
+            request.setAttribute("message", message);
+            session.removeAttribute("message");
+        }
+
         User user = (User) session.getAttribute("user");
         request.setAttribute("user", user);
 
@@ -63,7 +70,7 @@ public class ProfileServlet extends HttpServlet {
             String gender = request.getParameter("gender");
             String description = request.getParameter("description");
 
-            // Update user 
+            // Cập nhật thông tin user
             user.setFullName(fullName);
             user.setEmail(email);
             user.setPhoneNumber(phoneNumber);
@@ -95,13 +102,14 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
+            // Xử lý ảnh đại diện nếu có
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
-                String buildPath = getServletContext().getRealPath("/"); 
-                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                String buildPath = getServletContext().getRealPath("/");
+                Path projectRoot = Paths.get(buildPath).getParent().getParent();
                 Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
 
                 if (!Files.exists(uploadDir)) {
@@ -113,11 +121,14 @@ public class ProfileServlet extends HttpServlet {
                 user.setUserPicture(fileName);
             }
 
+            // Lưu thông tin cập nhật
             boolean updated = userDAO.updateUser(user);
             if (updated) {
                 user = userDAO.getUserById(user.getUserId());
                 session.setAttribute("user", user);
-                request.setAttribute("message", "Profile updated successfully!");
+                session.setAttribute("message", "Profile updated successfully!");
+                response.sendRedirect("profile");
+                return;
             } else {
                 request.setAttribute("error", "Failed to update profile. Please try again.");
             }
