@@ -329,7 +329,7 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <jsp:include page="HeaderAdmin.jsp"/>
+                <jsp:include page="Header.jsp"/>
                 <div class="container-fluid">
                     <div class="row">
                         <jsp:include page="SidebarDirector.jsp"/>
