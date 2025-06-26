@@ -150,7 +150,7 @@
                     <c:forEach var="product" items="${results}" varStatus="loop">
                         <tr class="text-center">
                             <td>${loop.index + 1}</td>
-                            <td><img src="${product.materialsUrl}" alt="${product.materialName}"></td>
+                            <td><img src="images/material1/${product.materialsUrl}" alt="${product.materialName}"></td>
                             <td>${product.materialName}</td>
                             <td>$${product.price}</td>
                             <td>

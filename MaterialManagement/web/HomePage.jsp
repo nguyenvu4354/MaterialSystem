@@ -709,7 +709,7 @@
                                 <div class="card-container">
                                     <c:forEach var="product" items="${productList}">
                                         <div class="product-card">
-                                            <img src="${product.materialsUrl}" alt="${product.materialName}" width="200">
+                                            <img src="images/material/Material_1.jpg" alt="${product.materialName}" width="200">
                                             <div class="card-content">
                                                 <h5>${product.materialName}</h5>
                                                 <p style="color: #d59f39; font-weight: bold;">$${product.price}</p>
@@ -800,8 +800,6 @@
 
 
 
-        <!-- Modal Login/Register -->
-        <!-- Đã bỏ modal login/register vì nút login giờ chuyển trang -->
 
 
 
