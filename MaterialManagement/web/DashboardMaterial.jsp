@@ -103,9 +103,11 @@
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-box"></i> Material List</h2>
-                    <a href="${pageContext.request.contextPath}/addmaterial" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Add New Material
-                    </a>
+                    <c:if test="${!readonly}">
+                        <a href="${pageContext.request.contextPath}/addmaterial" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Add New Material
+                        </a>
+                    </c:if>
                 </div>
 
                 <!-- Search and Filter Section -->
