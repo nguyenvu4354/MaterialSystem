@@ -69,15 +69,18 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
             // Lấy thông tin người dùng từ session
             HttpSession session = request.getSession();
             entity.User user = (entity.User) session.getAttribute("user");
-            int roleId = user.getRoleId();
+
+            int roleId = user != null ? user.getRoleId() : 0;
 
             request.setAttribute("details", details);
             request.setAttribute("requestId", requestId);
-            request.setAttribute("roleId", roleId); // Gửi roleId sang JSP
+            request.setAttribute("roleId", roleId);
+
             request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            request.setAttribute("error", "Failed to load repair request details.");
+            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
         }
     }
 

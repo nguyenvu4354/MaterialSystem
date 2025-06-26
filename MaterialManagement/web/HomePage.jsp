@@ -15,14 +15,14 @@
         <meta name="description" content="A professional material management system for tracking and managing computer accessories and inventory.">
         <style>
             body {
-                --primary: #2563eb;
-                --primary-dark: #1e40af;
-                --primary-light: #60a5fa;
+                --primary: #f4a261;
+                --primary-dark: #e76f51;
+                --primary-light: #fff5e6;
                 --success: #22c55e;
                 --danger: #ef4444;
-                --bg-main: #f4f6fb;
+                --bg-main: #fff5e6;
                 --bg-light: #f1f5f9;
-                --border: #e5e7eb;
+                --border: #e0e0e0;
                 --white: #fff;
                 font-family: 'Inter', sans-serif;
                 background-color: var(--bg-main);
@@ -31,11 +31,11 @@
                 line-height: 1.6;
             }
             .top-bar {
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                background: #d59f39;
                 color: #fff;
                 font-size: 16px;
                 letter-spacing: 0.5px;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
             }
             .top-bar .contact-info span {
                 margin-right: 18px;
@@ -49,17 +49,17 @@
             }
             .login-buttons .btn:hover {
                 background: #fff;
-                color: #3498db;
+                color: var(--primary);
             }
             .header-main {
-                box-shadow: 0 6px 24px rgba(37,99,235,0.10);
+                box-shadow: 0 6px 24px rgba(244,161,97,0.10);
                 border-radius: 0 0 24px 24px;
                 background: var(--white);
                 min-height: 80px;
             }
             .header-main .navbar-nav .nav-link {
                 font-weight: 700;
-                color: #3498db;
+                color: var(--primary);
                 border-radius: 12px;
                 font-size: 17px;
                 transition: background 0.2s, color 0.2s;
@@ -67,7 +67,7 @@
                 margin: 0 2px;
             }
             .header-main .navbar-nav .nav-link:hover, .header-main .navbar-nav .nav-link.active {
-                background: #3498db;
+                background: var(--primary);
                 color: #fff;
             }
             .header-main .btn-main {
@@ -75,21 +75,21 @@
                 border-radius: 22px;
                 padding: 12px 32px;
                 font-weight: 700;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
                 transition: background 0.2s, color 0.2s, transform 0.2s;
             }
             .header-main .btn-main:hover {
-                background: #2980b9;
+                background: var(--primary-dark);
                 color: #fff !important;
                 transform: scale(1.04);
             }
             .main-logo img {
                 height: 54px;
                 border-radius: 10px;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
             }
             .navbar-nav .nav-link {
-                color: #3498db;
+                color: var(--primary);
                 font-weight: 700;
                 margin: 0 10px;
                 border-radius: 8px;
@@ -97,26 +97,26 @@
                 font-size: 16px;
             }
             .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-                background: #3498db;
+                background: var(--primary);
                 color: #fff;
             }
             .offcanvas-body .btn {
-                background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
                 border: none;
                 color: #fff;
                 font-weight: 600;
-                box-shadow: 0 2px 8px rgba(52,152,219,0.12);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
                 transition: background 0.2s, transform 0.2s;
             }
             .offcanvas-body .btn:hover {
-                background: #2980b9;
+                background: var(--primary-dark);
                 transform: translateY(-2px) scale(1.04);
             }
             .sidebar {
                 padding: 24px 18px;
                 border-radius: 18px;
                 background: var(--white);
-                box-shadow: 0 4px 18px rgba(37,99,235,0.08);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.08);
                 margin-top: 0;
                 border: 1px solid var(--border);
             }
@@ -136,7 +136,7 @@
                 margin-bottom: 14px;
                 border-radius: 14px;
                 background: var(--bg-light);
-                box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.06);
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
                 text-decoration: none;
                 font-weight: 600;
@@ -147,7 +147,7 @@
             .sidebar-item:hover {
                 background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
                 color: #fff;
-                box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+                box-shadow: 0 4px 16px rgba(244,161,97,0.13);
                 transform: translateX(6px) scale(1.04);
             }
             .sidebar-item:hover .category-icon {
@@ -181,14 +181,14 @@
                 border-radius: 20px;
                 overflow: hidden;
                 background: var(--white);
-                box-shadow: 0 4px 18px rgba(37,99,235,0.10);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.10);
                 transition: box-shadow 0.3s, transform 0.3s;
                 margin-bottom: 0;
                 border: 1px solid var(--border);
                 position: relative;
             }
             .product-card:hover {
-                box-shadow: 0 10px 32px rgba(37,99,235,0.18);
+                box-shadow: 0 10px 32px rgba(244,161,97,0.18);
                 transform: translateY(-8px) scale(1.04);
             }
             .product-card img {
@@ -197,7 +197,7 @@
                 object-fit: cover;
                 border-bottom: 1px solid var(--border);
                 border-radius: 20px 20px 0 0;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.06);
             }
             .card-content {
                 padding: 20px 18px 18px 18px;
@@ -221,30 +221,30 @@
             .card-content p {
                 margin: 0 0 14px 0;
                 font-size: 1.08rem;
-                color: #22c55e;
+                color: var(--primary-light);
                 font-weight: 700;
             }
             .btn-main {
-                background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
                 color: #fff !important;
                 border: none;
                 border-radius: 24px;
                 font-weight: 700;
                 padding: 9px 28px;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
                 font-size: 16px;
                 transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
             }
             .btn-main:hover, .btn-main:focus {
-                background: linear-gradient(90deg, #60a5fa 0%, #2563eb 100%);
+                background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
                 transform: scale(1.05);
             }
             .btn-outline-main {
                 background: #fff;
-                color: #3498db !important;
-                border: 2px solid #3498db;
+                color: var(--primary) !important;
+                border: 2px solid var(--primary);
                 border-radius: 24px;
                 font-weight: 700;
                 padding: 9px 28px;
@@ -252,9 +252,9 @@
                 font-size: 16px;
             }
             .btn-outline-main:hover, .btn-outline-main:focus {
-                background: #3498db;
+                background: var(--primary);
                 color: #fff !important;
-                border: 2px solid #2980b9;
+                border: 2px solid var(--primary-dark);
             }
             .btn-action {
                 background: #27ae60;
@@ -279,17 +279,13 @@
                 font-weight: 600;
                 padding: 8px 20px;
                 transition: background 0.2s, color 0.2s, transform 0.2s;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
                 font-size: 15px;
             }
-            .btn-detail:hover {
-                background: var(--primary-light);
-                color: #fff;
-                transform: scale(1.07);
-            }
+
             .btn-contact-info {
                 border-radius: 24px;
                 background: #23272f;
@@ -297,7 +293,7 @@
                 border: none;
                 font-weight: 600;
                 padding: 8px 22px;
-                box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -305,7 +301,7 @@
                 font-size: 16px;
             }
             .btn-contact-info:hover {
-                background: #2563eb;
+                background: var(--primary);
                 color: #fff !important;
                 transform: scale(1.05);
             }
@@ -321,25 +317,25 @@
                 align-items: center;
                 justify-content: center;
                 font-size: 20px;
-                box-shadow: 0 2px 12px rgba(37,99,235,0.13);
+                box-shadow: 0 2px 12px rgba(244,161,97,0.13);
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s;
                 padding: 0;
             }
             .btn-login:hover, .btn-login:focus {
-                background: #2563eb;
+                background: var(--primary);
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
             }
             .section-header h2 {
-                color: #3498db;
+                color: var(--primary);
                 font-weight: 800;
-                border-bottom: 2px solid #6dd5fa;
+                border-bottom: 2px solid var(--primary-light);
                 padding-bottom: 10px;
                 margin-bottom: 20px;
                 letter-spacing: 1px;
             }
             .pagination .page-link {
-                color: #2563eb;
+                color: var(--primary);
                 border-radius: 8px;
                 margin: 0 6px;
                 font-weight: 600;
@@ -348,29 +344,29 @@
                 border: none;
             }
             .pagination .page-link:hover, .pagination .page-item.active .page-link {
-                background: #2563eb;
+                background: var(--primary);
                 color: #fff;
             }
             footer {
                 background: #fff;
                 color: #222;
                 border-radius: 18px;
-                box-shadow: 0 4px 18px rgba(52,152,219,0.08);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.08);
             }
             .footer-menu h3 {
-                color: #3498db;
+                color: var(--primary);
                 font-weight: 800;
                 margin-bottom: 18px;
                 font-size: 18px;
             }
             .footer-menu a {
-                color: #3498db;
+                color: var(--primary);
                 font-weight: 600;
                 transition: color 0.2s;
                 font-size: 16px;
             }
             .footer-menu a:hover {
-                color: #2980b9;
+                color: var(--primary-dark);
             }
             .footer-menu ul {
                 padding-left: 0;
@@ -381,18 +377,18 @@
             }
             .footer-menu img {
                 border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(52,152,219,0.12);
+                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
             }
             .social-links ul {
                 gap: 10px;
             }
             .social-icon {
                 font-size: 24px;
-                color: #3498db;
+                color: var(--primary);
                 transition: color 0.2s;
             }
             .social-icon:hover {
-                color: #2980b9;
+                color: var(--primary-dark);
             }
             @media (max-width: 991px) {
                 .sidebar {
@@ -465,11 +461,11 @@
                 background: #23272f;
                 color: #f1f5f9;
                 border-radius: 16px 16px 0 0;
-                box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+                box-shadow: 0 2px 12px rgba(244,161,97,0.08);
                 font-size: 15px;
             }
             .footer-mms .footer-title {
-                color: #2563eb;
+                color: var(--primary);
                 font-weight: 700;
                 margin-bottom: 16px;
                 font-size: 17px;
@@ -497,10 +493,10 @@
                 transition: color 0.2s;
             }
             .footer-mms .footer-list a:hover {
-                color: #60a5fa;
+                color: var(--primary-light);
             }
             .footer-mms .footer-list i {
-                color: #60a5fa;
+                color: var(--primary-light);
                 min-width: 20px;
                 text-align: center;
             }
@@ -519,18 +515,17 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 2px 12px rgba(37,99,235,0.13);
+                box-shadow: 0 2px 12px rgba(244,161,97,0.13);
                 font-size: 20px;
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s;
                 padding: 0;
             }
             .btn-topbar:hover, .btn-topbar:focus {
-                background: #2563eb;
+                background: var(--primary);
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(37,99,235,0.18);
+                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
             }
         </style>
-
 
 
 
@@ -559,7 +554,7 @@
                             <i class="fas fa-list-ul"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="menuDropdown" style="min-width:220px;">
-                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="home"><i class="fas fa-home"></i> Home</a></li>
                             <li><a class="dropdown-item d-flex align-items-center gap-2" href="view"><i class="fas fa-list"></i> Material List</a></li>
                             <li><a class="dropdown-item d-flex align-items-center gap-2" href="viewsupplier"><i class="fas fa-truck"></i> Suppliers</a></li>
                             <li>
@@ -584,7 +579,7 @@
             </div>
         </div>
         <!-- Header -->
-       <jsp:include page="Header.jsp" />
+        <jsp:include page="Header.jsp" />
 
         <section class="module-links py-4">
             <div class="container">
@@ -635,25 +630,25 @@
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Total Items</h5>
-                            <p style="color: #27ae60; font-weight: bold;">20</p>
+                            <p style="color: #bb8e2d; font-weight: bold;">20</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Assigned Devices</h5>
-                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Under Maintenance</h5>
-                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Decommissioned</h5>
-                            <p style="color: #27ae60; font-weight: bold;">0</p>
+                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
                         </div>
                     </div>
                 </div>
@@ -717,14 +712,14 @@
                                             <img src="${product.materialsUrl}" alt="${product.materialName}" width="200">
                                             <div class="card-content">
                                                 <h5>${product.materialName}</h5>
-                                                <p style="color: #27ae60; font-weight: bold;">$${product.price}</p>
+                                                <p style="color: #d59f39; font-weight: bold;">$${product.price}</p>
                                                 <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
                                                     <i class="fas fa-eye me-1"></i> View Detail
                                                 </a>
                                             </div>
                                         </div>
                                     </c:forEach>
-                                   
+
                                     <nav aria-label="Page navigation" style="padding-left: 500px">
                                         <ul class="pagination justify-content-center mt-4" id="pagination">
                                             <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
@@ -878,8 +873,6 @@
                         }
                     });
                 }
-
-
 
 
                 // Gán sự kiện click cho các nút phân trang

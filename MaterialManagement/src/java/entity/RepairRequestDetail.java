@@ -19,6 +19,7 @@ public class RepairRequestDetail {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
+    private Material material;
     // Constructor mặc định
     public RepairRequestDetail() {
     }
@@ -39,6 +40,15 @@ public class RepairRequestDetail {
     public int getDetailId() {
         return detailId;
     }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+    
 
     public void setDetailId(int detailId) {
         this.detailId = detailId;
