@@ -24,7 +24,7 @@ public class DashboardMaterialServlet extends HttpServlet {
         try {
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
-            if (user == null || (user.getRoleId() != 1 && user.getRoleId() != 3 && user.getRoleId() != 4)) {
+            if (user == null || (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4)) {
                 response.sendRedirect("error.jsp");
                 return;
             }
