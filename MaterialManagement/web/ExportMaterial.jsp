@@ -124,7 +124,7 @@
                                     <c:forEach var="detail" items="${exportDetails}">
                                         <tr>
                                             <td>
-                                                <img src="${pageContext.request.contextPath}/images/${empty materialMap[detail.materialId].materialsUrl ? 'default-material.png' : materialMap[detail.materialId].materialsUrl}"
+                                                <img src="${pageContext.request.contextPath}/images/material/${empty materialMap[detail.materialId].materialsUrl ? 'default-material.png' : materialMap[detail.materialId].materialsUrl}"
                                                      class="material-img" alt="${materialMap[detail.materialId].materialName}">
                                             </td>
                                             <td>${materialMap[detail.materialId].materialName}</td>
