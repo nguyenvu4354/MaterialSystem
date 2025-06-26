@@ -3,6 +3,7 @@ package controller;
 import dal.MaterialDAO;
 import dal.RepairRequestDAO;
 import dal.UserDAO;
+import entity.Material;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
 import entity.User;
@@ -24,6 +25,20 @@ import java.util.List;
 
 @WebServlet(name = "RepairRequestServlet", urlPatterns = {"/repairrequest"})
 public class RepairRequestServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Lấy danh sách vật tư từ database
+        MaterialDAO materialDAO = new MaterialDAO();
+        List<Material> materialList = materialDAO.getAllProducts();
+
+        // Truyền danh sách vật tư sang JSP
+        request.setAttribute("materialList", materialList);
+
+        // Forward đến trang tạo yêu cầu sửa chữa
+        request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -72,7 +87,7 @@ public class RepairRequestServlet extends HttpServlet {
             String[] repairCosts = request.getParameterValues("repairCost");
 
             List<RepairRequestDetail> detailList = new ArrayList<>();
-            MaterialDAO materialDAO = new MaterialDAO();
+            MaterialDAO materialDAO = new MaterialDAO(); // thêm bên ngoài vòng for
 
             for (int i = 0; i < materialNames.length; i++) {
                 String materialName = materialNames[i].trim();
@@ -106,7 +121,7 @@ public class RepairRequestServlet extends HttpServlet {
             // Lưu yêu cầu vào DB
             boolean success = new RepairRequestDAO().createRepairRequest(requestObj, detailList);
 
-            // Nếu thành công thì gửi email cho giám đốc và người tạo
+            // Nếu thành công thì gửi email cho giám đốc
             if (success) {
                 UserDAO userDAO = new UserDAO();
                 List<User> allUsers = userDAO.getAllUsers();
@@ -121,9 +136,6 @@ public class RepairRequestServlet extends HttpServlet {
                 if (!managers.isEmpty()) {
                     String subject = "[Thông báo] Có yêu cầu sửa chữa mới";
 
-                    // Format ngày dự kiến hoàn trả thành yyyy-dd-MM
-                    String formattedReturnDate = new SimpleDateFormat("yyyy-dd-MM").format(estimatedReturnDate);
-
                     StringBuilder content = new StringBuilder();
                     content.append("Xin chào Giám đốc,\n\n");
                     content.append("Một yêu cầu sửa chữa mới đã được tạo trên hệ thống.\n\n");
@@ -131,11 +143,10 @@ public class RepairRequestServlet extends HttpServlet {
                     content.append("Người tạo: ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")\n");
                     content.append("Lý do: ").append(reason).append("\n");
                     content.append("Địa điểm sửa chữa: ").append(repairLocation).append("\n");
-                    content.append("Ngày dự kiến hoàn trả: ").append(formattedReturnDate).append("\n");
+                    content.append("Ngày dự kiến hoàn trả: ").append(estimatedReturnDate).append("\n");
                     content.append("Thời gian gửi yêu cầu: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)).append("\n\n");
                     content.append("Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý yêu cầu.");
 
-                    // Gửi cho tất cả giám đốc
                     for (User manager : managers) {
                         if (manager.getEmail() != null && !manager.getEmail().trim().isEmpty()) {
                             try {
@@ -146,7 +157,6 @@ public class RepairRequestServlet extends HttpServlet {
                         }
                     }
 
-                    // Gửi cho người tạo yêu cầu
                     if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
                         try {
                             EmailUtils.sendEmail(user.getEmail(), subject, content.toString());
