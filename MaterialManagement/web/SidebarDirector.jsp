@@ -25,7 +25,7 @@
         </a>
       </li>
       <li class="nav-item mb-2">
-        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/RequestMaterialList">
+        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/repairrequestlist">
           <i class="fas fa-clipboard-list fs-4 me-3"></i>
           Request Material List
         </a>

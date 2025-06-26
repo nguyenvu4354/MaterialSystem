@@ -257,7 +257,7 @@
                     <c:forEach var="product" items="${productList}">
                         <tr>
                             <td>
-                                <img src="${product.materialsUrl}" alt="${product.materialName}">
+                                <img src="images/material1/${product.materialsUrl}" alt="${product.materialName}">
                             </td>
                             <td>${product.materialCode}</td>
                             <td>${product.materialName}</td>

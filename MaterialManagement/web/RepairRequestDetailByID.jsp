@@ -165,11 +165,9 @@
                 %>
                 <tr>
                     <td>
-                        <% if (m != null && m.getMaterialsUrl() != null && !m.getMaterialsUrl().isEmpty()) { %>
-                        <img src="<%= request.getContextPath() + "/" + m.getMaterialsUrl() %>" alt="Material Image" style="max-height: 60px; max-width: 60px; border-radius: 6px;">
-                        <% } else { %>
-                        No Image
-                        <% } %>
+                       <img src="<%= request.getContextPath() + "/images/material1/" + m.getMaterialsUrl() %>" 
+     alt="Material Image" 
+     style="max-height: 60px; max-width: 60px; border-radius: 6px;">
                     </td>
                     <td><%= d.getDetailId() %></td>
                     <td><%= m != null ? m.getMaterialCode() : "N/A" %></td>
