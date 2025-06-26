@@ -326,6 +326,7 @@ public class RequestDAO extends DBContext {
                 detail.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 detail.setMaterialName(rs.getString("material_name"));
                 detail.setCategoryId(rs.getInt("category_id"));
+                detail.setCategoryName(rs.getString("category_name")); 
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setNotes(rs.getString("notes"));
                 detail.setCreatedAt(rs.getTimestamp("created_at"));
