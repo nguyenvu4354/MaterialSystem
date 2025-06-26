@@ -318,4 +318,15 @@ public class ImportDAO extends DBContext {
         }
         return imports;
     }
+
+    // Lấy tổng số lượng đã nhập (tất cả vật tư, đã xác nhận nhập)
+    public int getTotalImportedQuantity() throws SQLException {
+        String sql = "SELECT SUM(quantity) AS total_imported FROM Import_Details WHERE status = 'imported'";
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total_imported");
+            }
+        }
+        return 0;
+    }
 }
