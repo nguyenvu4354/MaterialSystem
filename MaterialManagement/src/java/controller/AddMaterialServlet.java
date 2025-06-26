@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -101,6 +102,12 @@ public class AddMaterialServlet extends HttpServlet {
             String conditionPercentageStr = request.getParameter("conditionPercentage");
             String categoryIdStr = request.getParameter("categoryId");
             String unitIdStr = request.getParameter("unitId");
+            String urlInput = request.getParameter("materialsUrl");
+
+            System.out.println("🛠️ Form Parameters:");
+            System.out.println("materialCode: " + materialCode);
+            System.out.println("materialName: " + materialName);
+            System.out.println("price: " + priceStr);
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                 materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
@@ -126,26 +133,38 @@ public class AddMaterialServlet extends HttpServlet {
 
             Part filePart = request.getPart("imageFile");
             String relativeFilePath;
+
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
-                // Lưu vào thư mục web (như ProfileServlet)
-                String buildPath = getServletContext().getRealPath("/"); 
-                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
-                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("material");
+                // Đường dẫn đến build/web/images/material/
+                String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
+                Files.createDirectories(Paths.get(buildUploadPath));
+                filePart.write(buildUploadPath + fileName);
+                System.out.println("✅ Saved image to BUILD folder: " + buildUploadPath + fileName);
 
-                if (!Files.exists(uploadDir)) {
-                    Files.createDirectories(uploadDir);
+                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent(); // lên 4 cấp
+                Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
+                Files.createDirectories(sourceDir);
+                try {
+                    Files.copy(
+                            Paths.get(buildUploadPath + fileName),
+                            sourceDir.resolve(fileName),
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                    System.out.println("✅ Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
+                } catch (IOException e) {
+                    System.out.println("❌ Failed to copy to source: " + e.getMessage());
                 }
 
-                Path savePath = uploadDir.resolve(fileName);
-                filePart.write(savePath.toString());
                 relativeFilePath = fileName;
-            } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
-                relativeFilePath = request.getParameter("materialsUrl").trim();
+            } else if (urlInput != null && !urlInput.trim().isEmpty()) {
+                relativeFilePath = urlInput.trim();
+                System.out.println("📝 Using URL input instead of new image: " + relativeFilePath);
             } else {
                 relativeFilePath = "default.jpg";
+                System.out.println("📎 No image provided, using default.jpg");
             }
 
             BigDecimal priceBD = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -172,6 +191,8 @@ public class AddMaterialServlet extends HttpServlet {
             m.setDisable(false);
             m.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+            System.out.println("📌 Final Material Image URL: " + m.getMaterialsUrl());
 
             MaterialDAO md = new MaterialDAO();
             if (md.isMaterialCodeExists(materialCode)) {
