@@ -18,6 +18,9 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -111,18 +114,37 @@ public class EditMaterialServlet extends HttpServlet {
             request.setCharacterEncoding("UTF-8");
             response.setContentType("text/html;charset=UTF-8");
             
-            String realPath = request.getServletContext().getRealPath("/");
-            String uploadPath = realPath + UPLOAD_DIRECTORY + File.separator;
+            String imageUrl = null;
+            Part filePart = request.getPart("materialImage");
+            String urlInput = request.getParameter("materialsUrl");
 
-            System.out.println("Debug - Real path: " + realPath);
-            System.out.println("Debug - Upload path: " + uploadPath);
+            System.out.println("Debug - File part: " + (filePart != null ? "exists" : "null"));
+            System.out.println("Debug - File size: " + (filePart != null ? filePart.getSize() : "N/A"));
+            System.out.println("Debug - URL input: " + urlInput);
 
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-                System.out.println("Debug - Created upload directory: " + uploadPath);
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+                // Lưu vào thư mục web (như ProfileServlet)
+                String buildPath = getServletContext().getRealPath("/"); 
+                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("material");
+
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                Path savePath = uploadDir.resolve(fileName);
+                filePart.write(savePath.toString());
+                imageUrl = fileName;
+                System.out.println("Debug - Image URL set to: " + imageUrl);
+            } else if (urlInput != null && !urlInput.trim().isEmpty()) {
+                imageUrl = urlInput.trim();
+                System.out.println("Debug - Using URL input: " + imageUrl);
             } else {
-                System.out.println("Debug - Upload directory already exists: " + uploadPath);
+                imageUrl = "default.jpg";
+                System.out.println("Debug - No new image provided, using default.jpg");
             }
 
             String materialId = request.getParameter("materialId");
@@ -169,27 +191,6 @@ public class EditMaterialServlet extends HttpServlet {
                 request.setAttribute("units", unitDAO.getAllUnits());
                 request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
                 return;
-            }
-
-            String imageUrl = null;
-            Part filePart = request.getPart("materialImage");
-            String urlInput = request.getParameter("materialsUrl");
-
-            System.out.println("Debug - File part: " + (filePart != null ? "exists" : "null"));
-            System.out.println("Debug - File size: " + (filePart != null ? filePart.getSize() : "N/A"));
-            System.out.println("Debug - URL input: " + urlInput);
-
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                filePart.write(uploadPath + File.separator + fileName);
-                imageUrl = fileName;
-                System.out.println("Debug - Image URL set to: " + imageUrl);
-            } else if (urlInput != null && !urlInput.trim().isEmpty()) {
-                imageUrl = urlInput.trim();
-                System.out.println("Debug - Using URL input: " + imageUrl);
-            } else {
-                imageUrl = "default.jpg";
-                System.out.println("Debug - No new image provided, using default.jpg");
             }
 
             int materialIdInt = Integer.parseInt(materialId);
