@@ -2,6 +2,8 @@ package controller;
 
 import dal.InventoryDAO;
 import dal.UserDAO;
+import dal.ImportDAO;
+import dal.ExportDAO;
 import entity.Inventory;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -19,12 +21,16 @@ import java.util.Map;
 public class StaticInventoryServlet extends HttpServlet {
     private InventoryDAO inventoryDAO;
     private UserDAO userDAO;
+    private ImportDAO importDAO;
+    private ExportDAO exportDAO;
     private static final int PAGE_SIZE = 5; 
 
     @Override
     public void init() throws ServletException {
         inventoryDAO = new InventoryDAO();
         userDAO = new UserDAO();
+        importDAO = new ImportDAO();
+        exportDAO = new ExportDAO();
     }
 
     @Override
@@ -56,6 +62,24 @@ public class StaticInventoryServlet extends HttpServlet {
                     }
                 }
             }
+            
+            // Lấy tổng số lượng nhập, xuất, tồn
+            int totalImported = 0;
+            int totalExported = 0;
+            int totalStock = 0;
+            try {
+                totalImported = importDAO.getTotalImportedQuantity();
+            } catch (Exception ex) { totalImported = 0; }
+            try {
+                totalExported = exportDAO.getTotalExportedQuantity();
+            } catch (Exception ex) { totalExported = 0; }
+            try {
+                List<Inventory> allInv = inventoryDAO.getAllInventory();
+                for (Inventory inv : allInv) totalStock += inv.getStock();
+            } catch (Exception ex) { totalStock = 0; }
+            request.setAttribute("totalImported", totalImported);
+            request.setAttribute("totalExported", totalExported);
+            request.setAttribute("totalStock", totalStock);
             
             request.setAttribute("inventoryList", inventoryList);
             request.setAttribute("userMap", userMap);

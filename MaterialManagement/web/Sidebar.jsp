@@ -19,7 +19,7 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/StaticInventory">
                     <i class="fas fa-tachometer-alt fs-4 me-3"></i>
-                    Dashboard
+                    Inventory Report
                 </a>
             </li>
             <li class="nav-item mb-2">

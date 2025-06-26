@@ -249,4 +249,14 @@ public class ExportDAO extends DBContext {
             }
         }
     }
+
+    public int getTotalExportedQuantity() throws SQLException {
+        String sql = "SELECT SUM(quantity) AS total_exported FROM Export_Details WHERE status = 'exported'";
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total_exported");
+            }
+        }
+        return 0;
+    }
 }

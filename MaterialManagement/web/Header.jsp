@@ -54,10 +54,10 @@
                         <c:if test="${sessionScope.user.roleId == 1}">
                             <option value="UserList">Manage Users</option>
                         </c:if>
-                        <option value="manageDepartments.jsp">Manage Departments</option>
+                        <option value="StaticInventory">Manage Inventory</option>
                         <option value="dashboardmaterial">Manage Materials</option>
                         <option value="Category.jsp">Manage Categories</option>
-                        <option value="manageSuppliers.jsp">Manage Suppliers</option>
+                        <option value="Supplier">Manage Suppliers</option>
                         <option value="manageUnits.jsp">Manage Units</option>
                     </select>
 
