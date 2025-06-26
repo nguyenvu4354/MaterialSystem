@@ -1,7 +1,9 @@
 package controller;
 
+import dal.CategoryDAO; 
 import dal.DepartmentDAO;
 import dal.RequestDAO;
+import entity.Category; 
 import entity.ExportRequest;
 import entity.PurchaseRequest;
 import entity.RepairRequest;
@@ -35,10 +37,8 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             String type = request.getParameter("type");
             Object requestObj = null;
 
-            // Khởi tạo RequestDAO
             RequestDAO requestDAO = new RequestDAO();
 
-            // Fetch the request based on type
             switch (type.toLowerCase()) {
                 case "export":
                     requestObj = requestDAO.getExportRequestById(requestId);
@@ -67,9 +67,15 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 return;
             }
 
+            // Lấy danh sách vật tư từ DepartmentDAO
             DepartmentDAO departmentDAO = new DepartmentDAO();
             List<Material> materials = departmentDAO.getMaterials();
             request.setAttribute("materials", materials);
+
+            // Lấy danh sách danh mục từ CategoryDAO
+            CategoryDAO categoryDAO = new CategoryDAO();
+            List<Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
 
             String message = request.getParameter("message");
             if (message != null) {
@@ -126,7 +132,6 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // Check if user is the request owner
             int requestUserId = getRequestUserId(requestObj);
             if (requestUserId != user.getUserId()) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only the request owner can cancel it");
@@ -139,10 +144,12 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                     request.setAttribute("message", "Error: Only pending requests can be cancelled.");
                     request.setAttribute("request", requestObj);
                     request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
-                    // Lấy lại danh sách vật tư để hiển thị lại JSP
                     DepartmentDAO departmentDAO = new DepartmentDAO();
                     List<Material> materials = departmentDAO.getMaterials();
                     request.setAttribute("materials", materials);
+                    CategoryDAO categoryDAO = new CategoryDAO();
+                    List<Category> categories = categoryDAO.getAllCategories();
+                    request.setAttribute("categories", categories);
                     request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
                     return;
                 }
@@ -166,10 +173,13 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                     request.setAttribute("message", "Error: Failed to cancel request.");
                     request.setAttribute("request", requestObj);
                     request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
-
+                    // Lấy lại danh sách vật tư và danh mục
                     DepartmentDAO departmentDAO = new DepartmentDAO();
                     List<Material> materials = departmentDAO.getMaterials();
                     request.setAttribute("materials", materials);
+                    CategoryDAO categoryDAO = new CategoryDAO();
+                    List<Category> categories = categoryDAO.getAllCategories();
+                    request.setAttribute("categories", categories);
                     request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
                 }
             } else {
