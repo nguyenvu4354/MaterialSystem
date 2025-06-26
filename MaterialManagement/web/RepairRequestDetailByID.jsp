@@ -165,20 +165,15 @@
                 %>
                 <tr>
                     <td>
-                        <% if (m != null && m.getMaterialsUrl() != null && !m.getMaterialsUrl().isEmpty()) { %>
-                        <img src="<%= request.getContextPath() + "/" + m.getMaterialsUrl() %>" alt="Material Image" style="max-height: 60px; max-width: 60px; border-radius: 6px;">
-                        <% } else { %>
-                        No Image
-                        <% } %>
+                        <img src="<%= request.getContextPath() + "/images/material1/" + m.getMaterialsUrl() %>" 
+                             alt="Material Image" 
+                             style="max-height: 60px; max-width: 60px; border-radius: 6px;">
                     </td>
                     <td><%= d.getDetailId() %></td>
                     <td><%= m != null ? m.getMaterialCode() : "N/A" %></td>
                     <td><%= m != null ? m.getMaterialName() : "N/A" %></td>
                     <td><%= (m != null && m.getCategory() != null) ? m.getCategory().getCategory_name() : "N/A" %></td>
-
                     <td><%= (m != null && m.getUnit() != null) ? m.getUnit().getUnitName() : "N/A" %></td>
-
-
                     <td><%= d.getQuantity() %></td>
                     <td><%= d.getDamageDescription() %></td>
                     <td><%= d.getRepairCost() %></td>

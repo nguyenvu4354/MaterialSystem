@@ -55,21 +55,24 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
 
         List<PurchaseRequest> list;
         int totalItems;
-        if (user.getRoleId() == 3 || user.getRoleId() == 4) {
-            // Staff và Employee chỉ xem yêu cầu của chính mình
-            list = new ArrayList<>();
-            totalItems = 0;
-            List<PurchaseRequest> all = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
-            for (PurchaseRequest pr : all) {
-                if (pr.getUserId() == user.getUserId()) {
-                    list.add(pr);
-                    totalItems++;
-                }
-            }
-        } else {
-            // Giám đốc xem tất cả
+        if (user.getRoleId() == 2 || user.getRoleId() == 3 || user.getRoleId() == 4) {
+            // Giám đốc, nhân viên kho và nhân viên đều xem tất cả (trừ cancel)
             list = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
             totalItems = prd.countPurchaseRequest(keyword, status);
+            
+            // Lọc bỏ các đơn có trạng thái cancel
+            for (int i = list.size() - 1; i >= 0; i--) {
+                if ("cancel".equalsIgnoreCase(list.get(i).getStatus())) {
+                    list.remove(i);
+                }
+            }
+            // Cập nhật lại totalItems sau khi lọc
+            totalItems = list.size();
+        } else {
+            // Các role khác không có quyền xem
+            request.setAttribute("error", "You do not have permission to view this page.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
         }
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
 
@@ -91,7 +94,7 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.setAttribute("status", status);
         request.setAttribute("sortOption", sortOption);
-        request.setAttribute("canApprove", user.getRoleId() == 2);
+        request.setAttribute("canApprove", user.getRoleId() == 2 || user.getRoleId() == 3 || user.getRoleId() == 4);
 
         request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
     }
