@@ -12,10 +12,11 @@ import utils.MaterialValidator;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.UUID;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -28,9 +29,9 @@ import jakarta.servlet.http.Part;
 
 @WebServlet(name = "AddMaterialServlet", urlPatterns = {"/addmaterial"})
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 15
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 1024 * 1024 * 10,
+    maxRequestSize = 1024 * 1024 * 15
 )
 public class AddMaterialServlet extends HttpServlet {
 
@@ -40,7 +41,6 @@ public class AddMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-       
         if (session == null || session.getAttribute("user") == null) {
             String requestURI = request.getRequestURI();
             String queryString = request.getQueryString();
@@ -52,22 +52,20 @@ public class AddMaterialServlet extends HttpServlet {
             response.sendRedirect("LoginServlet");
             return;
         }
-        User user = (User) session.getAttribute("user");
 
+        User user = (User) session.getAttribute("user");
         if (user.getRoleId() != 1) {
             request.setAttribute("error", "You do not have permission to access this page. Only Admins can add materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-        
+
         try {
             CategoryDAO cd = new CategoryDAO();
             UnitDAO ud = new UnitDAO();
-
             request.setAttribute("categories", cd.getAllCategories());
             request.setAttribute("units", ud.getAllUnits());
 
-            // Sinh mã code tự động
             String code = "MTL-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(new java.util.Date()) + "-" + (int)(Math.random()*900+100);
             request.setAttribute("materialCode", code);
 
@@ -83,29 +81,19 @@ public class AddMaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("LoginServlet");
             return;
         }
 
         User user = (User) session.getAttribute("user");
-        
         if (user.getRoleId() != 1) {
             request.setAttribute("error", "You do not have permission to perform this action. Only Admins can add materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-        
+
         try {
-            String realPath = request.getServletContext().getRealPath("/");
-            String uploadPath = realPath + UPLOAD_DIRECTORY + File.separator;
-
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
@@ -118,39 +106,42 @@ public class AddMaterialServlet extends HttpServlet {
                 materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
 
             if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors);
-                // Gửi lại dữ liệu đã nhập để giữ lại trên form nếu cần
                 Material m = new Material();
                 m.setMaterialCode(materialCode);
                 m.setMaterialName(materialName);
                 m.setMaterialStatus(materialStatus);
                 m.setConditionPercentage(0);
                 m.setPrice(0);
-                Category category = new Category();
-                category.setCategory_id(0);
-                m.setCategory(category);
-                Unit unit = new Unit();
-                unit.setId(0);
-                m.setUnit(unit);
+                m.setCategory(new Category());
+                m.setUnit(new Unit());
+
+                request.setAttribute("errors", errors);
                 request.setAttribute("m", m);
-                CategoryDAO categoryDAO = new CategoryDAO();
-                UnitDAO unitDAO = new UnitDAO();
-                request.setAttribute("categories", categoryDAO.getAllCategories());
-                request.setAttribute("units", unitDAO.getAllUnits());
-                // Truyền lại materialCode về JSP để không bị trống
+                request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("materialCode", materialCode);
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
 
             Part filePart = request.getPart("imageFile");
-            String relativeFilePath = null;
+            String relativeFilePath;
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-                String newFileName = UUID.randomUUID().toString() + fileExtension;
-                filePart.write(uploadPath + newFileName);
-                relativeFilePath = newFileName;
+                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+                // Lưu vào thư mục web (như ProfileServlet)
+                String buildPath = getServletContext().getRealPath("/"); 
+                Path projectRoot = Paths.get(buildPath).getParent().getParent(); 
+                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("material");
+
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                Path savePath = uploadDir.resolve(fileName);
+                filePart.write(savePath.toString());
+                relativeFilePath = fileName;
             } else if (request.getParameter("materialsUrl") != null && !request.getParameter("materialsUrl").trim().isEmpty()) {
                 relativeFilePath = request.getParameter("materialsUrl").trim();
             } else {
@@ -184,17 +175,16 @@ public class AddMaterialServlet extends HttpServlet {
 
             MaterialDAO md = new MaterialDAO();
             if (md.isMaterialCodeExists(materialCode)) {
-                CategoryDAO cd = new CategoryDAO();
-                UnitDAO ud = new UnitDAO();
-                request.setAttribute("categories", cd.getAllCategories());
-                request.setAttribute("units", ud.getAllUnits());
+                request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("error", "Material code already exists, please enter a different code!");
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
+
             md.addMaterial(m);
             response.sendRedirect("dashboardmaterial?success=Material added successfully");
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             request.setAttribute("error", "Error occurred: " + ex.getMessage());
