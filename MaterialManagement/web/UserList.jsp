@@ -44,7 +44,7 @@
     </style>
 </head>
 <body>
-    <%@ include file="HeaderAdmin.jsp" %>
+    <%@ include file="Header.jsp" %>
 
     <!-- Main content -->
     <div class="container-fluid">

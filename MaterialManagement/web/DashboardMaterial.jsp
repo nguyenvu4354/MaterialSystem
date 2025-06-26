@@ -89,7 +89,7 @@
 </head>
 <body>
     <!-- Header -->
-    <jsp:include page="HeaderAdmin.jsp" />
+    <jsp:include page="Header.jsp" />
 
     <!-- Main content -->
     <div class="container-fluid">

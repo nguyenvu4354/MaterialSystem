@@ -50,7 +50,7 @@
 </head>
 <body>
     <!-- Header -->
-       <jsp:include page="HeaderAdmin.jsp" />
+       <jsp:include page="Header.jsp" />
 
     <!-- Main content -->
     <div class="container-fluid">
@@ -127,7 +127,9 @@
                                 <th scope="col" style="width: 150px">Status</th>
                                 <th scope="col" style="width: 500px">Description</th>
                                 <th scope="col" style="width: 150px">Priority</th>
-                                <th scope="col" style="width: 150px">Actions</th>
+                                <c:if test="${sessionScope.user.roleId == 1}">
+                                    <th scope="col" style="width: 150px">Actions</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,23 +245,19 @@
                                             <td>${cat.status}</td>
                                             <td>${cat.description}</td>
                                             <td>${cat.priority}</td>
-                                            <td>
-                                                <div class="d-flex justify-content-center">
-                                                    <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 1}">
-                                                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=updateCategory&categoryID=${cat.category_id}" 
-                                                           class="btn btn-warning btn-action" 
-                                                           title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <a href="${pageContext.request.contextPath}/CategoryServlet?service=deleteCategory&categoryID=${cat.category_id}" 
-                                                           class="btn btn-danger btn-action" 
-                                                           onclick="return confirm('Are you sure you want to delete this category?');" 
-                                                           title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
-                                                    </c:if>
-                                                </div>
-                                            </td>
+                                            <c:if test="${sessionScope.user.roleId == 1}">
+                                                <td class="d-flex justify-content-center">
+                                                    <a href="CategoryServlet?service=editCategory&category_id=${cat.category_id}" 
+                                                       class="btn btn-warning btn-sm btn-action">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="CategoryServlet?service=deleteCategory&category_id=${cat.category_id}" 
+                                                       class="btn btn-danger btn-sm btn-action" 
+                                                       onclick="return confirm('Are you sure you want to delete this category?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                 </c:when>

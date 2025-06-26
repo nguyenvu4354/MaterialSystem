@@ -35,7 +35,12 @@ public class ExportRequestDetailDAO extends DBContext {
                     detail.setMaterialUnit(rs.getString("material_unit"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setExportCondition(rs.getString("export_condition"));
-                    detail.setMaterialImageUrl(rs.getString("materials_url"));
+                    String rawUrl = rs.getString("materials_url");
+                    String imgUrl = rawUrl;
+                    if (imgUrl != null && !imgUrl.isEmpty() && !imgUrl.startsWith("/") && !imgUrl.startsWith("http") && !imgUrl.startsWith("images/material/")) {
+                        imgUrl = "images/material/" + imgUrl;
+                    }
+                    detail.setMaterialImageUrl(imgUrl);
                     detail.setCreatedAt(rs.getTimestamp("created_at"));
                     detail.setUpdatedAt(rs.getTimestamp("updated_at"));
                     details.add(detail);

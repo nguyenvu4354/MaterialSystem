@@ -500,14 +500,14 @@ public class UserDAO extends DBContext {
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
         User user = new User();
-        user.setUsername("Admin2");
+        user.setUsername("Employee1");
         user.setPassword(userDAO.md5("123"));
-        user.setFullName("User");
+        user.setFullName("Phạm Thị Kiều Trinh");
         user.setEmail("testuser@example.com");
         user.setPhoneNumber("0123456789");
         user.setAddress("123 Test Street");
         user.setUserPicture("test.jpg");
-        user.setRoleId(1);
+        user.setRoleId(4);
         user.setDepartmentId(1);
         user.setDateOfBirth(LocalDate.of(1990, 1, 1));
         user.setGender(User.Gender.male);

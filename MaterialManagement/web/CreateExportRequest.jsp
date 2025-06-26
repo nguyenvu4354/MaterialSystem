@@ -147,7 +147,14 @@
         const quantityInput = row.querySelector('.quantity-input');
         
         if (material) {
-            img.src = material.imageUrl && material.imageUrl !== 'null' ? material.imageUrl : 'images/placeholder.png';
+            let imgUrl = material.imageUrl && material.imageUrl !== 'null' ? material.imageUrl : '';
+            if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
+                img.src = imgUrl;
+            } else if (imgUrl) {
+                img.src = 'images/material/' + imgUrl;
+            } else {
+                img.src = 'images/placeholder.png';
+            }
             stockInput.value = material.stock;
             quantityInput.max = material.stock; // Set max attribute for validation
         } else {
