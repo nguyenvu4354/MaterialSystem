@@ -132,7 +132,7 @@
                                 <tr>
                                     <td class="text-center">${loop.count}</td>
                                     <td class="text-center">
-                                        <img src="images/material1/${not empty material.materialsUrl ? material.materialsUrl : 'https://via.placeholder.com/100x80?text=No+Image'}"
+                                        <img src="images/material/${not empty material.materialsUrl ? material.materialsUrl : 'https://via.placeholder.com/100x80?text=No+Image'}"
                                              alt="Image ${material.materialName}">
                                     </td>
                                     <td>${material.materialName}</td>

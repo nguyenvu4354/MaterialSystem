@@ -165,7 +165,7 @@
                 %>
                 <tr>
                     <td>
-                        <img src="<%= request.getContextPath() + "/images/material1/" + m.getMaterialsUrl() %>" 
+                        <img src="<%= request.getContextPath() + "/images/material/" + m.getMaterialsUrl() %>" 
                              alt="Material Image" 
                              style="max-height: 60px; max-width: 60px; border-radius: 6px;">
                     </td>
