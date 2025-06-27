@@ -11,7 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class InventoryDAO extends DBContext {
@@ -126,8 +128,6 @@ public class InventoryDAO extends DBContext {
                 inventory.setNote(rs.getString("note"));
                 inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
                 inventory.setUpdatedBy(rs.getInt("updated_by"));
-                
-                // Additional material information
                 inventory.setMaterialName(rs.getString("material_name"));
                 inventory.setMaterialCode(rs.getString("material_code"));
                 inventory.setCategoryName(rs.getString("category_name"));
@@ -137,5 +137,147 @@ public class InventoryDAO extends DBContext {
             }
         }
         return inventoryList;
+    }
+    public Map<String, Integer> getInventoryStatistics() throws SQLException {
+        Map<String, Integer> stats = new HashMap<>();
+        String sql = "SELECT " +
+                    "SUM(i.stock) as total_stock, " +
+                    "COUNT(CASE WHEN i.stock > 0 AND i.stock < 10 THEN 1 END) as low_stock_count, " +
+                    "COUNT(CASE WHEN i.stock = 0 THEN 1 END) as out_of_stock_count " +
+                    "FROM Inventory i " +
+                    "JOIN Materials m ON i.material_id = m.material_id " +
+                    "WHERE m.disable = 0";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                stats.put("totalStock", rs.getInt("total_stock"));
+                stats.put("lowStockCount", rs.getInt("low_stock_count"));
+                stats.put("outOfStockCount", rs.getInt("out_of_stock_count"));
+            }
+        }
+        return stats;
+    }
+    
+    public List<Inventory> getInventoryWithPagination(String searchTerm, String stockFilter, String sortStock, int page, int pageSize) throws SQLException {
+        List<Inventory> inventoryList = new ArrayList<>();
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT i.*, m.material_name, m.material_code, c.category_name, u.unit_name ");
+        sql.append("FROM Inventory i ");
+        sql.append("JOIN Materials m ON i.material_id = m.material_id ");
+        sql.append("LEFT JOIN Categories c ON m.category_id = c.category_id ");
+        sql.append("LEFT JOIN Units u ON m.unit_id = u.unit_id ");
+        sql.append("WHERE m.disable = 0 ");
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql.append("AND (LOWER(m.material_name) LIKE ? OR LOWER(m.material_code) LIKE ? OR LOWER(c.category_name) LIKE ?) ");
+        }
+        if (stockFilter != null && !stockFilter.trim().isEmpty()) {
+            switch (stockFilter) {
+                case "high":
+                    sql.append("AND i.stock > 50 ");
+                    break;
+                case "medium":
+                    sql.append("AND i.stock >= 10 AND i.stock <= 50 ");
+                    break;
+                case "low":
+                    sql.append("AND i.stock >= 1 AND i.stock < 10 ");
+                    break;
+                case "zero":
+                    sql.append("AND i.stock = 0 ");
+                    break;
+            }
+        }
+        
+        if (sortStock != null && !sortStock.trim().isEmpty()) {
+            if (sortStock.equals("asc")) {
+                sql.append("ORDER BY i.stock ASC, m.material_code ASC ");
+            } else if (sortStock.equals("desc")) {
+                sql.append("ORDER BY i.stock DESC, m.material_code ASC ");
+            } else {
+                sql.append("ORDER BY m.material_code ASC ");
+            }
+        } else {
+            sql.append("ORDER BY m.material_code ASC ");
+        }
+        sql.append("LIMIT ? OFFSET ?");
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                String searchPattern = "%" + searchTerm.toLowerCase().trim() + "%";
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+            }
+            
+            stmt.setInt(paramIndex++, pageSize);
+            stmt.setInt(paramIndex, (page - 1) * pageSize);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Inventory inventory = new Inventory();
+                    inventory.setInventoryId(rs.getInt("inventory_id"));
+                    inventory.setMaterialId(rs.getInt("material_id"));
+                    inventory.setStock(rs.getInt("stock"));
+                    inventory.setLocation(rs.getString("location"));
+                    inventory.setNote(rs.getString("note"));
+                    inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+                    inventory.setUpdatedBy(rs.getInt("updated_by"));
+                    inventory.setMaterialName(rs.getString("material_name"));
+                    inventory.setMaterialCode(rs.getString("material_code"));
+                    inventory.setCategoryName(rs.getString("category_name"));
+                    inventory.setUnitName(rs.getString("unit_name"));
+                    
+                    inventoryList.add(inventory);
+                }
+            }
+        }
+        return inventoryList;
+    }
+    public int getInventoryCount(String searchTerm, String stockFilter) throws SQLException {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) as total ");
+        sql.append("FROM Inventory i ");
+        sql.append("JOIN Materials m ON i.material_id = m.material_id ");
+        sql.append("LEFT JOIN Categories c ON m.category_id = c.category_id ");
+        sql.append("WHERE m.disable = 0 ");
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql.append("AND (LOWER(m.material_name) LIKE ? OR LOWER(m.material_code) LIKE ? OR LOWER(c.category_name) LIKE ?) ");
+        }
+        if (stockFilter != null && !stockFilter.trim().isEmpty()) {
+            switch (stockFilter) {
+                case "high":
+                    sql.append("AND i.stock > 50 ");
+                    break;
+                case "medium":
+                    sql.append("AND i.stock >= 10 AND i.stock <= 50 ");
+                    break;
+                case "low":
+                    sql.append("AND i.stock >= 1 AND i.stock < 10 ");
+                    break;
+                case "zero":
+                    sql.append("AND i.stock = 0 ");
+                    break;
+            }
+        }
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                String searchPattern = "%" + searchTerm.toLowerCase().trim() + "%";
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+                stmt.setString(paramIndex++, searchPattern);
+            }
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        }
+        return 0;
     }
 }

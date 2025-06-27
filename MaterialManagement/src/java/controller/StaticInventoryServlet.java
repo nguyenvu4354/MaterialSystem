@@ -23,7 +23,7 @@ public class StaticInventoryServlet extends HttpServlet {
     private UserDAO userDAO;
     private ImportDAO importDAO;
     private ExportDAO exportDAO;
-    private static final int PAGE_SIZE = 5; 
+    private static final int PAGE_SIZE = 10; 
 
     @Override
     public void init() throws ServletException {
@@ -37,22 +37,20 @@ public class StaticInventoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            
+            String searchTerm = request.getParameter("search");
+            String stockFilter = request.getParameter("filter");
+            String sortStock = request.getParameter("sortStock");
             String pageStr = request.getParameter("page");
             int currentPage = pageStr != null ? Integer.parseInt(pageStr) : 1;
-            if (currentPage < 1) currentPage = 1;           
-            List<Inventory> allInventoryList = inventoryDAO.getAllInventory();
-            int totalItems = allInventoryList.size();
+            if (currentPage < 1) currentPage = 1;
+            Map<String, Integer> stats = inventoryDAO.getInventoryStatistics();
+            int totalStock = stats.getOrDefault("totalStock", 0);
+            int lowStockCount = stats.getOrDefault("lowStockCount", 0);
+            int outOfStockCount = stats.getOrDefault("outOfStockCount", 0);
+            int totalItems = inventoryDAO.getInventoryCount(searchTerm, stockFilter);
             int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
             if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            int start = (currentPage - 1) * PAGE_SIZE;
-            int end = Math.min(start + PAGE_SIZE, totalItems);
-            List<Inventory> inventoryList;        
-            if (start < totalItems) {
-                inventoryList = allInventoryList.subList(start, end);
-            } else {
-                inventoryList = allInventoryList;
-            }
+            List<Inventory> inventoryList = inventoryDAO.getInventoryWithPagination(searchTerm, stockFilter, sortStock, currentPage, PAGE_SIZE);
             Map<Integer, User> userMap = new HashMap<>();
             for (Inventory inv : inventoryList) {
                 if (inv.getUpdatedBy() != null && inv.getUpdatedBy() > 0 && !userMap.containsKey(inv.getUpdatedBy())) {
@@ -62,34 +60,47 @@ public class StaticInventoryServlet extends HttpServlet {
                     }
                 }
             }
-            
-            // Lấy tổng số lượng nhập, xuất, tồn
+
             int totalImported = 0;
             int totalExported = 0;
-            int totalStock = 0;
+            
             try {
                 totalImported = importDAO.getTotalImportedQuantity();
-            } catch (Exception ex) { totalImported = 0; }
+            } catch (Exception ex) { 
+                totalImported = 0; 
+                System.err.println("Error getting total imported: " + ex.getMessage());
+            }
+            
             try {
                 totalExported = exportDAO.getTotalExportedQuantity();
-            } catch (Exception ex) { totalExported = 0; }
-            try {
-                List<Inventory> allInv = inventoryDAO.getAllInventory();
-                for (Inventory inv : allInv) totalStock += inv.getStock();
-            } catch (Exception ex) { totalStock = 0; }
+            } catch (Exception ex) { 
+                totalExported = 0; 
+                System.err.println("Error getting total exported: " + ex.getMessage());
+            }
+            
             request.setAttribute("totalImported", totalImported);
             request.setAttribute("totalExported", totalExported);
             request.setAttribute("totalStock", totalStock);
-            
+            request.setAttribute("lowStockCount", lowStockCount);
+            request.setAttribute("outOfStockCount", outOfStockCount);
             request.setAttribute("inventoryList", inventoryList);
             request.setAttribute("userMap", userMap);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalItems", totalItems);
             request.setAttribute("pageSize", PAGE_SIZE);
+            request.setAttribute("searchTerm", searchTerm);
+            request.setAttribute("stockFilter", stockFilter);
+            request.setAttribute("sortStock", sortStock);
             
         } catch (SQLException e) {
             request.setAttribute("error", "Error loading inventory data: " + e.getMessage());
+            System.err.println("SQL Error in StaticInventoryServlet: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            request.setAttribute("error", "Unexpected error: " + e.getMessage());
+            System.err.println("Unexpected error in StaticInventoryServlet: " + e.getMessage());
+            e.printStackTrace();
         }
         request.getRequestDispatcher("/StaticInventory.jsp").forward(request, response);
     }
