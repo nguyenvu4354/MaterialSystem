@@ -90,7 +90,7 @@
                         <div class="col-md-5">
                             <c:choose>
                                 <c:when test="${not empty product.materialsUrl}">
-                                    <img src="images/material1/${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
+                                    <img src="images/material/${product.materialsUrl}" alt="${product.materialName}" class="product-image img-fluid">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="images/default.jpg" alt="No Image" class="product-image img-fluid">
