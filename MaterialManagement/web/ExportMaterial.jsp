@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User, java.util.Map" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
     User admin = (User) session.getAttribute("user");
     if (admin == null || admin.getRoleId() != 3) {
@@ -124,9 +125,21 @@
                                     <tbody>
                                         <c:forEach var="detail" items="${exportDetails}">
                                             <tr>
+                                                <c:set var="imgUrl" value="${materialMap[detail.materialId].materialsUrl}" />
+                                                <c:choose>
+                                                    <c:when test="${empty imgUrl}">
+                                                        <c:set var="finalUrl" value='${pageContext.request.contextPath}/images/material/default-material.png' />
+                                                    </c:when>
+                                                    <c:when test="${fn:startsWith(imgUrl, 'http://') || fn:startsWith(imgUrl, 'https://')}">
+                                                        <c:set var="finalUrl" value='${imgUrl}' />
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:set var="finalUrl" value='${pageContext.request.contextPath}/images/material/${imgUrl}' />
+                                                    </c:otherwise>
+                                                </c:choose>
+
                                                 <td>
-                                                    <img src="${pageContext.request.contextPath}/images/material/${empty materialMap[detail.materialId].materialsUrl ? 'default-material.png' : materialMap[detail.materialId].materialsUrl}"
-                                                         class="material-img" alt="${materialMap[detail.materialId].materialName}">
+                                                    <img src="${finalUrl}" class="material-img" alt="${materialMap[detail.materialId].materialName}">
                                                 </td>
                                                 <td>${materialMap[detail.materialId].materialName}</td>
                                                 <td>
