@@ -4,15 +4,18 @@
     Author     : Admin
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Purchase Request List</title>
+        <title>Purchase Request Management</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" type="text/css" href="css/vendor.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
@@ -26,7 +29,7 @@
                 border-radius: 12px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             }
-            h1 {
+            h2 {
                 font-size: 1.75rem;
                 font-weight: bold;
                 margin-bottom: 0.5rem;
@@ -37,19 +40,27 @@
                 flex-wrap: wrap;
                 gap: 12px;
                 margin: 20px 0;
+                align-items: center;
+            }
+            .filter-bar .form-control,
+            .filter-bar .form-select,
+            .filter-bar .btn {
+                height: 48px;
+                min-width: 120px;
             }
             .btn-export, .btn-print {
+                background-color: #DEAD6F;
+                color: #fff;
+                border: none;
                 padding: 6px 14px;
                 border-radius: 6px;
                 font-weight: 500;
+                height:50px;
+                transition: background 0.2s;
             }
-            .btn-export {
-                background-color: #009966;
-                color: white;
-            }
-            .btn-print {
-                background-color: #6c757d;
-                color: white;
+            .btn-export:hover, .btn-print:hover {
+                background-color: #cfa856;
+                color: #fff;
             }
             .custom-table thead th {
                 background-color: #f9f5f0;
@@ -59,11 +70,20 @@
             .custom-table tbody tr:hover {
                 background-color: #f1f1f1;
             }
+            .custom-table th,
+            .custom-table td {
+                vertical-align: middle;
+                min-height: 48px;
+            }
             .status-badge {
                 padding: 2px 10px;
                 border-radius: 10px;
                 font-size: 13px;
                 font-weight: 500;
+            }
+            .status-pending {
+                background-color: #6c757d;
+                color: #fff;
             }
             .status-approved {
                 background-color: #d4edda;
@@ -72,10 +92,6 @@
             .status-rejected {
                 background-color: #f8d7da;
                 color: #721c24;
-            }
-            .status-pending {
-                background-color: #fff3cd;
-                color: #856404;
             }
             .btn-detail {
                 background-color: #fff7e6;
@@ -86,8 +102,8 @@
                 font-weight: 500;
             }
             .pagination .page-item.active .page-link {
-                background-color: #009966;
-                border-color: #009966;
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
             }
         </style>
     </head>
@@ -100,25 +116,29 @@
                 <jsp:include page="SidebarDirector.jsp"/>
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div class="container-main">
-                        <h1>Purchase Request List</h1>
-                        <p class="text-muted">Danh sách và quản lý các yêu cầu mua vật tư trong hệ thống</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice-dollar"></i> Purchase Request Management</h2>
+                            <div class="d-flex gap-2">
+                                <c:if test="${sessionScope.user.roleId != 2}">
+                                    <a href="CreatePurchaseRequest" class="btn btn-export">Add Purchase Request</a>
+                                </c:if>
+                            </div>
+                        </div>
                         <form class="filter-bar align-items-center" method="GET" action="ListPurchaseRequests" style="gap: 8px; flex-wrap:nowrap;">
-                            <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search..." style="max-width:260px; min-width:200px;">
-                            <select class="form-select" name="status" style="max-width:150px;">
-                                <option value="">All Status</option>
+                            <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search by request code" style="width:230px;">
+                            <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                                <option value="">All Statuses</option>
                                 <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                                 <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                 <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                             </select>
-                            <button type="submit" class="btn btn-primary">Filter</button>
-                            <a href="CreatePurchaseRequest" class="btn-export">Add Purchase Request</a>
+                            <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                         </form>
                         <c:if test="${not empty purchaseRequests}">
                             <div class="table-responsive" id="printTableListArea">
                                 <table class="table custom-table">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>Request Code</th>
                                             <th>Requester</th>
                                             <th>Request Date</th>
@@ -131,19 +151,23 @@
                                     <tbody>
                                         <c:forEach items="${purchaseRequests}" var="request">
                                             <tr>
-                                                <td>${request.purchaseRequestId}</td>
                                                 <td>${request.requestCode}</td>
                                                 <td>${userIdToName[request.userId]}</td>
                                                 <td>${request.requestDate}</td>
                                                 <td>${request.estimatedPrice}</td>
                                                 <td>${request.reason}</td>
                                                 <td>
-                                                    <span class="status-badge status-${request.status.toLowerCase()}">
-                                                        ${request.status == 'PENDING' ? 'Pending' : 
-                                                          request.status == 'APPROVED' ? 'Approved' : 
-                                                          request.status == 'REJECTED' ? 'Rejected' : 
-                                                          request.status}
-                                                    </span>
+                                                    <c:choose>
+                                                        <c:when test="${fn:toLowerCase(request.status) == 'approved'}">
+                                                            <span class="status-badge status-approved">Approved</span>
+                                                        </c:when>
+                                                        <c:when test="${fn:toLowerCase(request.status) == 'rejected'}">
+                                                            <span class="status-badge status-rejected">Rejected</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="status-badge status-pending">Pending</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td>
                                                     <a href="PurchaseRequestDetail?id=${request.purchaseRequestId}" class="btn-detail">
@@ -178,13 +202,14 @@
                         </c:if>
                         <c:if test="${empty purchaseRequests}">
                             <div class="alert alert-info mt-4">
-                                Không tìm thấy yêu cầu mua vật tư nào.
+                                No purchase request found.
                             </div>
                         </c:if>
                     </div>
                 </main>
             </div>
         </div>
+        <jsp:include page="Footer.jsp" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             function deleteRequest(id) {
