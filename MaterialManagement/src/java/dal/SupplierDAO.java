@@ -201,8 +201,22 @@ public class SupplierDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        // If no existing codes or error, start with SUP001
-        return "SUP001";
+        return "SUP001"; // Default if no existing codes
+    }
+
+    public boolean isSupplierCodeExists(String supplierCode) {
+        String sql = "SELECT COUNT(*) FROM Suppliers WHERE supplier_code = ? AND disable = 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, supplierCode);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     // Hàm main để test
