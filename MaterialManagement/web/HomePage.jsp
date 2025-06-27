@@ -540,11 +540,7 @@
     <body>
         <div class="top-bar py-2">
             <div class="container d-flex justify-content-between align-items-center flex-wrap position-relative">
-                <div class="main-logo me-3 d-flex align-items-center" style="min-width:120px;">
-                    <a href="HomePage.jsp">
-                        <img src="images/loogo.jpg" alt="Logo">
-                    </a>
-                </div>
+                
                 <div class="d-flex align-items-center ms-auto gap-2" style="z-index:3;">
                     <!-- Nút search icon -->
                     <button id="showSearchBtn" class="btn btn-topbar me-1"><i class="fas fa-search"></i></button>
