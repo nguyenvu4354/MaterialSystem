@@ -50,12 +50,10 @@
     <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 bg-light p-0">
                 <jsp:include page="Sidebar.jsp" />
             </div>
 
-            <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-person-fill-up"></i> Supplier List</h2>
@@ -67,7 +65,6 @@
                     </c:if>
                 </div>
 
-                <!-- Search and Filter Section -->
                 <div class="row search-box" style=" ">
                     <div class="col-md-8">
                         <form action="Supplier" method="GET" class="d-flex gap-2">
@@ -94,12 +91,9 @@
                     </div>
                 </div>
 
-                <!-- Error Mes -->
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
-
-                <!-- Supplier Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle text-center">
                         <thead class="table-light">
@@ -161,7 +155,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
                     <nav>
                         <ul class="pagination">
@@ -179,14 +172,12 @@
                         </ul>
                     </nav>
                 </c:if>
-            </div> <!-- end content -->
-        </div> <!-- end row -->
-    </div> <!-- end container-fluid -->
+            </div> 
+        </div> 
+    </div> 
 
     <!-- Footer -->
     <jsp:include page="Footer.jsp" />
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>

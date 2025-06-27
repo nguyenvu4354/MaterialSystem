@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ImportValidator {
 
-    // Validate Import entity (for backend object)
+    // Validate Import entity 
     public static Map<String, String> validateImport(Import imp, SupplierDAO supplierDAO) {
         Map<String, String> errors = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class ImportValidator {
         return errors;
     }
 
-    // Validate ImportDetail entity (for backend object)
+    // Validate ImportDetail entity 
     public static Map<String, String> validateImportDetail(ImportDetail detail) {
         Map<String, String> errors = new HashMap<>();
 
@@ -71,7 +71,7 @@ public class ImportValidator {
         return errors;
     }
 
-    // Validate import form data (for servlet form submission)
+    // Validate import form data 
     public static Map<String, String> validateImportFormData(String supplierIdStr, String destination, String batchNumber, String actualArrivalStr, String note, SupplierDAO supplierDAO) {
         Map<String, String> errors = new HashMap<>();
 
