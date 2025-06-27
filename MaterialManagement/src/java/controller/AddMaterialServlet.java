@@ -3,6 +3,7 @@ package controller;
 import dal.MaterialDAO;
 import dal.CategoryDAO;
 import dal.UnitDAO;
+import dal.RolePermissionDAO;
 import entity.Material;
 import entity.Category;
 import entity.Unit;
@@ -37,6 +38,12 @@ import jakarta.servlet.http.Part;
 public class AddMaterialServlet extends HttpServlet {
 
     private static final String UPLOAD_DIRECTORY = "images/material";
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        rolePermissionDAO = new RolePermissionDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -55,8 +62,9 @@ public class AddMaterialServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1) {
-            request.setAttribute("error", "You do not have permission to access this page. Only Admins can add materials.");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_MATERIAL")) {
+            request.setAttribute("error", "Bạn không có quyền thêm vật tư mới.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -73,7 +81,7 @@ public class AddMaterialServlet extends HttpServlet {
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         } catch (Exception ex) {
             ex.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + ex.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
@@ -88,8 +96,9 @@ public class AddMaterialServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1) {
-            request.setAttribute("error", "You do not have permission to perform this action. Only Admins can add materials.");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_MATERIAL")) {
+            request.setAttribute("error", "Bạn không có quyền thêm vật tư mới.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -138,13 +147,12 @@ public class AddMaterialServlet extends HttpServlet {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
-                // Đường dẫn đến build/web/images/material/
                 String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
                 Files.createDirectories(Paths.get(buildUploadPath));
                 filePart.write(buildUploadPath + fileName);
                 System.out.println("✅ Saved image to BUILD folder: " + buildUploadPath + fileName);
 
-                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent(); // lên 4 cấp
+                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
                 Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
                 Files.createDirectories(sourceDir);
                 try {
@@ -198,17 +206,17 @@ public class AddMaterialServlet extends HttpServlet {
             if (md.isMaterialCodeExists(materialCode)) {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
-                request.setAttribute("error", "Material code already exists, please enter a different code!");
+                request.setAttribute("error", "Mã vật tư đã tồn tại, vui lòng nhập mã khác!");
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
 
             md.addMaterial(m);
-            response.sendRedirect("dashboardmaterial?success=Material added successfully");
+            response.sendRedirect("dashboardmaterial?success=Vật tư được thêm thành công");
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + ex.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         }
     }

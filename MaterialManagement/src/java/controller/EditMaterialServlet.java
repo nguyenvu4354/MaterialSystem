@@ -3,6 +3,7 @@ package controller;
 import dal.CategoryDAO;
 import dal.MaterialDAO;
 import dal.UnitDAO;
+import dal.RolePermissionDAO;
 import entity.Category;
 import entity.Material;
 import entity.Unit;
@@ -17,7 +18,6 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Map;
 
 @WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
@@ -28,7 +28,14 @@ import java.util.Map;
 )
 public class EditMaterialServlet extends HttpServlet {
 
-        private static final String UPLOAD_DIRECTORY = "images/material";
+    private static final String UPLOAD_DIRECTORY = "images/material";
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        rolePermissionDAO = new RolePermissionDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -40,9 +47,9 @@ public class EditMaterialServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-
-        if (user.getRoleId() != 1) {
-            request.setAttribute("error", "You do not have permission to access this page.");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_MATERIAL")) {
+            request.setAttribute("error", "Bạn không có quyền chỉnh sửa vật tư.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -83,9 +90,9 @@ public class EditMaterialServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-
-        if (user.getRoleId() != 1) {
-            request.setAttribute("error", "You do not have permission to perform this action.");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_MATERIAL")) {
+            request.setAttribute("error", "Bạn không có quyền chỉnh sửa vật tư.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -117,13 +124,12 @@ public class EditMaterialServlet extends HttpServlet {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
-                // Đường dẫn đến build/web/images/material/
                 String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
                 Files.createDirectories(Paths.get(buildUploadPath));
                 filePart.write(buildUploadPath + fileName);
                 System.out.println("✅ Saved image to BUILD folder: " + buildUploadPath + fileName);
 
-                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent(); // lên 4 cấp
+                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
                 Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
                 Files.createDirectories(sourceDir);
                 try {
@@ -198,11 +204,11 @@ public class EditMaterialServlet extends HttpServlet {
             System.out.println("📌 Final Material Image URL: " + material.getMaterialsUrl());
 
             materialDAO.updateMaterial(material);
-            response.sendRedirect("dashboardmaterial?success=Material updated successfully");
+            response.sendRedirect("dashboardmaterial?success=Vật tư được cập nhật thành công");
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "An error occurred: " + e.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi: " + e.getMessage());
             doGet(request, response);
         }
     }

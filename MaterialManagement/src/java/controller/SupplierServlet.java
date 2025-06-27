@@ -1,7 +1,9 @@
 package controller;
 
 import dal.SupplierDAO;
+import dal.RolePermissionDAO;
 import entity.Supplier;
+import entity.User;
 import utils.SupplierValidator;
 import java.io.IOException;
 import java.util.Collections;
@@ -15,18 +17,45 @@ import jakarta.servlet.http.*;
 @WebServlet(name = "SupplierServlet", urlPatterns = {"/Supplier"})
 public class SupplierServlet extends HttpServlet {
     private SupplierDAO supplierDAO;
-    private static final int PAGE_SIZE = 5; 
+    private RolePermissionDAO rolePermissionDAO;
+    private static final int PAGE_SIZE = 5;
 
     @Override
     public void init() throws ServletException {
         supplierDAO = new SupplierDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please log in to access this page.");
+            return;
+        }
+
+        int roleId = currentUser.getRoleId();
         String action = request.getParameter("action");
         if (action == null) action = "list";
+
+        if (roleId != 1) {
+            if ("list".equals(action) && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_SUPPLIER")) {
+                request.setAttribute("error", "You do not have permission to view the supplier list.");
+                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                return;
+            }
+            if ("edit".equals(action) && !rolePermissionDAO.hasPermission(roleId, "UPDATE_SUPPLIER") && !rolePermissionDAO.hasPermission(roleId, "VIEW_DETAIL_SUPPLIER")) {
+                request.setAttribute("error", "You do not have permission to edit or view supplier details.");
+                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                return;
+            }
+            if ("delete".equals(action) && !rolePermissionDAO.hasPermission(roleId, "DELETE_SUPPLIER")) {
+                request.setAttribute("error", "You do not have permission to delete suppliers.");
+                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                return;
+            }
+        }
 
         switch (action) {
             case "list":
@@ -45,7 +74,7 @@ public class SupplierServlet extends HttpServlet {
     }
 
     private void listSuppliers(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         String code = request.getParameter("code");
         String sortBy = request.getParameter("sortBy");
@@ -57,12 +86,10 @@ public class SupplierServlet extends HttpServlet {
         int totalSuppliers;
 
         if (code != null && !code.trim().isEmpty()) {
-            // Search by code
             list = supplierDAO.searchSuppliersByCode(code);
             totalSuppliers = list.size();
             request.setAttribute("code", code);
         } else if (keyword != null && !keyword.trim().isEmpty()) {
-            // Search by name, contact info, phone
             list = supplierDAO.searchSuppliers(keyword);
             totalSuppliers = list.size();
             request.setAttribute("keyword", keyword);
@@ -71,7 +98,6 @@ public class SupplierServlet extends HttpServlet {
             totalSuppliers = list.size();
         }
 
-        // Sorting
         if (sortBy != null && !sortBy.isEmpty()) {
             switch (sortBy) {
                 case "name_asc":
@@ -84,7 +110,6 @@ public class SupplierServlet extends HttpServlet {
             request.setAttribute("sortBy", sortBy);
         }
 
-        // Pagination
         int totalPages = (int) Math.ceil((double) totalSuppliers / PAGE_SIZE);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
@@ -101,6 +126,7 @@ public class SupplierServlet extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
         request.setAttribute("code", code);
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO); 
         request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
     }
 
@@ -113,25 +139,31 @@ public class SupplierServlet extends HttpServlet {
                 Supplier supplier = supplierDAO.getSupplierByID(id);
                 request.setAttribute("supplier", supplier);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "ID erorr.");
+                request.setAttribute("error", "Invalid supplier ID.");
             }
         } else {
-            // Generate new supplier code for adding new supplier
             String newSupplierCode = supplierDAO.generateNextSupplierCode();
             request.setAttribute("newSupplierCode", newSupplierCode);
         }
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
         request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
     }
 
     private void deleteSupplier(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws IOException, ServletException {
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
             try {
                 int id = Integer.parseInt(idStr);
                 supplierDAO.deleteSupplier(id);
             } catch (NumberFormatException e) {
-                
+                request.setAttribute("error", "Invalid supplier ID.");
+                try {
+                    request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                } catch (ServletException | IOException ex) {
+                    throw new ServletException("Error forwarding to SupplierList.jsp", ex);
+                }
+                return;
             }
         }
         response.sendRedirect("Supplier?action=list");
@@ -140,7 +172,28 @@ public class SupplierServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please log in to access this page.");
+            return;
+        }
+
+        int roleId = currentUser.getRoleId();
         String idStr = request.getParameter("supplier_id");
+
+        if (roleId != 1) {
+            if ((idStr == null || idStr.isEmpty()) && !rolePermissionDAO.hasPermission(roleId, "CREATE_SUPPLIER")) {
+                request.setAttribute("error", "You do not have permission to create suppliers.");
+                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                return;
+            }
+            if (idStr != null && !idStr.isEmpty() && !rolePermissionDAO.hasPermission(roleId, "UPDATE_SUPPLIER")) {
+                request.setAttribute("error", "You do not have permission to update suppliers.");
+                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                return;
+            }
+        }
+
         String code = request.getParameter("supplier_code");
         String name = request.getParameter("supplier_name");
         String contactInfo = request.getParameter("contact_info");
@@ -155,7 +208,6 @@ public class SupplierServlet extends HttpServlet {
             code, name, contactInfo, address, phone, email, taxId, desc
         );
 
-        // If validation fails, redirect back to form with error
         if (!errors.isEmpty()) {
             Supplier supplier = new Supplier();
             supplier.setSupplierCode(code != null ? code : "");
@@ -175,7 +227,6 @@ public class SupplierServlet extends HttpServlet {
                 }
             }
             
-            // Combine all error messages
             StringBuilder errorMessage = new StringBuilder();
             for (String error : errors.values()) {
                 errorMessage.append(error).append(" ");
@@ -183,7 +234,12 @@ public class SupplierServlet extends HttpServlet {
             
             request.setAttribute("supplier", supplier);
             request.setAttribute("error", errorMessage.toString().trim());
-            request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
+            request.setAttribute("rolePermissionDAO", rolePermissionDAO); 
+            try {
+                request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
+            } catch (ServletException | IOException e) {
+                throw new ServletException("Error forwarding to SupplierEdit.jsp", e);
+            }
             return;
         }
 
@@ -205,7 +261,13 @@ public class SupplierServlet extends HttpServlet {
                 supplier.setSupplierId(id);
                 supplierDAO.updateSupplier(supplier);
             } catch (NumberFormatException e) {
-                
+                request.setAttribute("error", "Invalid supplier ID.");
+                try {
+                    request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                } catch (ServletException | IOException ex) {
+                    throw new ServletException("Error forwarding to SupplierList.jsp", ex);
+                }
+                return;
             }
         }
         response.sendRedirect("Supplier?action=list");
@@ -213,6 +275,6 @@ public class SupplierServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "SupplierServlet handles supplier management operations";
+        return "SupplierServlet handles supplier management operations with permission checks";
     }
 }

@@ -1,8 +1,8 @@
 package controller;
 
 import dal.MaterialDAO;
+import dal.RolePermissionDAO;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,22 +12,38 @@ import jakarta.servlet.http.HttpServletResponse;
 import entity.Material;
 import entity.User;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 
-@WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboardmaterial"})
+@WebServlet(name = "DashboardMaterialServlet", urlPatterns = {"/dashboardmaterial"})
 public class DashboardMaterialServlet extends HttpServlet {
+    private MaterialDAO materialDAO;
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        materialDAO = new MaterialDAO();
+        rolePermissionDAO = new RolePermissionDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         try {
             HttpSession session = request.getSession(false);
             User user = (session != null) ? (User) session.getAttribute("user") : null;
             if (user == null || (user.getRoleId() != 1 && user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4)) {
-                response.sendRedirect("error.jsp");
+                request.setAttribute("error", "Vui lòng đăng nhập để truy cập trang này.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
+
+            // Kiểm tra quyền VIEW_LIST_MATERIAL
+            int roleId = user.getRoleId();
+            if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_MATERIAL")) {
+                request.setAttribute("error", "Bạn không có quyền xem danh sách vật tư.");
+                request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
+                return;
+            }
+
             boolean readonly = user.getRoleId() != 1;
             request.setAttribute("readonly", readonly);
 
@@ -36,7 +52,11 @@ public class DashboardMaterialServlet extends HttpServlet {
 
             String pageParam = request.getParameter("page");
             if (pageParam != null && !pageParam.isEmpty()) {
-                pageIndex = Integer.parseInt(pageParam);
+                try {
+                    pageIndex = Integer.parseInt(pageParam);
+                } catch (NumberFormatException e) {
+                    pageIndex = 1;
+                }
             }
 
             String keyword = request.getParameter("keyword");
@@ -51,14 +71,9 @@ public class DashboardMaterialServlet extends HttpServlet {
             if (sortOption == null) {
                 sortOption = "";
             }
-            MaterialDAO md = new MaterialDAO();
 
-            List<Material> list;
-            int totalMaterials;
-
-            list = md.searchMaterials(keyword, status, pageIndex, pageSize,sortOption);
-            totalMaterials = md.countMaterials(keyword, status);
-
+            List<Material> list = materialDAO.searchMaterials(keyword, status, pageIndex, pageSize, sortOption);
+            int totalMaterials = materialDAO.countMaterials(keyword, status);
             int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
 
             request.setAttribute("list", list);
@@ -67,9 +82,13 @@ public class DashboardMaterialServlet extends HttpServlet {
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
             request.setAttribute("sortOption", sortOption);
+            request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+
             request.getRequestDispatcher("DashboardMaterial.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("error", "Đã xảy ra lỗi: " + e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
