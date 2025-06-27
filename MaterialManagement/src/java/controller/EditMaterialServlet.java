@@ -111,9 +111,10 @@ public class EditMaterialServlet extends HttpServlet {
 
             Part filePart = request.getPart("materialImage");
             String imageUrl = null;
+            boolean hasNewImage = false;
 
             if (filePart != null && filePart.getSize() > 0) {
-                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                 fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
 
                 // Đường dẫn đến build/web/images/material/
@@ -125,8 +126,6 @@ public class EditMaterialServlet extends HttpServlet {
                 Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent(); // lên 4 cấp
                 Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
                 Files.createDirectories(sourceDir);
-                Files.copy(Paths.get(buildUploadPath + fileName), sourceDir.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("✅ Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
                 try {
                     Files.copy(
                             Paths.get(buildUploadPath + fileName),
@@ -139,12 +138,11 @@ public class EditMaterialServlet extends HttpServlet {
                 }
 
                 imageUrl = fileName;
+                hasNewImage = true;
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 imageUrl = urlInput.trim();
+                hasNewImage = true;
                 System.out.println("📝 Using URL input instead of new image: " + imageUrl);
-            } else {
-                imageUrl = "default.jpg";
-                System.out.println("📎 No image provided, using default.jpg");
             }
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
@@ -188,7 +186,7 @@ public class EditMaterialServlet extends HttpServlet {
             unit.setId(Integer.parseInt(unitId));
             material.setUnit(unit);
 
-            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            if (hasNewImage && imageUrl != null && !imageUrl.trim().isEmpty()) {
                 material.setMaterialsUrl(imageUrl);
             } else if (oldMaterial != null) {
                 material.setMaterialsUrl(oldMaterial.getMaterialsUrl());
