@@ -2,10 +2,12 @@ package controller;
 
 import dal.SupplierDAO;
 import entity.Supplier;
+import utils.SupplierValidator;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -147,6 +149,43 @@ public class SupplierServlet extends HttpServlet {
         String email = request.getParameter("email");
         String desc = request.getParameter("description");
         String taxId = request.getParameter("tax_id");
+
+        // Use SupplierValidator for validation
+        Map<String, String> errors = SupplierValidator.validateSupplierFormData(
+            code, name, contactInfo, address, phone, email, taxId, desc
+        );
+
+        // If validation fails, redirect back to form with error
+        if (!errors.isEmpty()) {
+            Supplier supplier = new Supplier();
+            supplier.setSupplierCode(code != null ? code : "");
+            supplier.setSupplierName(name != null ? name : "");
+            supplier.setContactInfo(contactInfo != null ? contactInfo : "");
+            supplier.setAddress(address != null ? address : "");
+            supplier.setPhoneNumber(phone != null ? phone : "");
+            supplier.setEmail(email != null ? email : "");
+            supplier.setDescription(desc != null ? desc : "");
+            supplier.setTaxId(taxId != null ? taxId : "");
+            
+            if (idStr != null && !idStr.isEmpty()) {
+                try {
+                    supplier.setSupplierId(Integer.parseInt(idStr));
+                } catch (NumberFormatException e) {
+                    // Handle error
+                }
+            }
+            
+            // Combine all error messages
+            StringBuilder errorMessage = new StringBuilder();
+            for (String error : errors.values()) {
+                errorMessage.append(error).append(" ");
+            }
+            
+            request.setAttribute("supplier", supplier);
+            request.setAttribute("error", errorMessage.toString().trim());
+            request.getRequestDispatcher("/SupplierEdit.jsp").forward(request, response);
+            return;
+        }
 
         Supplier supplier = new Supplier();
         supplier.setSupplierCode(code);

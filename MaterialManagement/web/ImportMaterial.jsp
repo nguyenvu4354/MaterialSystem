@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="css/vendor.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        .import-form {
+        .material-form {
             border-radius: 12px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.07);
             background: white;
         }
-        .import-form .form-control, .import-form .form-select {
+        .material-form .form-control, .material-form .form-select {
             height: 48px;
             font-size: 18px;
             color: black;
@@ -25,39 +25,29 @@
             border-radius: 8px;
             border: 1px solid #bdbdbd;
         }
-        .import-form .form-label {
+        .material-form .form-label {
             font-size: 16px;
             margin-bottom: 6px;
             font-weight: 500;
             color: black;
         }
-        .import-form .btn {
-            font-size: 18px;
-            padding: 14px 24px;
-            color: black;
-            background: gainsboro;
-            border: 1px solid gray;
-            border-radius: 8px;
-            font-weight: 600;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        .material-form .btn {
+            font-size: 16px;
+            padding: 12px;
         }
-        .import-form .btn:hover {
-            background: gray;
-            color: white;
-        }
-        .import-form .material-row {
+        .material-form .material-row {
             margin-bottom: 16px;
             border-bottom: 1px solid gray;
             padding-bottom: 16px;
         }
-        .import-form .img-thumbnail {
+        .material-form .img-thumbnail {
             width: 60px;
             height: 60px;
             object-fit: cover;
             border-radius: 8px;
             border: 1px solid #bdbdbd;
         }
-        .import-form .status-badge {
+        .material-form .status-badge {
             padding: 10px 22px;
             border-radius: 12px;
             font-size: 16px;
@@ -66,19 +56,19 @@
             color: black;
             border: 1px solid #bdbdbd;
         }
-        .import-form .status-new {
+        .material-form .status-new {
             background-color: #198754;
             color: #fff;
         }
-        .import-form .status-used {
+        .material-form .status-used {
             background-color: #ffc107;
             color: #212529;
         }
-        .import-form .status-refurbished {
+        .material-form .status-refurbished {
             background-color: #0dcaf0;
             color: #fff;
         }
-        .import-form .badge.bg-secondary, .import-form .badge.bg-info, .import-form .badge.bg-success {
+        .material-form .badge.bg-secondary, .material-form .badge.bg-info, .material-form .badge.bg-success {
             font-size: 16px;
             padding: 10px 22px;
             font-weight: 600;
@@ -87,19 +77,19 @@
             background: lightgray !important;
             color: black !important;
         }
-        .import-form .badge.bg-info {
+        .material-form .badge.bg-info {
             background-color: #0dcaf0 !important;
             color: #fff !important;
         }
-        .import-form .badge.bg-secondary {
+        .material-form .badge.bg-secondary {
             background-color: #6c757d !important;
             color: #fff !important;
         }
-        .import-form .badge.bg-success {
+        .material-form .badge.bg-success {
             background-color: #198754 !important;
             color: #fff !important;
         }
-        .import-form .table {
+        .material-form .table {
             background: white;
             color: black;
             border: 1px solid #bdbdbd;
@@ -107,7 +97,7 @@
             overflow: hidden;
             box-shadow: 0 1px 8px rgba(0,0,0,0.04);
         }
-        .import-form .table th, .import-form .table td {
+        .material-form .table th, .material-form .table td {
             color: black;
             font-size: 16px;
             font-weight: 400;
@@ -115,24 +105,24 @@
             padding: 10px 12px;
             background: white;
         }
-        .import-form .table th {
+        .material-form .table th {
             font-weight: 700;
             background: lightgray;
             color: black;
             border-top: none;
         }
-        .import-form .card, .import-form .card-header, .import-form .card-body {
+        .material-form .card, .material-form .card-header, .material-form .card-body {
             border-radius: 12px !important;
             background: white;
             border: none;
         }
-        .import-form .card-header {
+        .material-form .card-header {
             background: lightgray !important;
             color: black;
             font-weight: 700;
             border-bottom: 1px solid #bdbdbd;
         }
-        .import-form .alert {
+        .material-form .alert {
             border-radius: 8px;
             font-size: 16px;
         }
@@ -144,7 +134,7 @@
 <section id="import-material" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
     <div class="container">
         <div class="row my-5 py-5">
-            <div class="col-12 bg-white p-4 rounded shadow import-form">
+            <div class="col-12 bg-white p-4 rounded shadow material-form">
                 <h2 class="display-4 fw-normal text-center mb-4">
                     <i class="fas fa-box-open me-2"></i>Import <span class="text-primary">Material</span>
                 </h2>
@@ -211,8 +201,8 @@
                                     <th>Unit</th>
                                     <th>Category</th>
                                     <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Total Value</th>
+                                    <th>Price</th>
+                                    <th>Value</th>
                                     <th>Condition</th>
                                     <th>Stock</th>
                                     <th>Action</th>
@@ -284,26 +274,37 @@
                                     <option value="${supplier.supplierId}">${supplier.supplierName}</option>
                                 </c:forEach>
                             </select>
+                            <c:if test="${not empty formErrors['supplierId']}">
+                                <div class="text-danger small mt-1">${formErrors['supplierId']}</div>
+                            </c:if>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-muted">Destination</label>
                             <input type="text" name="destination" class="form-control" placeholder="e.g., Warehouse A, Building 1" required>
+                            <c:if test="${not empty formErrors['destination']}">
+                                <div class="text-danger small mt-1">${formErrors['destination']}</div>
+                            </c:if>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label text-muted">Batch Number</label>
-                            <input type="text" name="batchNumber" class="form-control" maxlength="50" placeholder="e.g., BATCH001-2024" required>
+                            <input type="text" name="batchNumber" class="form-control" maxlength="50" required>
+                            <c:if test="${not empty formErrors['batchNumber']}">
+                                <div class="text-danger small mt-1">${formErrors['batchNumber']}</div>
+                            </c:if>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label text-muted">Actual Arrival</label>
                             <input type="datetime-local" name="actualArrival" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted">Import Date</label>
-                            <input type="text" id="importDate" class="form-control" readonly value="${importDetails.size() > 0 ? 'Will be set automatically' : 'No materials added'}">
+                            <c:if test="${not empty formErrors['actualArrival']}">
+                                <div class="text-danger small mt-1">${formErrors['actualArrival']}</div>
+                            </c:if>
                         </div>
                         <div class="col-12">
                             <label class="form-label text-muted">Notes</label>
                             <input type="text" name="note" class="form-control" placeholder="Enter Note">
+                            <c:if test="${not empty formErrors['note']}">
+                                <div class="text-danger small mt-1">${formErrors['note']}</div>
+                            </c:if>
                         </div>
                         <div class="col-12 mt-4">
                             <div class="d-grid gap-2">
@@ -327,11 +328,9 @@
 </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Auto-hide alerts after 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
-                // Auto-hide after 3 seconds
                 setTimeout(function() {
                     if (alert.style.display !== 'none') {
                         alert.style.transition = 'all 0.5s ease-out';
@@ -343,7 +342,6 @@
                     }
                 }, 3000);
                 
-                // Add click to dismiss functionality
                 alert.addEventListener('click', function(e) {
                     if (e.target.classList.contains('btn-close') || e.target.classList.contains('alert')) {
                         this.style.transition = 'all 0.3s ease-out';
@@ -357,7 +355,6 @@
             });
         });
 
-        // Calculate total value when quantity or unit price changes
         function calculateTotal() {
             const quantity = document.querySelector('input[name="quantity"]').value;
             const unitPrice = document.querySelector('input[name="unitPrice"]').value;
@@ -378,10 +375,29 @@
             const quantity = form.querySelector('input[name="quantity"]');
             const unitPrice = form.querySelector('input[name="unitPrice"]');
             const condition = form.querySelector('select[name="materialCondition"]');
-            if (!materialId.value) { materialId.classList.add('is-invalid'); isValid = false; } else { materialId.classList.remove('is-invalid'); }
-            if (!quantity.value || quantity.value <= 0) { quantity.classList.add('is-invalid'); isValid = false; } else { quantity.classList.remove('is-invalid'); }
-            if (!unitPrice.value || unitPrice.value < 0) { unitPrice.classList.add('is-invalid'); isValid = false; } else { unitPrice.classList.remove('is-invalid'); }
-            if (!condition.value) { condition.classList.add('is-invalid'); isValid = false; } else { condition.classList.remove('is-invalid'); }
+            if (!materialId.value) { 
+                materialId.classList.add('is-invalid'); 
+                isValid = false; 
+            } else {
+                materialId.classList.remove('is-invalid'); 
+            }
+            if (!quantity.value || quantity.value <= 0) {
+                quantity.classList.add('is-invalid'); isValid = false; 
+            } else { 
+                quantity.classList.remove('is-invalid'); 
+            }
+            if (!unitPrice.value || unitPrice.value < 0) { 
+                unitPrice.classList.add('is-invalid'); 
+                isValid = false; 
+            } else {
+                unitPrice.classList.remove('is-invalid'); 
+            }
+            if (!condition.value) { 
+                condition.classList.add('is-invalid');
+                isValid = false; 
+            } else { 
+                condition.classList.remove('is-invalid'); 
+            }
             return isValid;
         }
         function validateConfirmForm() {
@@ -391,10 +407,30 @@
             const destination = form.querySelector('input[name="destination"]');
             const batchNumber = form.querySelector('input[name="batchNumber"]');
             const actualArrival = form.querySelector('input[name="actualArrival"]');
-            if (!supplierId.value) { supplierId.classList.add('is-invalid'); isValid = false; } else { supplierId.classList.remove('is-invalid'); }
-            if (!destination.value.trim()) { destination.classList.add('is-invalid'); isValid = false; } else { destination.classList.remove('is-invalid'); }
-            if (!batchNumber.value.trim()) { batchNumber.classList.add('is-invalid'); isValid = false; } else { batchNumber.classList.remove('is-invalid'); }
-            if (!actualArrival.value) { actualArrival.classList.add('is-invalid'); isValid = false; } else { actualArrival.classList.remove('is-invalid'); }
+            if (!supplierId.value) { 
+                supplierId.classList.add('is-invalid'); 
+                isValid = false; }
+            else {
+                supplierId.classList.remove('is-invalid'); 
+            }
+            if (!destination.value.trim()) {
+                destination.classList.add('is-invalid'); 
+                isValid = false; 
+            } else { 
+                destination.classList.remove('is-invalid'); 
+            }
+            if (!batchNumber.value.trim()) {
+                batchNumber.classList.add('is-invalid');
+                isValid = false; 
+            } else { 
+                batchNumber.classList.remove('is-invalid'); 
+            }
+            if (!actualArrival.value) { 
+                actualArrival.classList.add('is-invalid');
+                isValid = false;
+            } else { 
+                actualArrival.classList.remove('is-invalid'); 
+            }
             return isValid;
         }
     </script>

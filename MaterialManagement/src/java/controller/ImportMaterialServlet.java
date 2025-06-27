@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.UUID;
+import utils.ImportValidator;
 
 @WebServlet(name = "ImportMaterialServlet", urlPatterns = {"/ImportMaterial"})
 public class ImportMaterialServlet extends HttpServlet {
@@ -39,6 +40,18 @@ public class ImportMaterialServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        int roleId = currentUser.getRoleId();
+        if (roleId != 1 && roleId != 3) {
+            request.setAttribute("error", "Access denied. Only Admin and Warehouse Staff can access Import Material.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+        
         loadDataAndForward(request, response);
     }
 
@@ -49,6 +62,12 @@ public class ImportMaterialServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect("Login.jsp");
+            return;
+        }
+        int roleId = user.getRoleId();
+        if (roleId != 1 && roleId != 3) {
+            request.setAttribute("error", "Access denied. Only Admin and Warehouse Staff can access Import Material.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
@@ -189,34 +208,27 @@ public class ImportMaterialServlet extends HttpServlet {
             return;
         }
 
-        Integer supplierId = request.getParameter("supplierId") != null && !request.getParameter("supplierId").isEmpty()
-                ? Integer.parseInt(request.getParameter("supplierId")) : null;
+        String supplierIdStr = request.getParameter("supplierId");
         String destination = request.getParameter("destination");
         String batchNumber = request.getParameter("batchNumber");
         String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
-        
-        if (supplierId == null || destination == null || destination.trim().isEmpty() || 
-            batchNumber == null || batchNumber.trim().isEmpty() || 
-            actualArrivalStr == null || actualArrivalStr.isEmpty()) {
-            request.setAttribute("error", "Please fill all required fields in the confirmation form.");
+        Map<String, String> formErrors = ImportValidator.validateImportFormData(
+            supplierIdStr, destination, batchNumber, actualArrivalStr, note, supplierDAO
+        );
+        if (!formErrors.isEmpty()) {
+            request.setAttribute("formErrors", formErrors);
             loadDataAndForward(request, response);
             return;
         }
 
-        LocalDateTime actualArrival;
-        try {
-            actualArrival = LocalDateTime.parse(actualArrivalStr);
-        } catch (Exception e) {
-            request.setAttribute("error", "Invalid actual arrival date format.");
-            loadDataAndForward(request, response);
-            return;
-        }
+        Integer supplierId = Integer.parseInt(supplierIdStr);
+        java.time.LocalDateTime actualArrival = java.time.LocalDateTime.parse(actualArrivalStr);
 
         Import imports = new Import();
         imports.setImportId(tempImportId);
         imports.setImportCode("IMP-" + UUID.randomUUID().toString().substring(0, 8));
-        imports.setImportDate(LocalDateTime.now());
+        imports.setImportDate(java.time.LocalDateTime.now());
         imports.setImportedBy(user.getUserId());
         imports.setSupplierId(supplierId);
         imports.setDestination(destination);
@@ -237,14 +249,12 @@ public class ImportMaterialServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         try {
-            // 1. Load primary data for dropdowns and display
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
             
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", allMaterials);
 
-            // 2. Load the temporary import details from session
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
             if (tempImportId == null) {
                 tempImportId = 0;
@@ -255,8 +265,6 @@ public class ImportMaterialServlet extends HttpServlet {
                     ? importDAO.getDraftImportDetails(tempImportId)
                     : new ArrayList<>();
             request.setAttribute("importDetails", importDetails);
-
-            // 3. Create necessary maps for the JSP to render details efficiently
             Map<Integer, Material> materialMap = new HashMap<>();
             for (Material m : allMaterials) {
                 materialMap.put(m.getMaterialId(), m);
@@ -271,7 +279,6 @@ public class ImportMaterialServlet extends HttpServlet {
             request.setAttribute("stockMap", stockMap);
 
         } catch (SQLException e) {
-            // Set a detailed error message for better debugging
             request.setAttribute("error", "Error loading page data: " + e.getMessage());
             e.printStackTrace(); 
         }

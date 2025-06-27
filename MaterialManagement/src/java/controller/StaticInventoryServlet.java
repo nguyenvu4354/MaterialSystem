@@ -36,6 +36,19 @@ public class StaticInventoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+        int roleId = currentUser.getRoleId();
+        if (roleId != 1 && roleId != 2 && roleId != 3) {
+            // User doesn't have permission
+            request.setAttribute("error", "Access denied. You don't have permission to view inventory reports.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             String searchTerm = request.getParameter("search");
             String stockFilter = request.getParameter("filter");
