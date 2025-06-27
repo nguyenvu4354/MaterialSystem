@@ -31,17 +31,15 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
                 
-                // Check for a redirect URL
                 String redirectURL = (String) session.getAttribute("redirectURL");
                 if (redirectURL != null && !redirectURL.isEmpty()) {
-                    session.removeAttribute("redirectURL"); // Remove the URL after using it
+                    session.removeAttribute("redirectURL");
                     response.sendRedirect(response.encodeRedirectURL(redirectURL));
                 } else {
-                    // Default redirection based on role
                     if (user.getRoleId() == 1) {
                         response.sendRedirect(response.encodeRedirectURL("UserList"));
                     } else {
-                        response.sendRedirect(response.encodeRedirectURL("HomePage.jsp"));
+                        response.sendRedirect(response.encodeRedirectURL("home"));
                     }
                 }
             }
