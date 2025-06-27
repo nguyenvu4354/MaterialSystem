@@ -16,12 +16,14 @@
                 </a>
             </li>
             <% } %>
+            <% if (user != null && (user.getRoleId() == 1 || user.getRoleId() == 2 || user.getRoleId() == 3)) { %>
             <li class="nav-item mb-2">
                 <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/StaticInventory">
                     <i class="fas fa-tachometer-alt fs-4 me-3"></i>
                     Inventory Report
                 </a>
             </li>
+            <% } %>
             <li class="nav-item mb-2">
                 <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/dashboardmaterial">
                     <i class="fas fa-shopping-cart fs-4 me-3"></i>
