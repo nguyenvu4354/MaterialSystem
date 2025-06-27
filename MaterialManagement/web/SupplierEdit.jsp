@@ -19,12 +19,21 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
         color: red;
         margin-left: 4px;
       }
+      .btn-brown {
+        background-color: #DEB887 !important;
+        color: #fff !important;
+        border: none;
+      }
+      .btn-brown:hover, .btn-brown:focus {
+        background-color: #c49b63 !important;
+        color: #fff !important;
+      }
     </style>
   </head>
   <body class="bg-light">
     <div class="container mt-5">
       <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header btn-brown text-white">
           <h3 class="mb-0">
             ${supplier != null ? "Edit Supplier" : "Add New Supplier"}
           </h3>
@@ -52,149 +61,73 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               />
             </c:if>
 
-            <!-- Supplier Code -->
-            <div class="mb-3">
-              <label for="supplier_code" class="form-label required-field"
-                ><i class="bi bi-upc-scan me-1"></i>Supplier Code</label
-              >
-              <input type="text" class="form-control" id="supplier_code"
-              name="supplier_code" placeholder="Enter supplier code"
-              value="${supplier != null ? supplier.supplierCode :
-              newSupplierCode}" ${supplier == null ? 'readonly' : ''} required
-              />
-              <div class="invalid-feedback">Please enter a supplier code.</div>
-              <c:if test="${supplier == null}">
-                <div class="form-text text-info"></div>
-              </c:if>
+            <!-- Supplier Code & Name -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="supplier_code" class="form-label required-field">Supplier Code</label>
+                <input type="text" class="form-control" id="supplier_code" name="supplier_code" value="${supplier != null ? supplier.supplierCode : newSupplierCode}" ${supplier == null ? 'readonly' : ''} required />
+                <div class="invalid-feedback">Please enter a supplier code.</div>
+                <c:if test="${supplier == null}">
+                  <div class="form-text text-info"></div>
+                </c:if>
+              </div>
+              <div class="col-md-6">
+                <label for="supplier_name" class="form-label required-field">Supplier Name</label>
+                <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="${supplier != null ? supplier.supplierName : ''}" required maxlength="100" pattern=".*\S.*" />
+                <div class="invalid-feedback">Please enter a valid supplier name (not empty, max 100 characters).</div>
+              </div>
             </div>
 
-            <!-- Supplier Name -->
-            <div class="mb-3">
-              <label for="supplier_name" class="form-label required-field"
-                ><i class="bi bi-building me-1"></i>Supplier Name</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="supplier_name"
-                name="supplier_name"
-                placeholder="Enter supplier name"
-                value="${supplier != null ? supplier.supplierName : ''}"
-                required
-              />
-              <div class="invalid-feedback">Please enter a supplier name.</div>
-            </div>
-
-            <!-- Contact Info -->
-            <div class="mb-3">
-              <label for="contact_info" class="form-label"
-                ><i class="bi bi-person-lines-fill me-1"></i>Contact Info</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="contact_info"
-                name="contact_info"
-                placeholder="Enter contact details"
-                value="${supplier != null ? supplier.contactInfo : ''}"
-              />
-            </div>
-
-            <!-- Address -->
-            <div class="mb-3">
-              <label for="address" class="form-label"
-                ><i class="bi bi-geo-alt me-1"></i>Address</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="address"
-                name="address"
-                placeholder="Enter supplier address"
-                value="${supplier != null ? supplier.address : ''}"
-              />
+            <!-- Contact Info & Address -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="contact_info" class="form-label required-field">Contact Info</label>
+                <input type="text" class="form-control" id="contact_info" name="contact_info" value="${supplier != null ? supplier.contactInfo : ''}" maxlength="100" required />
+                <div class="invalid-feedback">Please enter contact information.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="address" class="form-label required-field">Address</label>
+                <input type="text" class="form-control" id="address" name="address" value="${supplier != null ? supplier.address : ''}" maxlength="200" required />
+                <div class="invalid-feedback">Please enter supplier address.</div>
+              </div>
             </div>
 
             <!-- Phone Number and Email -->
-            <div class="row">
+            <div class="row mb-3">
               <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="phone_number" class="form-label"
-                    ><i class="bi bi-telephone me-1"></i>Phone Number</label
-                  >
-                  <input
-                    type="tel"
-                    class="form-control"
-                    id="phone_number"
-                    name="phone_number"
-                    placeholder="e.g., 123-456-7890"
-                    value="${supplier != null ? supplier.phoneNumber : ''}"
-                    pattern="[0-9]{10,12}"
-                    inputmode="numeric"
-                    oninput="formatPhoneNumber(this); validatePhoneNumber(this)"
-                    required
-                  />
-                </div>
+                <label for="phone_number" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone_number" name="phone_number" value="${supplier != null ? supplier.phoneNumber : ''}" pattern="[0-9\-\s]{10,15}" maxlength="15" inputmode="numeric" required />
+                <div class="invalid-feedback">Please enter a valid phone number (10-15 digits, numbers, dash or space allowed).</div>
               </div>
               <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="email" class="form-label"
-                    ><i class="bi bi-envelope me-1"></i>Email</label
-                  >
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    placeholder="e.g., supplier@example.com"
-                    value="${supplier != null ? supplier.email : ''}"
-                  />
-                </div>
+                <label for="email" class="form-label required-field">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="${supplier != null ? supplier.email : ''}" required />
+                <div class="invalid-feedback">Please enter a valid email address.</div>
               </div>
             </div>
 
-            <!-- Description -->
-            <div class="mb-3">
-              <label for="description" class="form-label"
-                ><i class="bi bi-card-text me-1"></i>Description</label
-              >
-              <textarea
-                class="form-control"
-                id="description"
-                name="description"
-                rows="3"
-                placeholder="Enter a brief description of the supplier"
-              >
-${supplier != null ? supplier.description : ''}</textarea
-              >
-            </div>
-
-            <!-- Tax ID -->
-            <div class="mb-3">
-              <label for="tax_id" class="form-label"
-                ><i class="bi bi-file-earmark-text me-1"></i>Tax ID</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="tax_id"
-                name="tax_id"
-                placeholder="Enter tax ID"
-                value="${supplier != null ? supplier.taxId : ''}"
-              />
-              <div class="form-text">
-                Enter the supplier's tax identification number.
+            <!-- Description & Tax ID -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" maxlength="200">${supplier != null ? supplier.description : ''}</textarea>
+              </div>
+              <div class="col-md-6">
+                <label for="tax_id" class="form-label required-field">Tax ID</label>
+                <input type="text" class="form-control" id="tax_id" name="tax_id" value="${supplier != null ? supplier.taxId : ''}" pattern="[A-Za-z0-9]{1,20}" maxlength="20" required />
+                <div class="invalid-feedback">Please enter a valid Tax ID (letters and numbers only, max 20 characters).</div>
+                <div class="form-text">Enter the supplier's tax identification number.</div>
               </div>
             </div>
 
             <!-- Buttons -->
             <div class="mt-4">
-              <button type="submit" class="btn btn-primary">
-                ${supplier != null ? 'Update Supplier' : 'Add Supplier'}
+              <button type="submit" class="btn btn-brown">
+                <i class="fas fa-save"></i> ${supplier != null ? 'Update Supplier' : 'Add Supplier'}
               </button>
-              <a href="Supplier?action=list" class="btn btn-secondary ms-2"
-                >Back to List</a
-              >
+              <a href="Supplier?action=list" class="btn btn-secondary ms-2">
+                <i class="fas fa-times"></i> Cancel
+              </a>
             </div>
           </form>
         </div>

@@ -59,9 +59,12 @@
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-person-fill-up"></i> Supplier List</h2>
-                    <a href="Supplier?action=edit" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Add New Supplier
-                    </a>
+                    <c:set var="roleId" value="${sessionScope.user.roleId}" />
+                    <c:if test="${roleId == 1 || roleId == 3}">
+                        <a href="Supplier?action=edit" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Add New Supplier
+                        </a>
+                    </c:if>
                 </div>
 
                 <!-- Search and Filter Section -->
@@ -102,22 +105,24 @@
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col"style="width: 120px">Code</th>
-                                <th scope="col"style="width: 150px">Name</th>
+                                <th scope="col" style="width: 90px;">Code</th>
+                                <th scope="col" style="width: 150px;">Name</th>
                                 <th scope="col"style="width: 150px">Contact</th>
                                 <th scope="col"style="width: 150px">Address</th>
                                 <th scope="col"style="width: 150px">Phone</th>
                                 <th scope="col"style="width: 200px">Email</th>
                                 <th scope="col"style="width: 150px">Description</th>
                                 <th scope="col">Tax ID</th>
-                                <th scope="col">Actions</th>
+                                <c:if test="${roleId == 1 || roleId == 3}">
+                                    <th scope="col">Actions</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="s" items="${supplierList}">
                                 <tr>
                                     <td>${s.supplierId}</td>
-                                    <td><span class="badge bg-primary">${s.supplierCode}</span></td>
+                                    <td>${s.supplierCode}</td>
                                     <td>${s.supplierName}</td>
                                     <td>${s.contactInfo}</td>
                                     <td>${s.address}</td>
@@ -133,21 +138,18 @@
                                     </td>
                                     <td>${s.description}</td>
                                     <td>${s.taxId}</td>
-                                    <td>
-                                        <div class="d-flex justify-content-center">
-                                            <a href="Supplier?action=edit&id=${s.supplierId}" 
-                                               class="btn btn-warning btn-action" 
-                                               title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="Supplier?action=delete&id=${s.supplierId}" 
-                                               class="btn btn-danger btn-action" 
-                                               onclick="return confirm('Are you sure you want to delete this supplier?');" 
-                                               title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+                                    <c:if test="${roleId == 1 || roleId == 3}">
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <a href="Supplier?action=edit&id=${s.supplierId}" class="btn btn-warning btn-action" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="Supplier?action=delete&id=${s.supplierId}" class="btn btn-danger btn-action" onclick="return confirm('Are you sure you want to delete this supplier?');" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </c:if>
                                 </tr>
                             </c:forEach>
                             <c:if test="${empty supplierList}">
