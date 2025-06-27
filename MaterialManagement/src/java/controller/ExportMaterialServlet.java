@@ -77,7 +77,7 @@ public class ExportMaterialServlet extends HttpServlet {
                 session.setAttribute("tempExportId", 0);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi khi lấy dữ liệu: " + e.getMessage());
+            request.setAttribute("error", "Error retrieving data: " + e.getMessage());
         }
         request.getRequestDispatcher("/ExportMaterial.jsp").forward(request, response);
     }
@@ -103,14 +103,14 @@ public class ExportMaterialServlet extends HttpServlet {
             } else if ("updateQuantity".equals(action)) {
                 handleUpdateQuantity(request, response, session);
             } else {
-                request.setAttribute("error", "Hành động không hợp lệ.");
+                request.setAttribute("error", "Invalid action.");
                 doGet(request, response);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi cơ sở dữ liệu: " + e.getMessage());
+            request.setAttribute("error", "Database error: " + e.getMessage());
             doGet(request, response);
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Dữ liệu đầu vào không hợp lệ: " + e.getMessage());
+            request.setAttribute("error", "Invalid input data: " + e.getMessage());
             doGet(request, response);
         }
     }
@@ -130,7 +130,7 @@ public class ExportMaterialServlet extends HttpServlet {
         if (materialIdStr == null || materialIdStr.isEmpty() || 
             quantityStr == null || quantityStr.isEmpty() || 
             condition == null || condition.isEmpty()) {
-            request.setAttribute("error", "Vui lòng điền đầy đủ các trường.");
+            request.setAttribute("error", "Please fill in all fields.");
             loadDataAndForward(request, response);
             return;
         }
@@ -140,20 +140,20 @@ public class ExportMaterialServlet extends HttpServlet {
             int quantity = Integer.parseInt(quantityStr);
 
             if (quantity <= 0) {
-                request.setAttribute("error", "Số lượng phải lớn hơn 0.");
+                request.setAttribute("error", "Quantity must be greater than 0.");
                 loadDataAndForward(request, response);
                 return;
             }
 
             int currentStock = inventoryDAO.getStockByMaterialId(materialId);
             if (currentStock < quantity) {
-                request.setAttribute("error", "Tồn kho không đủ cho vật tư ID: " + materialId + ". Khả dụng: " + currentStock);
+                request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
                 loadDataAndForward(request, response);
                 return;
             }
 
             if (!materialMap.containsKey(materialId)) {
-                request.setAttribute("error", "Vật tư được chọn không hợp lệ.");
+                request.setAttribute("error", "Selected material is invalid.");
                 loadDataAndForward(request, response);
                 return;
             }
@@ -167,7 +167,7 @@ public class ExportMaterialServlet extends HttpServlet {
             detail.setUpdatedAt(LocalDateTime.now());
             detailsToAdd.add(detail);
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Định dạng số không hợp lệ cho ID vật tư hoặc số lượng.");
+            request.setAttribute("error", "Invalid number format for material ID or quantity.");
             loadDataAndForward(request, response);
             return;
         }
@@ -189,7 +189,7 @@ public class ExportMaterialServlet extends HttpServlet {
             detail.setExportId(tempExportId);
         }
         exportDAO.createExportDetails(detailsToAdd);
-        request.setAttribute("success", "Vật tư đã được thêm vào danh sách xuất.");
+        request.setAttribute("success", "Material added to export list.");
         loadDataAndForward(request, response);
     }
 
@@ -201,7 +201,7 @@ public class ExportMaterialServlet extends HttpServlet {
         int tempExportId = (int) session.getAttribute("tempExportId");
 
         exportDAO.removeExportDetail(tempExportId, materialId, quantity, materialCondition);
-        request.setAttribute("success", "Vật tư đã được xóa khỏi danh sách xuất.");
+        request.setAttribute("success", "Material removed from export list.");
         loadDataAndForward(request, response);
     }
 
@@ -213,27 +213,27 @@ public class ExportMaterialServlet extends HttpServlet {
         int tempExportId = (int) session.getAttribute("tempExportId");
 
         if (quantity <= 0) {
-            request.setAttribute("error", "Số lượng phải lớn hơn 0.");
+            request.setAttribute("error", "Quantity must be greater than 0.");
             loadDataAndForward(request, response);
             return;
         }
 
         int currentStock = inventoryDAO.getStockByMaterialId(materialId);
         if (currentStock < quantity) {
-            request.setAttribute("error", "Tồn kho không đủ cho vật tư ID: " + materialId + ". Khả dụng: " + currentStock);
+            request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
             loadDataAndForward(request, response);
             return;
         }
 
         ExportDetail existingDetail = exportDAO.getExportDetailByMaterialAndCondition(tempExportId, materialId, materialCondition);
         if (existingDetail == null) {
-            request.setAttribute("error", "Không tìm thấy chi tiết xuất cho vật tư ID: " + materialId);
+            request.setAttribute("error", "Export detail not found for material ID: " + materialId);
             loadDataAndForward(request, response);
             return;
         }
 
         exportDAO.updateExportDetailQuantity(existingDetail.getExportDetailId(), quantity);
-        request.setAttribute("success", "Cập nhật số lượng thành công cho vật tư ID: " + materialId);
+        request.setAttribute("success", "Quantity updated successfully for material ID: " + materialId);
         loadDataAndForward(request, response);
     }
 
@@ -241,14 +241,14 @@ public class ExportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         int tempExportId = (int) session.getAttribute("tempExportId");
         if (tempExportId == 0)  {
-            request.setAttribute("error", "Không có vật tư nào được chọn để xuất.");
+            request.setAttribute("error", "No materials selected for export.");
             loadDataAndForward(request, response);
             return;
         }
 
         List<ExportDetail> details = exportDAO.getDraftExportDetails(tempExportId);
         if (details.isEmpty()) {
-            request.setAttribute("error", "Danh sách xuất kho trống.");
+            request.setAttribute("error", "Export list is empty.");
             loadDataAndForward(request, response);
             return;
         }
@@ -256,7 +256,7 @@ public class ExportMaterialServlet extends HttpServlet {
         for (ExportDetail detail : details) {
             int currentStock = inventoryDAO.getStockByMaterialId(detail.getMaterialId());
             if (currentStock < detail.getQuantity()) {
-                request.setAttribute("error", "Tồn kho không đủ cho vật tư ID: " + detail.getMaterialId() + ". Khả dụng: " + currentStock);
+                request.setAttribute("error", "Insufficient stock for material ID: " + detail.getMaterialId() + ". Available: " + currentStock);
                 loadDataAndForward(request, response);
                 return;
             }
@@ -281,7 +281,7 @@ public class ExportMaterialServlet extends HttpServlet {
         exportDAO.updateInventoryByExportId(tempExportId, user.getUserId());
 
         session.setAttribute("tempExportId", 0);
-        request.setAttribute("success", "Xuất kho thành công với mã: " + export.getExportCode());
+        request.setAttribute("success", "Export completed successfully with code: " + export.getExportCode());
         loadDataAndForward(request, response);
     }
 
@@ -314,7 +314,7 @@ public class ExportMaterialServlet extends HttpServlet {
             request.setAttribute("materialMap", materialMap);
             request.setAttribute("stockMap", stockMap);
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi khi lấy dữ liệu: " + e.getMessage());
+            request.setAttribute("error", "Error retrieving data: " + e.getMessage());
         }
         request.getRequestDispatcher("/ExportMaterial.jsp").forward(request, response);
     }
