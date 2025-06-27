@@ -191,17 +191,16 @@ public class SupplierDAO extends DBContext {
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 String lastCode = rs.getString("supplier_code");
-                // Extract number from code like "SUP001" -> "001"
                 if (lastCode != null && lastCode.matches("SUP\\d+")) {
-                    String numberStr = lastCode.substring(3); // Remove "SUP" prefix
+                    String numberStr = lastCode.substring(3); 
                     int nextNumber = Integer.parseInt(numberStr) + 1;
-                    return String.format("SUP%03d", nextNumber); // Format as SUP001, SUP002, etc.
+                    return String.format("SUP%03d", nextNumber); 
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "SUP001"; // Default if no existing codes
+        return "SUP001"; 
     }
 
     public boolean isSupplierCodeExists(String supplierCode) {
@@ -222,8 +221,6 @@ public class SupplierDAO extends DBContext {
     // Hàm main để test
     public static void main(String[] args) {
         SupplierDAO dao = new SupplierDAO();
-        
-        // Test generate next supplier code
         String nextCode = dao.generateNextSupplierCode();
         System.out.println("Next supplier code: " + nextCode);
         

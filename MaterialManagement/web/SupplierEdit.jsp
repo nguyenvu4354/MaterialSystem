@@ -39,14 +39,12 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
           </h3>
         </div>
         <div class="card-body">
-          <!-- Error and Success Messages -->
           <c:if test="${not empty error}">
             <div class="alert alert-danger" role="alert">${error}</div>
           </c:if>
           <c:if test="${not empty success}">
             <div class="alert alert-success" role="alert">${success}</div>
           </c:if>
-          <!-- Form with Validation -->
           <form
             action="Supplier"
             method="post"
@@ -60,8 +58,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 value="${supplier.supplierId}"
               />
             </c:if>
-
-            <!-- Supplier Code & Name -->
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="supplier_code" class="form-label required-field">Supplier Code</label>
@@ -77,8 +73,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <div class="invalid-feedback">Please enter a valid supplier name (not empty, max 100 characters).</div>
               </div>
             </div>
-
-            <!-- Contact Info & Address -->
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="contact_info" class="form-label required-field">Contact Info</label>
@@ -91,8 +85,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <div class="invalid-feedback">Please enter supplier address.</div>
               </div>
             </div>
-
-            <!-- Phone Number and Email -->
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="phone_number" class="form-label">Phone Number</label>
@@ -105,8 +97,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <div class="invalid-feedback">Please enter a valid email address.</div>
               </div>
             </div>
-
-            <!-- Description & Tax ID -->
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="description" class="form-label">Description</label>
@@ -119,8 +109,6 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
                 <div class="form-text">Enter the supplier's tax identification number.</div>
               </div>
             </div>
-
-            <!-- Buttons -->
             <div class="mt-4">
               <button type="submit" class="btn btn-brown">
                 <i class="fas fa-save"></i> ${supplier != null ? 'Update Supplier' : 'Add Supplier'}
@@ -134,9 +122,7 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Form Validation Script -->
     <script>
       (function () {
         "use strict";

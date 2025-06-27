@@ -314,14 +314,6 @@
                         </div>
                     </div>
                 </form>
-                <!-- After confirm import, show Check Inventory button if needed -->
-                <c:if test="${not empty success && param.action == 'import'}">
-                    <div class="text-center my-4">
-                        <a href="StaticInventory" class="btn btn-success btn-lg">
-                            <i class="fas fa-warehouse me-2"></i>Check Inventory
-                        </a>
-                    </div>
-                </c:if>
             </div>
         </div>
     </div>

@@ -186,7 +186,7 @@ public class SupplierValidator {
             errors.put("taxId", "Please enter a valid Tax ID (letters and numbers only, max 20 characters).");
         }
 
-        // Validate description (optional field)
+        // Validate description 
         if (description != null && description.trim().length() > 200) {
             errors.put("description", "Description cannot exceed 200 characters.");
         }
