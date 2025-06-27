@@ -181,7 +181,7 @@
                             <div class="col-12 mt-4">
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-dark btn-lg rounded-1">Confirm Export</button>
-                                    <a href="MaterialList" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
+                                    <a href="StaticInventory" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
                                 </div>
                             </div>
                         </div>
