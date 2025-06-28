@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet(name = "CategoryServlet", urlPatterns = {"/Category"})
+@WebServlet(name = "CategoryServlet", urlPatterns = {"/Category"}) // Sửa từ /CategoryServlet thành /Category
 public class CategoryServlet extends HttpServlet {
     private CategoryDAO categoryDAO;
     private RolePermissionDAO rolePermissionDAO;
@@ -46,7 +46,6 @@ public class CategoryServlet extends HttpServlet {
         int roleId = currentUser.getRoleId();
         boolean isAdmin = roleId == 1;
 
-        // Log request details
         System.out.println("CategoryServlet - Service: " + service + ", RoleId: " + roleId + ", IsAdmin: " + isAdmin);
 
         try {
@@ -60,7 +59,6 @@ public class CategoryServlet extends HttpServlet {
                     }
                     String submit = request.getParameter("submit");
                     if (submit == null) {
-                        // Display update form
                         String categoryIdRaw = request.getParameter("category_id");
                         if (categoryIdRaw == null || categoryIdRaw.trim().isEmpty()) {
                             sendErrorResponse(response, "Missing category ID.");
@@ -82,9 +80,8 @@ public class CategoryServlet extends HttpServlet {
                             sendErrorResponse(response, "Invalid category ID.");
                         }
                     } else {
-                        // Process category update
                         try {
-                            int categoryId = Integer.parseInt(request.getParameter("category_id"));
+                            int categoryId = Integer.parseInt(request.getParameter("categoryID"));
                             String categoryName = request.getParameter("categoryName");
                             String description = request.getParameter("description");
                             String status = request.getParameter("status");
@@ -103,7 +100,6 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Check for duplicate code
                             List<Category> existingCategories = categoryDAO.searchCategoriesByCode(code.trim());
                             for (Category existing : existingCategories) {
                                 if (existing.getCategory_id() != categoryId && existing.getCode().equalsIgnoreCase(code.trim())) {
@@ -166,7 +162,7 @@ public class CategoryServlet extends HttpServlet {
                             }
                         } catch (Exception e) {
                             request.setAttribute("error", "Error while updating category: " + e.getMessage());
-                            request.setAttribute("c", categoryDAO.getCategoryById(Integer.parseInt(request.getParameter("category_id"))));
+                            request.setAttribute("c", categoryDAO.getCategoryById(Integer.parseInt(request.getParameter("categoryID"))));
                             request.setAttribute("categories", categoryDAO.getAllCategories());
                             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
                             request.getRequestDispatcher("/UpdateCategory.jsp").forward(request, response);
@@ -330,7 +326,6 @@ public class CategoryServlet extends HttpServlet {
                         System.out.println("CategoryServlet - Invalid page number: " + pageStr);
                     }
 
-                    // Log parameters
                     System.out.println("CategoryServlet - Parameters: code=" + code + ", categoryName=" + keyword +
                             ", priority=" + priority + ", status=" + status + ", sortBy=" + sortBy + ", page=" + currentPage);
 
@@ -372,7 +367,6 @@ public class CategoryServlet extends HttpServlet {
                             totalCategories = list.size();
                         }
 
-                        // Log data size
                         System.out.println("CategoryServlet - Total categories fetched: " + totalCategories);
 
                         if (sortBy != null && !sortBy.isEmpty()) {
@@ -410,7 +404,6 @@ public class CategoryServlet extends HttpServlet {
                             list = Collections.emptyList();
                         }
 
-                        // Log final list size
                         System.out.println("CategoryServlet - Paginated list size: " + list.size());
 
                         request.setAttribute("data", list);
