@@ -2,6 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<c:if test="${empty sessionScope.user}">
+    <c:redirect url="Login.jsp"/>
+</c:if>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -60,7 +64,6 @@
                                                 <option value="${m.materialName}">${m.materialName}</option>
                                             </c:forEach>
                                         </select>
-
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label text-muted">Quantity</label>
@@ -121,54 +124,54 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                            // Thêm hàng mới
-                                            document.getElementById('addMaterial').addEventListener('click', function () {
-                                                const materialList = document.getElementById('materialList');
-                                                const firstRow = materialList.querySelector('.material-row');
-                                                const newRow = firstRow.cloneNode(true);
+            // Thêm hàng mới
+            document.getElementById('addMaterial').addEventListener('click', function () {
+                const materialList = document.getElementById('materialList');
+                const firstRow = materialList.querySelector('.material-row');
+                const newRow = firstRow.cloneNode(true);
 
-                                                newRow.querySelectorAll('input').forEach(input => {
-                                                    input.removeAttribute('readonly');
-                                                    input.value = (input.name === 'repairCost') ? '0' : (input.name === 'quantity' ? '1' : '');
-                                                });
+                newRow.querySelectorAll('input').forEach(input => {
+                    input.removeAttribute('readonly');
+                    input.value = (input.name === 'repairCost') ? '0' : (input.name === 'quantity' ? '1' : '');
+                });
 
-                                                const editBtn = newRow.querySelector('.edit-btn');
-                                                editBtn.textContent = 'Save';
-                                                editBtn.classList.remove('btn-outline-secondary');
-                                                editBtn.classList.add('btn-outline-primary');
+                const editBtn = newRow.querySelector('.edit-btn');
+                editBtn.textContent = 'Save';
+                editBtn.classList.remove('btn-outline-secondary');
+                editBtn.classList.add('btn-outline-primary');
 
-                                                materialList.appendChild(newRow);
-                                            });
+                materialList.appendChild(newRow);
+            });
 
-                                            // Xóa hàng vật tư
-                                            document.addEventListener('click', function (e) {
-                                                const removeBtn = e.target.closest('.remove-material');
-                                                if (removeBtn) {
-                                                    const rows = document.querySelectorAll('.material-row');
-                                                    if (rows.length > 1) {
-                                                        removeBtn.closest('.material-row').remove();
-                                                    } else {
-                                                        alert("At least one material is required.");
-                                                    }
-                                                }
-                                            });
+            // Xóa hàng vật tư
+            document.addEventListener('click', function (e) {
+                const removeBtn = e.target.closest('.remove-material');
+                if (removeBtn) {
+                    const rows = document.querySelectorAll('.material-row');
+                    if (rows.length > 1) {
+                        removeBtn.closest('.material-row').remove();
+                    } else {
+                        alert("At least one material is required.");
+                    }
+                }
+            });
 
-                                            // Toggle giữa Save và Edit
-                                            function toggleEdit(btn) {
-                                                const row = btn.closest('.material-row');
-                                                const inputs = row.querySelectorAll('input');
-                                                if (btn.textContent === 'Save') {
-                                                    inputs.forEach(input => input.setAttribute('readonly', true));
-                                                    btn.textContent = 'Edit';
-                                                    btn.classList.remove('btn-outline-primary');
-                                                    btn.classList.add('btn-outline-secondary');
-                                                } else {
-                                                    inputs.forEach(input => input.removeAttribute('readonly'));
-                                                    btn.textContent = 'Save';
-                                                    btn.classList.remove('btn-outline-secondary');
-                                                    btn.classList.add('btn-outline-primary');
-                                                }
-                                            }
+            // Toggle giữa Save và Edit
+            function toggleEdit(btn) {
+                const row = btn.closest('.material-row');
+                const inputs = row.querySelectorAll('input');
+                if (btn.textContent === 'Save') {
+                    inputs.forEach(input => input.setAttribute('readonly', true));
+                    btn.textContent = 'Edit';
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.add('btn-outline-secondary');
+                } else {
+                    inputs.forEach(input => input.removeAttribute('readonly'));
+                    btn.textContent = 'Save';
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('btn-outline-primary');
+                }
+            }
         </script>
     </body>
 </html>
