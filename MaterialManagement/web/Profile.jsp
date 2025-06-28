@@ -59,16 +59,9 @@
                 <div class="row justify-content-center">
                     <div class="col-md-10 p-4 bg-white rounded shadow profile-section">
                         <!-- Navigation buttons -->
-                        <div class="text-center mb-4 nav-buttons">
-                            <a href="profile" class="btn btn-primary">Profile</a>
-                            <a href="change-password.jsp" class="btn btn-secondary">Change Password</a>
-                            <c:if test="${not empty sessionScope.user and sessionScope.user.roleId == 4}">
-                                <a href="ViewRequests" class="btn btn-success">My Applications</a>
-                            </c:if>
-                        </div>
+                        <jsp:include page="Navigation.jsp" />
 
                         <h2 class="text-center display-5 mb-4">Profile of: <span class="text-primary"><%= user.getUsername() %></span></h2>
-
                         <!-- Message displays -->
                         <%
                             String message = (String) request.getAttribute("message");
