@@ -111,133 +111,125 @@
         <jsp:include page="SidebarDirector.jsp"/>
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="container-main">
-                <c:if test="${not hasViewExportRequestListPermission}">
-                    <div class="alert alert-danger">You do not have permission to view export requests.</div>
-                    <div class="text-center mt-3">
-                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Dashboard</a>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
+                        <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
                     </div>
-                </c:if>
-                <c:if test="${hasViewExportRequestListPermission}">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
-                            <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
-                        </div>
-                    </div>
-                    <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
-                        <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
-                        <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
-                            <option value="">All Recipients</option>
-                            <c:forEach var="recipient" items="${recipients}">
-                                <option value="${recipient.userId}" ${searchRecipient == recipient.userId ? 'selected' : ''}>${recipient.fullName}</option>
-                            </c:forEach>
-                        </select>
-                        <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
-                            <option value="">All Statuses</option>
-                            <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
-                            <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
-                            <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
-                        </select>
-                        <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                    </form>
-                    <c:if test="${not empty exportRequests}">
-                        <div class="table-responsive" id="printTableListArea">
-                            <table id="exportRequestTable" class="table custom-table">
-                                <thead>
+                </div>
+                <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
+                    <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
+                    <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
+                        <option value="">All Recipients</option>
+                        <c:forEach var="recipient" items="${recipients}">
+                            <option value="${recipient.userId}" ${searchRecipient == recipient.userId ? 'selected' : ''}>${recipient.fullName}</option>
+                        </c:forEach>
+                    </select>
+                    <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                        <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
+                    </select>
+                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                </form>
+                <c:if test="${not empty exportRequests}">
+                    <div class="table-responsive" id="printTableListArea">
+                        <table id="exportRequestTable" class="table custom-table">
+                            <thead>
+                            <tr>
+                                <th>Request Code</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Delivery Date</th>
+                                <th>Sender</th>
+                                <th>Recipient</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach var="request" items="${exportRequests}">
                                 <tr>
-                                    <th>Request Code</th>
-                                    <th>Request Date</th>
-                                    <th>Status</th>
-                                    <th>Delivery Date</th>
-                                    <th>Sender</th>
-                                    <th>Recipient</th>
-                                    <th>Action</th>
+                                    <td>${request.requestCode}</td>
+                                    <td>${request.requestDate}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${request.status == 'approved'}">
+                                                <span class="status-badge status-approved">Approved</span>
+                                            </c:when>
+                                            <c:when test="${request.status == 'rejected'}">
+                                                <span class="status-badge status-rejected">Rejected</span>
+                                            </c:when>
+                                            <c:when test="${request.status == 'cancel'}">
+                                                <span class="status-badge status-cancel">Cancelled</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="status-badge status-pending">Pending</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty request.deliveryDate}">
+                                                ${request.deliveryDate}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Not available
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty request.userName}">
+                                                ${request.userName}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Unknown
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty request.recipientName}">
+                                                ${request.recipientName}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Unknown
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                      <a href="${pageContext.request.contextPath}/ViewExportRequest?id=${request.exportRequestId}&status=${status}&search=${search}" class="btn-detail" style="pointer-events:auto;z-index:9999;position:relative;">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+                                    </td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                <c:forEach var="request" items="${exportRequests}">
-                                    <tr>
-                                        <td>${request.requestCode}</td>
-                                        <td>${request.requestDate}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${request.status == 'approved'}">
-                                                    <span class="status-badge status-approved">Approved</span>
-                                                </c:when>
-                                                <c:when test="${request.status == 'rejected'}">
-                                                    <span class="status-badge status-rejected">Rejected</span>
-                                                </c:when>
-                                                <c:when test="${request.status == 'cancel'}">
-                                                    <span class="status-badge status-cancel">Cancelled</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="status-badge status-pending">Pending</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty request.deliveryDate}">
-                                                    ${request.deliveryDate}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Not available
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty request.userName}">
-                                                    ${request.userName}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Unknown
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty request.recipientName}">
-                                                    ${request.recipientName}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Unknown
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <a href="${pageContext.request.contextPath}/ViewExportRequest?id=${request.exportRequestId}&status=${status}&search=${search}" class="btn-detail" style="pointer-events:auto;z-index:9999;position:relative;">
-                                                <i class="fas fa-eye"></i> Details
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
+                            </li>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${i}&status=${status}&search=${search}">${i}</a>
                                 </li>
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${i}&status=${status}&search=${search}">${i}</a>
-                                    </li>
-                                </c:forEach>
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </c:if>
-                    <c:if test="${empty exportRequests}">
-                        <div class="alert alert-info mt-4">
-                            No export request found.
-                        </div>
-                    </c:if>
+                            </c:forEach>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </c:if>
+                <c:if test="${empty exportRequests}">
+                    <div class="alert alert-info mt-4">
+                        No export request found.
+                    </div>
                 </c:if>
             </div>
         </main>
@@ -276,4 +268,4 @@ function printTableList() {
 }
 </script>
 </body>
-</html>d
+</html>
