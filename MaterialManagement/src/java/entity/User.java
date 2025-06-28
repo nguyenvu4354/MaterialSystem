@@ -15,7 +15,7 @@ public class User {
     private int roleId;
     private String roleName;
     private Integer departmentId;
-    private String departmentName; // Added to store department name
+    private String departmentName;
     private LocalDate dateOfBirth;
     private Gender gender;
     private String description;

@@ -31,7 +31,7 @@
                 </a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/Category.jsp">
+                <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/Category">
                     <i class="fas fa-list fs-4 me-3"></i>
                     Category
                 </a>
