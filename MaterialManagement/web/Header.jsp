@@ -79,7 +79,7 @@ if (user != null) {
                         <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_DEPARTMENT')}">
                             <option value="Departmet">Manage Department</option>
                         </c:if>
-                            <c:if test="${sessionScope.userPermissions.contains('VIEW_UNIT')}">
+                        <c:if test="${sessionScope.userPermissions.contains('VIEW_UNIT')}">
                             <option value="Unit">Manage Unit</option>
                         </c:if>
                         <c:if test="${sessionScope.userPermissions.contains('VIEW_INVENTORY')}">
@@ -122,6 +122,9 @@ if (user != null) {
                         <c:if test="${sessionScope.userPermissions.contains('CREATE_REPAIR_REQUEST')}">
                             <option value="repairrequest">Repair Request</option>
                         </c:if>
+                        <c:if test="${sessionScope.userPermissions.contains('CREATE_PURCHASE_ORDER')}">
+                            <option value="#">Purchase Order Request</option>
+                        </c:if>
                     </select>
 
                     <select class="filter-categories border-0 mb-0 me-5"
@@ -135,6 +138,9 @@ if (user != null) {
                         </c:if>
                         <c:if test="${sessionScope.userPermissions.contains('VIEW_REPAIR_REQUEST_LIST')}">
                             <option value="repairrequestlist">Repair Request List</option>
+                        </c:if>
+                        <c:if test="${sessionScope.userPermissions.contains('VIEW_PURCHASE_ORDER_LIST')}">
+                            <option value="purchaselist">Purchase Order List</option>
                         </c:if>
                     </select>
 
