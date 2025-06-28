@@ -11,7 +11,7 @@ public class RoleDAO extends DBContext {
 
     public List<Role> getAllRoles() {
         List<Role> roleList = new ArrayList<>();
-        String sql = "SELECT * FROM Roles WHERE disable = 0 AND role_id != 1"; // Loại bỏ Admin
+        String sql = "SELECT * FROM Roles WHERE disable = 0 AND role_id != 1"; 
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
