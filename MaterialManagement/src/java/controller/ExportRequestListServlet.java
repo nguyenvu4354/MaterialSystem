@@ -2,6 +2,7 @@ package controller;
 
 import dal.ExportRequestDAO;
 import dal.UserDAO;
+import dal.RolePermissionDAO;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -24,6 +25,7 @@ public class ExportRequestListServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ExportRequestListServlet.class.getName());
     private final ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
     private final UserDAO userDAO = new UserDAO();
+    private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
     
     // Hằng số cho phân trang
     private static final int DEFAULT_PAGE = 1;
@@ -48,10 +50,12 @@ public class ExportRequestListServlet extends HttpServlet {
                 return;
             }
 
-            // Phân quyền: Cho phép role_id = 2, 3, 4 (Giám đốc, nhân viên, staff) được truy cập
-            if (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4) {
+            boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_EXPORT_REQUEST_LIST");
+            request.setAttribute("hasViewExportRequestListPermission", hasPermission);
+            if (!hasPermission) {
                 LOGGER.warning("Unauthorized access attempt by user: " + user.getUsername() + " with role_id: " + user.getRoleId());
-                response.sendRedirect("HomePage.jsp"); // Hoặc trang báo lỗi không có quyền
+                request.setAttribute("error", "You do not have permission to view export requests.");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
 
