@@ -3,11 +3,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Trang quản lý vật tư - Phụ kiện máy tính</title>
+    <title>Material Management Dashboard - Computer Accessories</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
@@ -107,10 +107,10 @@
                 </c:if>
                 <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_LIST_MATERIAL')}">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-box"></i> Danh sách vật tư</h2>
+                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-box"></i> Material List</h2>
                         <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_MATERIAL')}">
                             <a href="${pageContext.request.contextPath}/addmaterial" class="btn btn-primary">
-                                <i class="fas fa-plus me-1"></i> Thêm vật tư mới
+                                <i class="fas fa-plus me-1"></i> Add New Material
                             </a>
                         </c:if>
                     </div>
@@ -119,30 +119,29 @@
                     <div class="row search-box">
                         <div class="col-md-8">
                             <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
-                                <input type="hidden" name="action" value="list" />
                                 <input type="text" name="keyword" class="form-control" 
-                                       placeholder="Tìm kiếm theo Tên hoặc Mã" 
+                                       placeholder="Search by Name" 
                                        value="${keyword != null ? keyword : ''}" 
                                        style="width: 200px; height: 50px; border: 2px solid gray"/>
                                 <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                    <option value="">Tất cả trạng thái</option>
-                                    <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>Mới</option>
-                                    <option value="USED" ${status == 'USED' ? 'selected' : ''}>Đã sử dụng</option>
-                                    <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Hỏng</option>
+                                    <option value="">All Status</option>
+                                    <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
+                                    <option value="USED" ${status == 'USED' ? 'selected' : ''}>Used</option>
+                                    <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
                                 </select>
                                 <select name="sortOption" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                    <option value="">Sắp xếp theo</option>
-                                    <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Tên (A-Z)</option>
-                                    <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Tên (Z-A)</option>
-                                    <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Mã (A-Z)</option>
-                                    <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Mã (Z-A)</option>
-                                    <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Tình trạng (Thấp-Cao)</option>
-                                    <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Tình trạng (Cao-Thấp)</option>
+                                    <option value="">Sort By</option>
+                                    <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                    <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                                    <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
+                                    <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
+                                    <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
+                                    <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
-                                    <i class="fas fa-search me-2"></i> Tìm kiếm
+                                    <i class="fas fa-search me-2"></i> Search
                                 </button>
-                                <a href="dashboardmaterial?action=list" class="btn btn-secondary" style="width: 150px; height: 50px">Xóa bộ lọc</a>
+                                <a href="dashboardmaterial" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
                             </form>
                         </div>
                     </div>
@@ -152,17 +151,17 @@
                         <table class="table table-bordered table-hover align-middle text-center">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col">Hình ảnh</th>
-                                    <th scope="col" style="width: 120px">Mã</th>
-                                    <th scope="col" style="width: 200px">Tên</th>
-                                    <th scope="col" style="width: 100px">Trạng thái</th>
-                                    <th scope="col" style="width: 120px">Giá</th>
-                                    <th scope="col" style="width: 150px">Tình trạng</th>
-                                    <th scope="col" style="width: 150px">Danh mục</th>
-                                    <th scope="col" style="width: 150px">Ngày tạo</th>
-                                    <th scope="col" style="width: 150px">Ngày cập nhật</th>
+                                    <th scope="col">Image</th>
+                                    <th scope="col" style="width: 120px">Code</th>
+                                    <th scope="col" style="width: 200px">Name</th>
+                                    <th scope="col" style="width: 100px">Status</th>
+                                    <th scope="col" style="width: 120px">Price</th>
+                                    <th scope="col" style="width: 150px">Condition</th>
+                                    <th scope="col" style="width: 150px">Category</th>
+                                    <th scope="col" style="width: 150px">Created At</th>
+                                    <th scope="col" style="width: 150px">Updated At</th>
                                     <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                        <th scope="col">Hành động</th>
+                                        <th scope="col">Actions</th>
                                     </c:if>
                                 </tr>
                             </thead>
@@ -185,7 +184,7 @@
                                                 <td>${material.materialName}</td>
                                                 <td>
                                                     <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
-                                                        ${material.materialStatus == 'NEW' ? 'Mới' : material.materialStatus == 'USED' ? 'Đã sử dụng' : 'Hỏng'}
+                                                        ${material.materialStatus}
                                                     </span>
                                                 </td>
                                                 <td><fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/></td>
@@ -205,21 +204,21 @@
                                                             <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
                                                                 <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
                                                                    class="btn btn-info btn-action" 
-                                                                   title="Xem chi tiết">
+                                                                   title="View Details">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             </c:if>
                                                             <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
                                                                 <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
                                                                    class="btn btn-warning btn-action" 
-                                                                   title="Chỉnh sửa vật tư">
+                                                                   title="Edit Material">
                                                                     <i class="fas fa-edit"></i>
                                                                 </a>
                                                             </c:if>
                                                             <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vật tư này?');">
+                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
                                                                     <input type="hidden" name="materialId" value="${material.materialId}" />
-                                                                    <button type="submit" class="btn btn-danger btn-action" title="Xóa vật tư">
+                                                                    <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
                                                                         <i class="fas fa-trash"></i>
                                                                     </button>
                                                                 </form>
@@ -231,7 +230,7 @@
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <tr><td colspan="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL') ? 10 : 9}" class="text-center text-muted">Không tìm thấy vật tư nào.</td></tr>
+                                        <tr><td colspan="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL') ? 10 : 9}" class="text-center text-muted">No materials found.</td></tr>
                                     </c:otherwise>
                                 </c:choose>
                             </tbody>
@@ -243,15 +242,15 @@
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?action=list&page=${currentPage - 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Trước</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="dashboardmaterial?action=list&page=${i}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">${i}</a>
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?action=list&page=${currentPage + 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Tiếp</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Next</a>
                                 </li>
                             </ul>
                         </nav>
