@@ -4,6 +4,7 @@ import dal.ExportRequestDAO;
 import dal.ExportRequestDetailDAO;
 import dal.MaterialDAO;
 import dal.UserDAO;
+import dal.RolePermissionDAO;
 import entity.ExportRequest;
 import entity.ExportRequestDetail;
 import entity.Material;
@@ -28,6 +29,7 @@ public class CreateExportRequestServlet extends HttpServlet {
     private ExportRequestDetailDAO exportRequestDetailDAO;
     private MaterialDAO materialDAO;
     private UserDAO userDAO;
+    private RolePermissionDAO rolePermissionDAO;
 
     @Override
     public void init() throws ServletException {
@@ -36,6 +38,7 @@ public class CreateExportRequestServlet extends HttpServlet {
             exportRequestDetailDAO = new ExportRequestDetailDAO();
             materialDAO = new MaterialDAO();
             userDAO = new UserDAO();
+            rolePermissionDAO = new RolePermissionDAO();
         } catch (Exception e) {
             throw new ServletException("Error initializing servlet", e);
         }
@@ -54,10 +57,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             return;
         }
 
-        int roleId = user.getRoleId();
-        if (roleId != 4) {
-            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
-            response.sendRedirect("HomePage.jsp");
+        boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "CREATE_EXPORT_REQUEST");
+        request.setAttribute("hasCreateExportRequestPermission", hasPermission);
+        if (!hasPermission) {
+            System.out.println("DEBUG: Unauthorized access for user ID " + user.getUserId() + ", redirecting to error.jsp");
+            request.setAttribute("error", "You do not have permission to create export requests.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
@@ -99,10 +104,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             return;
         }
 
-        int roleId = user.getRoleId();
-        if (roleId != 4) {
-            System.out.println("DEBUG: Unauthorized access for role_id " + roleId + ", redirecting to HomePage.jsp");
-            response.sendRedirect("HomePage.jsp");
+        boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "CREATE_EXPORT_REQUEST");
+        request.setAttribute("hasCreateExportRequestPermission", hasPermission);
+        if (!hasPermission) {
+            System.out.println("DEBUG: Unauthorized access for user ID " + user.getUserId() + ", redirecting to error.jsp");
+            request.setAttribute("error", "You do not have permission to create export requests.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 

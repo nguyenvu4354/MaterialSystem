@@ -40,89 +40,96 @@
     <div class="container">
         <div class="row my-5 py-5">
             <div class="col-12 bg-white p-4 rounded shadow export-form">
-                <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Export Request</span></h2>
-
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger">${error}</div>
-                </c:if>
-
-                <form action="CreateExportRequest" method="post">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="requestCode" class="form-label text-muted">Request Code</label>
-                            <input type="text" class="form-control" id="requestCode" name="requestCode" value="${requestCode}" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="deliveryDate" class="form-label text-muted">Delivery Date</label>
-                            <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
-                        </div>
-                        <div class="col-12">
-                            <label for="reason" class="form-label text-muted">Reason</label>
-                            <textarea class="form-control" id="reason" name="reason" required rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="recipientId" class="form-label text-muted">Recipient</label>
-                            <select class="form-select" id="recipientId" name="recipientId" required>
-                                <option value="">Select Recipient</option>
-                                <c:forEach var="user" items="${users}">
-                                    <option value="${user.userId}">${user.fullName}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
+                <c:if test="${not hasCreateExportRequestPermission}">
+                    <div class="alert alert-danger">You do not have permission to create export requests.</div>
+                    <div class="text-center mt-3">
+                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
                     </div>
+                </c:if>
+                <c:if test="${hasCreateExportRequestPermission}">
+                    <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Export Request</span></h2>
 
-                    <h3 class="fw-normal mt-5 mb-3">Materials</h3>
-                    <div id="materialList">
-                        <div class="row material-row align-items-center gy-2">
-                            <div class="col-md-3">
-                                <label class="form-label text-muted">Material</label>
-                                <select class="form-select material-select" name="materials[]" required>
-                                    <option value="">Select Material</option>
-                                    <c:forEach var="material" items="${materials}">
-                                        <option value="${material.materialId}">${material.materialName}</option>
+                    <c:if test="${not empty error}">
+                        <div class="alert alert-danger">${error}</div>
+                    </c:if>
+
+                    <form action="CreateExportRequest" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="requestCode" class="form-label text-muted">Request Code</label>
+                                <input type="text" class="form-control" id="requestCode" name="requestCode" value="${requestCode}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="deliveryDate" class="form-label text-muted">Delivery Date</label>
+                                <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="reason" class="form-label text-muted">Reason</label>
+                                <textarea class="form-control" id="reason" name="reason" required rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="recipientId" class="form-label text-muted">Recipient</label>
+                                <select class="form-select" id="recipientId" name="recipientId" required>
+                                    <option value="">Select Recipient</option>
+                                    <c:forEach var="user" items="${users}">
+                                        <option value="${user.userId}">${user.fullName}</option>
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-muted">In Stock</label>
-                                <input type="text" class="form-control stock-quantity" readonly value="0">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-muted">Quantity</label>
-                                <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required>
-                                <div class="invalid-feedback">Not enough stock!</div>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-muted">Condition</label>
-                                <select class="form-select" name="conditions[]" required>
-                                    <option value="new">New</option>
-                                    <option value="used">Used</option>
-                                    <option value="refurbished">Refurbished</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
-                            </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                        </div>
+
+                        <h3 class="fw-normal mt-5 mb-3">Materials</h3>
+                        <div id="materialList">
+                            <div class="row material-row align-items-center gy-2">
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted">Material</label>
+                                    <select class="form-select material-select" name="materials[]" required>
+                                        <option value="">Select Material</option>
+                                        <c:forEach var="material" items="${materials}">
+                                            <option value="${material.materialId}">${material.materialName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted">In Stock</label>
+                                    <input type="text" class="form-control stock-quantity" readonly value="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted">Quantity</label>
+                                    <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required>
+                                    <div class="invalid-feedback">Not enough stock!</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted">Condition</label>
+                                    <select class="form-select" name="conditions[]" required>
+                                        <option value="new">New</option>
+                                        <option value="used">Used</option>
+                                        <option value="refurbished">Refurbished</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mt-3">
-                        <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
-                    </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
+                        </div>
 
-                    <div class="mt-5 d-grid gap-2">
-                        <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
-                    </div>
-                </form>
+                        <div class="mt-5 d-grid gap-2">
+                            <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                            <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
+                        </div>
+                    </form>
+                </c:if>
             </div>
         </div>
     </div>
 </section>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
