@@ -10,24 +10,15 @@ import entity.Unit;
 import entity.User;
 import utils.MaterialValidator;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.sql.Timestamp;
-import java.util.Map;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
+import jakarta.servlet.http.*;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.sql.Timestamp;
+import java.util.Map;
 
 @WebServlet(name = "AddMaterialServlet", urlPatterns = {"/addmaterial"})
 @MultipartConfig(
@@ -64,26 +55,20 @@ public class AddMaterialServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_MATERIAL")) {
-            request.setAttribute("error", "Bạn không có quyền thêm vật tư mới.");
+            request.setAttribute("error", "Bạn không có quyền thêm mới vật tư.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
-        try {
-            CategoryDAO cd = new CategoryDAO();
-            UnitDAO ud = new UnitDAO();
-            request.setAttribute("categories", cd.getAllCategories());
-            request.setAttribute("units", ud.getAllUnits());
+        CategoryDAO cd = new CategoryDAO();
+        UnitDAO ud = new UnitDAO();
+        request.setAttribute("categories", cd.getAllCategories());
+        request.setAttribute("units", ud.getAllUnits());
 
-            String code = "MTL-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(new java.util.Date()) + "-" + (int)(Math.random()*900+100);
-            request.setAttribute("materialCode", code);
+        String code = "MTL-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(new java.util.Date()) + "-" + (int)(Math.random()*900+100);
+        request.setAttribute("materialCode", code);
 
-            request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
     }
 
     @Override
@@ -98,12 +83,14 @@ public class AddMaterialServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_MATERIAL")) {
-            request.setAttribute("error", "Bạn không có quyền thêm vật tư mới.");
+            request.setAttribute("error", "Bạn không có quyền thêm mới vật tư.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
         try {
+            request.setCharacterEncoding("UTF-8");
+
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
@@ -113,10 +100,15 @@ public class AddMaterialServlet extends HttpServlet {
             String unitIdStr = request.getParameter("unitId");
             String urlInput = request.getParameter("materialsUrl");
 
-            System.out.println("🛠️ Form Parameters:");
+            System.out.println("🛠️ [AddMaterialServlet] Form Parameters:");
             System.out.println("materialCode: " + materialCode);
             System.out.println("materialName: " + materialName);
+            System.out.println("materialStatus: " + materialStatus);
             System.out.println("price: " + priceStr);
+            System.out.println("conditionPercentage: " + conditionPercentageStr);
+            System.out.println("categoryId: " + categoryIdStr);
+            System.out.println("unitId: " + unitIdStr);
+            System.out.println("materialsUrl: " + urlInput);
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                 materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
@@ -150,7 +142,7 @@ public class AddMaterialServlet extends HttpServlet {
                 String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
                 Files.createDirectories(Paths.get(buildUploadPath));
                 filePart.write(buildUploadPath + fileName);
-                System.out.println("✅ Saved image to BUILD folder: " + buildUploadPath + fileName);
+                System.out.println("✅ [AddMaterialServlet] Saved image to BUILD folder: " + buildUploadPath + fileName);
 
                 Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
                 Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
@@ -161,24 +153,24 @@ public class AddMaterialServlet extends HttpServlet {
                             sourceDir.resolve(fileName),
                             StandardCopyOption.REPLACE_EXISTING
                     );
-                    System.out.println("✅ Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
+                    System.out.println("✅ [AddMaterialServlet] Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
                 } catch (IOException e) {
-                    System.out.println("❌ Failed to copy to source: " + e.getMessage());
+                    System.out.println("❌ [AddMaterialServlet] Failed to copy to source: " + e.getMessage());
                 }
 
                 relativeFilePath = fileName;
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 relativeFilePath = urlInput.trim();
-                System.out.println("📝 Using URL input instead of new image: " + relativeFilePath);
+                System.out.println("📝 [AddMaterialServlet] Using URL input instead of new image: " + relativeFilePath);
             } else {
                 relativeFilePath = "default.jpg";
-                System.out.println("📎 No image provided, using default.jpg");
+                System.out.println("📎 [AddMaterialServlet] No image provided, using default.jpg");
             }
 
-            BigDecimal priceBD = new BigDecimal(priceStr).setScale(2, BigDecimal.ROUND_HALF_UP);
             int categoryId = Integer.parseInt(categoryIdStr);
             int unitId = Integer.parseInt(unitIdStr);
             int conditionPercentage = Integer.parseInt(conditionPercentageStr);
+            double price = Double.parseDouble(priceStr);
 
             Material m = new Material();
             m.setMaterialCode(materialCode);
@@ -186,7 +178,7 @@ public class AddMaterialServlet extends HttpServlet {
             m.setMaterialsUrl(relativeFilePath);
             m.setMaterialStatus(materialStatus);
             m.setConditionPercentage(conditionPercentage);
-            m.setPrice(priceBD.doubleValue());
+            m.setPrice(price);
 
             Category category = new Category();
             category.setCategory_id(categoryId);
@@ -200,23 +192,29 @@ public class AddMaterialServlet extends HttpServlet {
             m.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-            System.out.println("📌 Final Material Image URL: " + m.getMaterialsUrl());
+            System.out.println("📌 [AddMaterialServlet] Final Material Image URL: " + m.getMaterialsUrl());
 
             MaterialDAO md = new MaterialDAO();
             if (md.isMaterialCodeExists(materialCode)) {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
-                request.setAttribute("error", "Mã vật tư đã tồn tại, vui lòng nhập mã khác!");
+                request.setAttribute("error", "Mã vật tư đã tồn tại.");
+                request.setAttribute("m", m);
+                request.setAttribute("materialCode", materialCode);
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
 
+            System.out.println("🔄 [AddMaterialServlet] Adding material to database...");
             md.addMaterial(m);
-            response.sendRedirect("dashboardmaterial?success=Vật tư được thêm thành công");
-
+            System.out.println("✅ [AddMaterialServlet] Material added successfully, redirecting to dashboardmaterial");
+            response.sendRedirect("dashboardmaterial?success=Material added successfully");
         } catch (Exception ex) {
+            System.out.println("❌ [AddMaterialServlet] Error: " + ex.getMessage());
             ex.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
+            request.setAttribute("categories", new CategoryDAO().getAllCategories());
+            request.setAttribute("units", new UnitDAO().getAllUnits());
             request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
         }
     }

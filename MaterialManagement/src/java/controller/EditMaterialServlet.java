@@ -54,29 +54,24 @@ public class EditMaterialServlet extends HttpServlet {
             return;
         }
 
-        try {
-            String materialId = request.getParameter("materialId");
-            if (materialId == null || materialId.trim().isEmpty()) {
-                response.sendRedirect("dashboardmaterial");
-                return;
-            }
-
-            MaterialDAO materialDAO = new MaterialDAO();
-            Material material = materialDAO.getInformation(Integer.parseInt(materialId));
-
-            if (material == null) {
-                response.sendRedirect("dashboardmaterial");
-                return;
-            }
-
-            request.setAttribute("m", material);
-            request.setAttribute("categories", new CategoryDAO().getAllCategories());
-            request.setAttribute("units", new UnitDAO().getAllUnits());
-            request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String materialId = request.getParameter("materialId");
+        if (materialId == null || materialId.trim().isEmpty()) {
             response.sendRedirect("dashboardmaterial");
+            return;
         }
+
+        MaterialDAO materialDAO = new MaterialDAO();
+        Material material = materialDAO.getInformation(Integer.parseInt(materialId));
+
+        if (material == null) {
+            response.sendRedirect("dashboardmaterial");
+            return;
+        }
+
+        request.setAttribute("m", material);
+        request.setAttribute("categories", new CategoryDAO().getAllCategories());
+        request.setAttribute("units", new UnitDAO().getAllUnits());
+        request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
     }
 
     @Override
@@ -110,47 +105,18 @@ public class EditMaterialServlet extends HttpServlet {
             String unitId = request.getParameter("unitId");
             String urlInput = request.getParameter("materialsUrl");
 
-            System.out.println("🛠️ Form Parameters:");
+            System.out.println("🛠️ [EditMaterialServlet] Form Parameters:");
             System.out.println("materialId: " + materialId);
             System.out.println("materialCode: " + materialCode);
             System.out.println("materialName: " + materialName);
+            System.out.println("materialStatus: " + materialStatus);
+            System.out.println("conditionPercentage: " + conditionPercentage);
             System.out.println("price: " + priceStr);
+            System.out.println("categoryId: " + categoryId);
+            System.out.println("unitId: " + unitId);
+            System.out.println("materialsUrl: " + urlInput);
 
-            Part filePart = request.getPart("materialImage");
-            String imageUrl = null;
-            boolean hasNewImage = false;
-
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
-
-                String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
-                Files.createDirectories(Paths.get(buildUploadPath));
-                filePart.write(buildUploadPath + fileName);
-                System.out.println("✅ Saved image to BUILD folder: " + buildUploadPath + fileName);
-
-                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
-                Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
-                Files.createDirectories(sourceDir);
-                try {
-                    Files.copy(
-                            Paths.get(buildUploadPath + fileName),
-                            sourceDir.resolve(fileName),
-                            StandardCopyOption.REPLACE_EXISTING
-                    );
-                    System.out.println("✅ Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
-                } catch (IOException e) {
-                    System.out.println("❌ Failed to copy to source: " + e.getMessage());
-                }
-
-                imageUrl = fileName;
-                hasNewImage = true;
-            } else if (urlInput != null && !urlInput.trim().isEmpty()) {
-                imageUrl = urlInput.trim();
-                hasNewImage = true;
-                System.out.println("📝 Using URL input instead of new image: " + imageUrl);
-            }
-
+            // Validate form data
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                     materialCode, materialName, materialStatus, priceStr, conditionPercentage, categoryId, unitId);
 
@@ -173,9 +139,49 @@ public class EditMaterialServlet extends HttpServlet {
                 return;
             }
 
+            // Handle file upload
+            Part filePart = request.getPart("materialImage");
+            String imageUrl = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+                String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
+                Files.createDirectories(Paths.get(buildUploadPath));
+                filePart.write(buildUploadPath + fileName);
+                System.out.println("✅ [EditMaterialServlet] Saved image to BUILD folder: " + buildUploadPath + fileName);
+
+                Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
+                Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
+                Files.createDirectories(sourceDir);
+                try {
+                    Files.copy(
+                            Paths.get(buildUploadPath + fileName),
+                            sourceDir.resolve(fileName),
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
+                    System.out.println("✅ [EditMaterialServlet] Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
+                } catch (IOException e) {
+                    System.out.println("❌ [EditMaterialServlet] Failed to copy to source: " + e.getMessage());
+                }
+
+                imageUrl = fileName;
+            } else if (urlInput != null && !urlInput.trim().isEmpty()) {
+                imageUrl = urlInput.trim();
+                System.out.println("📝 [EditMaterialServlet] Using URL input instead of new image: " + imageUrl);
+            }
+
+            // Load existing material
             MaterialDAO materialDAO = new MaterialDAO();
             Material oldMaterial = materialDAO.getInformation(Integer.parseInt(materialId));
+            if (oldMaterial == null) {
+                request.setAttribute("error", "Vật tư không tồn tại.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
 
+            // Create updated material object
             Material material = new Material();
             material.setMaterialId(Integer.parseInt(materialId));
             material.setMaterialCode(materialCode);
@@ -192,24 +198,22 @@ public class EditMaterialServlet extends HttpServlet {
             unit.setId(Integer.parseInt(unitId));
             material.setUnit(unit);
 
-            if (hasNewImage && imageUrl != null && !imageUrl.trim().isEmpty()) {
-                material.setMaterialsUrl(imageUrl);
-            } else if (oldMaterial != null) {
-                material.setMaterialsUrl(oldMaterial.getMaterialsUrl());
-            }
-
+            material.setMaterialsUrl(imageUrl != null ? imageUrl : oldMaterial.getMaterialsUrl());
             material.setDisable(oldMaterial.isDisable());
             material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-            System.out.println("📌 Final Material Image URL: " + material.getMaterialsUrl());
+            System.out.println("📌 [EditMaterialServlet] Final Material Image URL: " + material.getMaterialsUrl());
 
+            // Update material
+            System.out.println("🔄 [EditMaterialServlet] Updating material in database...");
             materialDAO.updateMaterial(material);
-            response.sendRedirect("dashboardmaterial?success=Vật tư được cập nhật thành công");
-
+            System.out.println("✅ [EditMaterialServlet] Material updated successfully, redirecting to dashboardmaterial");
+            response.sendRedirect("dashboardmaterial?success=Material updated successfully");
         } catch (Exception e) {
+            System.out.println("❌ [EditMaterialServlet] Error: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi: " + e.getMessage());
-            doGet(request, response);
+            request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
         }
     }
 }
