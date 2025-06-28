@@ -7,16 +7,26 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import dal.RolePermissionDAO;
 
 import java.io.IOException;
 
 @WebServlet(name = "UserDetailServlet", urlPatterns = {"/UserDetail"})
 public class UserDetailServlet extends HttpServlet {
 
+    private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+
+        User currentUser = (User) request.getSession().getAttribute("user");
+        if (currentUser == null || !rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_DETAIL_USER")) {
+            request.setAttribute("error", "Bạn không có quyền xem chi tiết người dùng.");
+            request.getRequestDispatcher("UserList").forward(request, response);
+            return;
+        }
 
         String userIdStr = request.getParameter("userId");
         if (userIdStr == null || userIdStr.trim().isEmpty()) {
