@@ -6,8 +6,8 @@
         <title>Admin Dashboard - Computer Accessories</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="css/vendor.css">
         <link rel="stylesheet" type="text/css" href="style.css">
         <style>
@@ -26,9 +26,10 @@
                 margin-top: 20px;
             }
             .btn-action {
-                width: auto;
-                padding: 0 10px;
-                display: inline-flex;
+                width: 50px;
+                height: 32px;
+                padding: 0;
+                display: flex;
                 align-items: center;
                 justify-content: center;
                 margin: 0 2px;
@@ -43,15 +44,18 @@
         </style>
     </head>
     <body>
-        <jsp:include page="Header.jsp" />
+        <%@ include file="Header.jsp" %>
 
+        <!-- Main content -->
         <div class="container-fluid">
             <div class="row">
+                <!-- Sidebar -->
                 <div class="col-md-3 col-lg-2 bg-light p-0">
                     <jsp:include page="Sidebar.jsp" />
                 </div>
 
-                <div class="col-md-9 col-lg-10 content px-md-4">
+                <!-- Page Content -->
+                <div class="col-md-9 col-lg-10 px-md-4">
                     <c:set var="roleId" value="${sessionScope.user.roleId}" />
                     <c:set var="hasViewListPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_LIST_USER')}" scope="request" />
 
@@ -60,53 +64,56 @@
                     </c:if>
                     <c:if test="${hasViewListPermission}">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-person-fill"></i> User List</h2>
+                            <h2 class="text-primary fw-bold display-6 border-bottom pb-2">👤 User List</h2>
+                            <c:if test="${roleId == 1}">
+                                <button type="button" class="btn btn-primary" onclick="window.location.href = 'RolePermission'">Permission</button>
+                            </c:if>
                             <c:if test="${rolePermissionDAO.hasPermission(roleId, 'CREATE_USER')}">
-                                <a href="CreateUser" class="btn btn-primary">
-                                    <i class="fas fa-plus me-1"></i> Add New User
-                                </a>
+                                <button type="button" class="btn btn-primary" onclick="window.location.href = 'CreateUser'">Create User</button>
                             </c:if>
                         </div>
 
-                        <div class="row search-box">
-                            <div class="col-md-8">
-                                <form action="UserList" method="GET" class="d-flex gap-2 align-items-center">
-                                    <input type="text" name="username" class="form-control" placeholder="Search by username" value="${usernameFilter != null ? usernameFilter : ''}" style="width: 180px; height: 50px; border: 2px solid gray"/>
-                                    <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                        <option value="">All Status</option>
-                                        <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
-                                        <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
-                                    </select>
-                                    <select name="roleId" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                        <option value="">All Roles</option>
-                                        <c:forEach var="role" items="${roleList}">
-                                            <c:if test="${role.roleId != 1}">
-                                                <option value="${role.roleId}" ${roleIdFilter == role.roleId ? 'selected' : ''}>${role.roleName}</option>
-                                            </c:if>
-                                        </c:forEach>
-                                    </select>
-                                    <select name="departmentId" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                        <option value="">All Departments</option>
-                                        <c:forEach var="dept" items="${departmentList}">
-                                            <option value="${dept.departmentId}" ${departmentIdFilter == dept.departmentId ? 'selected' : ''}>${dept.departmentName}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">
-                                        <i class="fas fa-search me-2"></i> Search
-                                    </button>
-                                    <a href="UserList" class="btn btn-secondary" style="width: 150px; height: 50px">Clear Filters</a>
-                                </form>
-                            </div>
-                        </div>
+                        <!-- Filter Form -->
+                        <form method="get" action="UserList" class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+                            <input type="text" name="username" class="form-control" placeholder="Search by username" value="${usernameFilter != null ? usernameFilter : ''}" style="max-width: 200px;"/>
+                            <select name="status" class="form-select" style="max-width: 150px;">
+                                <option value="">All Status</option>
+                                <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
+                                <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
+                            </select>
+                            <select name="roleId" class="form-select" style="max-width: 150px;">
+                                <option value="">All Roles</option>
+                                <c:forEach var="role" items="${roleList}">
+                                    <c:if test="${role.roleId != 1}">
+                                        <option value="${role.roleId}" ${roleIdFilter == role.roleId ? 'selected' : ''}>${role.roleName}</option>
+                                    </c:if>
+                                </c:forEach>
+                            </select>
+                            <select name="departmentId" class="form-select" style="max-width: 150px;">
+                                <option value="">All Departments</option>
+                                <c:forEach var="dept" items="${departmentList}">
+                                    <option value="${dept.departmentId}" ${departmentIdFilter == dept.departmentId ? 'selected' : ''}>${dept.departmentName}</option>
+                                </c:forEach>
+                            </select>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="UserList" class="btn btn-secondary">Clear</a>
+                        </form>
 
-                        <c:if test="${not empty error}">
-                            <div class="alert alert-danger">${error}</div>
+                        <!-- Messages -->
+                        <c:if test="${not empty successMessage}">
+                            <div class="alert alert-success">${successMessage}</div>
+                            <% session.removeAttribute("successMessage"); %>
                         </c:if>
                         <c:if test="${not empty message}">
                             <div class="alert alert-success">${message}</div>
                             <% session.removeAttribute("message"); %>
                         </c:if>
+                        <c:if test="${not empty error}">
+                            <div class="alert alert-danger">${error}</div>
+                            <% session.removeAttribute("error"); %>
+                        </c:if>
 
+                        <!-- User Table -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover align-middle text-center">
                                 <thead class="table-light">
@@ -118,9 +125,9 @@
                                         <th>Department</th>
                                         <th>Role</th>
                                         <th>Status</th>
-                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
+                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
                                             <th>Action</th>
-                                        </c:if>
+                                            </c:if>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -130,7 +137,7 @@
                                                 <td>${user.userId}</td>
                                                 <td>${user.username}</td>
                                                 <td>${user.fullName}</td>
-                                                <td><a href="mailto:${user.email}" class="text-decoration-none">${user.email}</a></td>
+                                                <td>${user.email}</td>
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER')}">
@@ -215,69 +222,70 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <c:if test="${rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
+                                                <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
                                                     <td>
-                                                        <div class="d-flex justify-content-center">
-                                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
-                                                                <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm btn-action" title="View">
-                                                                    <i class="bi bi-eye me-1"></i> View
-                                                                </a>
-                                                            </c:if>
-                                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'DELETE_USER')}">
-                                                                <form method="post" action="UserList" style="display:inline;">
-                                                                    <input type="hidden" name="userId" value="${user.userId}"/>
-                                                                    <input type="hidden" name="action" value="delete"/>
-                                                                    <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
-                                                                    <input type="hidden" name="statusFilter" value="${statusFilter}"/>
-                                                                    <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
-                                                                    <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
-                                                                    <input type="hidden" name="page" value="${currentPage}"/>
-                                                                    <button type="submit"
-                                                                            class="btn btn-danger btn-sm btn-action"
-                                                                            onclick="return confirm('Are you sure you want to delete this user?');">
-                                                                        Delete
-                                                                    </button>
-                                                                </form>
-                                                            </c:if>
-                                                        </div>
+                                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
+                                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-eye"></i> View
+                                                            </a>
+                                                        </c:if>
+                                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'DELETE_USER')}">
+                                                            <form method="post" action="UserList" style="display:inline;">
+                                                                <input type="hidden" name="userId" value="${user.userId}"/>
+                                                                <input type="hidden" name="action" value="delete"/>
+                                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                                <input type="hidden" name="page" value="${currentPage}"/>
+                                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                                            </form>
+                                                        </c:if>
                                                     </td>
                                                 </c:if>
                                             </tr>
                                         </c:if>
                                     </c:forEach>
-                                    <c:if test="${empty userList}">
-                                        <tr>
-                                            <td colspan="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER') ? 8 : 7}" class="text-center text-muted">No users found.</td>
-                                        </tr>
-                                    </c:if>
                                 </tbody>
                             </table>
                         </div>
 
-                        <c:if test="${totalPages > 1}">
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-center mt-3">
                             <nav>
                                 <ul class="pagination">
-                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="UserList?page=${currentPage - 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Previous</a>
-                                    </li>
+                                    <c:if test="${currentPage > 1}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="UserList?page=${currentPage - 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Previous</a>
+                                            </li>
+                                    </c:if>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
                                             <a class="page-link" href="UserList?page=${i}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">${i}</a>
-                                        </li>
+                                            </li>
                                     </c:forEach>
-                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="UserList?page=${currentPage + 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Next</a>
-                                    </li>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <li class="page-item">
+                                            <a class="page-link" href="UserList?page=${currentPage + 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Next</a>
+                                            </li>
+                                    </c:if>
                                 </ul>
                             </nav>
-                        </c:if>
+                        </div>
                     </c:if>
                 </div>
             </div>
         </div>
 
-        <jsp:include page="Footer.jsp" />
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+        <!-- Footer -->
+        <footer class="footer py-4 bg-light mt-auto">
+            <div class="container text-center">
+                <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
+            </div>
+        </footer>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     </body>
 </html>

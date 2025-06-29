@@ -7,8 +7,9 @@ import entity.Role;
 import entity.Permission;
 import entity.User;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,34 +29,28 @@ public class RolePermissionServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null || currentUser.getRoleId() != 1) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this page.");
+            response.sendRedirect("Login.jsp");
             return;
         }
-
+        
         try {
             List<Role> roles = roleDAO.getAllRoles();
-            request.setAttribute("roles", roles);
-
-            String roleIdParam = request.getParameter("roleId");
-            if (roleIdParam != null && !roleIdParam.isEmpty()) {
-                try {
-                    int selectedRoleId = Integer.parseInt(roleIdParam);
-                    Role selectedRole = roleDAO.getRoleById(selectedRoleId);
-                    List<Permission> assignedPermissions = permissionDAO.getPermissionsByRole(selectedRoleId);
-                    List<Permission> allPermissions = permissionDAO.getAllPermissions();
-                    List<Permission> availablePermissions = allPermissions.stream()
-                            .filter(p -> assignedPermissions.stream().noneMatch(ap -> ap.getPermissionId() == p.getPermissionId()))
-                            .collect(Collectors.toList());
-
-                    request.setAttribute("selectedRoleId", selectedRoleId);
-                    request.setAttribute("selectedRoleName", selectedRole != null ? selectedRole.getRoleName() : "");
-                    request.setAttribute("assignedPermissions", assignedPermissions);
-                    request.setAttribute("availablePermissions", availablePermissions);
-                } catch (NumberFormatException e) {
-                    request.setAttribute("errorMessage", "Invalid role ID!");
-                    System.out.println("❌ Invalid roleId format: " + e.getMessage());
+            List<Permission> permissions = permissionDAO.getAllPermissions();
+            
+            Map<Integer, Map<Integer, Boolean>> rolePermissionMap = new HashMap<>();
+            for (Role role : roles) {
+                List<Permission> assignedPermissions = permissionDAO.getPermissionsByRole(role.getRoleId());
+                Map<Integer, Boolean> permMap = new HashMap<>();
+                for (Permission perm : permissions) {
+                    permMap.put(perm.getPermissionId(), 
+                        assignedPermissions.stream().anyMatch(p -> p.getPermissionId() == perm.getPermissionId()));
                 }
+                rolePermissionMap.put(role.getRoleId(), permMap);
             }
+
+            request.setAttribute("roles", roles);
+            request.setAttribute("permissions", permissions);
+            request.setAttribute("rolePermissionMap", rolePermissionMap);
 
             request.getRequestDispatcher("RolePermission.jsp").forward(request, response);
         } catch (Exception e) {
@@ -72,41 +67,37 @@ public class RolePermissionServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null || currentUser.getRoleId() != 1) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this page.");
+            response.sendRedirect("Login.jsp");
             return;
         }
 
         try {
             String action = request.getParameter("action");
-            String roleIdParam = request.getParameter("roleId");
-            String permissionIdParam = request.getParameter("permissionId");
-
-            if (roleIdParam == null || permissionIdParam == null || action == null) {
-                request.setAttribute("errorMessage", "Missing required parameters!");
-                response.sendRedirect("RolePermission?roleId=" + roleIdParam);
+            if (!"update".equals(action)) {
+                request.setAttribute("errorMessage", "Invalid action!");
+                doGet(request, response);
                 return;
             }
 
-            int selectedRoleId = Integer.parseInt(roleIdParam);
-            int permissionId = Integer.parseInt(permissionIdParam);
+            List<Role> roles = roleDAO.getAllRoles();
+            List<Permission> permissions = permissionDAO.getAllPermissions();
 
-            if ("assign".equals(action)) {
-                rolePermissionDAO.assignPermissionToRole(selectedRoleId, permissionId);
-                request.setAttribute("successMessage", "Permission assigned successfully!");
-            } else if ("remove".equals(action)) {
-                rolePermissionDAO.removePermissionFromRole(selectedRoleId, permissionId);
-                request.setAttribute("successMessage", "Permission removed successfully!");
-            } else {
-                request.setAttribute("errorMessage", "Invalid action: " + action);
-                System.out.println("❌ Invalid action: " + action);
+            for (Role role : roles) {
+                for (Permission perm : permissions) {
+                    String paramName = "permission_" + role.getRoleId() + "_" + perm.getPermissionId();
+                    boolean isChecked = request.getParameter(paramName) != null;
+                    boolean hasPermission = rolePermissionDAO.hasPermission(role.getRoleId(), perm.getPermissionName());
+
+                    if (isChecked && !hasPermission) {
+                        rolePermissionDAO.assignPermissionToRole(role.getRoleId(), perm.getPermissionId());
+                    } else if (!isChecked && hasPermission) {
+                        rolePermissionDAO.removePermissionFromRole(role.getRoleId(), perm.getPermissionId());
+                    }
+                }
             }
 
-            response.sendRedirect("RolePermission?roleId=" + selectedRoleId);
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid parameter format!");
-            System.out.println("❌ Invalid parameter format: " + e.getMessage());
-            e.printStackTrace();
-            throw new ServletException("Invalid parameter format", e);
+            request.setAttribute("successMessage", "Permissions updated successfully!");
+            doGet(request, response); // Refresh the page with updated data
         } catch (Exception e) {
             request.setAttribute("errorMessage", "System error: " + e.getMessage());
             System.out.println("❌ Error in doPost: " + e.getMessage());
