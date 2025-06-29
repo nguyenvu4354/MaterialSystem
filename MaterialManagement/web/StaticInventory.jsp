@@ -94,17 +94,17 @@
         letter-spacing: 1px;
       }
       .stock-high {
-        background-color: #4ade80;   
+        background-color: #4ade80;
         color: #000;
         border-color: #22c55e;
       }
       .stock-medium {
-        background-color: #fde047;  
+        background-color: #fde047;
         color: #000;
         border-color: #facc15;
       }
       .stock-low {
-        background-color: #fd7e14; 
+        background-color: #fd7e14;
         color: #fff;
         border-color: #b35c00;
       }
@@ -208,220 +208,236 @@
           <jsp:include page="Sidebar.jsp" />
         </div>
         <div class="col-md-9 col-lg-10 content px-md-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-primary fw-bold display-6 border-bottom pb-2">
-              <i class="fas fa-chart-bar me-2"></i>Inventory Statistics
-            </h2>
-            <button id="viewReportBtn" class="btn-report">
-              <i class="fas fa-chart-pie me-2"></i> View Reports
-            </button>
-          </div>
-          <div id="reportSection" class="report-section">
-            <h4 class="mb-4">
-              <i class="fas fa-chart-line me-2"></i>Inventory Analytics
-            </h4>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="chart-container">
-                  <canvas id="pieChart"></canvas>
+          <c:set var="hasViewInventoryPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_INVENTORY')}" scope="request" />
+          <c:if test="${!hasViewInventoryPermission}">
+            <div class="alert alert-danger">Bạn không có quyền truy cập dữ liệu kho.</div>
+          </c:if>
+          <c:if test="${hasViewInventoryPermission}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="text-primary fw-bold display-6 border-bottom pb-2">
+                <i class="fas fa-chart-bar me-2"></i>Inventory Statistics
+              </h2>
+              <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+                <button id="viewReportBtn" class="btn-report">
+                  <i class="fas fa-chart-pie me-2"></i> View Reports
+                </button>
+              </c:if>
+            </div>
+            <c:if test="${not empty error}">
+              <div class="alert alert-danger">${error}</div>
+            </c:if>
+            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+              <div id="reportSection" class="report-section">
+                <h4 class="mb-4">
+                  <i class="fas fa-chart-line me-2"></i>Inventory Analytics
+                </h4>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="chart-container">
+                      <canvas id="pieChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-stock text-center">
+                          <i class="fas fa-boxes stat-icon"></i>
+                          <h3>${totalStock}</h3>
+                          <p>Total Stock</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-imported text-center">
+                          <i class="fas fa-arrow-down stat-icon"></i>
+                          <h3>${totalImported}</h3>
+                          <p>Total Imported</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-exported text-center">
+                          <i class="fas fa-arrow-up stat-icon"></i>
+                          <h3>${totalExported}</h3>
+                          <p>Total Exported</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-out text-center">
+                          <i class="fas fa-exclamation-triangle stat-icon"></i>
+                          <h3>${lowStockCount}</h3>
+                          <p>Low Stock Items</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6 mb-3">
-                    <div class="stat-card stat-stock text-center">
-                      <i class="fas fa-boxes stat-icon"></i>
+            </c:if>
+            <div class="row mb-4">
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card stat-stock">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
                       <h3>${totalStock}</h3>
                       <p>Total Stock</p>
                     </div>
+                    <i class="fas fa-boxes stat-icon"></i>
                   </div>
-                  <div class="col-6 mb-3">
-                    <div class="stat-card stat-imported text-center">
-                      <i class="fas fa-arrow-down stat-icon"></i>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card stat-imported">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
                       <h3>${totalImported}</h3>
                       <p>Total Imported</p>
                     </div>
+                    <i class="fas fa-arrow-down stat-icon"></i>
                   </div>
-                  <div class="col-6 mb-3">
-                    <div class="stat-card stat-exported text-center">
-                      <i class="fas fa-arrow-up stat-icon"></i>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card stat-exported">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
                       <h3>${totalExported}</h3>
                       <p>Total Exported</p>
                     </div>
+                    <i class="fas fa-arrow-up stat-icon"></i>
                   </div>
-                  <div class="col-6 mb-3">
-                    <div class="stat-card stat-out text-center">
-                      <i class="fas fa-exclamation-triangle stat-icon"></i>
-                      <h3>${lowStockCount}</h3>
-                      <p>Low Stock Items</p>
+                </div>
+              </div>
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stat-card stat-out">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h3>${outOfStockCount}</h3>
+                      <p>Out of Stock</p>
                     </div>
+                    <i class="fas fa-exclamation-triangle stat-icon"></i>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-4">
-              <div class="stat-card stat-stock">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h3>${totalStock}</h3>
-                    <p>Total Stock</p>
-                  </div>
-                  <i class="fas fa-boxes stat-icon"></i>
-                </div>
+            <div class="row search-section">
+              <div class="col-md-12">
+                <form method="GET" action="StaticInventory" class="d-flex gap-2 align-items-center">
+                  <input type="text" name="search" value="${searchTerm}" class="form-control" placeholder="Search by material name, code, or category..." style="width: 220px; height: 50px; border: 2px solid gray" />
+                  <select name="filter" class="form-select" style="width: 180px; height: 50px; border: 2px solid gray">
+                    <option value="">All Stock Levels</option>
+                    <option value="high" ${stockFilter == 'high' ? 'selected' : ''}>High Stock (>50)</option>
+                    <option value="medium" ${stockFilter == 'medium' ? 'selected' : ''}>Medium Stock (10-50)</option>
+                    <option value="low" ${stockFilter == 'low' ? 'selected' : ''}>Low Stock (1-9)</option>
+                    <option value="zero" ${stockFilter == 'zero' ? 'selected' : ''}>Out of Stock (0)</option>
+                  </select>
+                  <select name="sortStock" class="form-select" style="width: 180px; height: 50px; border: 2px solid gray">
+                    <option value="">Sort by Stock</option>
+                    <option value="asc" ${sortStock == 'asc' ? 'selected' : ''}>Stock Ascending</option>
+                    <option value="desc" ${sortStock == 'desc' ? 'selected' : ''}>Stock Descending</option>
+                  </select>
+                  <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
+                    <i class="fas fa-search me-2"></i> Search
+                  </button>
+                  <a href="StaticInventory" class="btn btn-secondary" style="width: 120px; height: 50px">Clear</a>
+                </form>
               </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-              <div class="stat-card stat-imported">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h3>${totalImported}</h3>
-                    <p>Total Imported</p>
-                  </div>
-                  <i class="fas fa-arrow-down stat-icon"></i>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-              <div class="stat-card stat-exported">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h3>${totalExported}</h3>
-                    <p>Total Exported</p>
-                  </div>
-                  <i class="fas fa-arrow-up stat-icon"></i>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-              <div class="stat-card stat-out">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h3>${outOfStockCount}</h3>
-                    <p>Out of Stock</p>
-                  </div>
-                  <i class="fas fa-exclamation-triangle stat-icon"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row search-section">
-            <div class="col-md-12">
-              <form method="GET" action="StaticInventory" class="d-flex gap-2 align-items-center">
-                <input type="text" name="search" value="${searchTerm}" class="form-control" placeholder="Search by material name, code, or category..." style="width: 220px; height: 50px; border: 2px solid gray" />
-                <select name="filter" class="form-select" style="width: 180px; height: 50px; border: 2px solid gray">
-                  <option value="">All Stock Levels</option>
-                  <option value="high" ${stockFilter == 'high' ? 'selected' : ''}>High Stock (&gt;50)</option>
-                  <option value="medium" ${stockFilter == 'medium' ? 'selected' : ''}>Medium Stock (10-50)</option>
-                  <option value="low" ${stockFilter == 'low' ? 'selected' : ''}>Low Stock (1-9)</option>
-                  <option value="zero" ${stockFilter == 'zero' ? 'selected' : ''}>Out of Stock (0)</option>
-                </select>
-                <select name="sortStock" class="form-select" style="width: 180px; height: 50px; border: 2px solid gray">
-                  <option value="">Sort by Stock</option>
-                  <option value="asc" ${sortStock == 'asc' ? 'selected' : ''}>Stock Ascending</option>
-                  <option value="desc" ${sortStock == 'desc' ? 'selected' : ''}>Stock Descending</option>
-                </select>
-                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
-                  <i class="fas fa-search me-2"></i> Search
-                </button>
-                <a href="StaticInventory" class="btn btn-secondary" style="width: 120px; height: 50px">Clear</a>
-              </form>
-            </div>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center">
-              <thead class="table-light">
-                <tr>
-                  <th>#</th>
-                  <th>Code</th>
-                  <th>Name</th>
-                  <th>Unit</th>
-                  <th>Category</th>
-                  <th>Stock</th>
-                  <th>Location</th>
-                  <th>Note</th>
-                  <th>Last Updated</th>
-                  <th>Updated By</th>
-                </tr>
-              </thead>
-              <tbody>
-                <c:forEach var="inv" items="${inventoryList}" varStatus="loop">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle text-center">
+                <thead class="table-light">
                   <tr>
-                    <td><strong>${loop.index + 1}</strong></td>
-                    <td><span class="material-code">${inv.materialCode}</span></td>
-                    <td><div class="material-name">${inv.materialName}</div></td>
-                    <td><div class="material-name">${inv.unitName}</div></td>
-                    <td><div class="material-name">${inv.categoryName}</div></td>
-                    <td>
-                      <c:choose>
-                        <c:when test="${inv.stock > 50}"><span class="badge stock-high">${inv.stock}</span></c:when>
-                        <c:when test="${inv.stock >= 10}"><span class="badge stock-medium">${inv.stock}</span></c:when>
-                        <c:when test="${inv.stock > 0}"><span class="badge stock-low">${inv.stock}</span></c:when>
-                        <c:otherwise><span class="badge stock-zero">${inv.stock}</span></c:otherwise>
-                      </c:choose>
-                    </td>
-                    <td><div class="material-name">${inv.location}</div></td>
-                    <td>
-                      <c:choose>
-                        <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
-                        <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                      </c:choose>
-                    </td>
-                    <td><small class="text-muted">${inv.lastUpdated}</small></td>
-                    <td>
-                      <c:choose>
-                        <c:when test="${not empty userMap[inv.updatedBy]}"><span style="color: black; font-weight: 500">${userMap[inv.updatedBy].fullName}</span></c:when>
-                        <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                      </c:choose>
-                    </td>
+                    <th>#</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Unit</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Location</th>
+                    <th>Note</th>
+                    <th>Last Updated</th>
+                    <th>Updated By</th>
                   </tr>
-                </c:forEach>
-                <c:if test="${empty inventoryList}">
-                  <tr>
-                    <td colspan="10" class="text-center text-muted">No inventory data available</td>
-                  </tr>
-                </c:if>
-              </tbody>
-            </table>
-          </div>
-          <c:if test="${totalPages > 1}">
-            <nav>
-              <ul class="pagination">
-                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                  <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
-                </li>
-                <c:forEach begin="1" end="${totalPages}" var="i">
-                  <li class="page-item ${currentPage == i ? 'active' : ''}">
-                    <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
+                </thead>
+                <tbody>
+                  <c:forEach var="inv" items="${inventoryList}" varStatus="loop">
+                    <tr>
+                      <td><strong>${loop.index + 1}</strong></td>
+                      <td><span class="material-code">${inv.materialCode}</span></td>
+                      <td><div class="material-name">${inv.materialName}</div></td>
+                      <td><div class="material-name">${inv.unitName}</div></td>
+                      <td><div class="material-name">${inv.categoryName}</div></td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${inv.stock > 50}"><span class="badge stock-high">${inv.stock}</span></c:when>
+                          <c:when test="${inv.stock >= 10}"><span class="badge stock-medium">${inv.stock}</span></c:when>
+                          <c:when test="${inv.stock > 0}"><span class="badge stock-low">${inv.stock}</span></c:when>
+                          <c:otherwise><span class="badge stock-zero">${inv.stock}</span></c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td><div class="material-name">${inv.location}</div></td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
+                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td><small class="text-muted">${inv.lastUpdated}</small></td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${not empty userMap[inv.updatedBy]}"><span style="color: black; font-weight: 500">${userMap[inv.updatedBy].fullName}</span></c:when>
+                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                        </c:choose>
+                      </td>
+                    </tr>
+                  </c:forEach>
+                  <c:if test="${empty inventoryList}">
+                    <tr>
+                      <td colspan="10" class="text-center text-muted">No inventory data available</td>
+                    </tr>
+                  </c:if>
+                </tbody>
+              </table>
+            </div>
+            <c:if test="${totalPages > 1}">
+              <nav>
+                <ul class="pagination">
+                  <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
                   </li>
-                </c:forEach>
-                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                  <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
-                </li>
-              </ul>
-            </nav>
+                  <c:forEach begin="1" end="${totalPages}" var="i">
+                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                      <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
+                    </li>
+                  </c:forEach>
+                  <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </c:if>
           </c:if>
-        </div> 
-      </div> 
+        </div>
+      </div>
+    </div>
     <jsp:include page="Footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       let chartRendered = false;
-      document.getElementById('viewReportBtn').addEventListener('click', function() {
-        const section = document.getElementById('reportSection');
-        if (section.style.display === 'none') {
-          section.style.display = 'block';
-          if (!chartRendered) {
-            renderCharts();
-            chartRendered = true;
+      <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+        document.getElementById('viewReportBtn').addEventListener('click', function() {
+          const section = document.getElementById('reportSection');
+          if (section.style.display === 'none') {
+            section.style.display = 'block';
+            if (!chartRendered) {
+              renderCharts();
+              chartRendered = true;
+            }
+          } else {
+            section.style.display = 'none';
           }
-        } else {
-          section.style.display = 'none';
-        }
-      });
+        });
+      </c:if>
       function renderCharts() {
         var totalImported = parseInt('${totalImported}', 10) || 0;
         var totalExported = parseInt('${totalExported}', 10) || 0;

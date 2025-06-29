@@ -4,6 +4,7 @@ import dal.InventoryDAO;
 import dal.UserDAO;
 import dal.ImportDAO;
 import dal.ExportDAO;
+import dal.RolePermissionDAO;
 import entity.Inventory;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -23,7 +24,8 @@ public class StaticInventoryServlet extends HttpServlet {
     private UserDAO userDAO;
     private ImportDAO importDAO;
     private ExportDAO exportDAO;
-    private static final int PAGE_SIZE = 10; 
+    private RolePermissionDAO rolePermissionDAO;
+    private static final int PAGE_SIZE = 10;
 
     @Override
     public void init() throws ServletException {
@@ -31,24 +33,33 @@ public class StaticInventoryServlet extends HttpServlet {
         userDAO = new UserDAO();
         importDAO = new ImportDAO();
         exportDAO = new ExportDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null) {
             response.sendRedirect("Login.jsp");
             return;
         }
-        int roleId = currentUser.getRoleId();
-        if (roleId != 1 && roleId != 2 && roleId != 3) {
-            // User doesn't have permission
-            request.setAttribute("error", "Access denied. You don't have permission to view inventory reports.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+
+        // Check if user has VIEW_INVENTORY permission
+        if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_INVENTORY")) {
+            request.setAttribute("error", "Bạn không có quyền truy cập dữ liệu kho.");
+            request.getRequestDispatcher("/StaticInventory.jsp").forward(request, response);
             return;
         }
-        
+
+        // Check if user has VIEW_REPORT permission
+        boolean hasViewReportPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_REPORT");
+        request.setAttribute("hasViewReportPermission", hasViewReportPermission);
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+        request.setAttribute("roleId", currentUser.getRoleId());
+
+        // Existing logic remains unchanged
         try {
             String searchTerm = request.getParameter("search");
             String stockFilter = request.getParameter("filter");
@@ -76,21 +87,21 @@ public class StaticInventoryServlet extends HttpServlet {
 
             int totalImported = 0;
             int totalExported = 0;
-            
+
             try {
                 totalImported = importDAO.getTotalImportedQuantity();
-            } catch (Exception ex) { 
-                totalImported = 0; 
+            } catch (Exception ex) {
+                totalImported = 0;
                 System.err.println("Error getting total imported: " + ex.getMessage());
             }
-            
+
             try {
                 totalExported = exportDAO.getTotalExportedQuantity();
-            } catch (Exception ex) { 
-                totalExported = 0; 
+            } catch (Exception ex) {
+                totalExported = 0;
                 System.err.println("Error getting total exported: " + ex.getMessage());
             }
-            
+
             request.setAttribute("totalImported", totalImported);
             request.setAttribute("totalExported", totalExported);
             request.setAttribute("totalStock", totalStock);
@@ -105,7 +116,7 @@ public class StaticInventoryServlet extends HttpServlet {
             request.setAttribute("searchTerm", searchTerm);
             request.setAttribute("stockFilter", stockFilter);
             request.setAttribute("sortStock", sortStock);
-            
+
         } catch (SQLException e) {
             request.setAttribute("error", "Error loading inventory data: " + e.getMessage());
             System.err.println("SQL Error in StaticInventoryServlet: " + e.getMessage());
@@ -123,4 +134,4 @@ public class StaticInventoryServlet extends HttpServlet {
             throws ServletException, IOException {
         doGet(request, response);
     }
-} 
+}
