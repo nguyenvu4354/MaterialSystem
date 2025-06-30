@@ -26,6 +26,14 @@
     <div class="position-sticky pt-4">
         <ul class="nav flex-column menu-list list-unstyled">
             <c:if test="${not empty sessionScope.user}">
+                <c:if test="${sessionScope.user.roleId == 1}">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/RolePermission">
+                            <i class="fas fa-key fs-4 me-3"></i>
+                            Permission
+                        </a>
+                    </li>
+                </c:if>
                 <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_USER')}">
                     <li class="nav-item mb-2">
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UserList">

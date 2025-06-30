@@ -65,9 +65,6 @@
                     <c:if test="${hasViewListPermission}">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h2 class="text-primary fw-bold display-6 border-bottom pb-2">👤 User List</h2>
-                            <c:if test="${roleId == 1}">
-                                <button type="button" class="btn btn-primary" onclick="window.location.href = 'RolePermission'">Permission</button>
-                            </c:if>
                             <c:if test="${rolePermissionDAO.hasPermission(roleId, 'CREATE_USER')}">
                                 <button type="button" class="btn btn-primary" onclick="window.location.href = 'CreateUser'">Create User</button>
                             </c:if>
