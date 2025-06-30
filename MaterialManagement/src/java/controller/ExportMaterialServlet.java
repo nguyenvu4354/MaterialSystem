@@ -5,6 +5,7 @@ import dal.ExportDAO;
 import dal.MaterialDAO;
 import dal.InventoryDAO;
 import dal.UserDAO;
+import dal.RolePermissionDAO;
 import entity.Department;
 import entity.Export;
 import entity.ExportDetail;
@@ -33,6 +34,7 @@ public class ExportMaterialServlet extends HttpServlet {
     private DepartmentDAO departmentDAO;
     private InventoryDAO inventoryDAO;
     private UserDAO userDAO;
+    private RolePermissionDAO rolePermissionDAO;
 
     @Override
     public void init() throws ServletException {
@@ -40,12 +42,28 @@ public class ExportMaterialServlet extends HttpServlet {
         departmentDAO = new DepartmentDAO();
         inventoryDAO = new InventoryDAO();
         userDAO = new UserDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+
+        boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "EXPORT_MATERIAL");
+        request.setAttribute("hasExportMaterialPermission", hasPermission);
+        if (!hasPermission) {
+            request.setAttribute("error", "You do not have permission to export materials.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+
         try {
             List<Department> departments = departmentDAO.getDepartments();
             List<Material> materials = departmentDAO.getMaterials();
@@ -78,6 +96,7 @@ public class ExportMaterialServlet extends HttpServlet {
             }
         } catch (SQLException e) {
             request.setAttribute("error", "Error retrieving data: " + e.getMessage());
+            e.printStackTrace();
         }
         request.getRequestDispatcher("/ExportMaterial.jsp").forward(request, response);
     }
@@ -88,7 +107,16 @@ public class ExportMaterialServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            response.sendRedirect("Login.jsp");
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+
+        boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "EXPORT_MATERIAL");
+        request.setAttribute("hasExportMaterialPermission", hasPermission);
+        if (!hasPermission) {
+            request.setAttribute("error", "You do not have permission to export materials.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
@@ -172,13 +200,17 @@ public class ExportMaterialServlet extends HttpServlet {
             return;
         }
 
-        int tempExportId = (int) session.getAttribute("tempExportId");
+        Integer tempExportId = (Integer) session.getAttribute("tempExportId");
+        if (tempExportId == null) {
+            tempExportId = 0;
+            session.setAttribute("tempExportId", 0);
+        }
         if (tempExportId == 0) {
             Export export = new Export();
             export.setExportCode("TEMP-" + UUID.randomUUID().toString().substring(0, 8));
             export.setExportDate(LocalDateTime.now());
             export.setExportedBy(user.getUserId());
-            export.setRecipientUserId(user.getUserId()); // Default to current user, will be updated
+            export.setRecipientUserId(user.getUserId()); 
             export.setCreatedAt(LocalDateTime.now());
             export.setUpdatedAt(LocalDateTime.now());
             tempExportId = exportDAO.createExport(export);
@@ -198,7 +230,11 @@ public class ExportMaterialServlet extends HttpServlet {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         String materialCondition = request.getParameter("materialCondition");
-        int tempExportId = (int) session.getAttribute("tempExportId");
+        Integer tempExportId = (Integer) session.getAttribute("tempExportId");
+        if (tempExportId == null) {
+            tempExportId = 0;
+            session.setAttribute("tempExportId", 0);
+        }
 
         exportDAO.removeExportDetail(tempExportId, materialId, quantity, materialCondition);
         request.setAttribute("success", "Material removed from export list.");
@@ -210,7 +246,11 @@ public class ExportMaterialServlet extends HttpServlet {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
         String materialCondition = request.getParameter("materialCondition");
-        int tempExportId = (int) session.getAttribute("tempExportId");
+        Integer tempExportId = (Integer) session.getAttribute("tempExportId");
+        if (tempExportId == null) {
+            tempExportId = 0;
+            session.setAttribute("tempExportId", 0);
+        }
 
         if (quantity <= 0) {
             request.setAttribute("error", "Quantity must be greater than 0.");
@@ -239,8 +279,12 @@ public class ExportMaterialServlet extends HttpServlet {
 
     private void handleExport(HttpServletRequest request, HttpServletResponse response, HttpSession session, User user)
             throws ServletException, IOException, SQLException {
-        int tempExportId = (int) session.getAttribute("tempExportId");
-        if (tempExportId == 0)  {
+        Integer tempExportId = (Integer) session.getAttribute("tempExportId");
+        if (tempExportId == null) {
+            tempExportId = 0;
+            session.setAttribute("tempExportId", 0);
+        }
+        if (tempExportId == 0) {
             request.setAttribute("error", "No materials selected for export.");
             loadDataAndForward(request, response);
             return;
@@ -315,6 +359,7 @@ public class ExportMaterialServlet extends HttpServlet {
             request.setAttribute("stockMap", stockMap);
         } catch (SQLException e) {
             request.setAttribute("error", "Error retrieving data: " + e.getMessage());
+            e.printStackTrace();
         }
         request.getRequestDispatcher("/ExportMaterial.jsp").forward(request, response);
     }

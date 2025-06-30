@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import dal.RolePermissionDAO;
 
 @WebServlet(name = "ViewRequestsServlet", urlPatterns = {"/ViewRequests"})
 public class ViewRequestsServlet extends HttpServlet {
+
+    private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,13 +32,13 @@ public class ViewRequestsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 4) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+        if (!rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_APPLICATION")) {
+            request.setAttribute("error", "You do not have permission to view requests.");
+            request.getRequestDispatcher("ViewRequests.jsp").forward(request, response);
             return;
         }
 
         try {
-            // Khởi tạo RequestDAO
             RequestDAO requestDAO = new RequestDAO();
             Integer userId = user.getUserId();
 
@@ -78,6 +81,7 @@ public class ViewRequestsServlet extends HttpServlet {
             request.setAttribute("requestCode", requestCode);
             request.setAttribute("startDate", request.getParameter("startDate"));
             request.setAttribute("endDate", request.getParameter("endDate"));
+            request.setAttribute("rolePermissionDAO", rolePermissionDAO);
 
             request.getRequestDispatcher("/ViewRequests.jsp").forward(request, response);
         } catch (Exception e) {
@@ -95,13 +99,13 @@ public class ViewRequestsServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 4) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+        if (!rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_APPLICATION")) {
+            request.setAttribute("error", "You do not have permission to view or manage requests.");
+            request.getRequestDispatcher("ViewRequests.jsp").forward(request, response);
             return;
         }
 
         try {
-            // Khởi tạo RequestDAO
             RequestDAO requestDAO = new RequestDAO();
             String action = request.getParameter("action");
             if ("cancel".equalsIgnoreCase(action)) {

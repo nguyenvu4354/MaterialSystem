@@ -3,6 +3,7 @@ package controller;
 import dal.MaterialDAO;
 import dal.RepairRequestDAO;
 import dal.UserDAO;
+import dal.RolePermissionDAO;
 import entity.Material;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
@@ -26,9 +27,27 @@ import java.util.List;
 @WebServlet(name = "RepairRequestServlet", urlPatterns = {"/repairrequest"})
 public class RepairRequestServlet extends HttpServlet {
 
+    private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+
+        // Kiểm tra đăng nhập
+        if (currentUser == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        // Kiểm tra quyền CREATE_REPAIR_REQUEST
+        if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "CREATE_REPAIR_REQUEST")) {
+            request.setAttribute("error", "Bạn không có quyền truy cập trang tạo yêu cầu sửa chữa.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         // Lấy danh sách vật tư từ database
         MaterialDAO materialDAO = new MaterialDAO();
         List<Material> materialList = materialDAO.getAllProducts();
@@ -43,7 +62,6 @@ public class RepairRequestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
             // Lấy user từ session
             HttpSession session = request.getSession();
@@ -52,6 +70,14 @@ public class RepairRequestServlet extends HttpServlet {
                 response.sendRedirect("Login.jsp");
                 return;
             }
+
+            // Kiểm tra quyền CREATE_REPAIR_REQUEST
+            if (!rolePermissionDAO.hasPermission(user.getRoleId(), "CREATE_REPAIR_REQUEST")) {
+                request.setAttribute("error", "Bạn không có quyền tạo yêu cầu sửa chữa.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+
             int userId = user.getUserId();
 
             // Sinh tự động requestCode
@@ -86,8 +112,15 @@ public class RepairRequestServlet extends HttpServlet {
             String[] descriptions = request.getParameterValues("damageDescription");
             String[] repairCosts = request.getParameterValues("repairCost");
 
+            // Kiểm tra dữ liệu đầu vào
+            if (materialNames == null || quantities == null || descriptions == null) {
+                request.setAttribute("errorMessage", "Dữ liệu vật tư không hợp lệ.");
+                request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                return;
+            }
+
             List<RepairRequestDetail> detailList = new ArrayList<>();
-            MaterialDAO materialDAO = new MaterialDAO(); // thêm bên ngoài vòng for
+            MaterialDAO materialDAO = new MaterialDAO();
 
             for (int i = 0; i < materialNames.length; i++) {
                 String materialName = materialNames[i].trim();
@@ -99,8 +132,26 @@ public class RepairRequestServlet extends HttpServlet {
                     return;
                 }
 
-                int quantity = Integer.parseInt(quantities[i]);
+                int quantity;
+                try {
+                    quantity = Integer.parseInt(quantities[i]);
+                    if (quantity <= 0) {
+                        request.setAttribute("errorMessage", "Số lượng phải lớn hơn 0.");
+                        request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorMessage", "Số lượng không hợp lệ cho vật tư: " + materialName);
+                    request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                    return;
+                }
+
                 String description = descriptions[i];
+                if (description == null || description.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Mô tả hư hỏng là bắt buộc cho vật tư: " + materialName);
+                    request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                    return;
+                }
 
                 RepairRequestDetail detail = new RepairRequestDetail();
                 detail.setMaterialId(materialId);
@@ -108,8 +159,19 @@ public class RepairRequestServlet extends HttpServlet {
                 detail.setDamageDescription(description);
 
                 Double repairCost = null;
-                if (repairCosts[i] != null && !repairCosts[i].isEmpty()) {
-                    repairCost = Double.parseDouble(repairCosts[i]);
+                if (repairCosts[i] != null && !repairCosts[i].trim().isEmpty()) {
+                    try {
+                        repairCost = Double.parseDouble(repairCosts[i]);
+                        if (repairCost < 0) {
+                            request.setAttribute("errorMessage", "Chi phí sửa chữa không được âm.");
+                            request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                            return;
+                        }
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("errorMessage", "Chi phí sửa chữa không hợp lệ cho vật tư: " + materialName);
+                        request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                        return;
+                    }
                 }
                 detail.setRepairCost(repairCost);
                 detail.setCreatedAt(now);
@@ -172,7 +234,7 @@ public class RepairRequestServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error sending repair request.");
+            request.setAttribute("errorMessage", "Lỗi khi gửi yêu cầu sửa chữa: " + e.getMessage());
             request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
         }
     }

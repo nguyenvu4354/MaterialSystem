@@ -108,102 +108,122 @@
         </style>
     </head>
     <body>
-        
-    <jsp:include page="Header.jsp"/>
+        <jsp:include page="Header.jsp"/>
         <div class="container-fluid">
-            
             <div class="row">
                 <jsp:include page="SidebarDirector.jsp"/>
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div class="container-main">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice-dollar"></i> Purchase Request Management</h2>
-                            <div class="d-flex gap-2">
-                                <c:if test="${sessionScope.user.roleId != 2}">
-                                    <a href="CreatePurchaseRequest" class="btn btn-export">Add Purchase Request</a>
-                                </c:if>
+                        <c:set var="roleId" value="${sessionScope.user.roleId}" />
+                        <c:set var="hasViewPurchaseRequestListPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_PURCHASE_REQUEST_LIST')}" scope="request" />
+                        <c:set var="hasCreatePurchaseRequestPermission" value="${rolePermissionDAO.hasPermission(roleId, 'CREATE_PURCHASE_REQUEST')}" scope="request" />
+
+                        <c:if test="${empty sessionScope.user}">
+                            <div class="alert alert-danger">Please log in to view purchase requests.</div>
+                            <div class="text-center mt-3">
+                                <a href="Login.jsp" class="btn btn-outline-secondary btn-lg rounded-1">Log In</a>
                             </div>
-                        </div>
-                        <form class="filter-bar align-items-center" method="GET" action="ListPurchaseRequests" style="gap: 8px; flex-wrap:nowrap;">
-                            <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search by request code" style="width:230px;">
-                            <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
-                                <option value="">All Statuses</option>
-                                <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
-                                <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
-                                <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                            </select>
-                            <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                        </form>
-                        <c:if test="${not empty purchaseRequests}">
-                            <div class="table-responsive" id="printTableListArea">
-                                <table class="table custom-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Request Code</th>
-                                            <th>Requester</th>
-                                            <th>Request Date</th>
-                                            <th>Estimated Price</th>
-                                            <th>Reason</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${purchaseRequests}" var="request">
-                                            <tr>
-                                                <td>${request.requestCode}</td>
-                                                <td>${userIdToName[request.userId]}</td>
-                                                <td>${request.requestDate}</td>
-                                                <td>${request.estimatedPrice}</td>
-                                                <td>${request.reason}</td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${fn:toLowerCase(request.status) == 'approved'}">
-                                                            <span class="status-badge status-approved">Approved</span>
-                                                        </c:when>
-                                                        <c:when test="${fn:toLowerCase(request.status) == 'rejected'}">
-                                                            <span class="status-badge status-rejected">Rejected</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="status-badge status-pending">Pending</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <a href="PurchaseRequestDetail?id=${request.purchaseRequestId}" class="btn-detail">
-                                                        <i class="fas fa-eye"></i> Detail
-                                                    </a>
-                                                    <c:if test="${request.status == 'PENDING' && request.userId == sessionScope.user.userId}">
-                                                        <button onclick="deleteRequest(${request.purchaseRequestId})" class="btn btn-danger btn-sm">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <nav class="mt-3">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="ListPurchaseRequests?page=${currentPage - 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Previous</a>
-                                    </li>
-                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="ListPurchaseRequests?page=${i}&status=${status}&keyword=${keyword}&sort=${sortOption}">${i}</a>
-                                        </li>
-                                    </c:forEach>
-                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="ListPurchaseRequests?page=${currentPage + 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
                         </c:if>
-                        <c:if test="${empty purchaseRequests}">
-                            <div class="alert alert-info mt-4">
-                                No purchase request found.
-                            </div>
+                        <c:if test="${not empty sessionScope.user}">
+                            <c:if test="${!hasViewPurchaseRequestListPermission}">
+                                <div class="alert alert-danger">You do not have permission to view purchase requests.</div>
+                                <div class="text-center mt-3">
+                                    <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Dashboard</a>
+                                </div>
+                            </c:if>
+                            <c:if test="${hasViewPurchaseRequestListPermission}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice-dollar"></i> Purchase Request Management</h2>
+                                    <div class="d-flex gap-2">
+                                        <c:if test="${hasCreatePurchaseRequestPermission}">
+                                            <a href="CreatePurchaseRequest" class="btn btn-export">Add Purchase Request</a>
+                                        </c:if>
+                                    </div>
+                                </div>
+                                <form class="filter-bar align-items-center" method="GET" action="ListPurchaseRequests" style="gap: 8px; flex-wrap:nowrap;">
+                                    <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search by request code" style="width:230px;">
+                                    <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                                        <option value="">All Statuses</option>
+                                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                                    </select>
+                                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                                </form>
+                                <c:if test="${not empty purchaseRequests}">
+                                    <div class="table-responsive" id="printTableListArea">
+                                        <table class="table custom-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Request Code</th>
+                                                    <th>Requester</th>
+                                                    <th>Request Date</th>
+                                                    <th>Estimated Price</th>
+                                                    <th>Reason</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach items="${purchaseRequests}" var="request">
+                                                    <tr>
+                                                        <td>${request.requestCode}</td>
+                                                        <td>${userIdToName[request.userId]}</td>
+                                                        <td>${request.requestDate}</td>
+                                                        <td>${request.estimatedPrice}</td>
+                                                        <td>${request.reason}</td>
+                                                        <td>
+                                                            <c:choose>
+                                                                <c:when test="${fn:toLowerCase(request.status) == 'approved'}">
+                                                                    <span class="status-badge status-approved">Approved</span>
+                                                                </c:when>
+                                                                <c:when test="${fn:toLowerCase(request.status) == 'rejected'}">
+                                                                    <span class="status-badge status-rejected">Rejected</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="status-badge status-pending">Pending</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                        <td>
+                                                            <c:if test="${hasViewPurchaseRequestListPermission}">
+                                                                <a href="PurchaseRequestDetail?id=${request.purchaseRequestId}" class="btn-detail">
+                                                                    <i class="fas fa-eye"></i> Detail
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${request.status == 'PENDING' && request.userId == sessionScope.user.userId}">
+                                                                <button onclick="deleteRequest(${request.purchaseRequestId})" class="btn btn-danger btn-sm">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </c:if>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav class="mt-3">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage - 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Previous</a>
+                                            </li>
+                                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                                    <a class="page-link" href="ListPurchaseRequests?page=${i}&status=${status}&keyword=${keyword}&sort=${sortOption}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage + 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Next</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </c:if>
+                                <c:if test="${empty purchaseRequests}">
+                                    <div class="alert alert-info mt-4">
+                                        No purchase request found.
+                                    </div>
+                                </c:if>
+                            </c:if>
                         </c:if>
                     </div>
                 </main>

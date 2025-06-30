@@ -102,149 +102,159 @@
 
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-box"></i> Material List</h2>
-                    <c:if test="${!readonly}">
-                        <a href="${pageContext.request.contextPath}/addmaterial" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i> Add New Material
-                        </a>
-                    </c:if>
-                </div>
-
-                <!-- Search and Filter Section -->
-                <div class="row search-box">
-                    <div class="col-md-8">
-                        <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
-                            <input type="text" name="keyword" class="form-control" 
-                                   placeholder="Search by Name" 
-                                   value="${keyword != null ? keyword : ''}" 
-                                   style="width: 200px; height: 50px; border: 2px solid gray"/>
-                            <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                <option value="">All Status</option>
-                                <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
-                                <option value="USED" ${status == 'USED' ? 'selected' : ''}>Used</option>
-                                <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
-                            </select>
-                            <select name="sortOption" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
-                                <option value="">Sort By</option>
-                                <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
-                                <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
-                                <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
-                                <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
-                                <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
-                                <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
-                                <i class="fas fa-search me-2"></i> Search
-                            </button>
-                            <a href="dashboardmaterial" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
-                        </form>
-                    </div>
-                </div>
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
+                <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_LIST_MATERIAL')}">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="bi bi-box"></i> Material List</h2>
+                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_MATERIAL')}">
+                            <a href="${pageContext.request.contextPath}/addmaterial" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Add New Material
+                            </a>
+                        </c:if>
+                    </div>
 
-                <!-- Material Table -->
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">Image</th>
-                                <th scope="col" style="width: 120px">Code</th>
-                                <th scope="col" style="width: 200px">Name</th>
-                                <th scope="col" style="width: 100px">Status</th>
-                                <th scope="col" style="width: 120px">Price</th>
-                                <th scope="col" style="width: 150px">Condition</th>
-                                <th scope="col" style="width: 150px">Category</th>
-                                <th scope="col" style="width: 150px">Created At</th>
-                                <th scope="col" style="width: 150px">Updated At</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:choose>
-                                <c:when test="${not empty list}">
-                                    <c:forEach items="${list}" var="material">
-                                        <tr>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${fn:startsWith(material.materialsUrl, 'http://') || fn:startsWith(material.materialsUrl, 'https://')}">
-                                                        <img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <img src="images/material/${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>${material.materialCode}</td>
-                                            <td>${material.materialName}</td>
-                                            <td>
-                                                <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
-                                                    ${material.materialStatus}
-                                                </span>
-                                            </td>
-                                            <td><fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/></td>
-                                            <td>
-                                                <div class="condition-bar">
-                                                    <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : material.conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" 
-                                                         style="width: ${material.conditionPercentage}%;"></div>
-                                                </div>
-                                                <small class="text-muted">${material.conditionPercentage}%</small>
-                                            </td>
-                                            <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
-                                            <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                            <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                            <td>
-                                                <div class="d-flex justify-content-center">
-                                                    <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
-                                                       class="btn btn-info btn-action" 
-                                                       title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <c:if test="${!readonly}">
-                                                        <a href="editmaterial?materialId=${material.materialId}" 
-                                                           class="btn btn-warning btn-action" 
-                                                           title="Edit Material">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <form method="post" action="deletematerial" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vật tư này?');">
-                                                            <input type="hidden" name="materialId" value="${material.materialId}" />
-                                                            <button type="submit" class="btn btn-danger btn-action" title="Delete">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </c:if>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <tr><td colspan="10" class="text-center text-muted">No materials found.</td></tr>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
-                </div>
+                    <!-- Search and Filter Section -->
+                    <div class="row search-box">
+                        <div class="col-md-8">
+                            <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
+                                <input type="text" name="keyword" class="form-control" 
+                                       placeholder="Search by Name" 
+                                       value="${keyword != null ? keyword : ''}" 
+                                       style="width: 200px; height: 50px; border: 2px solid gray"/>
+                                <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                    <option value="">All Status</option>
+                                    <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
+                                    <option value="USED" ${status == 'USED' ? 'selected' : ''}>Used</option>
+                                    <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
+                                </select>
+                                <select name="sortOption" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                    <option value="">Sort By</option>
+                                    <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                    <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
+                                    <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
+                                    <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
+                                    <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
+                                    <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
+                                    <i class="fas fa-search me-2"></i> Search
+                                </button>
+                                <a href="dashboardmaterial" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
+                            </form>
+                        </div>
+                    </div>
 
-                <!-- Pagination -->
-                <c:if test="${totalPages > 1}">
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Previous</a>
-                            </li>
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${i}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">${i}</a>
+                    <!-- Material Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Image</th>
+                                    <th scope="col" style="width: 120px">Code</th>
+                                    <th scope="col" style="width: 200px">Name</th>
+                                    <th scope="col" style="width: 100px">Status</th>
+                                    <th scope="col" style="width: 120px">Price</th>
+                                    <th scope="col" style="width: 150px">Condition</th>
+                                    <th scope="col" style="width: 150px">Category</th>
+                                    <th scope="col" style="width: 150px">Created At</th>
+                                    <th scope="col" style="width: 150px">Updated At</th>
+                                    <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                        <th scope="col">Actions</th>
+                                    </c:if>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:choose>
+                                    <c:when test="${not empty list}">
+                                        <c:forEach items="${list}" var="material">
+                                            <tr>
+                                                <td>
+                                                    <c:choose>
+                                                        <c:when test="${fn:startsWith(material.materialsUrl, 'http://') || fn:startsWith(material.materialsUrl, 'https://')}">
+                                                            <img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <img src="images/material/${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>${material.materialCode}</td>
+                                                <td>${material.materialName}</td>
+                                                <td>
+                                                    <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
+                                                        ${material.materialStatus}
+                                                    </span>
+                                                </td>
+                                                <td><fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/></td>
+                                                <td>
+                                                    <div class="condition-bar">
+                                                        <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : material.conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" 
+                                                             style="width: ${material.conditionPercentage}%;"></div>
+                                                    </div>
+                                                    <small class="text-muted">${material.conditionPercentage}%</small>
+                                                </td>
+                                                <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
+                                                <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                                <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                                <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                                    <td>
+                                                        <div class="d-flex justify-content-center">
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
+                                                                <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
+                                                                   class="btn btn-info btn-action" 
+                                                                   title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
+                                                                <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
+                                                                   class="btn btn-warning btn-action" 
+                                                                   title="Edit Material">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
+                                                                    <input type="hidden" name="materialId" value="${material.materialId}" />
+                                                                    <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                        </div>
+                                                    </td>
+                                                </c:if>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <tr><td colspan="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL') ? 10 : 9}" class="text-center text-muted">No materials found.</td></tr>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <c:if test="${totalPages > 1}">
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Previous</a>
                                 </li>
-                            </c:forEach>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">${i}</a>
+                                    </li>
+                                </c:forEach>
+                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </c:if>
                 </c:if>
             </div> <!-- end content -->
         </div> <!-- end row -->

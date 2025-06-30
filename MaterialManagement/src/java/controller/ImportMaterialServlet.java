@@ -4,6 +4,7 @@ import dal.ImportDAO;
 import dal.InventoryDAO;
 import dal.MaterialDAO;
 import dal.SupplierDAO;
+import dal.RolePermissionDAO;
 import entity.Import;
 import entity.ImportDetail;
 import entity.Material;
@@ -28,6 +29,7 @@ public class ImportMaterialServlet extends HttpServlet {
     private SupplierDAO supplierDAO;
     private MaterialDAO materialDAO;
     private InventoryDAO inventoryDAO;
+    private RolePermissionDAO rolePermissionDAO;
 
     @Override
     public void init() throws ServletException {
@@ -35,23 +37,28 @@ public class ImportMaterialServlet extends HttpServlet {
         supplierDAO = new SupplierDAO();
         materialDAO = new MaterialDAO();
         inventoryDAO = new InventoryDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User currentUser = (User) request.getSession().getAttribute("user");
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
-            response.sendRedirect("Login.jsp");
-            return;
-        }
-        int roleId = currentUser.getRoleId();
-        if (roleId != 1 && roleId != 3) {
-            request.setAttribute("error", "Access denied. Only Admin and Warehouse Staff can access Import Material.");
+            request.setAttribute("error", "Please log in to access this page.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
-        
+
+        boolean hasPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "IMPORT_MATERIAL");
+        request.setAttribute("hasImportMaterialPermission", hasPermission);
+        if (!hasPermission) {
+            request.setAttribute("error", "You do not have permission to import materials.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+
         loadDataAndForward(request, response);
     }
 
@@ -61,29 +68,38 @@ public class ImportMaterialServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            response.sendRedirect("Login.jsp");
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
-        int roleId = user.getRoleId();
-        if (roleId != 1 && roleId != 3) {
-            request.setAttribute("error", "Access denied. Only Admin and Warehouse Staff can access Import Material.");
+
+        boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "IMPORT_MATERIAL");
+        request.setAttribute("hasImportMaterialPermission", hasPermission);
+        if (!hasPermission) {
+            request.setAttribute("error", "You do not have permission to import materials.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
         String action = request.getParameter("action");
         try {
-            if ("add".equals(action)) {
-                handleAddMaterial(request, response, session, user);
-            } else if ("import".equals(action)) {
-                handleImport(request, response, session, user);
-            } else if ("remove".equals(action)) {
-                handleRemoveMaterial(request, response, session);
-            } else if ("update".equals(action)) {
-                handleUpdateQuantity(request, response, session);
-            } else {
-                request.setAttribute("error", "Invalid action.");
-                loadDataAndForward(request, response);
+            switch (action) {
+                case "add":
+                    handleAddMaterial(request, response, session, user);
+                    break;
+                case "import":
+                    handleImport(request, response, session, user);
+                    break;
+                case "remove":
+                    handleRemoveMaterial(request, response, session);
+                    break;
+                case "update":
+                    handleUpdateQuantity(request, response, session);
+                    break;
+                default:
+                    request.setAttribute("error", "Invalid action.");
+                    loadDataAndForward(request, response);
+                    break;
             }
         } catch (SQLException e) {
             request.setAttribute("error", "Database error: " + e.getMessage());
@@ -280,8 +296,8 @@ public class ImportMaterialServlet extends HttpServlet {
 
         } catch (SQLException e) {
             request.setAttribute("error", "Error loading page data: " + e.getMessage());
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
         request.getRequestDispatcher("/ImportMaterial.jsp").forward(request, response);
     }
-} 
+}
