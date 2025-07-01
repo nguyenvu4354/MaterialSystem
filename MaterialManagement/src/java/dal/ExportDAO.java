@@ -44,15 +44,14 @@ public class ExportDAO extends DBContext {
             throw new SQLException("Quantity must be greater than 0 for material ID: " + detail.getMaterialId());
         }
 
-        String sql = "INSERT INTO Export_Details (export_id, material_id, quantity, material_condition, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Export_Details (export_id, material_id, quantity, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, detail.getExportId());
             stmt.setInt(2, detail.getMaterialId());
             stmt.setInt(3, detail.getQuantity());
-            stmt.setString(4, detail.getMaterialCondition());
-            stmt.setString(5, "draft");
-            stmt.setObject(6, detail.getCreatedAt());
-            stmt.setObject(7, detail.getUpdatedAt());
+            stmt.setString(4, "draft");
+            stmt.setObject(5, detail.getCreatedAt());
+            stmt.setObject(6, detail.getUpdatedAt());
             
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -62,14 +61,14 @@ public class ExportDAO extends DBContext {
     }
 
     public void createExportDetails(List<ExportDetail> details) throws SQLException {
-        String insertSql = "INSERT INTO Export_Details (export_id, material_id, quantity, material_condition, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO Export_Details (export_id, material_id, quantity, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
             for (ExportDetail detail : details) {
                 if (detail.getQuantity() <= 0) {
                     throw new SQLException("Quantity must be greater than 0 for material ID: " + detail.getMaterialId());
                 }
 
-                ExportDetail existingDetail = getExportDetailByMaterialAndCondition(detail.getExportId(), detail.getMaterialId(), detail.getMaterialCondition());
+                ExportDetail existingDetail = getExportDetailByMaterial(detail.getExportId(), detail.getMaterialId());
                 if (existingDetail != null) {
                     int newQuantity = existingDetail.getQuantity() + detail.getQuantity();
                     updateExportDetailQuantity(existingDetail.getExportDetailId(), newQuantity);
@@ -77,10 +76,9 @@ public class ExportDAO extends DBContext {
                     insertStmt.setInt(1, detail.getExportId());
                     insertStmt.setInt(2, detail.getMaterialId());
                     insertStmt.setInt(3, detail.getQuantity());
-                    insertStmt.setString(4, detail.getMaterialCondition());
-                    insertStmt.setString(5, detail.getStatus());
-                    insertStmt.setObject(6, detail.getCreatedAt());
-                    insertStmt.setObject(7, detail.getUpdatedAt());
+                    insertStmt.setString(4, detail.getStatus());
+                    insertStmt.setObject(5, detail.getCreatedAt());
+                    insertStmt.setObject(6, detail.getUpdatedAt());
                     insertStmt.addBatch();
                 }
             }
@@ -95,12 +93,11 @@ public class ExportDAO extends DBContext {
         }
     }
 
-    public ExportDetail getExportDetailByMaterialAndCondition(int exportId, int materialId, String materialCondition) throws SQLException {
-        String sql = "SELECT * FROM Export_Details WHERE export_id = ? AND material_id = ? AND material_condition = ? AND status = 'draft'";
+    public ExportDetail getExportDetailByMaterial(int exportId, int materialId) throws SQLException {
+        String sql = "SELECT * FROM Export_Details WHERE export_id = ? AND material_id = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, exportId);
             stmt.setInt(2, materialId);
-            stmt.setString(3, materialCondition);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     ExportDetail detail = new ExportDetail();
@@ -108,7 +105,6 @@ public class ExportDAO extends DBContext {
                     detail.setExportId(rs.getInt("export_id"));
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
@@ -154,7 +150,6 @@ public class ExportDAO extends DBContext {
                     detail.setExportId(rs.getInt("export_id"));
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
@@ -165,13 +160,12 @@ public class ExportDAO extends DBContext {
         return details;
     }
 
-    public void removeExportDetail(int exportId, int materialId, int quantity, String materialCondition) throws SQLException {
-        String sql = "DELETE FROM Export_Details WHERE export_id = ? AND material_id = ? AND quantity = ? AND material_condition = ? AND status = 'draft'";
+    public void removeExportDetail(int exportId, int materialId, int quantity) throws SQLException {
+        String sql = "DELETE FROM Export_Details WHERE export_id = ? AND material_id = ? AND quantity = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, exportId);
             stmt.setInt(2, materialId);
             stmt.setInt(3, quantity);
-            stmt.setString(4, materialCondition);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("No draft export detail found to remove for export ID: " + exportId);
@@ -228,7 +222,6 @@ public class ExportDAO extends DBContext {
                     detail.setExportId(rs.getInt("export_id"));
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
