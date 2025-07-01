@@ -2,7 +2,6 @@ package controller;
 
 import dal.DepartmentDAO;
 import dal.ExportDAO;
-import dal.MaterialDAO;
 import dal.InventoryDAO;
 import dal.UserDAO;
 import dal.RolePermissionDAO;
@@ -19,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class ExportMaterialServlet extends HttpServlet {
             List<Material> materials = departmentDAO.getMaterials();
             List<User> users = userDAO.getAllUsers();
             Integer tempExportId = (Integer) session.getAttribute("tempExportId");
-            List<ExportDetail> exportDetails = (tempExportId != null && tempExportId != 0) 
+            List<ExportDetail> exportDetails = (tempExportId != null) 
                     ? exportDAO.getDraftExportDetails(tempExportId) 
                     : new ArrayList<>();
 
@@ -92,7 +92,7 @@ public class ExportMaterialServlet extends HttpServlet {
             request.setAttribute("stockMap", stockMap);
 
             if (tempExportId == null) {
-                session.setAttribute("tempExportId", 0);
+                session.setAttribute("tempExportId", null);
             }
         } catch (SQLException e) {
             request.setAttribute("error", "Error retrieving data: " + e.getMessage());
@@ -132,14 +132,14 @@ public class ExportMaterialServlet extends HttpServlet {
                 handleUpdateQuantity(request, response, session);
             } else {
                 request.setAttribute("error", "Invalid action.");
-                doGet(request, response);
+                loadDataAndForward(request, response);
             }
         } catch (SQLException e) {
             request.setAttribute("error", "Database error: " + e.getMessage());
-            doGet(request, response);
+            loadDataAndForward(request, response);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid input data: " + e.getMessage());
-            doGet(request, response);
+            loadDataAndForward(request, response);
         }
     }
 
@@ -147,7 +147,6 @@ public class ExportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         String materialIdStr = request.getParameter("materialId");
         String quantityStr = request.getParameter("quantity");
-        String condition = request.getParameter("materialCondition");
         List<ExportDetail> detailsToAdd = new ArrayList<>();
         List<Material> materials = departmentDAO.getMaterials();
         Map<Integer, Material> materialMap = new HashMap<>();
@@ -156,69 +155,57 @@ public class ExportMaterialServlet extends HttpServlet {
         }
 
         if (materialIdStr == null || materialIdStr.isEmpty() || 
-            quantityStr == null || quantityStr.isEmpty() || 
-            condition == null || condition.isEmpty()) {
+            quantityStr == null || quantityStr.isEmpty()) {
             request.setAttribute("error", "Please fill in all fields.");
             loadDataAndForward(request, response);
             return;
         }
 
-        try {
-            int materialId = Integer.parseInt(materialIdStr);
-            int quantity = Integer.parseInt(quantityStr);
+        int materialId = Integer.parseInt(materialIdStr);
+        int quantity = Integer.parseInt(quantityStr);
 
-            if (quantity <= 0) {
-                request.setAttribute("error", "Quantity must be greater than 0.");
-                loadDataAndForward(request, response);
-                return;
-            }
-
-            int currentStock = inventoryDAO.getStockByMaterialId(materialId);
-            if (currentStock < quantity) {
-                request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
-                loadDataAndForward(request, response);
-                return;
-            }
-
-            if (!materialMap.containsKey(materialId)) {
-                request.setAttribute("error", "Selected material is invalid.");
-                loadDataAndForward(request, response);
-                return;
-            }
-
-            ExportDetail detail = new ExportDetail();
-            detail.setMaterialId(materialId);
-            detail.setQuantity(quantity);
-            detail.setMaterialCondition(condition);
-            detail.setStatus("draft");
-            detail.setCreatedAt(LocalDateTime.now());
-            detail.setUpdatedAt(LocalDateTime.now());
-            detailsToAdd.add(detail);
-        } catch (NumberFormatException e) {
-            request.setAttribute("error", "Invalid number format for material ID or quantity.");
+        if (quantity <= 0) {
+            request.setAttribute("error", "Quantity must be greater than 0.");
             loadDataAndForward(request, response);
             return;
         }
 
+        int currentStock = inventoryDAO.getStockByMaterialId(materialId);
+        if (currentStock < quantity) {
+            request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        if (!materialMap.containsKey(materialId)) {
+            request.setAttribute("error", "Selected material is invalid.");
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        ExportDetail detail = new ExportDetail();
+        detail.setMaterialId(materialId);
+        detail.setQuantity(quantity);
+        detail.setStatus("draft");
+        detail.setCreatedAt(LocalDateTime.now());
+        detail.setUpdatedAt(LocalDateTime.now());
+        detailsToAdd.add(detail);
+
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
-            tempExportId = 0;
-            session.setAttribute("tempExportId", 0);
-        }
-        if (tempExportId == 0) {
             Export export = new Export();
             export.setExportCode("TEMP-" + UUID.randomUUID().toString().substring(0, 8));
             export.setExportDate(LocalDateTime.now());
             export.setExportedBy(user.getUserId());
-            export.setRecipientUserId(user.getUserId()); 
+            export.setRecipientUserId(user.getUserId());
             export.setCreatedAt(LocalDateTime.now());
             export.setUpdatedAt(LocalDateTime.now());
             tempExportId = exportDAO.createExport(export);
             session.setAttribute("tempExportId", tempExportId);
         }
 
-        for (ExportDetail detail : detailsToAdd) {
-            detail.setExportId(tempExportId);
+        for (ExportDetail detailToAdd : detailsToAdd) {
+            detailToAdd.setExportId(tempExportId);
         }
         exportDAO.createExportDetails(detailsToAdd);
         request.setAttribute("success", "Material added to export list.");
@@ -229,14 +216,14 @@ public class ExportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
-        String materialCondition = request.getParameter("materialCondition");
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
-            tempExportId = 0;
-            session.setAttribute("tempExportId", 0);
+            request.setAttribute("error", "No export session found.");
+            loadDataAndForward(request, response);
+            return;
         }
 
-        exportDAO.removeExportDetail(tempExportId, materialId, quantity, materialCondition);
+        exportDAO.removeExportDetail(tempExportId, materialId, quantity);
         request.setAttribute("success", "Material removed from export list.");
         loadDataAndForward(request, response);
     }
@@ -245,11 +232,11 @@ public class ExportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
-        String materialCondition = request.getParameter("materialCondition");
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
-            tempExportId = 0;
-            session.setAttribute("tempExportId", 0);
+            request.setAttribute("error", "No export session found.");
+            loadDataAndForward(request, response);
+            return;
         }
 
         if (quantity <= 0) {
@@ -265,7 +252,7 @@ public class ExportMaterialServlet extends HttpServlet {
             return;
         }
 
-        ExportDetail existingDetail = exportDAO.getExportDetailByMaterialAndCondition(tempExportId, materialId, materialCondition);
+        ExportDetail existingDetail = exportDAO.getExportDetailByMaterial(tempExportId, materialId);
         if (existingDetail == null) {
             request.setAttribute("error", "Export detail not found for material ID: " + materialId);
             loadDataAndForward(request, response);
@@ -281,10 +268,6 @@ public class ExportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
-            tempExportId = 0;
-            session.setAttribute("tempExportId", 0);
-        }
-        if (tempExportId == 0) {
             request.setAttribute("error", "No materials selected for export.");
             loadDataAndForward(request, response);
             return;
@@ -306,7 +289,22 @@ public class ExportMaterialServlet extends HttpServlet {
             }
         }
 
-        int recipientUserId = Integer.parseInt(request.getParameter("recipientUserId"));
+        int recipientUserId;
+        try {
+            recipientUserId = Integer.parseInt(request.getParameter("recipientUserId"));
+            boolean validRecipient = userDAO.getAllUsers().stream()
+                    .anyMatch(u -> u.getUserId() == recipientUserId);
+            if (!validRecipient) {
+                request.setAttribute("error", "Invalid recipient user ID.");
+                loadDataAndForward(request, response);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid recipient user ID format.");
+            loadDataAndForward(request, response);
+            return;
+        }
+
         String batchNumber = request.getParameter("batchNumber");
         String note = request.getParameter("note");
 
@@ -320,12 +318,37 @@ public class ExportMaterialServlet extends HttpServlet {
         export.setNote(note);
         export.setUpdatedAt(LocalDateTime.now());
 
-        exportDAO.updateExport(export);
-        exportDAO.confirmExport(tempExportId);
-        exportDAO.updateInventoryByExportId(tempExportId, user.getUserId());
+        Connection conn = null;
+        try {
+            conn = exportDAO.getConnection();
+            conn.setAutoCommit(false);
 
-        session.setAttribute("tempExportId", 0);
-        request.setAttribute("success", "Export completed successfully with code: " + export.getExportCode());
+            exportDAO.updateExport(export);
+            exportDAO.confirmExport(tempExportId);
+            exportDAO.updateInventoryByExportId(tempExportId, user.getUserId());
+
+            conn.commit();
+            session.setAttribute("tempExportId", null);
+            request.setAttribute("success", "Export completed successfully with code: " + export.getExportCode());
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+            }
+            request.setAttribute("error", "Export failed: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
+                }
+            }
+        }
         loadDataAndForward(request, response);
     }
 
@@ -336,7 +359,7 @@ public class ExportMaterialServlet extends HttpServlet {
             List<Material> materials = departmentDAO.getMaterials();
             List<User> users = userDAO.getAllUsers();
             Integer tempExportId = (Integer) request.getSession().getAttribute("tempExportId");
-            List<ExportDetail> exportDetails = (tempExportId != null && tempExportId != 0) 
+            List<ExportDetail> exportDetails = (tempExportId != null) 
                     ? exportDAO.getDraftExportDetails(tempExportId) 
                     : new ArrayList<>();
 

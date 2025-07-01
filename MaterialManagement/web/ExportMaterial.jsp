@@ -89,7 +89,7 @@
                             <form action="ExportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
                                 <input type="hidden" name="action" value="add">
                                 <div class="row g-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label for="materialId" class="form-label text-muted">Material</label>
                                         <select name="materialId" id="materialId" class="form-select" required>
                                             <option value="">Select Material</option>
@@ -97,19 +97,12 @@
                                                 <option value="${material.materialId}">${material.materialName}</option>
                                             </c:forEach>
                                         </select>
+                                        <div class="invalid-feedback">Please select a material.</div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label for="quantity" class="form-label text-muted">Quantity</label>
                                         <input type="number" name="quantity" id="quantity" min="1" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="materialCondition" class="form-label text-muted">Condition</label>
-                                        <select name="materialCondition" id="materialCondition" class="form-select" required>
-                                            <option value="">Select Condition</option>
-                                            <option value="new">New</option>
-                                            <option value="used">Used</option>
-                                            <option value="refurbished">Refurbished</option>
-                                        </select>
+                                        <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
                                     </div>
                                     <div class="col-12 mt-4">
                                         <button type="submit" class="btn btn-dark btn-lg rounded-1">Add to Export List</button>
@@ -127,7 +120,6 @@
                                                 <th>Image</th>
                                                 <th>Material</th>
                                                 <th>Quantity</th>
-                                                <th>Condition</th>
                                                 <th>Available Stock</th>
                                                 <th>Action</th>
                                             </tr>
@@ -155,7 +147,6 @@
                                                         <form action="ExportMaterial" method="post" class="d-flex align-items-center">
                                                             <input type="hidden" name="action" value="updateQuantity">
                                                             <input type="hidden" name="materialId" value="${detail.materialId}">
-                                                            <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
                                                             <input type="number" name="quantity" value="${detail.quantity}" min="1"
                                                                    class="form-control me-2" style="width: 100px;" required>
                                                             <button type="submit" class="btn btn-outline-primary btn-sm" title="Update Quantity">
@@ -163,14 +154,12 @@
                                                             </button>
                                                         </form>
                                                     </td>
-                                                    <td>${detail.materialCondition}</td>
                                                     <td>${stockMap[detail.materialId]}</td>
                                                     <td>
                                                         <form action="ExportMaterial" method="post">
                                                             <input type="hidden" name="action" value="remove">
                                                             <input type="hidden" name="materialId" value="${detail.materialId}">
                                                             <input type="hidden" name="quantity" value="${detail.quantity}">
-                                                            <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
                                                             <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
                                                         </form>
                                                     </td>
@@ -199,6 +188,7 @@
                                                 <option value="${user.userId}">${user.fullName} (ID: ${user.userId}, ${user.departmentName != null ? user.departmentName : 'No Department'})</option>
                                             </c:forEach>
                                         </select>
+                                        <div class="invalid-feedback">Please select a recipient.</div>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="batchNumber" class="form-label text-muted">Batch Number</label>
@@ -250,7 +240,6 @@
                 let isValid = true;
                 const materialId = form.querySelector('#materialId');
                 const quantity = form.querySelector('#quantity');
-                const condition = form.querySelector('#materialCondition');
 
                 if (!materialId.value) {
                     materialId.classList.add('is-invalid');
@@ -264,13 +253,6 @@
                     isValid = false;
                 } else {
                     quantity.classList.remove('is-invalid');
-                }
-
-                if (!condition.value) {
-                    condition.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    condition.classList.remove('is-invalid');
                 }
 
                 return isValid;
@@ -288,8 +270,13 @@
                     recipient.classList.remove('is-invalid');
                 }
 
+                if (${fn:length(exportDetails)} === 0) {
+                    alert("Cannot confirm export: No materials in the export list.");
+                    isValid = false;
+                }
+
                 return isValid;
             }
         </script>
     </body>
-</html> 
+</html>

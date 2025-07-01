@@ -7,12 +7,10 @@ public class ExportDetail {
     private int exportId;
     private int materialId;
     private int quantity;
-    private String materialCondition;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Getters and Setters
     public int getExportDetailId() { return exportDetailId; }
     public void setExportDetailId(int exportDetailId) { this.exportDetailId = exportDetailId; }
     public int getExportId() { return exportId; }
@@ -21,8 +19,6 @@ public class ExportDetail {
     public void setMaterialId(int materialId) { this.materialId = materialId; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-    public String getMaterialCondition() { return materialCondition; }
-    public void setMaterialCondition(String materialCondition) { this.materialCondition = materialCondition; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
