@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,7 +89,7 @@
 </head>
 <body>
     <!-- Header -->
-    <jsp:include page="Header.jsp" />
+   <jsp:include page="Header.jsp" />
 
     <!-- Main content -->
     <div class="container-fluid">
@@ -167,16 +166,7 @@
                                 <c:when test="${not empty list}">
                                     <c:forEach items="${list}" var="material">
                                         <tr>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${fn:startsWith(material.materialsUrl, 'http://') || fn:startsWith(material.materialsUrl, 'https://')}">
-                                                        <img src="${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <img src="images/material/${material.materialsUrl}" alt="${material.materialCode}" class="material-image">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
+                                            <td><img src="images/material/${material.materialsUrl}" alt="${material.materialCode}" class="material-image"></td>
                                             <td>${material.materialCode}</td>
                                             <td>${material.materialName}</td>
                                             <td>
