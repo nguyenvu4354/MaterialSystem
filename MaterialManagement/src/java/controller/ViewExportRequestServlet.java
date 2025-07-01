@@ -3,6 +3,7 @@ package controller;
 import dal.ExportRequestDAO;
 import dal.ExportRequestDetailDAO;
 import dal.UserDAO;
+import dal.RolePermissionDAO;
 import entity.ExportRequest;
 import entity.ExportRequestDetail;
 import entity.User;
@@ -21,22 +22,34 @@ public class ViewExportRequestServlet extends HttpServlet {
     private ExportRequestDAO exportRequestDAO;
     private ExportRequestDetailDAO exportRequestDetailDAO;
     private UserDAO userDAO;
+    private RolePermissionDAO rolePermissionDAO;
 
     @Override
     public void init() throws ServletException {
         exportRequestDAO = new ExportRequestDAO();
         exportRequestDetailDAO = new ExportRequestDetailDAO();
         userDAO = new UserDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
-
-        if (user == null || (user.getRoleId() != 2 && user.getRoleId() != 3 && user.getRoleId() != 4)) {
+        HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        if (user == null) {
+            session = request.getSession();
+            session.setAttribute("redirectURL", request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
+            return;
+        }
+        boolean canView = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_EXPORT_REQUEST_LIST");
+        boolean canApprove = rolePermissionDAO.hasPermission(user.getRoleId(), "APPROVE_EXPORT_REQUEST");
+        request.setAttribute("canViewExportRequest", canView);
+        request.setAttribute("canApproveExportRequest", canApprove);
+        if (!canView) {
+            request.setAttribute("error", "You do not have permission to view export requests.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
@@ -53,10 +66,24 @@ public class ViewExportRequestServlet extends HttpServlet {
             if (exportRequest.getRecipientId() > 0) {
                 recipient = userDAO.getUserById(exportRequest.getRecipientId());
             }
+            // Xử lý đường dẫn ảnh cho sender
+            String senderImg = (sender == null || sender.getUserPicture() == null || sender.getUserPicture().isEmpty())
+                    ? "images/placeholder.png"
+                    : (sender.getUserPicture().startsWith("http") || sender.getUserPicture().startsWith("/")
+                        ? sender.getUserPicture()
+                        : "images/profiles/" + sender.getUserPicture());
+            // Xử lý đường dẫn ảnh cho recipient
+            String recipientImg = (recipient == null || recipient.getUserPicture() == null || recipient.getUserPicture().isEmpty())
+                    ? "images/placeholder.png"
+                    : (recipient.getUserPicture().startsWith("http") || recipient.getUserPicture().startsWith("/")
+                        ? recipient.getUserPicture()
+                        : "images/profiles/" + recipient.getUserPicture());
             request.setAttribute("exportRequest", exportRequest);
             request.setAttribute("details", details);
             request.setAttribute("sender", sender);
             request.setAttribute("recipient", recipient);
+            request.setAttribute("senderImg", senderImg);
+            request.setAttribute("recipientImg", recipientImg);
             request.setAttribute("roleId", user.getRoleId());
             request.setAttribute("user", user);
             request.getRequestDispatcher("ViewExportRequest.jsp").forward(request, response);

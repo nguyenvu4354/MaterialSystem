@@ -135,101 +135,106 @@
                     </select>
                     <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                 </form>
-                <c:if test="${not empty exportRequests}">
-                    <div class="table-responsive" id="printTableListArea">
-                        <table id="exportRequestTable" class="table custom-table">
-                            <thead>
-                            <tr>
-                                <th>Request Code</th>
-                                <th>Request Date</th>
-                                <th>Status</th>
-                                <th>Delivery Date</th>
-                                <th>Sender</th>
-                                <th>Recipient</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <c:forEach var="request" items="${exportRequests}">
+                <c:if test="${canViewExportRequest}">
+                    <c:if test="${not empty exportRequests}">
+                        <div class="table-responsive" id="printTableListArea">
+                            <table id="exportRequestTable" class="table custom-table">
+                                <thead>
                                 <tr>
-                                    <td>${request.requestCode}</td>
-                                    <td>${request.requestDate}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${request.status == 'approved'}">
-                                                <span class="status-badge status-approved">Approved</span>
-                                            </c:when>
-                                            <c:when test="${request.status == 'rejected'}">
-                                                <span class="status-badge status-rejected">Rejected</span>
-                                            </c:when>
-                                            <c:when test="${request.status == 'cancel'}">
-                                                <span class="status-badge status-cancel">Cancelled</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="status-badge status-pending">Pending</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty request.deliveryDate}">
-                                                ${request.deliveryDate}
-                                            </c:when>
-                                            <c:otherwise>
-                                                Not available
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty request.userName}">
-                                                ${request.userName}
-                                            </c:when>
-                                            <c:otherwise>
-                                                Unknown
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty request.recipientName}">
-                                                ${request.recipientName}
-                                            </c:when>
-                                            <c:otherwise>
-                                                Unknown
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                      <a href="${pageContext.request.contextPath}/ViewExportRequest?id=${request.exportRequestId}&status=${status}&search=${search}" class="btn-detail" style="pointer-events:auto;z-index:9999;position:relative;">
-                                            <i class="fas fa-eye"></i> Details
-                                        </a>
-                                    </td>
+                                    <th>Request Code</th>
+                                    <th>Request Date</th>
+                                    <th>Status</th>
+                                    <th>Delivery Date</th>
+                                    <th>Sender</th>
+                                    <th>Recipient</th>
+                                    <th>Action</th>
                                 </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                    <nav class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
-                            </li>
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${i}&status=${status}&search=${search}">${i}</a>
+                                </thead>
+                                <tbody>
+                                <c:forEach var="request" items="${exportRequests}">
+                                    <tr>
+                                        <td>${request.requestCode}</td>
+                                        <td>${request.requestDate}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${request.status == 'approved'}">
+                                                    <span class="status-badge status-approved">Approved</span>
+                                                </c:when>
+                                                <c:when test="${request.status == 'rejected'}">
+                                                    <span class="status-badge status-rejected">Rejected</span>
+                                                </c:when>
+                                                <c:when test="${request.status == 'cancel'}">
+                                                    <span class="status-badge status-cancel">Cancelled</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-badge status-pending">Pending</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty request.deliveryDate}">
+                                                    ${request.deliveryDate}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Not available
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty request.userName}">
+                                                    ${request.userName}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Unknown
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty request.recipientName}">
+                                                    ${request.recipientName}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Unknown
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                          <a href="${pageContext.request.contextPath}/ViewExportRequest?id=${request.exportRequestId}&status=${status}&search=${search}" class="btn-detail" style="pointer-events:auto;z-index:9999;position:relative;">
+                                                <i class="fas fa-eye"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
                                 </li>
-                            </c:forEach>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${i}&status=${status}&search=${search}">${i}</a>
+                                    </li>
+                                </c:forEach>
+                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </c:if>
+                    <c:if test="${empty exportRequests}">
+                        <div class="alert alert-info mt-4">
+                            No export request found.
+                        </div>
+                    </c:if>
                 </c:if>
-                <c:if test="${empty exportRequests}">
-                    <div class="alert alert-info mt-4">
-                        No export request found.
-                    </div>
+                <c:if test="${!canViewExportRequest}">
+                    <div class="alert alert-danger mt-4">You do not have permission to view export requests.</div>
                 </c:if>
             </div>
         </main>
