@@ -314,6 +314,9 @@
         </style>
     </head>
     <body>
+        <c:set var="roleId" value="${sessionScope.user.roleId}" />
+        <c:set var="hasViewPurchaseRequestListPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_PURCHASE_REQUEST_LIST')}" scope="request" />
+
         <c:choose>
             <c:when test="${empty sessionScope.user}">
                 <div class="access-denied">
@@ -329,259 +332,274 @@
                 </div>
             </c:when>
             <c:otherwise>
-                <jsp:include page="Header.jsp"/>
-                <div class="container-fluid">
-                    <div class="row">
-                        <jsp:include page="SidebarDirector.jsp"/>
-                        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                            <div class="main-content">
-                                <div class="container">
-                                    <!-- Page Header -->
-                                    <div class="page-header text-center">
-                                        <h1 class="page-title">
-                                            <i class="fas fa-clipboard-list me-3"></i>
-                                            Purchase Request Details
-                                        </h1>
-                                        <p class="page-subtitle">View detailed information about the purchase request</p>
-                                    </div>
+                <c:if test="${!hasViewPurchaseRequestListPermission}">
+                    <div class="access-denied">
+                        <div class="access-denied-card">
+                            <div style="font-size: 4rem; color: #dc3545; margin-bottom: 1rem;">🔒</div>
+                            <h2 class="text-danger mb-3">Access Denied</h2>
+                            <p class="text-muted mb-4">You do not have permission to view purchase request details.</p>
+                            <div class="d-grid gap-2">
+                                <a href="ListPurchaseRequests" class="btn btn-primary">Back to Purchase Requests</a>
+                                <a href="dashboardmaterial" class="btn btn-outline-secondary">Back to Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+                <c:if test="${hasViewPurchaseRequestListPermission}">
+                    <jsp:include page="Header.jsp"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <jsp:include page="SidebarDirector.jsp"/>
+                            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                                <div class="main-content">
+                                    <div class="container">
+                                        <!-- Page Header -->
+                                        <div class="page-header text-center">
+                                            <h1 class="page-title">
+                                                <i class="fas fa-clipboard-list me-3"></i>
+                                                Purchase Request Details
+                                            </h1>
+                                            <p class="page-subtitle">View detailed information about the purchase request</p>
+                                        </div>
 
-                                    <!-- Stats Card -->
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="stats-card text-center">
-                                                <div class="stats-number">${purchaseRequestDetailList.size()}</div>
-                                                <div class="stats-label">Total Materials</div>
+                                        <!-- Stats Card -->
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-card text-center">
+                                                    <div class="stats-number">${purchaseRequestDetailList.size()}</div>
+                                                    <div class="stats-label">Total Materials</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="stats-card text-center">
+                                                    <div class="stats-number">
+                                                        <c:set var="totalQuantity" value="0"/>
+                                                        <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                                            <c:set var="totalQuantity" value="${totalQuantity + item.quantity}"/>
+                                                        </c:forEach>
+                                                        ${totalQuantity}
+                                                    </div>
+                                                    <div class="stats-label">Total Quantity</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="stats-card text-center">
+                                                    <div class="stats-number">
+                                                        <c:set var="uniqueCategories" value="0"/>
+                                                        <c:forEach var="item" items="${purchaseRequestDetailList}">
+                                                            <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
+                                                        </c:forEach>
+                                                        ${uniqueCategories}
+                                                    </div>
+                                                    <div class="stats-label">Material Types</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="stats-card text-center">
-                                                <div class="stats-number">
-                                                    <c:set var="totalQuantity" value="0"/>
-                                                    <c:forEach var="item" items="${purchaseRequestDetailList}">
-                                                        <c:set var="totalQuantity" value="${totalQuantity + item.quantity}"/>
-                                                    </c:forEach>
-                                                    ${totalQuantity}
-                                                </div>
-                                                <div class="stats-label">Total Quantity</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="stats-card text-center">
-                                                <div class="stats-number">
-                                                    <c:set var="uniqueCategories" value="0"/>
-                                                    <c:forEach var="item" items="${purchaseRequestDetailList}">
-                                                        <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
-                                                    </c:forEach>
-                                                    ${uniqueCategories}
-                                                </div>
-                                                <div class="stats-label">Material Types</div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <!-- Thông tin người yêu cầu -->
-                                    <div class="content-card mb-3">
-                                        <strong>Người yêu cầu:</strong>
-                                        <ul style="margin-bottom:0;">
-                                            <li><b>Họ tên:</b> ${requester.fullName}</li>
-                                            <li><b>Email:</b> ${requester.email}</li>
-                                            <li><b>Số điện thoại:</b> ${requester.phoneNumber}</li>
-                                            <li><b>Phòng ban:</b> ${requester.departmentName}</li>
-                                            <li><b>Chức vụ:</b> ${requester.roleName}</li>
-                                            <li><b>Ngày sinh:</b> <c:if test="${not empty requester.dateOfBirth}">${requester.dateOfBirth}</c:if></li>
-                                        </ul>
-                                    </div>
+                                        <!-- Thông tin người yêu cầu -->
+                                        <div class="content-card mb-3">
+                                            <strong>Người yêu cầu:</strong>
+                                            <ul style="margin-bottom:0;">
+                                                <li><b>Họ tên:</b> ${requester.fullName}</li>
+                                                <li><b>Email:</b> ${requester.email}</li>
+                                                <li><b>Số điện thoại:</b> ${requester.phoneNumber}</li>
+                                                <li><b>Phòng ban:</b> ${requester.departmentName}</li>
+                                                <li><b>Chức vụ:</b> ${requester.roleName}</li>
+                                                <li><b>Ngày sinh:</b> <c:if test="${not empty requester.dateOfBirth}">${requester.dateOfBirth}</c:if></li>
+                                            </ul>
+                                        </div>
 
-                                    <!-- Table Container -->
-                                    <div class="table-container">
-                                        <c:choose>
-                                            <c:when test="${not empty purchaseRequestDetailList}">
-                                                <div class="table-responsive">
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                                                                <th><i class="fas fa-file-invoice me-2"></i>Request Code</th>
-                                                                <th><i class="fas fa-box me-2"></i>Material Name</th>
-                                                                <th><i class="fas fa-tags me-2"></i>Category</th>
-                                                                <th><i class="fas fa-sort-numeric-up me-2"></i>Quantity</th>
-                                                                <th><i class="fas fa-sticky-note me-2"></i>Notes</th>
-                                                                <th><i class="fas fa-calendar-plus me-2"></i>Created Date</th>
-                                                                <th><i class="fas fa-calendar-check me-2"></i>Updated Date</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <c:forEach var="item" items="${purchaseRequestDetailList}" varStatus="status">
-                                                            <tr>
-                                                                <td>
-                                                                    <span class="badge badge-primary">#${item.purchaseRequestDetailId}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="badge badge-info">${item.purchaseRequestId}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <strong>${item.materialName}</strong>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="badge badge-warning">${item.categoryId}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="badge badge-success">${item.quantity}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <c:choose>
-                                                                        <c:when test="${not empty item.notes}">
-                                                                            <span class="text-muted">${item.notes}</span>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <span class="text-muted fst-italic">No notes</span>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </td>
-                                                                <td>
-                                                                    <small class="text-muted">
-                                                                        <i class="fas fa-clock me-1"></i>
-                                                                        ${item.createdAt}
-                                                                    </small>
-                                                                </td>
-                                                                <td>
-                                                                    <small class="text-muted">
-                                                                        <i class="fas fa-edit me-1"></i>
-                                                                        ${item.updatedAt}
-                                                                    </small>
-                                                                </td>
-                                                            </tr>
-                                                            </c:forEach>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                
-                                                <!-- Pagination -->
-                                                <c:if test="${showPagination}">
-                                                    <nav aria-label="Page navigation" class="mt-4">
-                                                        <ul class="pagination justify-content-center">
-                                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                                <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage - 1}">
-                                                                    <i class="fas fa-chevron-left"></i> Previous
-                                                                </a>
-                                                            </li>
-                                                            
-                                                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                                                <c:choose>
-                                                                    <c:when test="${i == currentPage}">
-                                                                        <li class="page-item active">
-                                                                            <span class="page-link">${i}</span>
-                                                                        </li>
-                                                                    </c:when>
-                                                                    <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
-                                                                        <li class="page-item">
-                                                                            <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${i}">${i}</a>
-                                                                        </li>
-                                                                    </c:when>
-                                                                    <c:when test="${i == currentPage - 3 || i == currentPage + 3}">
-                                                                        <li class="page-item disabled">
-                                                                            <span class="page-link">...</span>
-                                                                        </li>
-                                                                    </c:when>
-                                                                </c:choose>
-                                                            </c:forEach>
-                                                            
-                                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                                <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage + 1}">
-                                                                    Next <i class="fas fa-chevron-right"></i>
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </nav>
+                                        <!-- Table Container -->
+                                        <div class="table-container">
+                                            <c:choose>
+                                                <c:when test="${not empty purchaseRequestDetailList}">
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                                                                    <th><i class="fas fa-file-invoice me-2"></i>Request Code</th>
+                                                                    <th><i class="fas fa-box me-2"></i>Material Name</th>
+                                                                    <th><i class="fas fa-tags me-2"></i>Category</th>
+                                                                    <th><i class="fas fa-sort-numeric-up me-2"></i>Quantity</th>
+                                                                    <th><i class="fas fa-sticky-note me-2"></i>Notes</th>
+                                                                    <th><i class="fas fa-calendar-plus me-2"></i>Created Date</th>
+                                                                    <th><i class="fas fa-calendar-check me-2"></i>Updated Date</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <c:forEach var="item" items="${purchaseRequestDetailList}" varStatus="status">
+                                                                <tr>
+                                                                    <td>
+                                                                        <span class="badge badge-primary">#${item.purchaseRequestDetailId}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge badge-info">${item.purchaseRequestId}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <strong>${item.materialName}</strong>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge badge-warning">${item.categoryId}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge badge-success">${item.quantity}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <c:choose>
+                                                                            <c:when test="${not empty item.notes}">
+                                                                                <span class="text-muted">${item.notes}</span>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <span class="text-muted fst-italic">No notes</span>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </td>
+                                                                    <td>
+                                                                        <small class="text-muted">
+                                                                            <i class="fas fa-clock me-1"></i>
+                                                                            ${item.createdAt}
+                                                                        </small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <small class="text-muted">
+                                                                            <i class="fas fa-edit me-1"></i>
+                                                                            ${item.updatedAt}
+                                                                        </small>
+                                                                    </td>
+                                                                </tr>
+                                                                </c:forEach>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                     
-                                                    <!-- Page Info -->
-                                                    <div class="text-center text-muted mt-2">
-                                                        <small>
-                                                            Showing ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} 
-                                                            of ${totalItems} details
-                                                        </small>
+                                                    <!-- Pagination -->
+                                                    <c:if test="${showPagination}">
+                                                        <nav aria-label="Page navigation" class="mt-4">
+                                                            <ul class="pagination justify-content-center">
+                                                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                                    <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage - 1}">
+                                                                        <i class="fas fa-chevron-left"></i> Previous
+                                                                    </a>
+                                                                </li>
+                                                                
+                                                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                                                    <c:choose>
+                                                                        <c:when test="${i == currentPage}">
+                                                                            <li class="page-item active">
+                                                                                <span class="page-link">${i}</span>
+                                                                            </li>
+                                                                        </c:when>
+                                                                        <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                                                            <li class="page-item">
+                                                                                <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${i}">${i}</a>
+                                                                            </li>
+                                                                        </c:when>
+                                                                        <c:when test="${i == currentPage - 3 || i == currentPage + 3}">
+                                                                            <li class="page-item disabled">
+                                                                                <span class="page-link">...</span>
+                                                                            </li>
+                                                                        </c:when>
+                                                                    </c:choose>
+                                                                </c:forEach>
+                                                                
+                                                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                                    <a class="page-link" href="PurchaseRequestDetail?id=${purchaseRequest.purchaseRequestId}&page=${currentPage + 1}">
+                                                                        Next <i class="fas fa-chevron-right"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </nav>
+                                                        
+                                                        <!-- Page Info -->
+                                                        <div class="text-center text-muted mt-2">
+                                                            <small>
+                                                                Showing ${(currentPage - 1) * 10 + 1} - ${Math.min(currentPage * 10, totalItems)} 
+                                                                of ${totalItems} details
+                                                            </small>
+                                                        </div>
+                                                    </c:if>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="empty-state">
+                                                        <i class="fas fa-inbox"></i>
+                                                        <h4>No Data</h4>
+                                                        <p>No purchase request details found.</p>
                                                     </div>
-                                                </c:if>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="empty-state">
-                                                    <i class="fas fa-inbox"></i>
-                                                    <h4>No Data</h4>
-                                                    <p>No purchase request details found.</p>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
 
-                                    <!-- Action Buttons and Status Messages -->
-                                    <div class="action-buttons">
-                                        <!-- Hiển thị lý do nhân viên gửi lên -->
-                                        <c:if test="${not empty purchaseRequest.reason}">
-                                            <div class="content-card mb-3">
-                                                <strong>Employee's request reason:</strong>
-                                                <div class="text-muted">${purchaseRequest.reason}</div>
-                                            </div>
-                                        </c:if>
-                                        <c:if test="${sessionScope.user.roleId == 2 && purchaseRequest.status == 'pending'}">
-                                            <div class="content-card">
-                                                <h4 class="mb-3">Approval Action</h4>
-                                                <form id="actionForm" action="PurchaseRequestDetail" method="POST" style="display:inline-block;">
-                                                    <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                                                    <input type="hidden" id="actionType" name="action" value="">
-                                                    <div class="mb-2">
-                                                        <textarea name="reason" id="reasonInput" class="form-control" placeholder="Enter reason..." required></textarea>
-                                                    </div>
-                                                    <button type="submit" class="btn-action btn-approve" onclick="return setActionType('approve')">
-                                                        <i class="fas fa-check-circle me-2"></i>
-                                                        Approve
-                                                    </button>
-                                                    <button type="submit" class="btn-action btn-reject" onclick="return setActionType('reject')">
-                                                        <i class="fas fa-times-circle me-2"></i>
-                                                        Reject
-                                                    </button>
-                                                </form>
-                                                <script>
-                                                    function setActionType(type) {
-                                                        document.getElementById('actionType').value = type;
-                                                        if(type === 'approve') {
-                                                            return confirm('Are you sure you want to approve this request?');
-                                                        } else {
-                                                            return confirm('Are you sure you want to reject this request?');
+                                        <!-- Action Buttons and Status Messages -->
+                                        <div class="action-buttons">
+                                            <!-- Hiển thị lý do nhân viên gửi lên -->
+                                            <c:if test="${not empty purchaseRequest.reason}">
+                                                <div class="content-card mb-3">
+                                                    <strong>Employee's request reason:</strong>
+                                                    <div class="text-muted">${purchaseRequest.reason}</div>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${hasHandleRequestPermission && purchaseRequest.status == 'pending'}">
+                                                <div class="content-card">
+                                                    <h4 class="mb-3">Approval Action</h4>
+                                                    <form id="actionForm" action="PurchaseRequestDetail" method="POST" style="display:inline-block;">
+                                                        <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
+                                                        <input type="hidden" id="actionType" name="action" value="">
+                                                        <div class="mb-2">
+                                                            <textarea name="reason" id="reasonInput" class="form-control" placeholder="Enter reason..." required></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn-action btn-approve" onclick="return setActionType('approve')">
+                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            Approve
+                                                        </button>
+                                                        <button type="submit" class="btn-action btn-reject" onclick="return setActionType('reject')">
+                                                            <i class="fas fa-times-circle me-2"></i>
+                                                            Reject
+                                                        </button>
+                                                    </form>
+                                                    <script>
+                                                        function setActionType(type) {
+                                                            document.getElementById('actionType').value = type;
+                                                            if(type === 'approve') {
+                                                                return confirm('Are you sure you want to approve this request?');
+                                                            } else {
+                                                                return confirm('Are you sure you want to reject this request?');
+                                                            }
                                                         }
-                                                    }
-                                                </script>
-                                            </div>
-                                        </c:if>
-                                        <c:choose>
-                                            <c:when test="${purchaseRequest.status eq 'approved'}">
-                                                <div class="status-message status-approved">
-                                                    <i class="fas fa-check-circle me-2"></i>
-                                                    Request approved.<br>
-                                                    <strong>Approval reason:</strong> ${purchaseRequest.approvalReason}
+                                                    </script>
                                                 </div>
-                                            </c:when>
-                                            <c:when test="${purchaseRequest.status eq 'rejected'}">
-                                                <div class="status-message status-rejected">
-                                                    <i class="fas fa-times-circle me-2"></i>
-                                                    Request rejected.<br>
-                                                    <strong>Rejection reason:</strong> ${purchaseRequest.rejectionReason}
-                                                </div>
-                                            </c:when>
-                                        </c:choose>
-                                    </div>
+                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${purchaseRequest.status eq 'approved'}">
+                                                    <div class="status-message status-approved">
+                                                        <i class="fas fa-check-circle me-2"></i>
+                                                        Request approved.<br>
+                                                        <strong>Approval reason:</strong> ${purchaseRequest.approvalReason}
+                                                    </div>
+                                                </c:when>
+                                                <c:when test="${purchaseRequest.status eq 'rejected'}">
+                                                    <div class="status-message status-rejected">
+                                                        <i class="fas fa-times-circle me-2"></i>
+                                                        Request rejected.<br>
+                                                        <strong>Rejection reason:</strong> ${purchaseRequest.approvalReason}
+                                                    </div>
+                                                </c:when>
+                                            </c:choose>
+                                        </div>
 
-                                    <!-- Back Button -->
-                                    <div class="text-center">
-                                        <a href="ListPurchaseRequests" class="btn-back">
-                                            <i class="fas fa-arrow-left"></i>
-                                            Back to List
-                                        </a>
+                                        <!-- Back Button -->
+                                        <div class="text-center">
+                                            <a href="ListPurchaseRequests" class="btn-back">
+                                                <i class="fas fa-arrow-left"></i>
+                                                Back to List
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </main>
+                            </main>
+                        </div>
                     </div>
-                </div>
+                </c:if>
             </c:otherwise>
         </c:choose>
 

@@ -8,7 +8,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Create Category</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUV --
+
+XJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <style>
         .card-header {
@@ -39,7 +41,7 @@
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger error-message">${error}</div>
                 </c:if>
-                <form action="${pageContext.request.contextPath}/CategoryServlet?service=addCategory" method="post">
+                <form action="${pageContext.request.contextPath}/Category?service=addCategory" method="post">
                     <input type="hidden" name="disable" value="0">
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -109,7 +111,7 @@
                         <button type="submit" name="submit" value="submit" class="btn" style="background-color: #DEAD6F; color: white;">
                             <i class="fas fa-save"></i> Create Category
                         </button>
-                        <a href="${pageContext.request.contextPath}/Category.jsp" class="btn btn-secondary ms-2">
+                        <a href="${pageContext.request.contextPath}/Category?service=listCategory" class="btn btn-secondary ms-2">
                             <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
@@ -117,6 +119,6 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF7qD9jIH/wu1b3X9g8a8wXg8q3W0Xb2F5w5D7vX6D9z5j7mX1Z8a3X3z9z5j7mX1Z8a3X3z9z5j7mX1Z8a" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 </html>
