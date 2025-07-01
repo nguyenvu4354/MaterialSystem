@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User, java.util.Map" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -23,10 +24,17 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
               rel="stylesheet">
+        <!-- jQuery UI CSS -->
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <style>
             .material-form .form-control, .material-form .form-select {
                 height: 48px;
                 font-size: 1rem;
+                padding: 0.375rem 0.75rem;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                background-color: #fff;
+                transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             }
             .material-form .form-label {
                 font-size: 0.9rem;
@@ -58,6 +66,36 @@
                 border-radius: 8px;
                 font-size: 1rem;
             }
+            .material-form .form-control:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                outline: 0;
+            }
+            .material-form .form-control.is-invalid {
+                border-color: #dc3545;
+            }
+            .material-form .form-control.is-invalid:focus {
+                box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+            }
+            /* Customize autocomplete UI */
+            .ui-autocomplete {
+                max-height: 200px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                background-color: #fff;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                z-index: 1000;
+            }
+            .ui-menu-item {
+                padding: 8px 12px;
+                font-size: 1rem;
+                cursor: pointer;
+            }
+            .ui-menu-item:hover {
+                background-color: #f8f9fa;
+            }
         </style>
     </head>
     <body>
@@ -81,7 +119,7 @@
                                 <div class="alert alert-success">${success}</div>
                             </c:if>
                             <c:if test="${not empty error}">
-                                <div class="alert alert-danger">${error}</div>
+                                <div class=" alert alert-danger">${error}</div>
                             </c:if>
 
                             <!-- Add Material Form -->
@@ -90,14 +128,11 @@
                                 <input type="hidden" name="action" value="add">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="materialId" class="form-label text-muted">Material</label>
-                                        <select name="materialId" id="materialId" class="form-select" required>
-                                            <option value="">Select Material</option>
-                                            <c:forEach var="material" items="${materials}">
-                                                <option value="${material.materialId}">${material.materialName}</option>
-                                            </c:forEach>
-                                        </select>
-                                        <div class="invalid-feedback">Please select a material.</div>
+                                        <label for="materialName" class="form-label text-muted">Material</label>
+                                        <input type="text" id="materialName" name="materialName" class="form-control" required
+                                               placeholder="Type material name or code">
+                                        <input type="hidden" name="materialId" id="materialId">
+                                        <div class="invalid-feedback">Please enter a valid material name or code.</div>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="quantity" class="form-label text-muted">Quantity</label>
@@ -119,6 +154,7 @@
                                             <tr>
                                                 <th>Image</th>
                                                 <th>Material</th>
+                                                <th>Code</th>
                                                 <th>Quantity</th>
                                                 <th>Available Stock</th>
                                                 <th>Action</th>
@@ -143,6 +179,7 @@
                                                         <img src="${finalUrl}" class="material-img" alt="${materialMap[detail.materialId].materialName}">
                                                     </td>
                                                     <td>${materialMap[detail.materialId].materialName}</td>
+                                                    <td>${materialMap[detail.materialId].materialCode}</td>
                                                     <td>
                                                         <form action="ExportMaterial" method="post" class="d-flex align-items-center">
                                                             <input type="hidden" name="action" value="updateQuantity">
@@ -175,28 +212,36 @@
                                     <p class="text-muted">No materials added to the export list yet.</p>
                                 </div>
                             </c:if>
+
                             <!-- Confirm Export Form -->
                             <h3 class="fw-normal mb-3 mt-5">Confirm Export</h3>
                             <form action="ExportMaterial" method="post" class="confirm-form" onsubmit="return validateConfirmForm()">
                                 <input type="hidden" name="action" value="export">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="recipientUserId" class="form-label text-muted">Recipient</label>
-                                        <select name="recipientUserId" id="recipientUserId" class="form-select" required>
-                                            <option value="">Select Recipient</option>
+                                        <label for="recipientName" class="form-label text-muted">Recipient</label>
+                                        <input type="text" list="recipientList" id="recipientName" class="form-control" required
+                                               oninput="updateRecipientId(this)" placeholder="Type recipient name or department">
+                                        <input type="hidden" name="recipientUserId" id="recipientUserId">
+                                        <datalist id="recipientList">
                                             <c:forEach var="user" items="${users}">
-                                                <option value="${user.userId}">${user.fullName} (ID: ${user.userId}, ${user.departmentName != null ? user.departmentName : 'No Department'})</option>
+                                                <option value="${fn:escapeXml(user.fullName)} (${user.departmentName != null ? fn:escapeXml(user.departmentName) : 'No Department'})"
+                                                        data-id="${user.userId}"
+                                                        data-name="${fn:escapeXml(user.fullName)}"
+                                                        data-department="${fn:escapeXml(user.departmentName != null ? user.departmentName : 'No Department')}">
+                                                    ${fn:escapeXml(user.fullName)} (${user.departmentName != null ? fn:escapeXml(user.departmentName) : 'No Department'})
+                                                </option>
                                             </c:forEach>
-                                        </select>
-                                        <div class="invalid-feedback">Please select a recipient.</div>
+                                        </datalist>
+                                        <div class="invalid-feedback">Please select a valid recipient.</div>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="batchNumber" class="form-label text-muted">Batch Number</label>
-                                        <input type="text" name="batchNumber" id="batchNumber" maxlength="50" class="form-control">
+                                        <input type="text" name="batchNumber" id="batchNumber" maxlength="50" class="form-control" placeholder="Enter batch number">
                                     </div>
                                     <div class="col-12">
                                         <label for="note" class="form-label text-muted">Note</label>
-                                        <input type="text" name="note" id="note" maxlength="100" class="form-control" placeholder="Enter Note">
+                                        <input type="text" name="note" id="note" maxlength="100" class="form-control" placeholder="Enter note">
                                     </div>
                                     <div class="col-12 mt-4">
                                         <div class="d-grid gap-2">
@@ -218,6 +263,8 @@
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+        <!-- jQuery UI -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const alerts = document.querySelectorAll('.alert');
@@ -233,50 +280,134 @@
                         }
                     }, 3000);
                 });
+
+                // Material list for autocomplete
+                const materials = [
+                    <c:forEach var="material" items="${materials}" varStatus="loop">
+                        {
+                            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+                            value: "${fn:escapeXml(material.materialName)}",
+                            id: "${material.materialId}",
+                            name: "${fn:escapeXml(material.materialName)}",
+                            code: "${fn:escapeXml(material.materialCode)}"
+                        }${loop.last ? '' : ','}
+                    </c:forEach>
+                ];
+
+                // Initialize autocomplete for materialName
+                $("#materialName").autocomplete({
+                    source: function(request, response) {
+                        const term = request.term.toLowerCase();
+                        const matches = materials.filter(material => 
+                            material.name.toLowerCase().includes(term) || 
+                            material.code.toLowerCase().includes(term)
+                        );
+                        response(matches);
+                    },
+                    select: function(event, ui) {
+                        document.getElementById('materialId').value = ui.item.id;
+                        document.getElementById('materialName').value = ui.item.name;
+                        document.getElementById('materialName').classList.remove('is-invalid');
+                    },
+                    change: function(event, ui) {
+                        if (!ui.item) {
+                            const inputValue = document.getElementById('materialName').value.toLowerCase().trim();
+                            const selectedMaterial = materials.find(material => 
+                                material.name.toLowerCase() === inputValue || 
+                                material.code.toLowerCase() === inputValue
+                            );
+                            if (selectedMaterial) {
+                                document.getElementById('materialId').value = selectedMaterial.id;
+                                document.getElementById('materialName').value = selectedMaterial.name;
+                                document.getElementById('materialName').classList.remove('is-invalid');
+                            } else {
+                                document.getElementById('materialId').value = '';
+                                document.getElementById('materialName').classList.add('is-invalid');
+                            }
+                        }
+                    },
+                    minLength: 1
+                });
+
+                function debounce(func, wait) {
+                    let timeout;
+                    return function executedFunction(...args) {
+                        const later = () => {
+                            clearTimeout(timeout);
+                            func(...args);
+                        };
+                        clearTimeout(timeout);
+                        timeout = setTimeout(later, wait);
+                    };
+                }
+
+                function updateRecipientId(input) {
+                    const inputValue = input.value.toLowerCase().trim();
+                    const datalist = document.getElementById('recipientList');
+                    const options = datalist.querySelectorAll('option');
+                    const selectedOption = Array.from(options).find(option => {
+                        const displayText = option.value.toLowerCase();
+                        const name = option.getAttribute('data-name').toLowerCase();
+                        const department = option.getAttribute('data-department').toLowerCase();
+                        return displayText === inputValue || name === inputValue || department === inputValue;
+                    });
+                    document.getElementById('recipientUserId').value = selectedOption ? selectedOption.getAttribute('data-id') : '';
+                    if (!selectedOption) {
+                        document.getElementById('recipientName').classList.add('is-invalid');
+                    } else {
+                        document.getElementById('recipientName').classList.remove('is-invalid');
+                    }
+                }
+
+                document.getElementById('recipientName').addEventListener('input', debounce(function() {
+                    updateRecipientId(document.getElementById('recipientName'));
+                }, 100));
+
+                function validateAddForm() {
+                    const form = document.querySelector('form[action="ExportMaterial"]');
+                    let isValid = true;
+                    const materialId = form.querySelector('#materialId');
+                    const materialName = form.querySelector('#materialName');
+                    const quantity = form.querySelector('#quantity');
+
+                    if (!materialId.value) {
+                        materialName.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        materialName.classList.remove('is-invalid');
+                    }
+
+                    if (!quantity.value || quantity.value <= 0) {
+                        quantity.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        quantity.classList.remove('is-invalid');
+                    }
+
+                    return isValid;
+                }
+
+                function validateConfirmForm() {
+                    const form = document.querySelector('.confirm-form');
+                    let isValid = true;
+                    const recipientId = form.querySelector('#recipientUserId');
+                    const recipientName = form.querySelector('#recipientName');
+
+                    if (!recipientId.value) {
+                        recipientName.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        recipientName.classList.remove('is-invalid');
+                    }
+
+                    if (${fn:length(exportDetails)} === 0) {
+                        alert("Cannot confirm export: The material list is empty.");
+                        isValid = false;
+                    }
+
+                    return isValid;
+                }
             });
-
-            function validateAddForm() {
-                const form = document.querySelector('form[action="ExportMaterial"]');
-                let isValid = true;
-                const materialId = form.querySelector('#materialId');
-                const quantity = form.querySelector('#quantity');
-
-                if (!materialId.value) {
-                    materialId.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    materialId.classList.remove('is-invalid');
-                }
-
-                if (!quantity.value || quantity.value <= 0) {
-                    quantity.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    quantity.classList.remove('is-invalid');
-                }
-
-                return isValid;
-            }
-
-            function validateConfirmForm() {
-                const form = document.querySelector('.confirm-form');
-                let isValid = true;
-                const recipient = form.querySelector('#recipientUserId');
-
-                if (!recipient.value) {
-                    recipient.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    recipient.classList.remove('is-invalid');
-                }
-
-                if (${fn:length(exportDetails)} === 0) {
-                    alert("Cannot confirm export: No materials in the export list.");
-                    isValid = false;
-                }
-
-                return isValid;
-            }
         </script>
     </body>
 </html>
