@@ -45,8 +45,10 @@ public class ViewExportRequestServlet extends HttpServlet {
         }
         boolean canView = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_EXPORT_REQUEST_LIST");
         boolean canApprove = rolePermissionDAO.hasPermission(user.getRoleId(), "APPROVE_EXPORT_REQUEST");
+        boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
         request.setAttribute("canViewExportRequest", canView);
         request.setAttribute("canApproveExportRequest", canApprove);
+        request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
         if (!canView) {
             request.setAttribute("error", "You do not have permission to view export requests.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
