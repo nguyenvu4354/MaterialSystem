@@ -299,4 +299,54 @@ public class PurchaseRequestDAO extends DBContext {
             }
         }
     }
+
+    // Lấy danh sách Purchase Requests đã được approved
+    public List<PurchaseRequest> getApprovedPurchaseRequests() {
+        List<PurchaseRequest> list = new ArrayList<>();
+        try {
+            String sql = "SELECT pr.*, u.full_name, u.email, u.phone_number "
+                    + "FROM material_management.purchase_requests pr "
+                    + "LEFT JOIN material_management.users u ON pr.user_id = u.user_id "
+                    + "WHERE pr.status = 'APPROVED' AND pr.disable = 0 "
+                    + "ORDER BY pr.request_date DESC";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            PurchaseRequestDetailDAO prdd = new PurchaseRequestDetailDAO();
+
+            while (rs.next()) {
+                PurchaseRequest pr = new PurchaseRequest();
+                pr.setPurchaseRequestId(rs.getInt("purchase_request_id"));
+                pr.setRequestCode(rs.getString("request_code"));
+                pr.setUserId(rs.getInt("user_id"));
+                pr.setRequestDate(rs.getTimestamp("request_date"));
+                pr.setStatus(rs.getString("status"));
+                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
+                pr.setReason(rs.getString("reason"));
+
+                int approvedBy = rs.getInt("approved_by");
+                if (!rs.wasNull()) {
+                    pr.setApprovedBy(approvedBy);
+                } else {
+                    pr.setApprovedBy(null);
+                }
+
+                pr.setApprovalReason(rs.getString("approval_reason"));
+                pr.setApprovedAt(rs.getTimestamp("approved_at"));
+                pr.setRejectionReason(rs.getString("rejection_reason"));
+                pr.setCreatedAt(rs.getTimestamp("created_at"));
+                pr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                pr.setDisable(rs.getBoolean("disable"));
+
+                // Load details for each purchase request
+                List<PurchaseRequestDetail> details = prdd.paginationOfDetails(pr.getPurchaseRequestId(), 1, Integer.MAX_VALUE);
+                pr.setDetails(details);
+
+                list.add(pr);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
 }

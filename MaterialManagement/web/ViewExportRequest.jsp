@@ -1,9 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Waggy - Request Details</title>
+    <title>Request Details</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,7 +71,6 @@
                     <p><strong>Address:</strong> Hanoi</p>
                 </div>
                 <div style="flex: 0 0 100px; margin-left: 20px;">
-                    <c:set var="senderImg" value="${empty sender.userPicture ? 'images/placeholder.png' : (sender.userPicture.startsWith('http') || sender.userPicture.startsWith('/') ? sender.userPicture : 'images/profiles/' += sender.userPicture)}" />
                     <img src="${senderImg}" alt="${sender.fullName}" class="img-fluid rounded-circle">
                 </div>
             </div>
@@ -87,7 +86,6 @@
                     <p><strong>Address:</strong> Hanoi</p>
                 </div>
                 <div style="flex: 0 0 100px; margin-left: 20px;">
-                    <c:set var="recipientImg" value="${empty recipient.userPicture ? 'images/placeholder.png' : (recipient.userPicture.startsWith('http') || recipient.userPicture.startsWith('/') ? recipient.userPicture : 'images/profiles/' += recipient.userPicture)}" />
                     <img src="${recipientImg}" alt="${recipient.fullName}" class="img-fluid rounded-circle">
                 </div>
             </div>
@@ -154,7 +152,7 @@
             <div class="alert alert-success">${message}</div>
         </c:if>
 
-        <c:if test="${roleId == 2 && exportRequest.status == 'pending'}">
+        <c:if test="${canApproveExportRequest && exportRequest.status == 'pending'}">
             <div class="d-flex gap-2 mb-2">
                 <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Approve</button>
                 <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Reject</button>
@@ -186,7 +184,7 @@
             </script>
         </c:if>
 
-        <c:if test="${!(roleId == 2 && exportRequest.status == 'pending')}">
+        <c:if test="${!(canApproveExportRequest && exportRequest.status == 'pending')}">
             <div class="mb-2">
                 <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
             </div>
