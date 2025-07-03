@@ -12,16 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "DashboardUnitServlet", urlPatterns = {"/UnitList"})
 public class DashboardUnitServlet extends HttpServlet {
-    private UnitDAO unitDAO;
-
-    @Override
-    public void init() throws ServletException {
-        unitDAO = new UnitDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        UnitDAO unitDAO = new UnitDAO();
         List<Unit> units = unitDAO.getAllUnits();
         request.setAttribute("units", units);
         request.getRequestDispatcher("DashboardUnit.jsp").forward(request, response);
@@ -32,4 +26,4 @@ public class DashboardUnitServlet extends HttpServlet {
             throws ServletException, IOException {
         doGet(request, response);
     }
-} 
+}
