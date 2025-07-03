@@ -14,14 +14,12 @@ import java.sql.Timestamp;
 public class PurchaseRequestDetail {
     private int purchaseRequestDetailId;
     private int purchaseRequestId;
-    private String materialName;
-    private int categoryId;
     private int quantity;
     private String notes;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private int materialId;
-    private String categoryName;
+    private String materialName;
 
     
     public PurchaseRequestDetail() {
@@ -41,22 +39,6 @@ public class PurchaseRequestDetail {
 
     public void setPurchaseRequestId(int purchaseRequestId) {
         this.purchaseRequestId = purchaseRequestId;
-    }
-
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
-        this.materialName = materialName;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
     }
 
     public int getQuantity() {
@@ -98,12 +80,12 @@ public class PurchaseRequestDetail {
     public void setMaterialId(int materialId) {
         this.materialId = materialId;
     }
-
-    public String getCategoryName() {
-        return categoryName;
+    
+    public String getMaterialName() {
+        return materialName;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
     }
 }
