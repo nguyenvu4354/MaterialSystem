@@ -11,16 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "EditUnitServlet", urlPatterns = {"/EditUnit"})
 public class EditUnitServlet extends HttpServlet {
-    private UnitDAO unitDAO;
-
-    @Override
-    public void init() throws ServletException {
-        unitDAO = new UnitDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        UnitDAO unitDAO = new UnitDAO();
         String idStr = request.getParameter("id");
         if (idStr != null) {
             int id = Integer.parseInt(idStr);
@@ -33,6 +27,7 @@ public class EditUnitServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        UnitDAO unitDAO = new UnitDAO();
         int id = Integer.parseInt(request.getParameter("id"));
         String unitName = request.getParameter("unitName");
         String symbol = request.getParameter("symbol");
@@ -45,4 +40,4 @@ public class EditUnitServlet extends HttpServlet {
         unitDAO.updateUnit(unit);
         response.sendRedirect("UnitList");
     }
-} 
+}

@@ -11,13 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "AddUnitServlet", urlPatterns = {"/AddUnit"})
 public class AddUnitServlet extends HttpServlet {
-    private UnitDAO unitDAO;
-
-    @Override
-    public void init() throws ServletException {
-        unitDAO = new UnitDAO();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -27,6 +20,7 @@ public class AddUnitServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        UnitDAO unitDAO = new UnitDAO();
         String unitName = request.getParameter("unitName");
         String symbol = request.getParameter("symbol");
         String description = request.getParameter("description");

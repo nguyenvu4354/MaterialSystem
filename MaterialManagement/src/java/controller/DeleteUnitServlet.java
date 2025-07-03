@@ -10,18 +10,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(name = "DeleteUnitServlet", urlPatterns = {"/DeleteUnit"})
 public class DeleteUnitServlet extends HttpServlet {
-    private UnitDAO unitDAO;
-
-    @Override
-    public void init() throws ServletException {
-        unitDAO = new UnitDAO();
-    }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        UnitDAO unitDAO = new UnitDAO();
         int id = Integer.parseInt(request.getParameter("id"));
         unitDAO.deleteUnit(id);
         response.sendRedirect("UnitList");
     }
-} 
+}
