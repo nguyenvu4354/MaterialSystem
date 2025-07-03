@@ -101,6 +101,20 @@
                 font-size: 1rem;
                 margin-bottom: 20px;
             }
+            .pagination {
+                justify-content: center;
+                margin-top: 20px;
+            }
+            .pagination .page-item.active .page-link {
+                background-color: #0d6efd;
+                border-color: #0d6efd;
+            }
+            .pagination .page-link {
+                color: #0d6efd;
+            }
+            .pagination .page-link:hover {
+                background-color: #e9ecef;
+            }
         </style>
     </head>
     <body>
@@ -155,7 +169,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="detail" items="${request.details}">
+                                <c:forEach var="detail" items="${details}">
                                     <tr>
                                         <td>${detail.materialName}</td>
                                         <td>${detail.materialCode}</td>
@@ -192,7 +206,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="detail" items="${request.details}">
+                                <c:forEach var="detail" items="${details}">
                                     <tr>
                                         <td>${detail.materialName}</td>
                                         <td>
@@ -221,7 +235,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="detail" items="${request.details}">
+                                <c:forEach var="detail" items="${details}">
                                     <tr>
                                         <td>${detail.materialId}</td>
                                         <td>${detail.quantity}</td>
@@ -248,6 +262,29 @@
                     </c:when>
                 </c:choose>
 
+                <!-- Phân trang -->
+                <c:if test="${totalPages > 1}">
+                    <nav aria-label="Details pagination">
+                        <ul class="pagination">
+                            <c:if test="${currentPage > 1}">
+                                <li class="page-item">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage - 1}">Previous</a>
+                                </li>
+                            </c:if>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${i}">${i}</a>
+                                </li>
+                            </c:forEach>
+                            <c:if test="${currentPage < totalPages}">
+                                <li class="page-item">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage + 1}">Next</a>
+                                </li>
+                            </c:if>
+                        </ul>
+                    </nav>
+                </c:if>
+
                 <div class="mt-4">
                     <a href="${pageContext.request.contextPath}/ViewRequests" class="btn btn-secondary">Back to Requests</a>
                     <c:if test="${request.status == 'pending'}">
@@ -255,6 +292,7 @@
                             <input type="hidden" name="action" value="cancel">
                             <input type="hidden" name="type" value="${requestType.toLowerCase()}">
                             <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}">
+                            <input type="hidden" name="page" value="${currentPage}">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel Request</button>
                         </form>
                     </c:if>
