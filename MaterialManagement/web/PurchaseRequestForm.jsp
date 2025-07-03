@@ -105,7 +105,11 @@
                                         <div class="row material-row">
                                             <div class="col-md-3 mb-2">
                                                 <label class="form-label text-muted">Material Name</label>
-                                                <input type="text" class="form-control" name="materialName">
+                                                <select class="form-select" name="materialId">
+                                                    <c:forEach var="material" items="${materials}">
+                                                        <option value="${material.materialId}">${material.materialName} (${material.materialCode})</option>
+                                                    </c:forEach>
+                                                </select>
                                             </div>
                                             <div class="col-md-2 mb-2">
                                                 <label class="form-label text-muted">Quantity</label>
@@ -113,11 +117,8 @@
                                             </div>
                                             <div class="col-md-3 mb-2">
                                                 <label class="form-label text-muted">Category</label>
-                                                <select class="form-select" name="categoryId">
-                                                    <c:forEach var="category" items="${categories}">
-                                                        <option value="${category.category_id}">${category.category_name}</option>
-                                                    </c:forEach>
-                                                </select>
+                                                <input type="text" class="form-control category-name" name="categoryName" readonly>
+                                                <input type="hidden" class="category-id" name="categoryId">
                                             </div>
                                             <div class="col-md-3 mb-2">
                                                 <label class="form-label text-muted">Notes</label>
@@ -155,16 +156,61 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Tạo map vật tư - category
+    </script>
+    <script>
+        var materialCategoryMap = {};
+    </script>
+    <c:forEach var="material" items="${materials}">
+        <script>
+            materialCategoryMap["${material.materialId}"] = {
+                categoryId: "${material.category.category_id}",
+                categoryName: "${material.category.category_name}"
+            };
+        </script>
+    </c:forEach>
+    <script>
+        function updateCategory(selectElem) {
+            var materialId = selectElem.value;
+            var row = selectElem.closest('.material-row');
+            var categoryInput = row.querySelector('.category-name');
+            var categoryIdInput = row.querySelector('.category-id');
+            if (materialCategoryMap[materialId]) {
+                categoryInput.value = materialCategoryMap[materialId].categoryName;
+                categoryIdInput.value = materialCategoryMap[materialId].categoryId;
+            } else {
+                categoryInput.value = '';
+                categoryIdInput.value = '';
+            }
+        }
+
+        // Gán sự kiện cho tất cả dropdown material
+        document.querySelectorAll('select[name="materialId"]').forEach(function(selectElem) {
+            selectElem.addEventListener('change', function() {
+                updateCategory(this);
+            });
+            // Gọi luôn khi load để set category cho dòng đầu tiên
+            updateCategory(selectElem);
+        });
+
+        // Khi thêm dòng mới, cũng phải gán sự kiện và cập nhật category
         document.getElementById('addMaterial').addEventListener('click', function () {
             const materialList = document.getElementById('materialList');
             const newRow = materialList.querySelector('.material-row').cloneNode(true);
-            newRow.querySelector('input[name="materialName"]').value = '';
             newRow.querySelector('input[name="quantity"]').value = '';
-            newRow.querySelector('select[name="categoryId"]').selectedIndex = 0;
             newRow.querySelector('input[name="note"]').value = '';
+            // reset material select
+            var selectElem = newRow.querySelector('select[name="materialId"]');
+            selectElem.selectedIndex = 0;
+            // Gán lại sự kiện
+            selectElem.addEventListener('change', function() {
+                updateCategory(this);
+            });
+            // Cập nhật category cho dòng mới
+            updateCategory(selectElem);
             materialList.appendChild(newRow);
         });
-        
+
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-material')) {
                 const materialRows = document.querySelectorAll('.material-row');
