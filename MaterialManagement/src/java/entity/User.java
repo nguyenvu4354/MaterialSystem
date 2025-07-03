@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class User {
+
     private int userId;
     private String username;
     private String password;
@@ -22,16 +23,20 @@ public class User {
     private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    private String verificationToken;
+    private String verificationStatus; // Could also use an enum
+    private LocalDateTime verificationExpiry;
+    
     public enum Gender {
         male, female, other
     }
 
     public enum Status {
-        active, inactive, deleted
+        active, inactive, deleted, pending // Thêm pending để hỗ trợ xác thực email
     }
 
-    public User() {}
+    public User() {
+    }
 
     public int getUserId() {
         return userId;
@@ -179,5 +184,29 @@ public class User {
 
     public boolean isDeleted() {
         return status == Status.deleted;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public LocalDateTime getVerificationExpiry() {
+        return verificationExpiry;
+    }
+
+    public void setVerificationExpiry(LocalDateTime verificationExpiry) {
+        this.verificationExpiry = verificationExpiry;
     }
 }

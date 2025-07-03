@@ -4,19 +4,28 @@ import dal.DepartmentDAO;
 import dal.UserDAO;
 import entity.Department;
 import entity.User;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import utils.UserValidator;
 import utils.EmailUtils;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @WebServlet(name = "CreateUserServlet", value = "/CreateUser")
 @MultipartConfig
@@ -78,7 +87,12 @@ public class CreateUserServlet extends HttpServlet {
 
             try {
                 roleId = Integer.parseInt(roleIdStr);
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Role ID không hợp lệ.");
+                List<Department> departments = departmentDAO.getAllDepartments();
+                request.setAttribute("departments", departments);
+                request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
+                return;
             }
             try {
                 if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
@@ -98,25 +112,73 @@ public class CreateUserServlet extends HttpServlet {
             newUser.setRoleId(roleId);
             newUser.setDepartmentId(departmentId);
             newUser.setDescription(description);
+            newUser.setVerificationToken(UUID.randomUUID().toString());
+            newUser.setVerificationStatus("pending");
+            newUser.setVerificationExpiry(LocalDateTime.now().plusHours(24));
+            newUser.setStatus(User.Status.inactive); 
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
-                newUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
-            }
-
-            if (gender != null && !gender.isEmpty()) {
-                if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
-                    newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
+                try {
+                    newUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
+                } catch (Exception e) {
+                    request.setAttribute("error", "Ngày sinh không hợp lệ.");
+                    List<Department> departments = departmentDAO.getAllDepartments();
+                    request.setAttribute("departments", departments);
+                    request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
+                    return;
                 }
             }
 
-            // Check if email exists
-            Map<String, String> errors = new HashMap<>();
-            if (userDAO.isEmailExist(email, 0)) {
-                errors.put("email", "This email is already in use.");
+            if (gender != null && !gender.isEmpty()) {
+                try {
+                    if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
+                        newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
+                    } else {
+                        throw new IllegalArgumentException("Giới tính không hợp lệ.");
+                    }
+                } catch (Exception e) {
+                    request.setAttribute("error", "Giới tính không hợp lệ.");
+                    List<Department> departments = departmentDAO.getAllDepartments();
+                    request.setAttribute("departments", departments);
+                    request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
+                    return;
+                }
             }
 
-            // Validate other user inputs
+            Map<String, String> errors = new HashMap<>();
+            
+            if (userDAO.isEmailExist(email, 0)) {
+                errors.put("email", "Email này đã được sử dụng.");
+            }
+
+            // Validate dữ liệu người dùng
             errors.putAll(UserValidator.validate(newUser, userDAO));
+
+            // Xử lý file ảnh
+            Part filePart = request.getPart("userPicture");
+            if (filePart != null && filePart.getSize() > 0) {
+                if (filePart.getSize() > 2 * 1024 * 1024) { // Giới hạn 2MB
+                    errors.put("userPicture", "Kích thước file ảnh không được vượt quá 2MB.");
+                } else {
+                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+                    String buildPath = getServletContext().getRealPath("/");
+                    Path projectRoot = Paths.get(buildPath).getParent().getParent();
+                    Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
+
+                    try {
+                        if (!Files.exists(uploadDir)) {
+                            Files.createDirectories(uploadDir);
+                        }
+                        Path savePath = uploadDir.resolve(fileName);
+                        filePart.write(savePath.toString());
+                        newUser.setUserPicture(fileName);
+                    } catch (IOException e) {
+                        errors.put("userPicture", "Lỗi khi lưu file ảnh: " + e.getMessage());
+                    }
+                }
+            }
 
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
@@ -131,56 +193,44 @@ public class CreateUserServlet extends HttpServlet {
                 return;
             }
 
-            Part filePart = request.getPart("userPicture");
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
-
-                String buildPath = getServletContext().getRealPath("/");
-                Path projectRoot = Paths.get(buildPath).getParent().getParent();
-                Path uploadDir = projectRoot.resolve("web").resolve("images").resolve("profiles");
-
-                if (!Files.exists(uploadDir)) {
-                    Files.createDirectories(uploadDir);
-                }
-
-                Path savePath = uploadDir.resolve(fileName);
-                filePart.write(savePath.toString());
-                newUser.setUserPicture(fileName);
-            }
-
             boolean created = userDAO.createUser(newUser);
             if (created) {
                 try {
-                    String subject = "Your account has been created!";
-                    String content = "<html><body>"
-                            + "Hello " + newUser.getFullName() + ",<br><br>"
-                            + "Your account has been successfully created.<br><br>"
-                            + "Username: <b>" + newUser.getUsername() + "</b><br>"
-                            + "Password: <b>" + password + "</b><br><br>"
-                            + "Please log in and change your password after your first login to ensure security.<br><br>"
-                            + "You can <a href=\"http://localhost:8080/MaterialManagement/Login.jsp\">login</a> here.<br><br>"
-                            + "Best regards,<br>"
-                            + "Support Team."
-                            + "</body></html>";
+                    String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + newUser.getVerificationToken();
+                    String subject = "Xác thực tài khoản của bạn";
+                    String content = "<html><body>" +
+                                    "<p>Hello " + newUser.getFullName() + ",</p>" +
+                                    "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
+                                    "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>" +
+                                    "<p>Your login credentials:</p>" +
+                                    "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>" +
+                                    "<p><strong>Password:</strong> " + password + "</p>" +
+                                    "<p>This link will expire in 24 hours.</p>" +
+                                    "<p>Best regards,<br>The Support Team</p>" +
+                                    "</body></html>";
 
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
+                    session.setAttribute("successMessage", "Tạo tài khoản thành công! Email xác thực đã được gửi.");
+                    response.sendRedirect(request.getContextPath() + "/UserList");
                 } catch (Exception e) {
+                    System.err.println("❌ Lỗi khi gửi email xác thực: " + e.getMessage());
                     e.printStackTrace();
+                    request.setAttribute("error", "Tạo tài khoản thành công, nhưng không thể gửi email xác thực: " + e.getMessage());
+                    List<Department> departments = departmentDAO.getAllDepartments();
+                    request.setAttribute("departments", departments);
+                    request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 }
-
-                session.setAttribute("successMessage", "User created successfully!");
-                response.sendRedirect(request.getContextPath() + "/UserList");
             } else {
-                request.setAttribute("error", "Failed to create user. Please try again.");
+                request.setAttribute("error", "Không thể tạo tài khoản. Vui lòng thử lại.");
                 List<Department> departments = departmentDAO.getAllDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
+            System.err.println("❌ Lỗi hệ thống khi tạo tài khoản: " + e.getMessage());
             e.printStackTrace();
-            request.setAttribute("error", "Error occurred: " + e.getMessage());
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             List<Department> departments = departmentDAO.getAllDepartments();
             request.setAttribute("departments", departments);
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -197,7 +247,11 @@ public class CreateUserServlet extends HttpServlet {
             }
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Error hashing password", e);
+            throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
         }
+    }
+
+    private String generateVerificationToken() {
+        return UUID.randomUUID().toString();
     }
 }
