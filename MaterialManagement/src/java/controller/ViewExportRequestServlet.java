@@ -44,17 +44,14 @@ public class ViewExportRequestServlet extends HttpServlet {
             return;
         }
         boolean canView = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_EXPORT_REQUEST_LIST");
-        boolean canApprove = rolePermissionDAO.hasPermission(user.getRoleId(), "APPROVE_EXPORT_REQUEST");
         boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
         request.setAttribute("canViewExportRequest", canView);
-        request.setAttribute("canApproveExportRequest", canApprove);
         request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
         if (!canView) {
             request.setAttribute("error", "You do not have permission to view export requests.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-
         try {
             int requestId = Integer.parseInt(request.getParameter("id"));
             ExportRequest exportRequest = exportRequestDAO.getById(requestId);
@@ -62,19 +59,14 @@ public class ViewExportRequestServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/ExportRequestList");
                 return;
             }
-            List<ExportRequestDetail> details = new ExportRequestDetailDAO().getByRequestId(requestId);
+            List<ExportRequestDetail> details = exportRequestDetailDAO.getByRequestId(requestId);
             User sender = userDAO.getUserById(exportRequest.getUserId());
-            User recipient = null;
-            if (exportRequest.getRecipientId() > 0) {
-                recipient = userDAO.getUserById(exportRequest.getRecipientId());
-            }
-            // Xử lý đường dẫn ảnh cho sender
+            User recipient = exportRequest.getRecipientId() > 0 ? userDAO.getUserById(exportRequest.getRecipientId()) : null;
             String senderImg = (sender == null || sender.getUserPicture() == null || sender.getUserPicture().isEmpty())
                     ? "images/placeholder.png"
                     : (sender.getUserPicture().startsWith("http") || sender.getUserPicture().startsWith("/")
                         ? sender.getUserPicture()
                         : "images/profiles/" + sender.getUserPicture());
-            // Xử lý đường dẫn ảnh cho recipient
             String recipientImg = (recipient == null || recipient.getUserPicture() == null || recipient.getUserPicture().isEmpty())
                     ? "images/placeholder.png"
                     : (recipient.getUserPicture().startsWith("http") || recipient.getUserPicture().startsWith("/")
@@ -90,7 +82,6 @@ public class ViewExportRequestServlet extends HttpServlet {
             request.setAttribute("user", user);
             request.getRequestDispatcher("ViewExportRequest.jsp").forward(request, response);
         } catch (Exception e) {
-            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/ExportRequestList");
         }
     }

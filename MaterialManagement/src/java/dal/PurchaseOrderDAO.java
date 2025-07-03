@@ -3,6 +3,7 @@ package dal;
 import entity.DBContext;
 import entity.PurchaseOrder;
 import entity.PurchaseOrderDetail;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,7 +27,8 @@ public class PurchaseOrderDAO extends DBContext {
         List<PurchaseOrder> orders = new ArrayList<>();
         LOGGER.info("Starting getPurchaseOrders method with page=" + page + ", pageSize=" + pageSize + ", status=" + status + ", poCode=" + poCode);
         
-        if (connection == null) {
+        Connection conn = getConnection();
+        if (conn == null) {
             LOGGER.severe("Database connection is null");
             return orders;
         }
@@ -70,7 +72,7 @@ public class PurchaseOrderDAO extends DBContext {
         params.add(pageSize);
         params.add((page - 1) * pageSize);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -91,7 +93,8 @@ public class PurchaseOrderDAO extends DBContext {
     // Đếm tổng số Purchase Orders
     public int getPurchaseOrderCount(String status, String poCode, LocalDate startDate, LocalDate endDate) {
         int count = 0;
-        if (connection == null) {
+        Connection conn = getConnection();
+        if (conn == null) {
             LOGGER.severe("Database connection is null");
             return count;
         }
@@ -121,7 +124,7 @@ public class PurchaseOrderDAO extends DBContext {
             params.add(Timestamp.valueOf(endDate.atTime(23, 59, 59)));
         }
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -137,7 +140,8 @@ public class PurchaseOrderDAO extends DBContext {
 
     // Lấy Purchase Order theo ID
     public PurchaseOrder getPurchaseOrderById(int poId) {
-        if (connection == null) {
+        Connection conn = getConnection();
+        if (conn == null) {
             LOGGER.severe("Database connection is null");
             return null;
         }
@@ -153,7 +157,7 @@ public class PurchaseOrderDAO extends DBContext {
                 + "WHERE po.po_id = ? AND po.disable = 0 "
                 + "GROUP BY po.po_id";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, poId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -172,7 +176,8 @@ public class PurchaseOrderDAO extends DBContext {
     // Lấy chi tiết Purchase Order
     public List<PurchaseOrderDetail> getPurchaseOrderDetails(int poId) {
         List<PurchaseOrderDetail> details = new ArrayList<>();
-        if (connection == null) {
+        Connection conn = getConnection();
+        if (conn == null) {
             LOGGER.severe("Database connection is null");
             return details;
         }
@@ -184,7 +189,7 @@ public class PurchaseOrderDAO extends DBContext {
                 + "WHERE pod.po_id = ? "
                 + "ORDER BY pod.po_detail_id";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, poId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -199,7 +204,8 @@ public class PurchaseOrderDAO extends DBContext {
 
     // Cập nhật status của Purchase Order
     public boolean updatePurchaseOrderStatus(int poId, String status, Integer approvedBy, String approvalReason, String rejectionReason) {
-        if (connection == null) {
+        Connection conn = getConnection();
+        if (conn == null) {
             LOGGER.severe("Database connection is null");
             return false;
         }
@@ -210,7 +216,7 @@ public class PurchaseOrderDAO extends DBContext {
                 + "updated_at = CURRENT_TIMESTAMP "
                 + "WHERE po_id = ? AND disable = 0";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setObject(2, approvedBy);
             ps.setString(3, approvalReason);
@@ -273,38 +279,29 @@ public class PurchaseOrderDAO extends DBContext {
 
     // Tạo Purchase Order mới
     public boolean createPurchaseOrder(PurchaseOrder purchaseOrder, List<PurchaseOrderDetail> details) {
-        if (connection == null) {
-            LOGGER.severe("Database connection is null");
-            return false;
-        }
-
+        Connection conn = null;
         try {
-            connection.setAutoCommit(false);
-            
+            conn = getConnection();
+            conn.setAutoCommit(false);
             // Insert Purchase Order
             String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-            
-            try (PreparedStatement ps = connection.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, purchaseOrder.getPoCode());
                 ps.setInt(2, purchaseOrder.getPurchaseRequestId());
                 ps.setInt(3, purchaseOrder.getCreatedBy());
                 ps.setString(4, purchaseOrder.getStatus());
                 ps.setString(5, purchaseOrder.getNote());
-                
                 int rowsAffected = ps.executeUpdate();
                 if (rowsAffected == 0) {
                     throw new SQLException("Creating purchase order failed, no rows affected.");
                 }
-                
                 // Get generated PO ID
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int poId = generatedKeys.getInt(1);
-                        
                         // Insert Purchase Order Details
                         String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_name, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-                        
-                        try (PreparedStatement detailPs = connection.prepareStatement(insertDetailSql)) {
+                        try (PreparedStatement detailPs = conn.prepareStatement(insertDetailSql)) {
                             for (PurchaseOrderDetail detail : details) {
                                 detailPs.setInt(1, poId);
                                 detailPs.setString(2, detail.getMaterialName());
@@ -312,15 +309,13 @@ public class PurchaseOrderDAO extends DBContext {
                                 detailPs.setInt(4, detail.getQuantity());
                                 detailPs.setBigDecimal(5, detail.getUnitPrice());
                                 detailPs.setInt(6, detail.getSupplierId());
-                                
                                 int detailRowsAffected = detailPs.executeUpdate();
                                 if (detailRowsAffected == 0) {
                                     throw new SQLException("Creating purchase order detail failed, no rows affected.");
                                 }
                             }
                         }
-                        
-                        connection.commit();
+                        conn.commit();
                         LOGGER.info("Successfully created purchase order with ID: " + poId);
                         return true;
                     } else {
@@ -329,18 +324,14 @@ public class PurchaseOrderDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException rollbackEx) {
-                LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx);
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException rollbackEx) { LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx); }
             }
             LOGGER.log(Level.SEVERE, "Error creating purchase order: " + e.getMessage(), e);
             return false;
         } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error resetting auto-commit", e);
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { LOGGER.log(Level.SEVERE, "Error closing connection", e); }
             }
         }
     }

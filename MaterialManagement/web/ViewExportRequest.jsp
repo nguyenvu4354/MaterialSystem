@@ -9,52 +9,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .card {
-            border: none;
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background-color: #DEAD6F;
-            border-bottom: none;
-            font-weight: bold;
-        }
-        .table {
-            margin-top: 20px;
-        }
-        .btn {
-            margin-right: 10px;
-            background-color:#DEAD6F;
-        
-        }
-        .alert {
-            margin-top: 20px;
-        }
-        .total-amount {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #dc3545;
-        }
-        .status-tag {
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: #fff;
-        }
-        .status-pending { background-color: #6c757d; }
-        .status-approved { background-color: #198754; }
-        .status-rejected { background-color: #dc3545; }
-    </style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .card {
+        border: none;
+        margin-bottom: 20px;
+    }
+    .card-header {
+        background-color: #DEAD6F;
+        border-bottom: none;
+        font-weight: bold;
+        color: #fff;
+    }
+    .table {
+        margin-top: 20px;
+    }
+    .btn {
+        margin-right: 10px;
+        background-color: #DEAD6F;
+        border: none;
+        color: #fff;
+    }
+    .btn:hover {
+        background-color: #c79b5a;
+        color: #fff;
+    }
+    .alert {
+        margin-top: 20px;
+    }
+    .total-amount {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .status-tag {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: #fff;
+    }
+    .status-pending { background-color: #6c757d; }
+    .status-approved { background-color: #198754; }
+    .status-rejected { background-color: #dc3545; }
+    .page-info {
+        text-align: center;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+    .custom-table thead th {
+        background-color: #f9f5f0;
+        color: #5c4434;
+        font-weight: 600;
+    }
+    .custom-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+    .custom-table th,
+    .custom-table td {
+        vertical-align: middle;
+        min-height: 48px;
+    }
+
+    /* Custom Pagination Styles */
+    .pagination .page-link {
+        color: #5c4434;
+        background-color: #f4f1ed;
+        border: 1px solid #e2d6c3;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e7dbc7;
+        color: #5c4434;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #DEAD6F;
+        border-color: #DEAD6F;
+        color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: #eee;
+        color: #aaa;
+        border-color: #ddd;
+        cursor: not-allowed;
+    }
+</style>
+
 </head>
 <body>
     <div class="container">
@@ -113,7 +164,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive" id="printTableArea">
-                    <table class="table table-bordered">
+                    <table class="table custom-table">
                         <thead>
                             <tr>
                                 <th>Material Code</th>
@@ -142,6 +193,24 @@
                         </tbody>
                     </table>
                 </div>
+                <c:if test="${not empty details}">
+     
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewExportRequest?id=${exportRequest.exportRequestId}&page=${currentPage - 1}&status=${listStatus}&search=${listSearch}&searchRecipient=${listSearchRecipient}">Previous</a>
+                            </li>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewExportRequest?id=${exportRequest.exportRequestId}&page=${i}&status=${listStatus}&search=${listSearch}&searchRecipient=${listSearchRecipient}">${i}</a>
+                                </li>
+                            </c:forEach>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewExportRequest?id=${exportRequest.exportRequestId}&page=${currentPage + 1}&status=${listStatus}&search=${listSearch}&searchRecipient=${listSearchRecipient}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </c:if>
             </div>
         </div>
 
@@ -154,43 +223,90 @@
 
         <c:if test="${hasHandleRequestPermission && exportRequest.status == 'pending'}">
             <div class="d-flex gap-2 mb-2">
-                <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Approve</button>
-                <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Reject</button>
-                <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
+                <button type="button" class="btn" style="background-color: #198754; color: #fff; border: none;" onclick="updateStatus('approved')">Approve</button>
+                <button type="button" class="btn" style="background-color: #dc3545; color: #fff; border: none;" onclick="updateStatus('rejected')">Reject</button>
+                <a href="${pageContext.request.contextPath}/ExportRequestList?page=${listPage}&status=${listStatus}&search=${listSearch}&searchRecipient=${listSearchRecipient}" class="btn btn-warning">Cancel</a>
             </div>
-            <!-- Approval reason box -->
-            <form id="approveForm" action="${pageContext.request.contextPath}/ApproveExportRequest" method="post" style="display:none; margin-top:10px;">
-                <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
-                <input type="text" name="approvalReason" placeholder="Enter approval reason" required class="form-control mb-2">
-                <button type="submit" class="btn btn-success">Confirm Approval</button>
-                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Cancel</button>
-            </form>
-            <!-- Rejection reason box -->
-            <form id="rejectForm" action="${pageContext.request.contextPath}/RejectExportRequest" method="post" style="display:none; margin-top:10px;">
-                <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
-                <input type="text" name="rejectionReason" placeholder="Enter rejection reason" required class="form-control mb-2">
-                <button type="submit" class="btn btn-danger">Confirm Rejection</button>
-                <button type="button" class="btn btn-secondary" onclick="hideReasonBox()">Cancel</button>
-            </form>
-            <script>
-                function showReasonBox(type) {
-                    document.getElementById('approveForm').style.display = (type === 'approve') ? 'block' : 'none';
-                    document.getElementById('rejectForm').style.display = (type === 'reject') ? 'block' : 'none';
-                }
-                function hideReasonBox() {
-                    document.getElementById('approveForm').style.display = 'none';
-                    document.getElementById('rejectForm').style.display = 'none';
-                }
-            </script>
         </c:if>
 
         <c:if test="${!(hasHandleRequestPermission && exportRequest.status == 'pending')}">
             <div class="mb-2">
-                <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
+                <a href="${pageContext.request.contextPath}/ExportRequestList?page=${listPage}&status=${listStatus}&search=${listSearch}&searchRecipient=${listSearchRecipient}" class="btn btn-warning">Cancel</a>
             </div>
         </c:if>
     </div>
+    <!-- Status Update Modal -->
+    <div class="modal fade" id="statusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Export Request Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="statusForm" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
+                        <div class="mb-3">
+                            <label for="statusSelect" class="form-label">New Status</label>
+                            <select class="form-select" name="status" id="statusSelect" required onchange="onStatusChange()">
+                                <option value="">Select Status</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="approvalReasonDiv" style="display: none;">
+                            <label for="approvalReason" class="form-label">Approval Reason</label>
+                            <textarea class="form-control" name="approvalReason" id="approvalReason" rows="3" placeholder="Enter approval reason..."></textarea>
+                        </div>
+                        <div class="mb-3" id="rejectionReasonDiv" style="display: none;">
+                            <label for="rejectionReason" class="form-label">Rejection Reason</label>
+                            <textarea class="form-control" name="rejectionReason" id="rejectionReason" rows="3" placeholder="Enter rejection reason..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function updateStatus(status) {
+            document.getElementById('statusSelect').value = status;
+            onStatusChange();
+            if (status === 'approved') {
+                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/ApproveExportRequest';
+            } else if (status === 'rejected') {
+                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/RejectExportRequest';
+            } else {
+                document.getElementById('statusForm').action = '';
+            }
+            new bootstrap.Modal(document.getElementById('statusModal')).show();
+        }
+        function onStatusChange() {
+            const status = document.getElementById('statusSelect').value;
+            const approvalReasonDiv = document.getElementById('approvalReasonDiv');
+            const rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
+            const rejectionReason = document.getElementById('rejectionReason');
+            if (status === 'approved') {
+                approvalReasonDiv.style.display = 'block';
+                rejectionReasonDiv.style.display = 'none';
+                rejectionReason.removeAttribute('required');
+                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/ApproveExportRequest';
+            } else if (status === 'rejected') {
+                approvalReasonDiv.style.display = 'none';
+                rejectionReasonDiv.style.display = 'block';
+                rejectionReason.setAttribute('required', 'required');
+                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/RejectExportRequest';
+            } else {
+                approvalReasonDiv.style.display = 'none';
+                rejectionReasonDiv.style.display = 'none';
+                rejectionReason.removeAttribute('required');
+                document.getElementById('statusForm').action = '';
+            }
+        }
     </script>
 </body>
 </html>

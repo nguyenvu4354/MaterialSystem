@@ -119,7 +119,7 @@ if (user != null) {
                             <option value="repairrequest">Repair Request</option>
                         </c:if>
                         <c:if test="${sessionScope.userPermissions.contains('CREATE_PURCHASE_ORDER')}">
-                            <option value="#">Purchase Order Request</option>
+                            <option value="CreatePurchaseOrder">Purchase Order Request</option>
                         </c:if>
                     </select>
 
@@ -136,7 +136,7 @@ if (user != null) {
                             <option value="repairrequestlist">Repair Request List</option>
                         </c:if>
                         <c:if test="${sessionScope.userPermissions.contains('VIEW_PURCHASE_ORDER_LIST')}">
-                            <option value="purchaselist">Purchase Order List</option>
+                            <option value="PurchaseOrderList">Purchase Order List</option>
                         </c:if>
                     </select>
 

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +31,25 @@
             margin-bottom: 1rem;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 1rem;
+        }
+        /* Giao diện autocomplete giống ExportMaterial.jsp */
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            z-index: 1000;
+        }
+        .ui-menu-item {
+            padding: 8px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .ui-menu-item:hover {
+            background-color: #f8f9fa;
         }
     </style>
 </head>
@@ -83,12 +103,9 @@
                             <div class="row material-row align-items-center gy-2">
                                 <div class="col-md-3">
                                     <label class="form-label text-muted">Material</label>
-                                    <select class="form-select material-select" name="materials[]" required>
-                                        <option value="">Select Material</option>
-                                        <c:forEach var="material" items="${materials}">
-                                            <option value="${material.materialId}">${material.materialName}</option>
-                                        </c:forEach>
-                                    </select>
+                                    <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off">
+                                    <input type="hidden" name="materials[]" class="material-id-input">
+                                    <div class="invalid-feedback">Please enter a valid material name or code.</div>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">In Stock</label>
@@ -131,110 +148,145 @@
     </div>
 </section>
 
+<script src="js/jquery-1.11.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Store materials data in a JavaScript variable
-    const materialsData = [
-        <c:forEach var="material" items="${materials}" varStatus="loop">
-            {
-                "id": "${material.materialId}",
-                "name": "${material.materialName}",
-                "imageUrl": "${material.materialsUrl}",
-                "stock": ${material.quantity}
-            }<c:if test="${not loop.last}">,</c:if>
-        </c:forEach>
-    ];
+var materialsData = [];
+<c:forEach var="material" items="${materials}">
+materialsData.push({
+    label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+    value: "${fn:escapeXml(material.materialName)}",
+    id: "${material.materialId}",
+    name: "${fn:escapeXml(material.materialName)}",
+    code: "${fn:escapeXml(material.materialCode)}",
+    imageUrl: "${fn:escapeXml(material.materialsUrl)}",
+    stock: ${material.quantity}
+});
+</c:forEach>
 
-    function updateMaterialRow(selectElement) {
-        const selectedId = selectElement.value;
-        const material = materialsData.find(m => m.id === selectedId);
-        const row = selectElement.closest('.material-row');
-        const img = row.querySelector('.material-image');
-        const stockInput = row.querySelector('.stock-quantity');
-        const quantityInput = row.querySelector('.quantity-input');
-        
-        if (material) {
-            let imgUrl = material.imageUrl && material.imageUrl !== 'null' ? material.imageUrl : '';
+console.log("materialsData", materialsData);
+
+function updateMaterialRowAutocomplete(row) {
+    const nameInput = row.querySelector('.material-name-input');
+    const idInput = row.querySelector('.material-id-input');
+    const img = row.querySelector('.material-image');
+    const stockInput = row.querySelector('.stock-quantity');
+    const quantityInput = row.querySelector('.quantity-input');
+    $(nameInput).autocomplete({
+        source: function(request, response) {
+            const term = request.term.toLowerCase();
+            const matches = materialsData.filter(material => 
+                material.name.toLowerCase().includes(term) || 
+                material.code.toLowerCase().includes(term)
+            );
+            console.log("Autocomplete term:", term, "matches:", matches);
+            response(matches);
+        },
+        select: function(event, ui) {
+            idInput.value = ui.item.id;
+            nameInput.value = ui.item.name;
+            nameInput.classList.remove('is-invalid');
+            // Update image and stock
+            let imgUrl = ui.item.imageUrl && ui.item.imageUrl !== 'null' ? ui.item.imageUrl : '';
             if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
                 img.src = imgUrl;
             } else if (imgUrl) {
                 img.src = 'images/material/' + imgUrl;
             } else {
-                img.src = 'images/placeholder.png';
+                img.src = 'images/material/default.jpg';
             }
-            stockInput.value = material.stock;
-            quantityInput.max = material.stock; // Set max attribute for validation
-        } else {
-            img.src = 'images/placeholder.png'; // Default image
-            stockInput.value = 0;
-            quantityInput.max = null;
-        }
-        validateQuantity(quantityInput); // Validate after selection changes
+            stockInput.value = ui.item.stock;
+            quantityInput.max = ui.item.stock;
+            validateQuantity(quantityInput);
+        },
+        change: function(event, ui) {
+            if (!ui.item) {
+                const inputValue = nameInput.value.toLowerCase().trim();
+                const selectedMaterial = materialsData.find(material => 
+                    material.name.toLowerCase() === inputValue || 
+                    material.code.toLowerCase() === inputValue
+                );
+                if (selectedMaterial) {
+                    idInput.value = selectedMaterial.id;
+                    nameInput.value = selectedMaterial.name;
+                    nameInput.classList.remove('is-invalid');
+                    // Update image and stock
+                    let imgUrl = selectedMaterial.imageUrl && selectedMaterial.imageUrl !== 'null' ? selectedMaterial.imageUrl : '';
+                    if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
+                        img.src = imgUrl;
+                    } else if (imgUrl) {
+                        img.src = 'images/material/' + imgUrl;
+                    } else {
+                        img.src = 'images/material/default.jpg';
+                    }
+                    stockInput.value = selectedMaterial.stock;
+                    quantityInput.max = selectedMaterial.stock;
+                    validateQuantity(quantityInput);
+                } else {
+                    idInput.value = '';
+                    nameInput.classList.add('is-invalid');
+                    img.src = 'images/material/default.jpg';
+                    stockInput.value = 0;
+                    quantityInput.max = null;
+                }
+            }
+        },
+        minLength: 1
+    });
+}
+
+// Initial setup for the first row
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.material-row').forEach(row => {
+        updateMaterialRowAutocomplete(row);
+    });
+});
+
+// When add material row
+document.getElementById('addMaterial').addEventListener('click', function () {
+    const materialList = document.getElementById('materialList');
+    const firstRow = materialList.querySelector('.material-row');
+    const newRow = firstRow.cloneNode(true);
+    // Reset fields in the new row
+    newRow.querySelector('.material-name-input').value = '';
+    newRow.querySelector('.material-id-input').value = '';
+    newRow.querySelector('.material-name-input').classList.remove('is-invalid');
+    newRow.querySelector('.stock-quantity').value = '0';
+    newRow.querySelector('.quantity-input').value = '';
+    newRow.querySelector('.quantity-input').classList.remove('is-invalid');
+    newRow.querySelector('select[name="conditions[]"]').value = 'new';
+    newRow.querySelector('.material-image').src = 'images/material/default.jpg';
+    materialList.appendChild(newRow);
+    updateMaterialRowAutocomplete(newRow);
+});
+
+// Validate quantity on input
+document.addEventListener('input', function(e) {
+    if(e.target.classList.contains('quantity-input')) {
+        validateQuantity(e.target);
     }
-    
-    function validateQuantity(quantityInput) {
-        const stock = parseInt(quantityInput.max, 10);
-        const quantity = parseInt(quantityInput.value, 10);
+});
 
-        if (!isNaN(stock) && !isNaN(quantity) && quantity > stock) {
-            quantityInput.classList.add('is-invalid');
-        } else {
-            quantityInput.classList.remove('is-invalid');
+// Remove material row
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-material')) {
+        const materialRows = document.querySelectorAll('.material-row');
+        if (materialRows.length > 1) {
+            e.target.closest('.material-row').remove();
         }
     }
+});
 
-    document.getElementById('addMaterial').addEventListener('click', function () {
-        const materialList = document.getElementById('materialList');
-        const firstRow = materialList.querySelector('.material-row');
-        const newRow = firstRow.cloneNode(true);
-        
-        // Reset fields in the new row
-        newRow.querySelector('select[name="materials[]"]').value = '';
-        newRow.querySelector('input[name="quantities[]"]').value = '';
-        newRow.querySelector('input[name="quantities[]"]').classList.remove('is-invalid');
-        newRow.querySelector('.stock-quantity').value = '0';
-        newRow.querySelector('select[name="conditions[]"]').value = 'new';
-        newRow.querySelector('.material-image').src = 'images/placeholder.png';
-        
-        materialList.appendChild(newRow);
-    });
-
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('material-select')) {
-            updateMaterialRow(e.target);
-        }
-    });
-    
-    document.addEventListener('input', function(e) {
-        if(e.target.classList.contains('quantity-input')) {
-            validateQuantity(e.target);
-        }
-    });
-
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-material')) {
-            const materialRows = document.querySelectorAll('.material-row');
-            if (materialRows.length > 1) {
-                e.target.closest('.material-row').remove();
-            }
-        }
-    });
-
-    // Initial image setup for the first row if a material is pre-selected (e.g., on form error)
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.material-select').forEach(select => {
-            if (select.value) {
-                updateMaterialRow(select);
-            }
-        });
-        
-        // Also add listeners for quantity inputs that might have values on load
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            if (input.value) {
-                validateQuantity(input);
-            }
-        });
-    });
+function validateQuantity(quantityInput) {
+    const stock = parseInt(quantityInput.max, 10);
+    const quantity = parseInt(quantityInput.value, 10);
+    if (!isNaN(stock) && !isNaN(quantity) && quantity > stock) {
+        quantityInput.classList.add('is-invalid');
+    } else {
+        quantityInput.classList.remove('is-invalid');
+    }
+}
 </script>
 </body>
 </html>

@@ -135,138 +135,131 @@
                     </div>
                 </c:if>
                 
-                <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/PurchaseOrderList" style="gap: 8px; flex-wrap:nowrap;">
-                    <input type="text" class="form-control" name="poCode" value="${poCode}" placeholder="Search by PO code" style="width:230px;">
-                    <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
-                        <option value="draft" ${status == 'draft' ? 'selected' : ''}>Draft</option>
-                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
-                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
-                        <option value="sent_to_supplier" ${status == 'sent_to_supplier' ? 'selected' : ''}>Sent to Supplier</option>
-                        <option value="cancelled" ${status == 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                    </select>
-                    <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:150px;">
-                    <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:150px;">
-                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                </form>
-                
-                <c:if test="${not empty purchaseOrders}">
-                    <div class="table-responsive" id="printTableListArea">
-                        <table id="purchaseOrderTable" class="table custom-table">
-                            <thead>
-                            <tr>
-                                <th>PO Code</th>
-                                <th>Request Code</th>
-                                <th>Created Date</th>
-                                <th>Status</th>
-                                <th>Created By</th>
-                                <th>Total Amount</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <c:forEach var="po" items="${purchaseOrders}">
-                                <tr>
-                                    <td><strong>${po.poCode}</strong></td>
-                                    <td>${po.purchaseRequestCode}</td>
-                                    <td>${po.createdAt}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${po.status == 'draft'}">
-                                                <span class="status-badge status-draft">Draft</span>
-                                            </c:when>
-                                            <c:when test="${po.status == 'pending'}">
-                                                <span class="status-badge status-pending">Pending</span>
-                                            </c:when>
-                                            <c:when test="${po.status == 'approved'}">
-                                                <span class="status-badge status-approved">Approved</span>
-                                            </c:when>
-                                            <c:when test="${po.status == 'rejected'}">
-                                                <span class="status-badge status-rejected">Rejected</span>
-                                            </c:when>
-                                            <c:when test="${po.status == 'sent_to_supplier'}">
-                                                <span class="status-badge status-sent_to_supplier">Sent to Supplier</span>
-                                            </c:when>
-                                            <c:when test="${po.status == 'cancelled'}">
-                                                <span class="status-badge status-cancelled">Cancelled</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="status-badge status-pending">${po.status}</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty po.createdByName}">
-                                                ${po.createdByName}
-                                            </c:when>
-                                            <c:otherwise>
-                                                Unknown
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <strong>$<fmt:formatNumber value="${po.totalAmount}" type="number" minFractionDigits="2"/></strong>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <a href="PurchaseOrderDetail?id=${po.poId}" class="btn btn-detail btn-sm" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <c:if test="${po.status == 'pending'}">
-                                                <button type="button" class="btn btn-success btn-sm" onclick="updateStatus(${po.poId}, 'approved')" title="Approve">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm" onclick="updateStatus(${po.poId}, 'rejected')" title="Reject">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </c:if>
-                                            <c:if test="${po.status == 'approved'}">
-                                                <button type="button" class="btn btn-info btn-sm" onclick="updateStatus(${po.poId}, 'sent_to_supplier')" title="Send to Supplier">
-                                                    <i class="fas fa-paper-plane"></i>
-                                                </button>
-                                            </c:if>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Pagination -->
-                    <c:if test="${totalPages > 1}">
-                        <nav aria-label="Purchase Order pagination">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                        <i class="fas fa-chevron-left"></i> Previous
-                                    </a>
-                                </li>
-                                
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
-                                    </li>
-                                </c:forEach>
-                                
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                        Next <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </c:if>
+                <c:if test="${!hasViewPurchaseOrderListPermission}">
+                    <div class="alert alert-danger">You do not have permission to view purchase order list.</div>
+                    <jsp:include page="HomePage.jsp"/>
                 </c:if>
-                
-                <c:if test="${empty purchaseOrders}">
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No Purchase Orders Found</h4>
-                        <p class="text-muted">No purchase orders match your current filters.</p>
-                    </div>
+                <c:if test="${hasViewPurchaseOrderListPermission}">
+                    <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/PurchaseOrderList" style="gap: 8px; flex-wrap:nowrap;">
+                        <input type="text" class="form-control" name="poCode" value="${poCode}" placeholder="Search by PO code" style="width:230px;">
+                        <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            <option value="draft" ${status == 'draft' ? 'selected' : ''}>Draft</option>
+                            <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                            <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                            <option value="sent_to_supplier" ${status == 'sent_to_supplier' ? 'selected' : ''}>Sent to Supplier</option>
+                            <option value="cancelled" ${status == 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                        <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:200px;">
+                        <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:200px;">
+                        <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                    </form>
+                    
+                    <c:if test="${not empty purchaseOrders}">
+                        <div class="table-responsive" id="printTableListArea">
+                            <table id="purchaseOrderTable" class="table custom-table">
+                                <thead>
+                                <tr>
+                                    <th>PO Code</th>
+                                    <th>Request Code</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th>Created By</th>
+                                    <th>Total Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach var="po" items="${purchaseOrders}">
+                                    <tr>
+                                        <td><strong>${po.poCode}</strong></td>
+                                        <td>${po.purchaseRequestCode}</td>
+                                        <td>${po.createdAt}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${po.status == 'draft'}">
+                                                    <span class="status-badge status-draft">Draft</span>
+                                                </c:when>
+                                                <c:when test="${po.status == 'pending'}">
+                                                    <span class="status-badge status-pending">Pending</span>
+                                                </c:when>
+                                                <c:when test="${po.status == 'approved'}">
+                                                    <span class="status-badge status-approved">Approved</span>
+                                                </c:when>
+                                                <c:when test="${po.status == 'rejected'}">
+                                                    <span class="status-badge status-rejected">Rejected</span>
+                                                </c:when>
+                                                <c:when test="${po.status == 'sent_to_supplier'}">
+                                                    <span class="status-badge status-sent_to_supplier">Sent to Supplier</span>
+                                                </c:when>
+                                                <c:when test="${po.status == 'cancelled'}">
+                                                    <span class="status-badge status-cancelled">Cancelled</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-badge status-pending">${po.status}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty po.createdByName}">
+                                                    ${po.createdByName}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Unknown
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <strong>$<fmt:formatNumber value="${po.totalAmount}" type="number" minFractionDigits="2"/></strong>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a href="PurchaseOrderDetail?id=${po.poId}" class="btn btn-detail btn-sm" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <c:if test="${totalPages > 1}">
+                            <nav aria-label="Purchase Order pagination">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+                                    
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                            <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    
+                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </c:if>
+                    </c:if>
+                    
+                    <c:if test="${empty purchaseOrders}">
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Purchase Orders Found</h4>
+                            <p class="text-muted">No purchase orders match your current filters.</p>
+                        </div>
+                    </c:if>
                 </c:if>
             </div>
         </main>

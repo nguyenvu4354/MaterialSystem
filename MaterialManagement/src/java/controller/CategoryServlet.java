@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet(name = "CategoryServlet", urlPatterns = {"/Category"}) // Sửa từ /CategoryServlet thành /Category
+@WebServlet(name = "CategoryServlet", urlPatterns = {"/Category"})
 public class CategoryServlet extends HttpServlet {
     private CategoryDAO categoryDAO;
     private RolePermissionDAO rolePermissionDAO;
@@ -26,7 +26,6 @@ public class CategoryServlet extends HttpServlet {
     public void init() throws ServletException {
         categoryDAO = new CategoryDAO();
         rolePermissionDAO = new RolePermissionDAO();
-        System.out.println("CategoryServlet - Initialized with CategoryDAO and RolePermissionDAO");
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -34,25 +33,18 @@ public class CategoryServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String service = request.getParameter("service");
         if (service == null) service = "listCategory";
-
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null) {
-            System.out.println("CategoryServlet - No user in session");
             request.setAttribute("error", "Please log in to access this page.");
             request.getRequestDispatcher("/Category.jsp").forward(request, response);
             return;
         }
-
         int roleId = currentUser.getRoleId();
         boolean isAdmin = roleId == 1;
-
-        System.out.println("CategoryServlet - Service: " + service + ", RoleId: " + roleId + ", IsAdmin: " + isAdmin);
-
         try {
             switch (service) {
                 case "updateCategory": {
                     if (!isAdmin && !rolePermissionDAO.hasPermission(roleId, "UPDATE_CATEGORY")) {
-                        System.out.println("CategoryServlet - User lacks UPDATE_CATEGORY permission");
                         request.setAttribute("error", "You do not have permission to update categories.");
                         request.getRequestDispatcher("/Category.jsp").forward(request, response);
                         return;
@@ -150,7 +142,6 @@ public class CategoryServlet extends HttpServlet {
                             Category category = new Category(categoryId, categoryName, parentId, createdAt, disable, status, description, priority, code);
                             boolean updated = categoryDAO.updateCategory(category);
                             if (updated) {
-                                System.out.println("CategoryServlet - Category updated successfully: " + categoryName);
                                 response.sendRedirect("Category?service=listCategory");
                             } else {
                                 String daoError = categoryDAO.getLastError() != null ? categoryDAO.getLastError() : "No detailed error from CategoryDAO.";
@@ -173,7 +164,6 @@ public class CategoryServlet extends HttpServlet {
 
                 case "deleteCategory": {
                     if (!isAdmin && !rolePermissionDAO.hasPermission(roleId, "DELETE_CATEGORY")) {
-                        System.out.println("CategoryServlet - User lacks DELETE_CATEGORY permission");
                         request.setAttribute("error", "You do not have permission to delete categories.");
                         request.getRequestDispatcher("/Category.jsp").forward(request, response);
                         return;
@@ -201,7 +191,6 @@ public class CategoryServlet extends HttpServlet {
                         }
                         boolean deleted = categoryDAO.deleteCategory(categoryId);
                         if (deleted) {
-                            System.out.println("CategoryServlet - Category deleted successfully: ID = " + categoryId);
                             response.sendRedirect("Category?service=listCategory");
                         } else {
                             String daoError = categoryDAO.getLastError() != null ? categoryDAO.getLastError() : "No detailed error from CategoryDAO.";
@@ -218,7 +207,6 @@ public class CategoryServlet extends HttpServlet {
 
                 case "addCategory": {
                     if (!isAdmin && !rolePermissionDAO.hasPermission(roleId, "CREATE_CATEGORY")) {
-                        System.out.println("CategoryServlet - User lacks CREATE_CATEGORY permission");
                         request.setAttribute("error", "You do not have permission to create categories.");
                         request.getRequestDispatcher("/Category.jsp").forward(request, response);
                         return;
@@ -284,7 +272,6 @@ public class CategoryServlet extends HttpServlet {
                             Category category = new Category(0, categoryName, parentId, createdAt, disable, status, description, priority, code);
                             boolean inserted = categoryDAO.insertCategory(category);
                             if (inserted) {
-                                System.out.println("CategoryServlet - Category inserted successfully: " + categoryName);
                                 response.sendRedirect("Category?service=listCategory");
                             } else {
                                 String daoError = categoryDAO.getLastError() != null ? categoryDAO.getLastError() : "No detailed error from CategoryDAO.";
@@ -305,7 +292,6 @@ public class CategoryServlet extends HttpServlet {
 
                 case "listCategory": {
                     if (!isAdmin && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_CATEGORY")) {
-                        System.out.println("CategoryServlet - User lacks VIEW_LIST_CATEGORY permission");
                         request.setAttribute("error", "You do not have permission to view the category list.");
                         request.getRequestDispatcher("/Category.jsp").forward(request, response);
                         return;
@@ -430,9 +416,8 @@ public class CategoryServlet extends HttpServlet {
                     sendErrorResponse(response, "Unsupported service: " + service);
             }
         } catch (Exception e) {
-            System.out.println("CategoryServlet - Error processing request: " + e.getMessage());
-            e.printStackTrace();
-            sendErrorResponse(response, "Error processing request: " + e.getMessage());
+            request.setAttribute("error", "Error: " + e.getMessage());
+            request.getRequestDispatcher("/Category.jsp").forward(request, response);
         }
     }
 
@@ -458,6 +443,6 @@ public class CategoryServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Category Servlet for Category Management with Permission Checks";
+        return "Category management servlet";
     }
 }

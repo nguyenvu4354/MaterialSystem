@@ -20,6 +20,8 @@ public class PurchaseRequestDetail {
     private String notes;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private int materialId;
+    private String categoryName;
 
     
     public PurchaseRequestDetail() {
@@ -87,5 +89,21 @@ public class PurchaseRequestDetail {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getMaterialId() {
+        return materialId;
+    }
+
+    public void setMaterialId(int materialId) {
+        this.materialId = materialId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

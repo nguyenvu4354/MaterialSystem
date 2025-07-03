@@ -1,6 +1,7 @@
 package controller;
 
 import dal.PurchaseOrderDAO;
+import dal.RolePermissionDAO;
 import entity.PurchaseOrder;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -21,6 +22,7 @@ public class PurchaseOrderListServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(PurchaseOrderListServlet.class.getName());
     private final PurchaseOrderDAO purchaseOrderDAO = new PurchaseOrderDAO();
+    private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
     
     // Hằng số cho phân trang
     private static final int DEFAULT_PAGE = 1;
@@ -45,9 +47,9 @@ public class PurchaseOrderListServlet extends HttpServlet {
                 return;
             }
 
-            // Phân quyền: Chỉ Admin và Director được truy cập
-            if (user.getRoleId() != 1 && user.getRoleId() != 2) {
-                LOGGER.warning("Unauthorized access attempt by user: " + user.getUsername() + " with role_id: " + user.getRoleId());
+            boolean hasPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_PURCHASE_ORDER_LIST");
+            request.setAttribute("hasViewPurchaseOrderListPermission", hasPermission);
+            if (!hasPermission) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                 return;
             }

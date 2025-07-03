@@ -1,6 +1,7 @@
 package controller;
 
 import dal.PurchaseOrderDAO;
+import dal.RolePermissionDAO;
 import entity.PurchaseOrder;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,8 @@ import java.io.IOException;
 @WebServlet(name = "PurchaseOrderDetailServlet", urlPatterns = {"/PurchaseOrderDetail"})
 public class PurchaseOrderDetailServlet extends HttpServlet {
 
+    private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -24,11 +27,15 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        // Chỉ Admin và Director mới có quyền xem Purchase Order Detail
-        if (user.getRoleId() != 1 && user.getRoleId() != 2) {
+        boolean hasListPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_PURCHASE_ORDER_LIST");
+        request.setAttribute("hasViewPurchaseOrderDetailPermission", hasListPermission);
+        if (!hasListPermission) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }
+
+        boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
+        request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
 
         try {
             int poId = Integer.parseInt(request.getParameter("id"));
@@ -39,6 +46,33 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase Order not found");
                 return;
             }
+
+            // Phân trang cho chi tiết đơn hàng
+            int itemsPerPage = 5;
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null) {
+                try {
+                    currentPage = Integer.parseInt(pageParam);
+                    if (currentPage < 1) currentPage = 1;
+                } catch (NumberFormatException e) {
+                    currentPage = 1;
+                }
+            }
+            int totalItems = purchaseOrder.getDetails() != null ? purchaseOrder.getDetails().size() : 0;
+            int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+            if (totalPages == 0) totalPages = 1;
+            int fromIndex = (currentPage - 1) * itemsPerPage;
+            int toIndex = Math.min(fromIndex + itemsPerPage, totalItems);
+            java.util.List pagedDetails = new java.util.ArrayList();
+            if (purchaseOrder.getDetails() != null && totalItems > 0 && fromIndex < totalItems) {
+                pagedDetails = purchaseOrder.getDetails().subList(fromIndex, toIndex);
+            }
+            request.setAttribute("pagedDetails", pagedDetails);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("itemsPerPage", itemsPerPage);
+            request.setAttribute("totalItems", totalItems);
 
             String message = request.getParameter("message");
             if (message != null) {
@@ -64,7 +98,7 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1 && user.getRoleId() != 2) {
+        if (user.getRoleId() != 2) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
             return;
         }

@@ -1,4 +1,4 @@
-    <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0" id="sidebarMenu">
+<div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0" id="sidebarMenu">
         <div class="position-sticky pt-4">
             <ul class="nav flex-column menu-list list-unstyled">
                 <c:if test="${not empty sessionScope.user}">
@@ -28,7 +28,7 @@
                     </c:if>
                     <c:if test="${sessionScope.userPermissions.contains('VIEW_PURCHASE_ORDER_LIST')}">
                         <li class="nav-item mb-2">
-                            <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/PurchaseRequestList">
+                            <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/PurchaseOrderList">
                                 <i class="fas fa-file-import fs-4 me-3"></i>
                                 Purchase Order List
                             </a>
@@ -57,7 +57,7 @@
         #sidebarMenu .nav-link:hover {
             background-color: #8B4513;
             color: #ffffff !important;
-            transform: scale(1.02);
+transform: scale(1.02);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #sidebarMenu .nav-link.active {
