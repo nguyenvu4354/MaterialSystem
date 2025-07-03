@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.security.MessageDigest;
+import java.util.UUID;
+import utils.EmailUtils;
 
 public class UserDAO extends DBContext {
 
@@ -31,7 +33,7 @@ public class UserDAO extends DBContext {
                 + "FROM Users u "
                 + "LEFT JOIN Roles r ON u.role_id = r.role_id "
                 + "LEFT JOIN Departments d ON u.department_id = d.department_id "
-                + "WHERE u.username = ? AND u.password = ?";
+                + "WHERE u.username = ? AND u.password = ? AND u.verification_status = 'verified' AND u.status != 'deleted'";
 
         String md5Password = md5(password);
 
@@ -58,10 +60,13 @@ public class UserDAO extends DBContext {
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                user.setVerificationToken(rs.getString("verification_token"));
+                user.setVerificationStatus(rs.getString("verification_status"));
+                user.setVerificationExpiry(rs.getTimestamp("verification_expiry") != null ? rs.getTimestamp("verification_expiry").toLocalDateTime() : null);
                 System.out.println("✅ Đăng nhập thành công: " + user.getUsername());
                 return user;
             } else {
-                System.out.println("❌ Sai thông tin đăng nhập hoặc tài khoản bị xóa.");
+                System.out.println("❌ Sai thông tin đăng nhập, tài khoản chưa được xác thực hoặc bị xóa.");
             }
         } catch (Exception e) {
             System.out.println("❌ Lỗi login: " + e.getMessage());
@@ -192,9 +197,8 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status, verification_token, verification_status, verification_expiry) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
@@ -208,15 +212,46 @@ public class UserDAO extends DBContext {
             ps.setObject(10, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
             ps.setString(11, user.getGender() != null ? user.getGender().name() : null);
             ps.setString(12, user.getDescription());
-            ps.setString(13, user.getStatus() != null ? user.getStatus().name() : "active");
+            ps.setString(13, user.getStatus() != null ? user.getStatus().name() : "pending");
+            ps.setString(14, user.getVerificationToken());
+            ps.setString(15, user.getVerificationStatus() != null ? user.getVerificationStatus() : "pending");
+            ps.setObject(16, user.getVerificationExpiry() != null ? java.sql.Timestamp.valueOf(user.getVerificationExpiry()) : null);
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
+            if (rowsAffected > 0) {
+                System.out.println("✅ Tạo user thành công: " + user.getUsername());
+                return true;
+            } else {
+                System.out.println("❌ Không thể tạo user: Không có dòng nào được chèn");
+                return false;
+            }
         } catch (Exception e) {
+            System.err.println("❌ Lỗi khi tạo user: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
+
+    public boolean verifyUser(String token) {
+        String sql = "UPDATE Users SET verification_status = 'verified', status = 'active', created_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE verification_token = ? AND verification_status = 'pending' AND verification_expiry > CURRENT_TIMESTAMP";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, token);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ User verified successfully with token: " + token);
+                return true;
+            } else {
+                System.out.println("❌ Invalid or expired token: " + token);
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error verifying user: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
 
     public boolean deleteUserById(int id) {
         String sql = "UPDATE Users SET status = 'deleted', updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
@@ -253,18 +288,18 @@ public class UserDAO extends DBContext {
     }
 
     public boolean isEmailExist(String email, int excludeUserId) {
-        String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND user_id != ?";
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND verification_status = 'verified' AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setInt(2, excludeUserId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 boolean exists = rs.getInt(1) > 0;
-                System.out.println(exists ? "❌ Email đã tồn tại: " + email : "✅ Email có thể sử dụng: " + email);
+                System.out.println(exists ? "❌ Email already exists: " + email : "✅ Email available: " + email);
                 return exists;
             }
         } catch (Exception e) {
-            System.out.println("❌ Lỗi khi kiểm tra email tồn tại: " + e.getMessage());
+            System.out.println("❌ Error checking email existence: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -500,25 +535,51 @@ public class UserDAO extends DBContext {
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
         User user = new User();
+
+        // Thiết lập thông tin người dùng
         user.setUsername("Employee1");
-        user.setPassword(userDAO.md5("123"));
+        user.setPassword(userDAO.md5("123")); // Mã hóa mật khẩu bằng MD5
         user.setFullName("Phạm Thị Kiều Trinh");
-        user.setEmail("testuser@example.com");
+        user.setEmail("testuser@example.com"); // Thay bằng email thật để kiểm tra
         user.setPhoneNumber("0123456789");
         user.setAddress("123 Test Street");
         user.setUserPicture("test.jpg");
-        user.setRoleId(4);
-        user.setDepartmentId(1);
+        user.setRoleId(4); // Giả sử role_id = 4 là Employee
+        user.setDepartmentId(1); // Giả sử department_id = 1 tồn tại
         user.setDateOfBirth(LocalDate.of(1990, 1, 1));
         user.setGender(User.Gender.male);
         user.setDescription("Test user for DAO");
-        user.setStatus(User.Status.active);
+        user.setStatus(User.Status.inactive); // Trạng thái ban đầu là pending
+        user.setVerificationToken(UUID.randomUUID().toString()); // Sử dụng UUID đúng
+        user.setVerificationStatus("pending"); // Trạng thái xác thực
+        user.setVerificationExpiry(LocalDateTime.now().plusHours(24)); // Hết hạn sau 24 giờ
 
+        // Tạo người dùng trong database
         boolean created = userDAO.createUser(user);
         if (created) {
             System.out.println("✅ Tạo user thành công: " + user.getUsername());
+
+            // Giả lập gửi email xác thực
+            try {
+                String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + user.getVerificationToken();
+                String subject = "Xác thực tài khoản của bạn";
+                String content = "<html><body>"
+                        + "Xin chào " + user.getFullName() + ",<br><br>"
+                        + "Tài khoản của bạn đã được tạo. Vui lòng xác thực email bằng cách nhấp vào liên kết sau:<br><br>"
+                        + "<a href=\"" + verificationLink + "\">Xác thực tài khoản</a><br><br>"
+                        + "Liên kết này sẽ hết hạn sau 24 giờ.<br><br>"
+                        + "Trân trọng,<br>"
+                        + "Đội ngũ hỗ trợ."
+                        + "</body></html>";
+
+                EmailUtils.sendEmail(user.getEmail(), subject, content);
+                System.out.println("✅ Đã gửi email xác thực tới: " + user.getEmail());
+            } catch (Exception e) {
+                System.err.println("❌ Lỗi khi gửi email xác thực: " + e.getMessage());
+                e.printStackTrace();
+            }
         } else {
-            System.out.println("❌ Tạo user thất bại");
+            System.err.println("❌ Tạo user thất bại");
         }
     }
 }

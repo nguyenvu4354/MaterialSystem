@@ -152,7 +152,7 @@
             <div class="alert alert-success">${message}</div>
         </c:if>
 
-        <c:if test="${canApproveExportRequest && exportRequest.status == 'pending'}">
+        <c:if test="${hasHandleRequestPermission && exportRequest.status == 'pending'}">
             <div class="d-flex gap-2 mb-2">
                 <button type="button" class="btn btn-success" onclick="showReasonBox('approve')">Approve</button>
                 <button type="button" class="btn btn-danger" onclick="showReasonBox('reject')">Reject</button>
@@ -184,7 +184,7 @@
             </script>
         </c:if>
 
-        <c:if test="${!(canApproveExportRequest && exportRequest.status == 'pending')}">
+        <c:if test="${!(hasHandleRequestPermission && exportRequest.status == 'pending')}">
             <div class="mb-2">
                 <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-warning">Cancel</a>
             </div>

@@ -18,9 +18,11 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
 
 @WebServlet(name = "ViewRequestDetailsServlet", urlPatterns = {"/ViewRequestDetails"})
 public class ViewRequestDetailsServlet extends HttpServlet {
+    private static final int PAGE_SIZE = 5; 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -35,6 +37,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
         try {
             int requestId = Integer.parseInt(request.getParameter("id"));
             String type = request.getParameter("type");
+            int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             Object requestObj = null;
 
             RequestDAO requestDAO = new RequestDAO();
@@ -77,6 +80,14 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
 
+            // Phân trang cho danh sách chi tiết
+            List<?> details = getRequestDetails(requestObj);
+            int totalDetails = details.size();
+            int totalPages = (int) Math.ceil((double) totalDetails / PAGE_SIZE);
+            int start = (page - 1) * PAGE_SIZE;
+            int end = Math.min(start + PAGE_SIZE, totalDetails);
+            List<?> paginatedDetails = details.subList(start, end);
+
             String message = request.getParameter("message");
             if (message != null) {
                 request.setAttribute("message", message);
@@ -84,9 +95,12 @@ public class ViewRequestDetailsServlet extends HttpServlet {
 
             request.setAttribute("request", requestObj);
             request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+            request.setAttribute("details", paginatedDetails);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
             request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID or page number");
         } catch (SQLException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
@@ -106,6 +120,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             int requestId = Integer.parseInt(request.getParameter("id"));
             String action = request.getParameter("action");
             String type = request.getParameter("type");
+            int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             Object requestObj = null;
 
             // Khởi tạo RequestDAO
@@ -142,15 +157,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 String status = getRequestStatus(requestObj);
                 if (!"pending".equals(status)) {
                     request.setAttribute("message", "Error: Only pending requests can be cancelled.");
-                    request.setAttribute("request", requestObj);
-                    request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
-                    DepartmentDAO departmentDAO = new DepartmentDAO();
-                    List<Material> materials = departmentDAO.getMaterials();
-                    request.setAttribute("materials", materials);
-                    CategoryDAO categoryDAO = new CategoryDAO();
-                    List<Category> categories = categoryDAO.getAllCategories();
-                    request.setAttribute("categories", categories);
-                    request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                    setRequestAttributes(request, response, requestObj, type, page);
                     return;
                 }
 
@@ -168,28 +175,56 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 }
 
                 if (cancelled) {
-                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + requestId + "&message=Request+cancelled+successfully");
+                    response.sendRedirect(request.getContextPath() + "/ViewRequestDetails?type=" + type + "&id=" + requestId + "&page=" + page + "&message=Request+cancelled+successfully");
                 } else {
                     request.setAttribute("message", "Error: Failed to cancel request.");
-                    request.setAttribute("request", requestObj);
-                    request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
-                    // Lấy lại danh sách vật tư và danh mục
-                    DepartmentDAO departmentDAO = new DepartmentDAO();
-                    List<Material> materials = departmentDAO.getMaterials();
-                    request.setAttribute("materials", materials);
-                    CategoryDAO categoryDAO = new CategoryDAO();
-                    List<Category> categories = categoryDAO.getAllCategories();
-                    request.setAttribute("categories", categories);
-                    request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+                    setRequestAttributes(request, response, requestObj, type, page);
                 }
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
             }
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request ID or page number");
         } catch (SQLException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
+    }
+
+    private void setRequestAttributes(HttpServletRequest request, HttpServletResponse response, Object requestObj, String type, int page)
+            throws ServletException, IOException, SQLException {
+        // Lấy lại danh sách vật tư và danh mục
+        DepartmentDAO departmentDAO = new DepartmentDAO();
+        List<Material> materials = departmentDAO.getMaterials();
+        request.setAttribute("materials", materials);
+        CategoryDAO categoryDAO = new CategoryDAO();
+        List<Category> categories = categoryDAO.getAllCategories();
+        request.setAttribute("categories", categories);
+
+        // Phân trang cho danh sách chi tiết
+        List<?> details = getRequestDetails(requestObj);
+        int totalDetails = details.size();
+        int totalPages = (int) Math.ceil((double) totalDetails / PAGE_SIZE);
+        int start = (page - 1) * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, totalDetails);
+        List<?> paginatedDetails = details.subList(start, end);
+
+        request.setAttribute("request", requestObj);
+        request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+        request.setAttribute("details", paginatedDetails);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.getRequestDispatcher("/ViewRequestDetails.jsp").forward(request, response);
+    }
+
+    private List<?> getRequestDetails(Object request) {
+        if (request instanceof ExportRequest) {
+            return ((ExportRequest) request).getDetails();
+        } else if (request instanceof PurchaseRequest) {
+            return ((PurchaseRequest) request).getDetails();
+        } else if (request instanceof RepairRequest) {
+            return ((RepairRequest) request).getDetails();
+        }
+        return new ArrayList<>();
     }
 
     private int getRequestUserId(Object request) {

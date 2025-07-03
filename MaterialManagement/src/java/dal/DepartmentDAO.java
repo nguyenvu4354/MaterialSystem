@@ -1,4 +1,4 @@
-    package dal;
+package dal;
 
 import entity.DBContext;
 import entity.Department;
@@ -42,8 +42,7 @@ public class DepartmentDAO extends DBContext {
     public List<Department> getDepartments() throws SQLException {
         List<Department> departments = new ArrayList<>();
         String sql = "SELECT department_id, department_name FROM Departments WHERE status = 'active'";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Department dept = new Department();
                 dept.setDepartmentId(rs.getInt("department_id"));
@@ -60,12 +59,13 @@ public class DepartmentDAO extends DBContext {
 
     public List<Material> getMaterials() throws SQLException {
     List<Material> materials = new ArrayList<>();
-    String sql = "SELECT material_id, material_name, materials_url FROM Materials WHERE disable = 0";
+    String sql = "SELECT material_id, material_code, material_name, materials_url FROM Materials WHERE disable = 0";
     try (PreparedStatement stmt = connection.prepareStatement(sql);
          ResultSet rs = stmt.executeQuery()) {
         while (rs.next()) {
             Material material = new Material();
             material.setMaterialId(rs.getInt("material_id"));
+            material.setMaterialCode(rs.getString("material_code"));
             material.setMaterialName(rs.getString("material_name"));
             material.setMaterialsUrl(rs.getString("materials_url"));
             materials.add(material);
