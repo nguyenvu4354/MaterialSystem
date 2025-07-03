@@ -4,6 +4,7 @@ import dal.CategoryDAO;
 import dal.PurchaseRequestDAO;
 import dal.UserDAO;
 import dal.RolePermissionDAO;
+import dal.MaterialDAO;
 import entity.Category;
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
@@ -34,6 +35,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
     private final CategoryDAO categoryDAO = new CategoryDAO();
     private final PurchaseRequestDAO prd = new PurchaseRequestDAO();
     private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+    private final MaterialDAO materialDAO = new MaterialDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -64,6 +66,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
         try {
             List<User> users = userDAO.getAllUsers();
             List<Category> categories = categoryDAO.getAllCategories();
+            List<entity.Material> materials = materialDAO.getAllProducts();
 
             String requestCode = "PR-" + new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date())
                     + "-" + (int) (Math.random() * 1000);
@@ -71,6 +74,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
 
             request.setAttribute("users", users);
             request.setAttribute("categories", categories);
+            request.setAttribute("materials", materials);
             request.setAttribute("requestCode", requestCode);
             request.setAttribute("requestDate", requestDate);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
@@ -125,7 +129,9 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
 
             if (!formErrors.isEmpty()) {
                 List<Category> categories = categoryDAO.getAllCategories();
+                List<entity.Material> materials = materialDAO.getAllProducts();
                 request.setAttribute("categories", categories);
+                request.setAttribute("materials", materials);
                 request.setAttribute("errors", formErrors);
                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
                 LOGGER.warning("Validation errors: " + formErrors);
@@ -202,7 +208,9 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                 LOGGER.warning("Failed to create purchase request");
                 request.setAttribute("error", "Could not create purchase request. Please try again.");
                 List<Category> categories = categoryDAO.getAllCategories();
+                List<entity.Material> materials = materialDAO.getAllProducts();
                 request.setAttribute("categories", categories);
+                request.setAttribute("materials", materials);
                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
                 request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
             }
@@ -211,7 +219,9 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error in CreatePurchaseRequestServlet: " + e.getMessage(), e);
             request.setAttribute("error", "An error occurred while processing the request: " + e.getMessage());
             List<Category> categories = categoryDAO.getAllCategories();
+            List<entity.Material> materials = materialDAO.getAllProducts();
             request.setAttribute("categories", categories);
+            request.setAttribute("materials", materials);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
         }
