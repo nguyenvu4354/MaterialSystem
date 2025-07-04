@@ -1,6 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.util.Map" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,21 +30,15 @@
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 1rem;
         }
-        .access-denied {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: url('images/background-img.png') no-repeat;
-            background-size: cover;
-        }
-        .access-denied-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 3rem;
-            text-align: center;
-            max-width: 500px;
+        .purchase-form .material-image {
+            height: 80px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #f8f9fa;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            border: 1px solid #eee;
+            display: block;
         }
     </style>
 </head>
@@ -82,64 +76,65 @@
             </c:if>
             <c:if test="${hasCreatePurchaseRequestPermission}">
                 <jsp:include page="Header.jsp" />
-                <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover; min-height: 100vh;">
+                <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
                     <div class="container">
                         <div class="row my-5 py-5">
                             <div class="col-12 bg-white p-4 rounded shadow purchase-form">
-                                <h2 class="display-5 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
-                                
-                                <!-- Display error message if any -->
-                                <c:if test="${not empty errors}">
-                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
-                                        <ul style="margin-bottom: 0;">
-                                            <c:forEach var="error" items="${errors}">
-                                                <li>${error.value}</li>
-                                            </c:forEach>
-                                        </ul>
-                                    </div>
-                                </c:if>
-                                
+                                <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
                                 <form action="CreatePurchaseRequest" method="post">
-                                    <h4 class="fw-normal mt-3 mb-3">Material List</h4>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted">Request Code</label>
+                                            <input type="text" class="form-control" name="requestCode" value="${requestCode}" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted">Request Date</label>
+                                            <input type="text" class="form-control" name="requestDate" value="${requestDate}" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted">Total Estimated Price ($)</label>
+                                            <input type="number" class="form-control" name="estimatedPrice" step="0.01">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted">Purchase Reason</label>
+                                            <textarea class="form-control" name="reason" rows="1"></textarea>
+                                        </div>
+                                    </div>
+                                    <h3 class="fw-normal mt-5 mb-3">Materials</h3>
                                     <div id="materialList">
-                                        <div class="row material-row">
-                                            <div class="col-md-3 mb-2">
-                                                <label class="form-label text-muted">Material Name</label>
-                                                <select class="form-select" name="materialId">
-                                                    <c:forEach var="material" items="${materials}">
-                                                        <option value="${material.materialId}">${material.materialName} (${material.materialCode})</option>
-                                                    </c:forEach>
-                                                </select>
+                                        <div class="row material-row align-items-center gy-2">
+                                            <div class="col-md-3">
+                                                <label class="form-label text-muted">Material</label>
+                                                <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off">
+                                                <input type="hidden" name="materialId" class="material-id-input">
                                             </div>
-                                            <div class="col-md-2 mb-2">
+                                            <div class="col-md-2">
                                                 <label class="form-label text-muted">Quantity</label>
                                                 <input type="number" class="form-control" name="quantity">
                                             </div>
-                                            
-                                            <div class="col-md-3 mb-2">
+                                            <div class="col-md-2">
+                                                <label class="form-label text-muted">Category</label>
+                                                <input type="text" class="form-control category-name" name="categoryName" readonly>
+                                                <input type="hidden" class="category-id" name="categoryId">
+                                            </div>
+                                            <div class="col-md-2">
                                                 <label class="form-label text-muted">Notes</label>
                                                 <input type="text" class="form-control" name="note">
                                             </div>
-                                            <div class="col-md-1 d-flex align-items-end mb-2">
+                                            <div class="col-md-2">
+                                                <img class="material-image" src="<c:out value='${materials[0].materialsUrl}'/>" alt="Material Image">
+                                            </div>
+                                            <div class="col-md-1 d-flex align-items-center">
                                                 <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mt-3">
-                                        <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material Row</button>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="estimatedPrice" class="form-label text-muted">Total Estimated Price ($)</label>
-                                            <input type="number" class="form-control" name="estimatedPrice" id="estimatedPrice" step="0.01">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="reason" class="form-label text-muted">Purchase Reason</label>
-                                            <textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
-                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
                                     </div>
                                     <div class="mt-5 d-grid gap-2">
                                         <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
                                     </div>
                                 </form>
                             </div>
@@ -150,71 +145,120 @@
         </c:otherwise>
     </c:choose>
 
-
-    
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // function updateCategory(selectElem) {
-        //     var materialId = selectElem.value;
-        //     var row = selectElem.closest('.material-row');
-        //     var categoryInput = row.querySelector('.category-name');
-        //     var categoryIdInput = row.querySelector('.category-id');
-        //     if (materialCategoryMap[materialId]) {
-        //         categoryInput.value = materialCategoryMap[materialId].categoryName;
-        //         categoryIdInput.value = materialCategoryMap[materialId].categoryId;
-        //     } else {
-        //         categoryInput.value = '';
-        //         categoryIdInput.value = '';
-        //     }
-        // }
+        var materialsData = [];
+        <c:forEach var="material" items="${materials}">
+        materialsData.push({
+            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+            value: "${fn:escapeXml(material.materialName)}",
+            id: "${material.materialId}",
+            name: "${fn:escapeXml(material.materialName)}",
+            code: "${fn:escapeXml(material.materialCode)}",
+            imageUrl: "${fn:escapeXml(material.materialsUrl)}",
+            categoryId: "${material.category.category_id}",
+            categoryName: "${material.category.category_name}"
+        });
+        </c:forEach>
 
-        // // Gán sự kiện cho tất cả dropdown material
-        // document.querySelectorAll('select[name="materialId"]').forEach(function(selectElem) {
-        //     selectElem.addEventListener('change', function() {
-        //         updateCategory(this);
-        //     });
-        //     // Gọi luôn khi load để set category cho dòng đầu tiên
-        //     updateCategory(selectElem);
-        // });
+        function updateMaterialRowAutocomplete(row) {
+            const nameInput = row.querySelector('.material-name-input');
+            const idInput = row.querySelector('.material-id-input');
+            const img = row.querySelector('.material-image');
+            const categoryInput = row.querySelector('.category-name');
+            const categoryIdInput = row.querySelector('.category-id');
+            $(nameInput).autocomplete({
+                source: function(request, response) {
+                    const term = request.term.toLowerCase();
+                    const matches = materialsData.filter(material => 
+                        material.name.toLowerCase().includes(term) || 
+                        material.code.toLowerCase().includes(term)
+                    );
+                    response(matches);
+                },
+                select: function(event, ui) {
+                    idInput.value = ui.item.id;
+                    nameInput.value = ui.item.name;
+                    // Update image
+                    let imgUrl = ui.item.imageUrl && ui.item.imageUrl !== 'null' ? ui.item.imageUrl : '';
+                    if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
+                        img.src = imgUrl;
+                    } else if (imgUrl) {
+                        img.src = 'images/material/' + imgUrl;
+                    } else {
+                        img.src = 'images/material/default.jpg';
+                    }
+                    // Update category
+                    categoryInput.value = ui.item.categoryName;
+                    categoryIdInput.value = ui.item.categoryId;
+                },
+                change: function(event, ui) {
+                    if (!ui.item) {
+                        const inputValue = nameInput.value.toLowerCase().trim();
+                        const selectedMaterial = materialsData.find(material => 
+                            material.name.toLowerCase() === inputValue || 
+                            material.code.toLowerCase() === inputValue
+                        );
+                        if (selectedMaterial) {
+                            idInput.value = selectedMaterial.id;
+                            nameInput.value = selectedMaterial.name;
+                            let imgUrl = selectedMaterial.imageUrl && selectedMaterial.imageUrl !== 'null' ? selectedMaterial.imageUrl : '';
+                            if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
+                                img.src = imgUrl;
+                            } else if (imgUrl) {
+                                img.src = 'images/material/' + imgUrl;
+                            } else {
+                                img.src = 'images/material/default.jpg';
+                            }
+                            categoryInput.value = selectedMaterial.categoryName;
+                            categoryIdInput.value = selectedMaterial.categoryId;
+                        } else {
+                            idInput.value = '';
+                            img.src = 'images/material/default.jpg';
+                            categoryInput.value = '';
+                            categoryIdInput.value = '';
+                        }
+                    }
+                },
+                minLength: 1
+            });
+        }
 
-        // // Khi thêm dòng mới, cũng phải gán sự kiện và cập nhật category
-        // document.getElementById('addMaterial').addEventListener('click', function () {
-        //     const materialList = document.getElementById('materialList');
-        //     const newRow = materialList.querySelector('.material-row').cloneNode(true);
-        //     newRow.querySelector('input[name="quantity"]').value = '';
-        //     newRow.querySelector('input[name="note"]').value = '';
-        //     // reset material select
-        //     var selectElem = newRow.querySelector('select[name="materialId"]');
-        //     selectElem.selectedIndex = 0;
-        //     // Gán lại sự kiện
-        //     selectElem.addEventListener('change', function() {
-        //         updateCategory(this);
-        //     });
-        //     // Cập nhật category cho dòng mới
-        //     updateCategory(selectElem);
-        //     materialList.appendChild(newRow);
-        // });
-
-        document.getElementById('addMaterial').addEventListener('click', function () {
-            const materialList = document.getElementById('materialList');
-            const newRow = materialList.querySelector('.material-row').cloneNode(true);
-            newRow.querySelector('input[name="quantity"]').value = '';
-            newRow.querySelector('input[name="note"]').value = '';
-            // reset material select
-            var selectElem = newRow.querySelector('select[name="materialId"]');
-            selectElem.selectedIndex = 0;
-            materialList.appendChild(newRow);
+        // Initial setup for the first row
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.material-row').forEach(row => {
+                updateMaterialRowAutocomplete(row);
+            });
         });
 
+        // When add material row
+        document.getElementById('addMaterial').addEventListener('click', function () {
+            const materialList = document.getElementById('materialList');
+            const firstRow = materialList.querySelector('.material-row');
+            const newRow = firstRow.cloneNode(true);
+            // Reset fields in the new row
+            newRow.querySelector('.material-name-input').value = '';
+            newRow.querySelector('.material-id-input').value = '';
+            newRow.querySelector('.category-name').value = '';
+            newRow.querySelector('.category-id').value = '';
+            newRow.querySelector('input[name="quantity"]').value = '';
+            newRow.querySelector('input[name="note"]').value = '';
+            newRow.querySelector('.material-image').src = 'images/material/default.jpg';
+            materialList.appendChild(newRow);
+            updateMaterialRowAutocomplete(newRow);
+        });
+
+        // Remove material row
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-material')) {
                 const materialRows = document.querySelectorAll('.material-row');
                 if (materialRows.length > 1) {
                     e.target.closest('.material-row').remove();
-                } else {
-                    alert('You must have at least one material in the request.');
                 }
             }
         });
     </script>
 </body>
-</html
+</html>
