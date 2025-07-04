@@ -135,6 +135,11 @@
             border-radius: 8px;
             font-size: 16px;
         }
+        .condition-bar { height: 5px; background-color: #e9ecef; border-radius: 3px; margin-top: 5px; }
+        .condition-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+        .condition-good { background-color: #28a745; }
+        .condition-warning { background-color: #ffc107; }
+        .condition-bad { background-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -167,7 +172,7 @@
                         <form id="addMaterialForm" action="ImportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
                             <input type="hidden" name="action" value="add">
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label text-muted">Material</label>
                                     <select name="materialId" class="form-select" required>
                                         <option value="">Select Material</option>
@@ -179,38 +184,26 @@
                                         <div class="text-danger small mt-1">${formErrors['materialId']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label text-muted">Condition</label>
-                                    <select name="materialCondition" class="form-select" required>
-                                        <option value="">Select</option>
-                                        <option value="new">New</option>
-                                        <option value="used">Used</option>
-                                        <option value="refurbished">Refurbished</option>
-                                    </select>
-                                    <c:if test="${not empty formErrors['materialCondition']}">
-                                        <div class="text-danger small mt-1">${formErrors['materialCondition']}</div>
-                                    </c:if>
-                                </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="form-label text-muted">Quantity</label>
                                     <input type="number" name="quantity" class="form-control" min="1" required placeholder="Qty">
                                     <c:if test="${not empty formErrors['quantity']}">
                                         <div class="text-danger small mt-1">${formErrors['quantity']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="form-label text-muted">Unit Price ($)</label>
                                     <input type="number" name="unitPrice" class="form-control" min="0" step="0.01" required placeholder="Unit Price ($)">
                                     <c:if test="${not empty formErrors['unitPrice']}">
                                         <div class="text-danger small mt-1">${formErrors['unitPrice']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="form-label text-muted">Total Value</label>
                                     <input type="text" id="totalValue" class="form-control" readonly placeholder="Auto">
                                 </div>
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-dark btn-lg rounded-1">
+                                <div class="col-12 mt-4 d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-dark btn-lg rounded-1 px-4">
                                         <i class="fas fa-plus-circle me-2"></i>Add to Import List
                                     </button>
                                 </div>
@@ -221,19 +214,19 @@
                         <h3 class="fw-normal mb-3">Current Import List</h3>
                         <c:if test="${not empty importDetails}">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table align-middle text-center">
                                     <thead>
                                         <tr>
-                                            <th>Image</th>
-                                            <th>Material</th>
-                                            <th>Unit</th>
-                                            <th>Category</th>
-                                            <th>Quantity</th>
-                                            <th>Price</th>
-                                            <th>Value</th>
-                                            <th>Condition</th>
-                                            <th>Stock</th>
-                                            <th>Action</th>
+                                            <th style="width: 8%">Image</th>
+                                            <th style="width: 18%">Material</th>
+                                            <th style="width: 12%">Unit</th>
+                                            <th style="width: 15%">Category</th>
+                                            <th style="width: 10%">Quantity</th>
+                                            <th style="width: 12%">Price</th>
+                                            <th style="width: 12%">Value</th>
+                                            <th style="width: 10%">Condition</th>
+                                            <th style="width: 8%">Stock</th>
+                                            <th style="width: 5%">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -261,12 +254,11 @@
                                                 <td><span class="badge bg-secondary">${materialMap[detail.materialId].unit.unitName}</span></td>
                                                 <td><span class="badge bg-info">${materialMap[detail.materialId].category.category_name}</span></td>
                                                 <td>
-                                                    <form action="ImportMaterial" method="post" class="d-flex align-items-center">
+                                                    <form action="ImportMaterial" method="post" class="d-flex align-items-center justify-content-center gap-2 mb-0">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="materialId" value="${detail.materialId}">
-                                                        <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                                                        <input type="number" name="newQuantity" value="${detail.quantity}" class="form-control me-2" min="1" required style="width:80px;">
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm" title="Update Quantity">
+                                                        <input type="number" name="newQuantity" value="${detail.quantity}" class="form-control form-control-sm me-2 text-center" min="1" required style="width:80px;">
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm px-2" title="Update Quantity">
                                                             <i class="fas fa-sync-alt"></i>
                                                         </button>
                                                     </form>
@@ -274,18 +266,19 @@
                                                 <td><strong>$<fmt:formatNumber value="${detail.unitPrice}" type="number" minFractionDigits="2"/></strong></td>
                                                 <td><strong>$<fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" minFractionDigits="2"/></strong></td>
                                                 <td>
-                                                    <span class="status-badge ${detail.materialCondition == 'new' ? 'status-new' : detail.materialCondition == 'used' ? 'status-used' : 'status-refurbished'}">
-                                                        ${detail.materialCondition}
-                                                    </span>
+                                                    <div class="condition-bar" style="height: 5px; background-color: #e9ecef; border-radius: 3px; margin-top: 5px;">
+                                                        <div class="condition-fill ${materialMap[detail.materialId].conditionPercentage >= 70 ? 'condition-good' : materialMap[detail.materialId].conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" 
+                                                             style="width: ${materialMap[detail.materialId].conditionPercentage}%; height: 100%; border-radius: 3px;"></div>
+                                                    </div>
+                                                    <small class="text-muted">${materialMap[detail.materialId].conditionPercentage}%</small>
                                                 </td>
                                                 <td><span class="badge bg-success">${stockMap[detail.materialId]}</span></td>
                                                 <td>
-                                                    <form action="ImportMaterial" method="post">
+                                                    <form action="ImportMaterial" method="post" class="mb-0">
                                                         <input type="hidden" name="action" value="remove">
                                                         <input type="hidden" name="materialId" value="${detail.materialId}">
                                                         <input type="hidden" name="quantity" value="${detail.quantity}">
-                                                        <input type="hidden" name="materialCondition" value="${detail.materialCondition}">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm px-2">Remove</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -408,7 +401,6 @@
             const materialId = form.querySelector('select[name="materialId"]');
             const quantity = form.querySelector('input[name="quantity"]');
             const unitPrice = form.querySelector('input[name="unitPrice"]');
-            const condition = form.querySelector('select[name="materialCondition"]');
             if (!materialId.value) { 
                 materialId.classList.add('is-invalid'); 
                 isValid = false; 
@@ -426,12 +418,6 @@
                 isValid = false; 
             } else {
                 unitPrice.classList.remove('is-invalid'); 
-            }
-            if (!condition.value) { 
-                condition.classList.add('is-invalid');
-                isValid = false; 
-            } else { 
-                condition.classList.remove('is-invalid'); 
             }
             return isValid;
         }

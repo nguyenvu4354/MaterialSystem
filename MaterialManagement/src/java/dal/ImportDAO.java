@@ -47,14 +47,14 @@ public class ImportDAO extends DBContext {
     }
 
     public void createImportDetails(List<ImportDetail> details) throws SQLException {
-        String insertSql = "INSERT INTO Import_Details (import_id, material_id, quantity, unit_price, material_condition, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO Import_Details (import_id, material_id, quantity, unit_price, status, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
             for (ImportDetail detail : details) {
                 if (detail.getQuantity() <= 0) {
                     throw new SQLException("Quantity must be greater than 0 for material ID: " + detail.getMaterialId());
                 }
 
-                ImportDetail existingDetail = getImportDetailByMaterialAndCondition(detail.getImportId(), detail.getMaterialId(), detail.getMaterialCondition());
+                ImportDetail existingDetail = getImportDetailByMaterial(detail.getImportId(), detail.getMaterialId());
                 if (existingDetail != null) {
                     int newQuantity = existingDetail.getQuantity() + detail.getQuantity();
                     updateImportDetailQuantity(existingDetail.getImportDetailId(), newQuantity);
@@ -63,9 +63,8 @@ public class ImportDAO extends DBContext {
                     insertStmt.setInt(2, detail.getMaterialId());
                     insertStmt.setInt(3, detail.getQuantity());
                     insertStmt.setDouble(4, detail.getUnitPrice());
-                    insertStmt.setString(5, detail.getMaterialCondition());
-                    insertStmt.setString(6, detail.getStatus());
-                    insertStmt.setObject(7, detail.getCreatedAt());
+                    insertStmt.setString(5, detail.getStatus());
+                    insertStmt.setObject(6, detail.getCreatedAt());
                     insertStmt.addBatch();
                 }
             }
@@ -80,12 +79,11 @@ public class ImportDAO extends DBContext {
         }
     }
 
-    public ImportDetail getImportDetailByMaterialAndCondition(int importId, int materialId, String materialCondition) throws SQLException {
-        String sql = "SELECT * FROM Import_Details WHERE import_id = ? AND material_id = ? AND material_condition = ? AND status = 'draft'";
+    public ImportDetail getImportDetailByMaterial(int importId, int materialId) throws SQLException {
+        String sql = "SELECT * FROM Import_Details WHERE import_id = ? AND material_id = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             stmt.setInt(2, materialId);
-            stmt.setString(3, materialCondition);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     ImportDetail detail = new ImportDetail();
@@ -94,7 +92,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
@@ -141,7 +138,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
@@ -152,13 +148,12 @@ public class ImportDAO extends DBContext {
         return details;
     }
 
-    public void removeImportDetail(int importId, int materialId, int quantity, String materialCondition) throws SQLException {
-        String sql = "DELETE FROM Import_Details WHERE import_id = ? AND material_id = ? AND quantity = ? AND material_condition = ? AND status = 'draft'";
+    public void removeImportDetail(int importId, int materialId, int quantity) throws SQLException {
+        String sql = "DELETE FROM Import_Details WHERE import_id = ? AND material_id = ? AND quantity = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             stmt.setInt(2, materialId);
             stmt.setInt(3, quantity);
-            stmt.setString(4, materialCondition);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("No draft import detail found to remove for import ID: " + importId);
@@ -225,7 +220,6 @@ public class ImportDAO extends DBContext {
                     detail.setMaterialId(rs.getInt("material_id"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setUnitPrice(rs.getDouble("unit_price"));
-                    detail.setMaterialCondition(rs.getString("material_condition"));
                     detail.setStatus(rs.getString("status"));
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);

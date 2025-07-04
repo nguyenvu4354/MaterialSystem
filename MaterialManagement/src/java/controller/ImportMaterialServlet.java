@@ -115,12 +115,10 @@ public class ImportMaterialServlet extends HttpServlet {
         String materialIdStr = request.getParameter("materialId");
         String quantityStr = request.getParameter("quantity");
         String unitPriceStr = request.getParameter("unitPrice");
-        String condition = request.getParameter("materialCondition");
 
         if (materialIdStr == null || materialIdStr.isEmpty() || 
             quantityStr == null || quantityStr.isEmpty() || 
-            unitPriceStr == null || unitPriceStr.isEmpty() ||
-            condition == null || condition.isEmpty()) {
+            unitPriceStr == null || unitPriceStr.isEmpty()) {
             request.setAttribute("error", "Please fill in all required fields.");
             loadDataAndForward(request, response);
             return;
@@ -157,7 +155,6 @@ public class ImportMaterialServlet extends HttpServlet {
         detail.setMaterialId(materialId);
         detail.setQuantity(quantity);
         detail.setUnitPrice(unitPrice);
-        detail.setMaterialCondition(condition);
         detail.setStatus("draft");
 
         importDAO.createImportDetails(Collections.singletonList(detail));
@@ -169,11 +166,10 @@ public class ImportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int quantity = Integer.parseInt(request.getParameter("quantity"));
-        String materialCondition = request.getParameter("materialCondition");
         Integer tempImportId = (Integer) session.getAttribute("tempImportId");
 
         if (tempImportId != null && tempImportId != 0) {
-            importDAO.removeImportDetail(tempImportId, materialId, quantity, materialCondition);
+            importDAO.removeImportDetail(tempImportId, materialId, quantity);
             request.setAttribute("success", "Material removed from import list successfully.");
         } else {
             request.setAttribute("error", "No import list found to remove material from.");
@@ -185,7 +181,6 @@ public class ImportMaterialServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         int newQuantity = Integer.parseInt(request.getParameter("newQuantity"));
-        String materialCondition = request.getParameter("materialCondition");
         Integer tempImportId = (Integer) session.getAttribute("tempImportId");
 
         if (newQuantity <= 0) {
@@ -195,7 +190,7 @@ public class ImportMaterialServlet extends HttpServlet {
         }
 
         if (tempImportId != null && tempImportId != 0) {
-            ImportDetail detail = importDAO.getImportDetailByMaterialAndCondition(tempImportId, materialId, materialCondition);
+            ImportDetail detail = importDAO.getImportDetailByMaterial(tempImportId, materialId);
             if (detail != null) {
                 importDAO.updateImportDetailQuantity(detail.getImportDetailId(), newQuantity);
                 request.setAttribute("success", "Quantity updated successfully for material ID: " + materialId);
