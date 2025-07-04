@@ -382,18 +382,7 @@
                                                     <div class="stats-label">Total Quantity</div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="stats-card text-center">
-                                                    <div class="stats-number">
-                                                        <c:set var="uniqueCategories" value="0"/>
-                                                        <c:forEach var="item" items="${purchaseRequestDetailList}">
-                                                            <c:set var="uniqueCategories" value="${uniqueCategories + 1}"/>
-                                                        </c:forEach>
-                                                        ${uniqueCategories}
-                                                    </div>
-                                                    <div class="stats-label">Material Types</div>
-                                                </div>
-                                            </div>
+
                                         </div>
 
                                         <!-- Thông tin người yêu cầu -->
@@ -420,7 +409,6 @@
                                                                     <th><i class="fas fa-hashtag me-2"></i>ID</th>
                                                                     <th><i class="fas fa-file-invoice me-2"></i>Request Code</th>
                                                                     <th><i class="fas fa-box me-2"></i>Material Name</th>
-                                                                    <th><i class="fas fa-tags me-2"></i>Category</th>
                                                                     <th><i class="fas fa-sort-numeric-up me-2"></i>Quantity</th>
                                                                     <th><i class="fas fa-sticky-note me-2"></i>Notes</th>
                                                                     <th><i class="fas fa-calendar-plus me-2"></i>Created Date</th>
@@ -438,9 +426,6 @@
                                                                     </td>
                                                                     <td>
                                                                         <strong>${item.materialName}</strong>
-                                                                    </td>
-                                                                    <td>
-                                                                        <span class="badge badge-warning">${item.categoryId}</span>
                                                                     </td>
                                                                     <td>
                                                                         <span class="badge badge-success">${item.quantity}</span>

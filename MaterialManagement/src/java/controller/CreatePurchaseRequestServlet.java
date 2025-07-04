@@ -20,8 +20,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import utils.PurchaseRequestValidator;
 
 /**
@@ -30,34 +28,27 @@ import utils.PurchaseRequestValidator;
 @WebServlet(name = "CreatePurchaseRequestServlet", urlPatterns = {"/CreatePurchaseRequest"})
 public class CreatePurchaseRequestServlet extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger(CreatePurchaseRequestServlet.class.getName());
-    private final UserDAO userDAO = new UserDAO();
-    private final CategoryDAO categoryDAO = new CategoryDAO();
-    private final PurchaseRequestDAO prd = new PurchaseRequestDAO();
-    private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
-    private final MaterialDAO materialDAO = new MaterialDAO();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOGGER.info("CreatePurchaseRequestServlet.doGet() started");
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
         if (currentUser == null) {
-            LOGGER.warning("No user session found, redirecting to Login.jsp");
             session = request.getSession();
             session.setAttribute("redirectURL", request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
 
-        LOGGER.info("User role_id: " + currentUser.getRoleId() + ", username: " + currentUser.getUsername());
+        UserDAO userDAO = new UserDAO();
+        CategoryDAO categoryDAO = new CategoryDAO();
+        RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+        MaterialDAO materialDAO = new MaterialDAO();
+
         boolean hasPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "CREATE_PURCHASE_REQUEST");
-        LOGGER.info("Permission CREATE_PURCHASE_REQUEST for role_id " + currentUser.getRoleId() + ": " + hasPermission);
         if (!hasPermission) {
-            LOGGER.warning("Unauthorized access attempt by user: " + currentUser.getUsername() + " with role_id: " + currentUser.getRoleId());
             request.setAttribute("error", "You do not have permission to create purchase requests.");
             request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
             return;
@@ -79,12 +70,9 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             request.setAttribute("requestDate", requestDate);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
 
-            LOGGER.info("Forwarding to PurchaseRequestForm.jsp");
             request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
-            LOGGER.info("CreatePurchaseRequestServlet.doGet() completed successfully");
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error in CreatePurchaseRequestServlet: " + e.getMessage(), e);
             request.setAttribute("error", "An error occurred: " + e.getMessage());
             request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
         }
@@ -93,22 +81,23 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        LOGGER.info("CreatePurchaseRequestServlet.doPost() started");
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
         if (currentUser == null) {
-            LOGGER.warning("No user session found, redirecting to Login.jsp");
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
 
-        LOGGER.info("User role_id: " + currentUser.getRoleId() + ", username: " + currentUser.getUsername());
+        PurchaseRequestDAO prd = new PurchaseRequestDAO();
+        CategoryDAO categoryDAO = new CategoryDAO();
+        RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+        MaterialDAO materialDAO = new MaterialDAO();
+        UserDAO userDAO = new UserDAO();
+
         boolean hasPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "CREATE_PURCHASE_REQUEST");
-        LOGGER.info("Permission CREATE_PURCHASE_REQUEST for role_id " + currentUser.getRoleId() + ": " + hasPermission);
         if (!hasPermission) {
-            LOGGER.warning("Unauthorized action attempt by user: " + currentUser.getUsername() + " with role_id: " + currentUser.getRoleId());
             request.setAttribute("error", "You do not have permission to create purchase requests.");
             request.getRequestDispatcher("PurchaseRequestList.jsp").forward(request, response);
             return;
@@ -119,12 +108,11 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             String reason = request.getParameter("reason");
 
             String[] materialNames = request.getParameterValues("materialName");
-            String[] categoryIds = request.getParameterValues("categoryId");
             String[] quantities = request.getParameterValues("quantity");
             String[] notes = request.getParameterValues("note");
 
             Map<String, String> formErrors = PurchaseRequestValidator.validatePurchaseRequestFormData(reason, estimatedPriceStr);
-            Map<String, String> detailErrors = PurchaseRequestValidator.validatePurchaseRequestDetails(materialNames, categoryIds, quantities);
+            Map<String, String> detailErrors = PurchaseRequestValidator.validatePurchaseRequestDetails(materialNames, quantities);
             formErrors.putAll(detailErrors);
 
             if (!formErrors.isEmpty()) {
@@ -134,7 +122,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                 request.setAttribute("materials", materials);
                 request.setAttribute("errors", formErrors);
                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
-                LOGGER.warning("Validation errors: " + formErrors);
                 request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
                 return;
             }
@@ -145,12 +132,10 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                 if (materialName == null || materialName.trim().isEmpty()) {
                     continue;
                 }
-                int categoryId = Integer.parseInt(categoryIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
 
                 PurchaseRequestDetail detail = new PurchaseRequestDetail();
                 detail.setMaterialName(materialName.trim());
-                detail.setCategoryId(categoryId);
                 detail.setQuantity(quantity);
                 String note = (notes != null && notes.length > i) ? notes[i] : null;
                 detail.setNotes(note != null && !note.trim().isEmpty() ? note.trim() : null);
@@ -171,7 +156,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             boolean success = prd.createPurchaseRequestWithDetails(purchaseRequest, purchaseRequestDetails);
 
             if (success) {
-                LOGGER.info("Purchase request created successfully: " + requestCode);
                 List<User> allUsers = userDAO.getAllUsers();
                 List<User> managers = new ArrayList<>();
                 for (User u : allUsers) {
@@ -195,17 +179,15 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                     for (User manager : managers) {
                         if (manager.getEmail() != null && !manager.getEmail().trim().isEmpty()) {
                             try {
-                                utils.EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
-                                LOGGER.info("Email sent to: " + manager.getEmail());
+                                // utils.EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
                             } catch (Exception e) {
-                                LOGGER.log(Level.WARNING, "Failed to send email to: " + manager.getEmail(), e);
+                                // Log the error if needed, but don't rethrow to prevent breaking the flow
                             }
                         }
                     }
                 }
                 response.sendRedirect("ListPurchaseRequests?success=created");
             } else {
-                LOGGER.warning("Failed to create purchase request");
                 request.setAttribute("error", "Could not create purchase request. Please try again.");
                 List<Category> categories = categoryDAO.getAllCategories();
                 List<entity.Material> materials = materialDAO.getAllProducts();
@@ -216,7 +198,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error in CreatePurchaseRequestServlet: " + e.getMessage(), e);
             request.setAttribute("error", "An error occurred while processing the request: " + e.getMessage());
             List<Category> categories = categoryDAO.getAllCategories();
             List<entity.Material> materials = materialDAO.getAllProducts();
@@ -229,6 +210,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Handles creation and saving of purchase requests.";
+        return "Short description";
     }
 }

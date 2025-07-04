@@ -59,10 +59,10 @@ public class PurchaseRequestValidator {
         return errors;
     }
 
-    public static Map<String, String> validatePurchaseRequestDetails(String[] materialNames, String[] categoryIds, String[] quantities) {
+    public static Map<String, String> validatePurchaseRequestDetails(String[] materialNames, String[] quantities) {
         Map<String, String> errors = new HashMap<>();
 
-        if (materialNames == null || categoryIds == null || quantities == null) {
+        if (materialNames == null || quantities == null) {
             errors.put("details", "Detail information is invalid.");
             return errors;
         }
@@ -71,39 +71,25 @@ public class PurchaseRequestValidator {
 
         for (int i = 0; i < materialNames.length; i++) {
             String materialName = materialNames[i];
-            String categoryIdStr = categoryIds[i];
             String quantityStr = quantities[i];
 
             // Skip if material name is empty
             if (materialName == null || materialName.trim().isEmpty()) {
                 continue;
-            } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
-                errors.put("materialName", "Material name cannot contain special characters.");
-                return errors;
-            }
-
-            // Validate categoryId
-            try {
-                int categoryId = Integer.parseInt(categoryIdStr);
-                if (categoryId <= 0) {
-                    errors.put("categoryId", "Invalid category.");
-                    return errors;
-                }
-            } catch (NumberFormatException e) {
-                errors.put("categoryId", "Invalid category.");
-                return errors;
             }
 
             // Validate quantity
-            try {
-                int quantity = Integer.parseInt(quantityStr);
-                if (quantity <= 0) {
-                    errors.put("quantity", "Quantity must be greater than 0.");
-                    return errors;
+            if (quantityStr == null || quantityStr.trim().isEmpty()) {
+                errors.put("quantity_" + i, "Quantity cannot be empty for material " + materialName + ".");
+            } else {
+                try {
+                    int quantity = Integer.parseInt(quantityStr);
+                    if (quantity <= 0) {
+                        errors.put("quantity_" + i, "Quantity must be greater than 0 for material " + materialName + ".");
+                    }
+                } catch (NumberFormatException e) {
+                    errors.put("quantity_" + i, "Invalid quantity format for material " + materialName + ".");
                 }
-            } catch (NumberFormatException e) {
-                errors.put("quantity", "Invalid quantity.");
-                return errors;
             }
 
             hasValidDetail = true;
@@ -119,16 +105,9 @@ public class PurchaseRequestValidator {
     public static Map<String, String> validatePurchaseRequestDetail(PurchaseRequestDetail detail) {
         Map<String, String> errors = new HashMap<>();
 
-        // Validate materialName
-        if (detail.getMaterialName() == null || detail.getMaterialName().trim().isEmpty()) {
-            errors.put("materialName", "Material name cannot be empty.");
-        } else if (!detail.getMaterialName().matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
-            errors.put("materialName", "Material name cannot contain special characters.");
-        }
-
-        // Validate categoryId
-        if (detail.getCategoryId() <= 0) {
-            errors.put("categoryId", "Invalid category.");
+        // Validate materialId
+        if (detail.getMaterialId() <= 0) {
+            errors.put("materialId", "Invalid material ID.");
         }
 
         // Validate quantity
@@ -139,27 +118,20 @@ public class PurchaseRequestValidator {
         return errors;
     }
 
-    public static Map<String, String> validatePurchaseRequestDetailFormData(String materialName, String categoryIdStr, String quantityStr) {
+    public static Map<String, String> validatePurchaseRequestDetailFormData(String materialIdStr, String quantityStr) {
         Map<String, String> errors = new HashMap<>();
 
-        // Validate materialName
-        if (materialName == null || materialName.trim().isEmpty()) {
-            errors.put("materialName", "Material name cannot be empty.");
-        } else if (!materialName.matches("^[a-zA-Z0-9\sÀ-ỹà-ỹ.,-]+$")) {
-            errors.put("materialName", "Material name cannot contain special characters.");
-        }
-
-        // Validate categoryId
-        if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
-            errors.put("categoryId", "Category cannot be empty.");
+        // Validate materialId
+        if (materialIdStr == null || materialIdStr.trim().isEmpty()) {
+             errors.put("materialId", "Material must be selected.");
         } else {
             try {
-                int categoryId = Integer.parseInt(categoryIdStr);
-                if (categoryId <= 0) {
-                    errors.put("categoryId", "Invalid category.");
+                int materialId = Integer.parseInt(materialIdStr);
+                if (materialId <= 0) {
+                     errors.put("materialId", "Invalid material.");
                 }
             } catch (NumberFormatException e) {
-                errors.put("categoryId", "Invalid category.");
+                errors.put("materialId", "Invalid material ID format.");
             }
         }
 
@@ -179,4 +151,4 @@ public class PurchaseRequestValidator {
 
         return errors;
     }
-} 
+}
