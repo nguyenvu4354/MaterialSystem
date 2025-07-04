@@ -231,7 +231,7 @@ public class PurchaseRequestDAO extends DBContext {
 
     public boolean createPurchaseRequestWithDetails(PurchaseRequest request, List<PurchaseRequestDetail> details) {
         String insertRequestSQL = "INSERT INTO material_management.purchase_requests (request_code, user_id, request_date, status, estimated_price, reason) VALUES (?, ?, ?, ?, ?, ?)";
-        String insertDetailSQL = "INSERT INTO material_management.purchase_request_details (purchase_request_id, material_name, category_id, quantity, notes) VALUES (?, ?, ?, ?, ?)";
+        String insertDetailSQL = "INSERT INTO material_management.purchase_request_details (purchase_request_id, material_id, quantity, notes) VALUES (?, ?, ?, ?)";
 
         try {
             connection.setAutoCommit(false);
@@ -258,14 +258,13 @@ public class PurchaseRequestDAO extends DBContext {
                             try (PreparedStatement psDetail = connection.prepareStatement(insertDetailSQL)) {
                                 for (PurchaseRequestDetail detail : details) {
                                     psDetail.setInt(1, purchaseRequestId);
-                                    psDetail.setString(2, detail.getMaterialName());
-                                    psDetail.setInt(3, detail.getCategoryId());
-                                    psDetail.setInt(4, detail.getQuantity());
+                                    psDetail.setInt(2, detail.getMaterialId());
+                                    psDetail.setInt(3, detail.getQuantity());
                                     
                                     if (detail.getNotes() != null) {
-                                        psDetail.setString(5, detail.getNotes());
+                                        psDetail.setString(4, detail.getNotes());
                                     } else {
-                                        psDetail.setNull(5, Types.VARCHAR);
+                                        psDetail.setNull(4, Types.VARCHAR);
                                     }
                                     
                                     psDetail.addBatch();
