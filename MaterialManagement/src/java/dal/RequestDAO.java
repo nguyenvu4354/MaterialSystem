@@ -310,11 +310,13 @@ public class RequestDAO extends DBContext {
     }
 
     // Fetch details for a specific purchase request
+    // Fetch details for a specific purchase request
     private List<PurchaseRequestDetail> getPurchaseRequestDetails(int purchaseRequestId) {
         List<PurchaseRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT prd.*, c.category_name "
+        String sql = "SELECT prd.*, m.material_name, m.material_code, u.unit_name "
                 + "FROM Purchase_Request_Details prd "
-                + "JOIN Categories c ON prd.category_id = c.category_id "
+                + "JOIN Materials m ON prd.material_id = m.material_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "WHERE prd.purchase_request_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -324,8 +326,8 @@ public class RequestDAO extends DBContext {
                 PurchaseRequestDetail detail = new PurchaseRequestDetail();
                 detail.setPurchaseRequestDetailId(rs.getInt("detail_id"));
                 detail.setPurchaseRequestId(rs.getInt("purchase_request_id"));
+                detail.setMaterialId(rs.getInt("material_id"));
                 detail.setMaterialName(rs.getString("material_name"));
-                detail.setCategoryId(rs.getInt("category_id"));
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setNotes(rs.getString("notes"));
                 detail.setCreatedAt(rs.getTimestamp("created_at"));

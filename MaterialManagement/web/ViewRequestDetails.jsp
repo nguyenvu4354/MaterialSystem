@@ -199,25 +199,42 @@
                         <table>
                             <thead>
                                 <tr>
+                                    <th>Material ID</th>
                                     <th>Material Name</th>
-                                    <th>Category</th>
+                                    <th>Material Code</th>
                                     <th>Quantity</th>
                                     <th>Notes</th>
+                                    <th>Image</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach var="detail" items="${details}">
                                     <tr>
+                                        <td>${detail.materialId}</td>
                                         <td>${detail.materialName}</td>
                                         <td>
-                                            <c:forEach var="category" items="${categories}">
-                                                <c:if test="${category.category_id == detail.categoryId}">
-                                                    ${category.category_name}
+                                            <c:forEach var="material" items="${materials}">
+                                                <c:if test="${material.materialId == detail.materialId}">
+                                                    ${material.materialCode}
                                                 </c:if>
                                             </c:forEach>
                                         </td>
                                         <td>${detail.quantity}</td>
                                         <td>${detail.notes != null ? detail.notes : "N/A"}</td>
+                                        <td>
+                                            <c:forEach var="material" items="${materials}">
+                                                <c:if test="${material.materialId == detail.materialId}">
+                                                    <c:choose>
+                                                        <c:when test="${not empty material.materialsUrl}">
+                                                            <img src="${pageContext.request.contextPath}/images/material/${material.materialsUrl}" alt="${detail.materialName}" />
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span>No image available</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:if>
+                                            </c:forEach>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </tbody>
