@@ -63,11 +63,6 @@ public class ImportValidator {
             errors.put("unitPrice", "Unit price cannot be negative.");
         }
 
-        // Validate materialCondition
-        if (detail.getMaterialCondition() == null || detail.getMaterialCondition().trim().isEmpty()) {
-            errors.put("materialCondition", "Material condition is required.");
-        }
-
         return errors;
     }
 
