@@ -75,6 +75,11 @@
                 text-align: center;
                 margin-top: 10px;
             }
+            .btn-filter {
+                width: 150px;
+                height: 50px;
+            }
+           
         </style>
     </head>
     <body>
@@ -101,7 +106,7 @@
                                 </select>
                             </div>
                             <div class="col-auto">
-                               <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                               <button type="submit" class="btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                             </div>
                         </form>
 
