@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,29 +66,55 @@ public class RepairRequestListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String status = request.getParameter("status");
+        String search = request.getParameter("search");
+
         RepairRequestDAO dao = new RepairRequestDAO();
+        List<RepairRequest> list = new ArrayList<>();
+
         try {
-            List<RepairRequest> list = dao.getAllRepairRequests();
+            if (search != null && !search.trim().isEmpty()
+                    && status != null && !status.equalsIgnoreCase("all")) {
+                // Có cả tìm kiếm và lọc status
+                List<RepairRequest> searchList = dao.searchByRequestCode(search);
+                for (RepairRequest r : searchList) {
+                    if (r.getStatus().equalsIgnoreCase(status)) {
+                        list.add(r);
+                    }
+                }
+            } else if (search != null && !search.trim().isEmpty()) {
+                // Chỉ tìm kiếm
+                list = dao.searchByRequestCode(search);
+            } else if (status != null && !status.equalsIgnoreCase("all")) {
+                // Chỉ lọc theo trạng thái
+                list = dao.filterByStatus(status);
+            } else {
+                // Không có gì, lấy tất cả
+                list = dao.getAllRepairRequests();
+            }
+
             request.setAttribute("repairRequests", list);
+            request.setAttribute("selectedStatus", status);
+            request.setAttribute("searchKeyword", search);
+
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi truy xuất dữ liệu!");
+            request.setAttribute("error", "Lỗi khi truy xuất danh sách yêu cầu!");
         }
 
         request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
     }
 
-
-/**
- * Handles the HTTP <code>POST</code> method.
- *
- * @param request servlet request
- * @param response servlet response
- * @throws ServletException if a servlet-specific error occurs
- * @throws IOException if an I/O error occurs
- */
-@Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
@@ -98,7 +125,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
      * @return a String containing servlet description
      */
     @Override
-public String getServletInfo() {
+    public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
 
