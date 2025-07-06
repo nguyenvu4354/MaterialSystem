@@ -3,232 +3,141 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Danh sách yêu cầu sửa chữa</title>
+    <title>Repair Request Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
+            font-family: 'Poppins', sans-serif;
         }
-
-        header {
-            background-color: #fff;
-            border-bottom: 2px solid #d59f39;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            padding: 15px 30px;
-            z-index: 1000;
+        .container-main {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-
-        h2 {
-            color: #d59f39;
-            text-align: center;
-            font-size: 30px;
+        h1 {
+            font-size: 2 rem;
             font-weight: bold;
-            margin: 20px 0;
+            margin-bottom: 0.5rem;
+            color: #DEAD6F;
         }
-
-        .main-layout {
-            display: flex;
-            min-height: calc(100vh - 80px);
+        .custom-table thead th {
+            background-color: #f9f5f0;
+            color: #5c4434;
+            font-weight: 600;
         }
-
-        .sidebar {
-            width: 250px;
-            background-color: #ffffff;
-            padding: 20px 0;
-            border-right: 1px solid #ddd;
-        }
-
-        .sidebar a {
-            display: block;
-            padding: 12px 24px;
-            color: #333;
-            text-decoration: none;
-            font-size: 16px;
-            transition: background-color 0.2s;
-        }
-
-        .sidebar a:hover {
+        .custom-table tbody tr:hover {
             background-color: #f1f1f1;
         }
-
-        .container-content {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-            margin: 20px;
-            flex: 1;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-            font-size: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        th, td {
-            border: 1px solid #f0f0f0;
+        .custom-table th,
+        .custom-table td {
+            vertical-align: middle;
+            min-height: 48px;
             padding: 14px;
-            text-align: left;
         }
-
-        th {
-            background-color: #f9f3ea;
-            color: #333;
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: bold;
+            display: inline-block;
+            min-width: 90px;
+            text-align: center;
         }
-
-        tr:nth-child(even) {
-            background-color: #fcfcfc;
+        .status-pending {
+            background-color: #d6d6d6;
+            color: #555;
         }
-
-        tr:hover {
-            background-color: #f1f9ff;
+        .status-approved {
+            background-color: #c2f0c2;
+            color: #1b5e20;
         }
-
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .btn-detail {
+            background-color: #fff7e6;
+            color: #b8860b;
+            border: 1px solid #ffe58f;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-weight: 500;
+        }
         .error {
             color: red;
             font-weight: bold;
             text-align: center;
             margin-top: 10px;
         }
-
-        .status {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            display: inline-block;
-            min-width: 90px;
-        }
-
-        .status.pending {
-            background-color: #d6d6d6;
-            color: #555;
-        }
-
-        .status.approved {
-            background-color: #c2f0c2;
-            color: #1b5e20;
-        }
-
-        .status.rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .home-btn-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-        }
-
-        .home-btn {
-            background-color: #d59f39;
-            color: white;
-            padding: 10px 24px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        .home-btn:hover {
-            background-color: #c5892c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        form button {
-            background-color: #d59f39;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 18px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        form button:hover {
-            background-color: #c5892c;
-        }
     </style>
 </head>
 <body>
+    <jsp:include page="Header.jsp" />
 
-    <header>
-        <jsp:include page="Header.jsp"/>
-    </header>
-
-    <div class="main-layout">
-        <!-- Sidebar -->
-        <div class="sidebar">
+    <div class="container-fluid">
+        <div class="row">
             <jsp:include page="SidebarDirector.jsp" />
-        </div>
 
-        <!-- Nội dung chính -->
-        <div class="container-content">
-            <h2>List repair request</h2>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="container-main">
+                    <h1><i class="fas fa-tools"></i> Repair Request List</h1>
 
-            <c:if test="${not empty error}">
-                <p class="error">${error}</p>
-            </c:if>
-
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Request Code</th>
-                    <th>User ID</th>
-                    <th>Request Date</th>
-                    <th>Status</th>
-                    <th>Reason</th>
-                    <th>Action</th>
-                </tr>
-                <c:forEach var="r" items="${repairRequests}">
-                    <c:if test="${r.status ne 'cancel'}">
-                        <tr>
-                            <td>${r.repairRequestId}</td>
-                            <td>${r.requestCode}</td>
-                            <td>${r.userId}</td>
-                            <td>${r.requestDate}</td>
-                            <td>
-                                <span class="status
-                                      <c:choose>
-                                          <c:when test="${r.status == 'pending'}"> pending</c:when>
-                                          <c:when test="${r.status == 'approved'}"> approved</c:when>
-                                          <c:when test="${r.status == 'rejected'}"> rejected</c:when>
-                                      </c:choose>">
-                                    ${r.status}
-                                </span>
-                            </td>
-                            <td>${r.reason}</td>
-                            <td>
-                                <form action="repairrequestdetailbyID" method="get">
-                                    <input type="hidden" name="requestId" value="${r.repairRequestId}" />
-                                    <button type="submit" class="btn-detail">View Detail</button>
-                                </form>
-                            </td>
-                        </tr>
+                    <c:if test="${not empty error}">
+                        <p class="error">${error}</p>
                     </c:if>
-                </c:forEach>
-            </table>
 
-            <div class="home-btn-container">
-                <a href="home">
-                    <button type="button" class="home-btn">Home</button>
-                </a>
-            </div>
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Request Code</th>
+                                <th>User ID</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Reason</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="r" items="${repairRequests}">
+                                <c:if test="${r.status ne 'cancel'}">
+                                    <tr>
+                                        <td>${r.repairRequestId}</td>
+                                        <td>${r.requestCode}</td>
+                                        <td>${r.userId}</td>
+                                        <td>${r.requestDate}</td>
+                                        <td>
+                                            <span class="status-badge
+                                                <c:choose>
+                                                    <c:when test="${r.status == 'pending'}">status-pending</c:when>
+                                                    <c:when test="${r.status == 'approved'}">status-approved</c:when>
+                                                    <c:when test="${r.status == 'rejected'}">status-rejected</c:when>
+                                                </c:choose>">
+                                                ${r.status}
+                                            </span>
+                                        </td>
+                                        <td>${r.reason}</td>
+                                        <td>
+                                            <form action="repairrequestdetailbyID" method="get">
+                                                <input type="hidden" name="requestId" value="${r.repairRequestId}" />
+                                                <button type="submit" class="btn-detail">
+                                                    <i class="fas fa-eye"></i> Detail
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:if>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
         </div>
     </div>
 
