@@ -209,7 +209,45 @@ public class RepairRequestDAO extends DBContext {
             ps.executeUpdate();
         }
     }
-    
-    
+
+    public List<RepairRequest> searchByRequestCode(String code) throws SQLException {
+        List<RepairRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND request_code LIKE ?";
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "%" + code + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequest req = new RepairRequest();
+                req.setRepairRequestId(rs.getInt("repair_request_id"));
+                req.setRequestCode(rs.getString("request_code"));
+                req.setRequestDate(rs.getTimestamp("request_date"));
+                req.setRepairLocation(rs.getString("repair_location"));
+                req.setStatus(rs.getString("status"));
+                list.add(req);
+            }
+        }
+        return list;
+    }
+
+    public List<RepairRequest> filterByStatus(String status) throws SQLException {
+        List<RepairRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND status = ?";
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                RepairRequest req = new RepairRequest();
+                req.setRepairRequestId(rs.getInt("repair_request_id"));
+                req.setRequestCode(rs.getString("request_code"));
+                req.setRequestDate(rs.getTimestamp("request_date"));
+                req.setRepairLocation(rs.getString("repair_location"));
+                req.setStatus(rs.getString("status"));
+                list.add(req);
+            }
+        }
+        return list;
+    }
 
 }
