@@ -21,8 +21,6 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
         if (currentUser == null) {
@@ -88,7 +86,6 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
                 request.setAttribute("showPagination", false);
             }
 
-            // Lấy tên người yêu cầu
             User requester = userDAO.getUserById(purchaseRequest.getUserId());
             String requesterName = requester != null ? requester.getFullName() : "Không xác định";
 
@@ -159,8 +156,5 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         }
     }
 
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }
+   
 }
