@@ -223,6 +223,7 @@ public class RepairRequestDAO extends DBContext {
                 req.setRequestCode(rs.getString("request_code"));
                 req.setRequestDate(rs.getTimestamp("request_date"));
                 req.setRepairLocation(rs.getString("repair_location"));
+                req.setReason(rs.getString("reason"));
                 req.setStatus(rs.getString("status"));
                 list.add(req);
             }
@@ -243,6 +244,7 @@ public class RepairRequestDAO extends DBContext {
                 req.setRequestCode(rs.getString("request_code"));
                 req.setRequestDate(rs.getTimestamp("request_date"));
                 req.setRepairLocation(rs.getString("repair_location"));
+                req.setReason(rs.getString("reason"));
                 req.setStatus(rs.getString("status"));
                 list.add(req);
             }
