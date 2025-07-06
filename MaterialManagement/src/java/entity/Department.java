@@ -99,4 +99,10 @@ public class Department {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Department{" + "departmentId=" + departmentId + ", departmentName=" + departmentName + ", departmentCode=" + departmentCode + ", phoneNumber=" + phoneNumber + ", email=" + email + ", location=" + location + ", description=" + description + ", status=" + status + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    }
+    
 }
