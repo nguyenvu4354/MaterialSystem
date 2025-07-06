@@ -4,9 +4,11 @@ import dal.PurchaseRequestDAO;
 import dal.PurchaseRequestDetailDAO;
 import dal.RolePermissionDAO;
 import dal.UserDAO;
+import dal.MaterialDAO;
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
 import entity.User;
+import entity.Material;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 @WebServlet(name="PurchaseRequestDetailServlet", urlPatterns={"/PurchaseRequestDetail"})
 public class PurchaseRequestDetailServlet extends HttpServlet {
 
@@ -34,6 +38,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         PurchaseRequestDetailDAO purchaseRequestDetailDAO = new PurchaseRequestDetailDAO();
         UserDAO userDAO = new UserDAO();
         RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+        MaterialDAO materialDAO = new MaterialDAO();
 
         boolean hasPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_PURCHASE_REQUEST_LIST");
         if (!hasPermission) {
@@ -86,6 +91,24 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
                 request.setAttribute("showPagination", false);
             }
 
+            // Create a map of material IDs to their image URLs
+            Map<Integer, String> materialImages = new HashMap<>();
+            for (PurchaseRequestDetail detail : purchaseRequestDetailList) {
+                Material material = materialDAO.getInformation(detail.getMaterialId());
+                if (material != null) {
+                    String imageUrl = material.getMaterialsUrl();
+                    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                        materialImages.put(detail.getMaterialId(), imageUrl);
+                    } else {
+                        // Use default image if no image URL is available
+                        materialImages.put(detail.getMaterialId(), "images/material/default.jpg");
+                    }
+                } else {
+                    // Use default image if material not found
+                    materialImages.put(detail.getMaterialId(), "images/material/default.jpg");
+                }
+            }
+
             User requester = userDAO.getUserById(purchaseRequest.getUserId());
             String requesterName = requester != null ? requester.getFullName() : "Không xác định";
 
@@ -95,6 +118,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
             request.setAttribute("requester", requester);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.setAttribute("hasHandleRequestPermission", rolePermissionDAO.hasPermission(currentUser.getRoleId(), "HANDLE_REQUEST"));
+            request.setAttribute("materialImages", materialImages);
 
             request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
 
@@ -129,7 +153,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         try {
             String action = request.getParameter("action");
             int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
-            String reason = request.getParameter("approvalReason");
+            String reason = request.getParameter("reason");
             
             boolean success = false;
             if ("approve".equals(action)) {

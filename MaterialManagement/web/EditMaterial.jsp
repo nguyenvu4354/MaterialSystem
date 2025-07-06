@@ -105,11 +105,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="materialName" class="form-label">Material Name</label>
-                                <input type="text" class="form-control<%= (nameError != null ? " is-invalid" : "") %>" id="materialName" name="materialName" 
-                                       value="${m.materialName}">
-                                <% if (nameError != null) { %>
-                                    <div class="invalid-feedback"><%= nameError %></div>
-                                <% } %>
+                                <input type="text" class="form-control" id="materialName" name="materialName" value="${param.materialName != null ? param.materialName : m.materialName}">
                             </div>
                         </div>
 
@@ -117,25 +113,44 @@
                         <div class="mb-3">
                             <label class="form-label">Material Image</label>
                             <div class="mb-3">
-                                <img id="previewImage" src="<c:choose><c:when test='${empty m.materialsUrl}'>data:image/png;base64,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</c:when><c:otherwise>${pageContext.request.contextPath}/${m.materialsUrl}</c:otherwise></c:choose>" alt="${m.materialCode}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
-                                    </div>
-                                    <ul class="nav nav-tabs" id="imageInputTabs" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab">Media Upload</button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-content" type="button" role="tab">Media URL</button>
-                                        </li>
-                                    </ul>
-                                    <div class="tab-content pt-3" id="imageInputTabContent">
-                                        <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
-                                            <label class="form-label">Upload New Image</label>
-                                            <input type="file" class="form-control" id="materialImage" name="materialImage" accept="image/*">
-                                            <div class="form-text">Upload a new image file (Max size: 10MB)</div>
-                                        </div>
-                                        <div class="tab-pane fade" id="url-content" role="tabpanel">
-                                            <label class="form-label">Or Use Image URL</label>
-                                                <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" value="${m.materialsUrl != null && m.materialsUrl.startsWith('material_images/') ? '' : m.materialsUrl}" placeholder="Enter an image URL from the internet">
+                                <c:set var="imgUrl" value="" />
+                                <c:choose>
+                                    <c:when test="${not empty param.materialsUrl}">
+                                        <c:choose>
+                                            <c:when test="${param.materialsUrl.startsWith('http')}">
+                                                <c:set var="imgUrl" value="${param.materialsUrl}" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:set var="imgUrl" value="images/material/${param.materialsUrl}" />
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
+                                    <c:when test="${not empty m.materialsUrl}">
+                                        <c:set var="imgUrl" value="images/material/${m.materialsUrl}" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set var="imgUrl" value="images/material/default.jpg" />
+                                    </c:otherwise>
+                                </c:choose>
+                                <img id="previewImage" src="${imgUrl}" alt="${m.materialCode}" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;" onerror="this.onerror=null;this.src='images/material/default.jpg';">
+                            </div>
+                            <ul class="nav nav-tabs" id="imageInputTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab">Media Upload</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-content" type="button" role="tab">Media URL</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content pt-3" id="imageInputTabContent">
+                                <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
+                                    <label class="form-label">Upload New Image</label>
+                                    <input type="file" class="form-control" id="materialImage" name="materialImage">
+                                    <div class="form-text">Upload a new image file (Max size: 10MB)</div>
+                                </div>
+                                <div class="tab-pane fade" id="url-content" role="tabpanel">
+                                    <label class="form-label">Or Use Image URL</label>
+                                    <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" value="${param.materialsUrl != null ? param.materialsUrl : (m.materialsUrl != null && m.materialsUrl.startsWith('material_images/') ? '' : m.materialsUrl)}" placeholder="Enter an image URL from the internet">
                                     <div class="form-text">Enter an image URL from the internet</div>
                                 </div>
                             </div>
@@ -148,15 +163,11 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="conditionPercentage" class="form-label">Condition (%)</label>
-                                <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" 
-                                       value="${m.conditionPercentage}" min="0" max="100">
+                                <input class="form-control" id="conditionPercentage" name="conditionPercentage" value="${param.conditionPercentage != null ? param.conditionPercentage : m.conditionPercentage}">
                             </div>
                             <div class="col-md-6">
                                 <label for="price" class="form-label">Price (VNĐ)</label>
-                                <input type="number" id="price" name="price" class="form-control<%= (priceError != null ? " is-invalid" : "") %>" value="${m.price}">
-                                <% if (priceError != null) { %>
-                                    <div class="invalid-feedback"><%= priceError %></div>
-                                <% } %>
+                                <input id="price" name="price" class="form-control" value="${param.price != null ? param.price : m.price}">
                             </div>
                         </div>
 
@@ -168,7 +179,7 @@
                                     <option value="">Select Category</option>
                                     <c:forEach items="${categories}" var="category">
                                         <option value="${category.category_id}"
-                                                <c:if test="${m.category != null && m.category.category_id == category.category_id}">selected</c:if>>
+                                            <c:if test="${param.categoryId != null ? param.categoryId == category.category_id : (m.category != null && m.category.category_id == category.category_id)}">selected</c:if>>
                                             ${category.category_name}
                                         </option>
                                     </c:forEach>
@@ -180,7 +191,7 @@
                                     <option value="">Select Unit</option>
                                     <c:forEach items="${units}" var="unit">
                                         <option value="${unit.id}"
-                                                <c:if test="${m.unit != null && m.unit.id == unit.id}">selected</c:if>>
+                                            <c:if test="${param.unitId != null ? param.unitId == unit.id : (m.unit != null && m.unit.id == unit.id)}">selected</c:if>>
                                             ${unit.unitName}
                                         </option>
                                     </c:forEach>
@@ -193,9 +204,9 @@
                             <div class="col-md-6">
                                 <label for="materialStatus" class="form-label">Status</label>
                                 <select class="form-select" id="materialStatus" name="materialStatus">
-                                    <option value="NEW" <c:if test="${m.materialStatus == 'NEW'}">selected</c:if>>New</option>
-                                    <option value="USED" <c:if test="${m.materialStatus == 'USED'}">selected</c:if>>Used</option>
-                                    <option value="DAMAGED" <c:if test="${m.materialStatus == 'DAMAGED'}">selected</c:if>>Damaged</option>
+                                    <option value="NEW" <c:if test="${param.materialStatus != null ? param.materialStatus == 'NEW' : m.materialStatus == 'NEW'}">selected</c:if>>New</option>
+                                    <option value="USED" <c:if test="${param.materialStatus != null ? param.materialStatus == 'USED' : m.materialStatus == 'USED'}">selected</c:if>>Used</option>
+                                    <option value="DAMAGED" <c:if test="${param.materialStatus != null ? param.materialStatus == 'DAMAGED' : m.materialStatus == 'DAMAGED'}">selected</c:if>>Damaged</option>
                                 </select>
                             </div>
                         </div>
@@ -295,6 +306,17 @@
                     window.location.href = '${pageContext.request.contextPath}/deletematerial?materialId=' + materialId;
                 }
             }
+        </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Nếu có giá trị materialsUrl (tức là vừa nhập URL), tự động chuyển sang tab Media URL
+            var urlValue = '<c:out value="${param.materialsUrl}" />';
+            if (urlValue && urlValue.trim() !== '') {
+                var urlTab = document.getElementById('url-tab');
+                var urlTabContent = new bootstrap.Tab(urlTab);
+                urlTabContent.show();
+            }
+        });
         </script>
     </body>
 </html>
