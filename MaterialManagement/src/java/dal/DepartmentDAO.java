@@ -58,23 +58,111 @@ public class DepartmentDAO extends DBContext {
     }
 
     public List<Material> getMaterials() throws SQLException {
-    List<Material> materials = new ArrayList<>();
-    String sql = "SELECT material_id, material_code, material_name, materials_url FROM Materials WHERE disable = 0";
-    try (PreparedStatement stmt = connection.prepareStatement(sql);
-         ResultSet rs = stmt.executeQuery()) {
-        while (rs.next()) {
-            Material material = new Material();
-            material.setMaterialId(rs.getInt("material_id"));
-            material.setMaterialCode(rs.getString("material_code"));
-            material.setMaterialName(rs.getString("material_name"));
-            material.setMaterialsUrl(rs.getString("materials_url"));
-            materials.add(material);
+        List<Material> materials = new ArrayList<>();
+        String sql = "SELECT material_id, material_code, material_name, materials_url FROM Materials WHERE disable = 0";
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Material material = new Material();
+                material.setMaterialId(rs.getInt("material_id"));
+                material.setMaterialCode(rs.getString("material_code"));
+                material.setMaterialName(rs.getString("material_name"));
+                material.setMaterialsUrl(rs.getString("materials_url"));
+                materials.add(material);
+            }
+            System.out.println("✅ Lấy danh sách vật tư thành công, số lượng: " + materials.size());
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi getMaterials: " + e.getMessage());
+            throw e;
         }
-        System.out.println("✅ Lấy danh sách vật tư thành công, số lượng: " + materials.size());
-    } catch (SQLException e) {
-        System.out.println("❌ Lỗi getMaterials: " + e.getMessage());
-        throw e;
+        return materials;
     }
-    return materials;
-}
+
+    public void addDepartment(Department dept) {
+        String sql = "INSERT INTO Departments (department_name, department_code, phone_number, email, location, description, status, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, dept.getDepartmentName());
+            ps.setString(2, dept.getDepartmentCode());
+            ps.setString(3, dept.getPhoneNumber());
+            ps.setString(4, dept.getEmail());
+            ps.setString(5, dept.getLocation());
+            ps.setString(6, dept.getDescription());
+            ps.setString(7, dept.getStatus().toString());
+            ps.setTimestamp(8, java.sql.Timestamp.valueOf(dept.getCreatedAt()));
+            ps.setTimestamp(9, java.sql.Timestamp.valueOf(dept.getUpdatedAt()));
+            ps.executeUpdate();
+            System.out.println("✅ Thêm phòng ban thành công!");
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi addDepartment: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void updateDepartment(Department dept) {
+        String sql = "UPDATE Departments SET department_name = ?, department_code = ?, phone_number = ?, email = ?, location = ?, description = ?, "
+                + "status = ?, updated_at = ? WHERE department_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, dept.getDepartmentName());
+            ps.setString(2, dept.getDepartmentCode());
+            ps.setString(3, dept.getPhoneNumber());
+            ps.setString(4, dept.getEmail());
+            ps.setString(5, dept.getLocation());
+            ps.setString(6, dept.getDescription());
+            ps.setString(7, dept.getStatus().toString());
+            ps.setTimestamp(8, java.sql.Timestamp.valueOf(dept.getUpdatedAt()));
+            ps.setInt(9, dept.getDepartmentId());
+            ps.executeUpdate();
+            System.out.println("✅ Cập nhật phòng ban thành công!");
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi updateDepartment: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteDepartment(int id) {
+        String sql = "UPDATE Departments SET status = 'deleted', updated_at = ? WHERE department_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(2, id);
+            ps.executeUpdate();
+            System.out.println("✅ Xóa mềm phòng ban thành công!");
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi deleteDepartment: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public Department getDepartmentById(int id) {
+        String sql = "SELECT * FROM Departments WHERE department_id = ? AND status != 'deleted'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Department d = new Department();
+                    d.setDepartmentId(rs.getInt("department_id"));
+                    d.setDepartmentName(rs.getString("department_name"));
+                    d.setDepartmentCode(rs.getString("department_code"));
+                    d.setPhoneNumber(rs.getString("phone_number"));
+                    d.setEmail(rs.getString("email"));
+                    d.setLocation(rs.getString("location"));
+                    d.setDescription(rs.getString("description"));
+                    d.setStatus(Department.Status.valueOf(rs.getString("status")));
+                    d.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    d.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    return d;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        DepartmentDAO dao = new DepartmentDAO();
+        List<Department> list = dao.getAllDepartments();
+        for (Department department : list) {
+            System.out.println(department.toString());
+        }
+    }
 }
