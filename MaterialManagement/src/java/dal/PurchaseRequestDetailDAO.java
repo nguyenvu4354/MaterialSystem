@@ -21,12 +21,18 @@ public class PurchaseRequestDetailDAO extends DBContext {
                          "WHERE d.purchase_request_id = ? " +
                          "ORDER BY d.detail_id " +
                          "LIMIT ? OFFSET ?";
+            System.out.println("SQL Query: " + sql);
+            System.out.println("Parameters: id=" + id + ", page=" + page + ", pageSize=" + pageSize);
+            
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
             ps.setInt(2, pageSize);
             ps.setInt(3, (page - 1) * pageSize);
             ResultSet rs = ps.executeQuery();
+            
+            int count = 0;
             while (rs.next()) {
+                count++;
                 PurchaseRequestDetail prd = new PurchaseRequestDetail();
                 prd.setPurchaseRequestDetailId(rs.getInt("detail_id"));
                 prd.setPurchaseRequestId(rs.getInt("purchase_request_id"));
@@ -37,8 +43,11 @@ public class PurchaseRequestDetailDAO extends DBContext {
                 prd.setUpdatedAt(rs.getTimestamp("updated_at"));
                 prd.setMaterialName(rs.getString("material_name")); // Set material_name
                 list.add(prd);
+                System.out.println("Found detail: ID=" + prd.getPurchaseRequestDetailId() + ", Material=" + prd.getMaterialName() + ", Quantity=" + prd.getQuantity());
             }
+            System.out.println("Total details found: " + count);
         } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
             e.printStackTrace();
         }
         return list;

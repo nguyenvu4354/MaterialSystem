@@ -33,7 +33,7 @@
                 font-size: 1.75rem;
                 font-weight: bold;
                 margin-bottom: 0.5rem;
-                color: #5c4434;
+                color: #DEAD6F;
             }
             .filter-bar {
                 display: flex;

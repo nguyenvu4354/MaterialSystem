@@ -81,6 +81,15 @@
                         <div class="row my-5 py-5">
                             <div class="col-12 bg-white p-4 rounded shadow purchase-form">
                                 <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
+                                <c:if test="${not empty errors}">
+                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                        <ul style="margin-bottom: 0;">
+                                            <c:forEach var="error" items="${errors}">
+                                                <li>${error.value}</li>
+                                            </c:forEach>
+                                        </ul>
+                                    </div>
+                                </c:if>
                                 <form action="CreatePurchaseRequest" method="post">
                                     <div class="row g-3">
                                         <div class="col-md-6">
@@ -105,7 +114,7 @@
                                         <div class="row material-row align-items-center gy-2">
                                             <div class="col-md-3">
                                                 <label class="form-label text-muted">Material</label>
-                                                <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off">
+                                                <input type="text" class="form-control material-name-input" name="materialName" placeholder="Type material name or code" autocomplete="off">
                                                 <input type="hidden" name="materialId" class="material-id-input">
                                             </div>
                                             <div class="col-md-2">
@@ -149,19 +158,20 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        var materialsData = [];
-        <c:forEach var="material" items="${materials}">
-        materialsData.push({
-            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
-            value: "${fn:escapeXml(material.materialName)}",
-            id: "${material.materialId}",
-            name: "${fn:escapeXml(material.materialName)}",
-            code: "${fn:escapeXml(material.materialCode)}",
-            imageUrl: "${fn:escapeXml(material.materialsUrl)}",
-            categoryId: "${material.category.category_id}",
-            categoryName: "${material.category.category_name}"
-        });
+        var materialsData = [
+        <c:forEach var="material" items="${materials}" varStatus="status">
+            {
+                label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+                value: "${fn:escapeXml(material.materialName)}",
+                id: "${material.materialId}",
+                name: "${fn:escapeXml(material.materialName)}",
+                code: "${fn:escapeXml(material.materialCode)}",
+                imageUrl: "${fn:escapeXml(material.materialsUrl)}",
+                categoryId: "${material.category.category_id}",
+                categoryName: "${material.category.category_name}"
+            }<c:if test="${!status.last}">,</c:if>
         </c:forEach>
+        ];
 
         function updateMaterialRowAutocomplete(row) {
             const nameInput = row.querySelector('.material-name-input');
@@ -249,7 +259,7 @@
             materialList.appendChild(newRow);
             updateMaterialRowAutocomplete(newRow);
         });
-
+        
         // Remove material row
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-material')) {

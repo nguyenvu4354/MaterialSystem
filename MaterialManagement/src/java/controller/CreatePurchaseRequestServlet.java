@@ -108,6 +108,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             String reason = request.getParameter("reason");
 
             String[] materialNames = request.getParameterValues("materialName");
+            String[] materialIds = request.getParameterValues("materialId");
             String[] quantities = request.getParameterValues("quantity");
             String[] notes = request.getParameterValues("note");
 
@@ -118,10 +119,21 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             if (!formErrors.isEmpty()) {
                 List<Category> categories = categoryDAO.getAllCategories();
                 List<entity.Material> materials = materialDAO.getAllProducts();
+                String requestCode = request.getParameter("requestCode");
+                if (requestCode == null || requestCode.isEmpty()) {
+                    requestCode = "PR-" + new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date())
+                        + "-" + (int) (Math.random() * 1000);
+                }
+                String requestDate = request.getParameter("requestDate");
+                if (requestDate == null || requestDate.isEmpty()) {
+                    requestDate = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
+                }
                 request.setAttribute("categories", categories);
                 request.setAttribute("materials", materials);
                 request.setAttribute("errors", formErrors);
                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+                request.setAttribute("requestCode", requestCode);
+                request.setAttribute("requestDate", requestDate);
                 request.getRequestDispatcher("PurchaseRequestForm.jsp").forward(request, response);
                 return;
             }
@@ -133,9 +145,13 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                     continue;
                 }
                 int quantity = Integer.parseInt(quantities[i]);
-
+                int materialId = 0;
+                if (materialIds != null && materialIds.length > i && materialIds[i] != null && !materialIds[i].isEmpty()) {
+                    materialId = Integer.parseInt(materialIds[i]);
+                }
                 PurchaseRequestDetail detail = new PurchaseRequestDetail();
                 detail.setMaterialName(materialName.trim());
+                detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 String note = (notes != null && notes.length > i) ? notes[i] : null;
                 detail.setNotes(note != null && !note.trim().isEmpty() ? note.trim() : null);
