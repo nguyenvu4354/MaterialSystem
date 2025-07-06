@@ -40,6 +40,26 @@
             border: 1px solid #eee;
             display: block;
         }
+        /* Style cho box gợi ý autocomplete */
+        .ui-autocomplete {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            z-index: 9999 !important;
+            font-size: 1rem;
+        }
+        .ui-menu-item-wrapper {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .ui-menu-item-wrapper.ui-state-active {
+            background: #f0f4fa;
+            color: #0d6efd;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>

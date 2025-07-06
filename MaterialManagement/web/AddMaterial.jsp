@@ -69,11 +69,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode != null ? materialCode : ''}" readonly>
+                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${param.materialCode != null ? param.materialCode : (materialCode != null ? materialCode : '')}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="materialName" class="form-label required-field">Material Name</label>
-                            <input type="text" class="form-control" id="materialName" name="materialName" value="${m.materialName}">
+                            <input type="text" class="form-control" id="materialName" name="materialName" value="${param.materialName != null ? param.materialName : (materialName != null ? materialName : '')}">
                         </div>
                     </div>
 
@@ -120,9 +120,8 @@
                             <label for="categoryId" class="form-label required-field">Category</label>
                             <select class="form-select" id="categoryId" name="categoryId">
                                 <option value="">Select Category</option>
-                                <!-- Loop through category list -->
                                 <c:forEach items="${categories}" var="category">
-                                    <option value="${category.category_id}">${category.category_name}</option>
+                                    <option value="${category.category_id}" <c:if test="${(param.categoryId != null ? param.categoryId : categoryId) == category.category_id}">selected</c:if>>${category.category_name}</option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -131,7 +130,7 @@
                             <select class="form-select" id="unitId" name="unitId">
                                 <option value="" selected disabled>Select Unit</option>
                                 <c:forEach items="${units}" var="unit">
-                                    <option value="${unit.id}">${unit.unitName}</option>
+                                    <option value="${unit.id}" <c:if test="${(param.unitId != null ? param.unitId : unitId) == unit.id}">selected</c:if>>${unit.unitName}</option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -141,11 +140,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="price" class="form-label required-field">Price ($)</label>
-                            <input type="number" class="form-control" id="price" name="price" min="0.01" step="0.01">
+                            <input type="number" class="form-control" id="price" name="price" value="${param.price != null ? param.price : (price != null ? price : '')}">
                         </div>
                         <div class="col-md-6">
                             <label for="conditionPercentage" class="form-label required-field">Condition (%)</label>
-                            <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" min="0" max="100" value="100">
+                            <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" value="${param.conditionPercentage != null ? param.conditionPercentage : (conditionPercentage != null ? conditionPercentage : '100')}">
                         </div>
                     </div>
 
@@ -154,9 +153,9 @@
                         <div class="col-md-6">
                             <label for="materialStatus" class="form-label required-field">Status</label>
                             <select class="form-select" id="materialStatus" name="materialStatus">
-                                <option value="NEW">New</option>
-                                <option value="USED">Used</option>
-                                <option value="DAMAGED">Damaged</option>
+                                <option value="NEW" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'NEW'}">selected</c:if>>New</option>
+                                <option value="USED" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'USED'}">selected</c:if>>Used</option>
+                                <option value="DAMAGED" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'DAMAGED'}">selected</c:if>>Damaged</option>
                             </select>
                         </div>
                     </div>
@@ -179,7 +178,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Handle image file selection -> display preview + switch tab
+        // Preview ảnh khi chọn file hoặc nhập URL, không validate gì ở client
         document.getElementById('imageFile').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -195,19 +194,22 @@
             }
         });
 
-        // Handle image URL input -> display preview + switch tab
         document.getElementById('materialsUrl').addEventListener('input', function(event) {
             const url = event.target.value.trim();
             if (url) {
                 document.getElementById('imageFile').value = '';
-                document.getElementById('previewImg').src = url;
+                // Nếu là tên file, tự động thêm prefix images/material/
+                let previewUrl = url;
+                if (!url.startsWith('http')) {
+                    previewUrl = 'images/material/' + url;
+                }
+                document.getElementById('previewImg').src = previewUrl;
                 document.getElementById('imagePreview').style.display = 'block';
                 const urlTab = document.getElementById('url-tab');
                 bootstrap.Tab.getOrCreateInstance(urlTab).show();
             }
         });
 
-        // When switching between upload/url tabs, clear the other input
         document.getElementById('imageInputTabs').addEventListener('shown.bs.tab', function (event) {
             if (event.target.id === 'upload-tab') {
                 document.getElementById('materialsUrl').value = '';
