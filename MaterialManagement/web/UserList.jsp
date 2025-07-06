@@ -122,9 +122,9 @@
                                         <th>Department</th>
                                         <th>Role</th>
                                         <th>Status</th>
-                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
+                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
                                             <th>Action</th>
-                                            </c:if>
+                                        </c:if>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -221,23 +221,27 @@
                                                 </td>
                                                 <c:if test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') || rolePermissionDAO.hasPermission(roleId, 'DELETE_USER') || rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
                                                     <td>
-                                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
-                                                            <a href="UserDetail?userId=${user.userId}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1">
-                                                                <i class="bi bi-eye"></i> View
-                                                            </a>
-                                                        </c:if>
-                                                        <c:if test="${rolePermissionDAO.hasPermission(roleId, 'DELETE_USER')}">
-                                                            <form method="post" action="UserList" style="display:inline;">
-                                                                <input type="hidden" name="userId" value="${user.userId}"/>
-                                                                <input type="hidden" name="action" value="delete"/>
-                                                                <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
-                                                                <input type="hidden" name="statusFilter" value="${statusFilter}"/>
-                                                                <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
-                                                                <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
-                                                                <input type="hidden" name="page" value="${currentPage}"/>
-                                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
-                                                            </form>
-                                                        </c:if>
+                                                        <div class="d-flex justify-content-center">
+                                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_DETAIL_USER')}">
+                                                                <a href="UserDetail?userId=${user.userId}" class="btn btn-info btn-action" title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'DELETE_USER')}">
+                                                                <form method="post" action="UserList" style="display:inline;">
+                                                                    <input type="hidden" name="userId" value="${user.userId}"/>
+                                                                    <input type="hidden" name="action" value="delete"/>
+                                                                    <input type="hidden" name="usernameFilter" value="${usernameFilter}"/>
+                                                                    <input type="hidden" name="statusFilter" value="${statusFilter}"/>
+                                                                    <input type="hidden" name="roleIdFilter" value="${roleIdFilter}"/>
+                                                                    <input type="hidden" name="departmentIdFilter" value="${departmentIdFilter}"/>
+                                                                    <input type="hidden" name="page" value="${currentPage}"/>
+                                                                    <button type="submit" class="btn btn-danger btn-action" title="Delete User" onclick="return confirm('Are you sure you want to delete this user?');">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                        </div>
                                                     </td>
                                                 </c:if>
                                             </tr>
@@ -254,17 +258,17 @@
                                     <c:if test="${currentPage > 1}">
                                         <li class="page-item">
                                             <a class="page-link" href="UserList?page=${currentPage - 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Previous</a>
-                                            </li>
+                                        </li>
                                     </c:if>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${i == currentPage ? 'active' : ''}">
                                             <a class="page-link" href="UserList?page=${i}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">${i}</a>
-                                            </li>
+                                        </li>
                                     </c:forEach>
                                     <c:if test="${currentPage < totalPages}">
                                         <li class="page-item">
                                             <a class="page-link" href="UserList?page=${currentPage + 1}<c:if test='${not empty usernameFilter}'>&username=${usernameFilter}</c:if><c:if test='${not empty statusFilter}'>&status=${statusFilter}</c:if><c:if test='${roleIdFilter != null}'>&roleId=${roleIdFilter}</c:if><c:if test='${departmentIdFilter != null}'>&departmentId=${departmentIdFilter}</c:if>">Next</a>
-                                            </li>
+                                        </li>
                                     </c:if>
                                 </ul>
                             </nav>
