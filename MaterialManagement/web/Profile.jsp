@@ -103,6 +103,9 @@
                                     <input type="file" class="form-control" name="userPicture" id="userPictureInput"
                                            form="profileForm" accept="image/*" onchange="previewImage(event)">
                                 </div>
+                                <div class="mb-3">
+                                    <a href="ChangePassword.jsp" class="btn btn-outline-primary w-100">Change Password</a>
+                                </div>
                             </div>
 
                             <!-- Profile Form -->
