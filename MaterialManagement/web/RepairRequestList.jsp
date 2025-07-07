@@ -10,7 +10,7 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <style>
             body {
-                font-family: 'Poppins', sans-serif;
+                font-family: 'Roboto', sans-serif;
             }
             .container-main {
                 max-width: 1200px;
@@ -76,10 +76,14 @@
                 margin-top: 10px;
             }
             .btn-filter {
-                width: 150px;
+                font-family: 'Roboto', Arial, sans-serif;
+                width: 110px;
                 height: 50px;
             }
-           
+            .form-select {
+                width: 180px;
+            }
+
         </style>
     </head>
     <body>
@@ -106,7 +110,7 @@
                                 </select>
                             </div>
                             <div class="col-auto">
-                               <button type="submit" class="btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                                <button type="submit" class="btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                             </div>
                         </form>
 
