@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class DepartmentDAO extends DBContext {
 
@@ -156,6 +157,45 @@ public class DepartmentDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String generateUniqueDepartmentCode() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random = new Random();
+        String code;
+        int maxAttempts = 100; // Limit attempts to avoid infinite loop
+        int attempt = 0;
+
+        do {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 3; i++) {
+                sb.append(characters.charAt(random.nextInt(characters.length())));
+            }
+            code = sb.toString();
+            attempt++;
+        } while (isCodeExists(code) && attempt < maxAttempts);
+
+        if (attempt >= maxAttempts) {
+            throw new RuntimeException("Unable to generate unique department code after " + maxAttempts + " attempts");
+        }
+
+        return code;
+    }
+
+    private boolean isCodeExists(String code) {
+        String sql = "SELECT COUNT(*) FROM Departments WHERE department_code = ? AND status != 'deleted'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, code);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi isCodeExists: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void main(String[] args) {
