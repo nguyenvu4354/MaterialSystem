@@ -9,75 +9,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f8f9fa;
-    }
-    .container {
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .card {
-        border: none;
-        margin-bottom: 20px;
-    }
-    .card-header {
-        background-color: #DEAD6F;
-        border-bottom: none;
-        font-weight: bold;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #DEAD6F;
+            border-bottom: none;
+            font-weight: bold;
         color: #fff;
-    }
-    .table {
-        margin-top: 20px;
-    }
-    .btn {
-        margin-right: 10px;
-        background-color: #DEAD6F;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .btn {
+            margin-right: 10px;
+            background-color: #DEAD6F;
         border: none;
         color: #fff;
     }
     .btn:hover {
         background-color: #c79b5a;
         color: #fff;
-    }
-    .alert {
-        margin-top: 20px;
-    }
-    .total-amount {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #dc3545;
-    }
-    .status-tag {
-        padding: 5px 10px;
-        border-radius: 5px;
-        color: #fff;
-    }
-    .status-pending { background-color: #6c757d; }
-    .status-approved { background-color: #198754; }
-    .status-rejected { background-color: #dc3545; }
-    .page-info {
-        text-align: center;
-        margin: 10px 0;
-        font-weight: bold;
-    }
-    .custom-table thead th {
-        background-color: #f9f5f0;
-        color: #5c4434;
-        font-weight: 600;
-    }
-    .custom-table tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-    .custom-table th,
-    .custom-table td {
-        vertical-align: middle;
-        min-height: 48px;
-    }
+        }
+        .alert {
+            margin-top: 20px;
+        }
+        .total-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .status-pending { background-color: #6c757d; }
+        .status-approved { background-color: #198754; }
+        .status-rejected { background-color: #dc3545; }
+        .page-info {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .custom-table thead th {
+            background-color: #f9f5f0;
+            color: #5c4434;
+            font-weight: 600;
+        }
+        .custom-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .custom-table th,
+        .custom-table td {
+            vertical-align: middle;
+            min-height: 48px;
+        }
 
     /* Custom Pagination Styles */
     .pagination .page-link {
@@ -104,7 +104,7 @@
         border-color: #ddd;
         cursor: not-allowed;
     }
-</style>
+    </style>
 
 </head>
 <body>

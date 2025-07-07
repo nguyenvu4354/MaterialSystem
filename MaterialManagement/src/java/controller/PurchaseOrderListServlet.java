@@ -54,6 +54,9 @@ public class PurchaseOrderListServlet extends HttpServlet {
                 return;
             }
 
+            boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
+            request.setAttribute("hasSendToSupplierPermission", hasSendToSupplierPermission);
+
             // Lấy và xử lý các tham số tìm kiếm
             String status = request.getParameter("status");
             String poCode = request.getParameter("poCode");

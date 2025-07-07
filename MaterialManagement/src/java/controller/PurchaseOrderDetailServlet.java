@@ -36,6 +36,9 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
 
         boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
         request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
+        // Thêm kiểm tra quyền gửi nhà cung cấp
+        boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
+        request.setAttribute("hasSendToSupplierPermission", hasSendToSupplierPermission);
 
         try {
             int poId = Integer.parseInt(request.getParameter("id"));
@@ -46,6 +49,11 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase Order not found");
                 return;
             }
+
+            // Lấy thông tin đầy đủ của người tạo đơn
+            dal.UserDAO userDAO = new dal.UserDAO();
+            entity.User creator = userDAO.getUserById(purchaseOrder.getCreatedBy());
+            request.setAttribute("creator", creator);
 
             // Phân trang cho chi tiết đơn hàng
             int itemsPerPage = 5;
@@ -68,6 +76,18 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
             if (purchaseOrder.getDetails() != null && totalItems > 0 && fromIndex < totalItems) {
                 pagedDetails = purchaseOrder.getDetails().subList(fromIndex, toIndex);
             }
+            // Tạo map materialId -> materialImageUrl
+            java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
+            if (purchaseOrder.getDetails() != null) {
+                for (entity.PurchaseOrderDetail detail : purchaseOrder.getDetails()) {
+                    String url = detail.getMaterialImageUrl();
+                    if (url == null || url.trim().isEmpty()) {
+                        url = "default.jpg";
+                    }
+                    materialImages.put(detail.getMaterialId(), url);
+                }
+            }
+            request.setAttribute("materialImages", materialImages);
             request.setAttribute("pagedDetails", pagedDetails);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
@@ -98,23 +118,36 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 2) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
-
+        PurchaseOrderDAO purchaseOrderDAO = new PurchaseOrderDAO();
         try {
             String action = request.getParameter("action");
             int poId = Integer.parseInt(request.getParameter("poId"));
-
+            String status = request.getParameter("status");
+            String approvalReason = request.getParameter("approvalReason");
+            String rejectionReason = request.getParameter("rejectionReason");
+            PurchaseOrder purchaseOrder = purchaseOrderDAO.getPurchaseOrderById(poId);
             if ("updateStatus".equals(action)) {
-                String status = request.getParameter("status");
-                String approvalReason = request.getParameter("approvalReason");
-                String rejectionReason = request.getParameter("rejectionReason");
-
-                PurchaseOrderDAO purchaseOrderDAO = new PurchaseOrderDAO();
+                // Xử lý quyền động
+                if ("approved".equals(status) || "rejected".equals(status)) {
+                    // Chỉ cho phép nếu có quyền HANDLE_REQUEST và đơn đang pending
+                    boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
+                    if (!hasHandleRequestPermission || purchaseOrder == null || !"pending".equals(purchaseOrder.getStatus())) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+                        return;
+                    }
+                } else if ("sent_to_supplier".equals(status)) {
+                    // Chỉ cho phép nếu có quyền SENT_TO_SUPPLIER và đơn đang approved
+                    boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
+                    if (!hasSendToSupplierPermission || purchaseOrder == null || !"approved".equals(purchaseOrder.getStatus())) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+                        return;
+                    }
+                } else {
+                    // Không cho phép các trạng thái khác
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid status update");
+                    return;
+                }
                 boolean success = purchaseOrderDAO.updatePurchaseOrderStatus(poId, status, user.getUserId(), approvalReason, rejectionReason);
-
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/PurchaseOrderDetail?id=" + poId + "&message=Status updated successfully");
                 } else {

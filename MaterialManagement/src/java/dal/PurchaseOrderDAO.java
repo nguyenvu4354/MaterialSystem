@@ -182,8 +182,9 @@ public class PurchaseOrderDAO extends DBContext {
             return details;
         }
 
-        String sql = "SELECT pod.*, c.category_name, s.supplier_name "
+        String sql = "SELECT pod.*, m.material_id, m.material_name, m.materials_url, c.category_name, s.supplier_name "
                 + "FROM Purchase_Order_Details pod "
+                + "LEFT JOIN materials m ON pod.material_id = m.material_id "
                 + "LEFT JOIN Categories c ON pod.category_id = c.category_id "
                 + "LEFT JOIN Suppliers s ON pod.supplier_id = s.supplier_id "
                 + "WHERE pod.po_id = ? "
@@ -210,7 +211,7 @@ public class PurchaseOrderDAO extends DBContext {
             return false;
         }
 
-        String sql = "UPDATE Purchase_Orders SET status = ?, approved_by = ?, approval_reason = ?, "
+        String sql = "UPDATE Purchase_Orders SET status = ?, approved_by = ?, approve_reason = ?, "
                 + "rejection_reason = ?, approved_at = CASE WHEN ? = 'approved' THEN CURRENT_TIMESTAMP ELSE NULL END, "
                 + "sent_to_supplier_at = CASE WHEN ? = 'sent_to_supplier' THEN CURRENT_TIMESTAMP ELSE sent_to_supplier_at END, "
                 + "updated_at = CURRENT_TIMESTAMP "
@@ -264,7 +265,9 @@ public class PurchaseOrderDAO extends DBContext {
         PurchaseOrderDetail detail = new PurchaseOrderDetail();
         detail.setPoDetailId(rs.getInt("po_detail_id"));
         detail.setPoId(rs.getInt("po_id"));
+        detail.setMaterialId(rs.getInt("material_id"));
         detail.setMaterialName(rs.getString("material_name"));
+        detail.setMaterialImageUrl(rs.getString("materials_url"));
         detail.setCategoryId(rs.getInt("category_id"));
         detail.setCategoryName(rs.getString("category_name"));
         detail.setQuantity(rs.getInt("quantity"));
@@ -300,15 +303,19 @@ public class PurchaseOrderDAO extends DBContext {
                     if (generatedKeys.next()) {
                         int poId = generatedKeys.getInt(1);
                         // Insert Purchase Order Details
-                        String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_name, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                        String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_id, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
                         try (PreparedStatement detailPs = conn.prepareStatement(insertDetailSql)) {
                             for (PurchaseOrderDetail detail : details) {
                                 detailPs.setInt(1, poId);
-                                detailPs.setString(2, detail.getMaterialName());
+                                detailPs.setInt(2, detail.getMaterialId());
                                 detailPs.setInt(3, detail.getCategoryId());
                                 detailPs.setInt(4, detail.getQuantity());
                                 detailPs.setBigDecimal(5, detail.getUnitPrice());
-                                detailPs.setInt(6, detail.getSupplierId());
+                                if (detail.getSupplierId() != null) {
+                                    detailPs.setInt(6, detail.getSupplierId());
+                                } else {
+                                    detailPs.setNull(6, java.sql.Types.INTEGER);
+                                }
                                 int detailRowsAffected = detailPs.executeUpdate();
                                 if (detailRowsAffected == 0) {
                                     throw new SQLException("Creating purchase order detail failed, no rows affected.");

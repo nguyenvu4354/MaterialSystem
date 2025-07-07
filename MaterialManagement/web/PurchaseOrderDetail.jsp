@@ -12,52 +12,62 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #faf4ee;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
         }
-        .container-main {
-            max-width: 1200px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        h2 {
-            font-size: 1.75rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #5c4434;
-        }
-        .status-badge {
-            padding: 2px 10px;
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
             border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .status-draft {
-            background-color: #e2e3e5;
-            color: #495057;
+        .card {
+            border: none;
+            margin-bottom: 20px;
         }
-        .status-pending {
-            background-color: #6c757d;
+        .card-header {
+            background-color: #DEAD6F;
+            border-bottom: none;
+            font-weight: bold;
             color: #fff;
         }
-        .status-approved {
-            background-color: #d4edda;
-            color: #155724;
+        .table {
+            margin-top: 20px;
         }
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
+        .btn {
+            margin-right: 10px;
+            background-color: #DEAD6F;
+            border: none;
+            color: #fff;
         }
-        .status-sent_to_supplier {
-            background-color: #cce5ff;
-            color: #004085;
+        .btn:hover {
+            background-color: #c79b5a;
+            color: #fff;
         }
-        .status-cancelled {
-            background-color: #e2e3f3;
-            color: #4b0082;
+        .alert {
+            margin-top: 20px;
+        }
+        .total-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #198754;
+        }
+        .status-tag {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .status-pending { background-color: #6c757d; }
+        .status-approved { background-color: #198754; }
+        .status-rejected { background-color: #dc3545; }
+        .status-sent_to_supplier { background-color: #0d6efd; }
+        .status-cancel { background-color: #4b0082; }
+        .page-info {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
         }
         .custom-table thead th {
             background-color: #f9f5f0;
@@ -72,21 +82,6 @@
             vertical-align: middle;
             min-height: 48px;
         }
-        .btn-back {
-            background-color: #DEAD6F;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .btn-back:hover {
-            background-color: #cfa856;
-            color: #fff;
-        }
-
-        /* Custom Pagination Styles */
         .pagination .page-link {
             color: #5c4434;
             background-color: #f4f1ed;
@@ -111,246 +106,144 @@
     </style>
 </head>
 <body>
-<jsp:include page="Header.jsp" />
-<div class="container-fluid">
-    <div class="row">
-        <jsp:include page="SidebarDirector.jsp"/>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="container-main">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;">
-                        <i class="fas fa-file-invoice"></i> Purchase Order Detail
-                    </h2>
-                    <a href="PurchaseOrderList" class="btn btn-back">
-                        <i class="fas fa-arrow-left me-2"></i>Back to List
-                    </a>
-                </div>
-                
-                <c:if test="${!hasViewPurchaseOrderDetailPermission}">
-                    <div class="alert alert-danger">You do not have permission to view purchase order detail.</div>
-                    <jsp:include page="HomePage.jsp"/>
-                </c:if>
-                <c:if test="${hasViewPurchaseOrderDetailPermission}">
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>${error}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    </c:if>
-                    
-                    <c:if test="${not empty purchaseOrder}">
-                        <!-- Purchase Order Information -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Purchase Order Information</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>PO Code:</strong></div>
-                                            <div class="col-sm-8">${purchaseOrder.poCode}</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>Request Code:</strong></div>
-                                            <div class="col-sm-8">${purchaseOrder.purchaseRequestCode}</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>Status:</strong></div>
-                                            <div class="col-sm-8">
-                                                <c:choose>
-                                                    <c:when test="${purchaseOrder.status == 'draft'}">
-                                                        <span class="status-badge status-draft">Draft</span>
-                                                    </c:when>
-                                                    <c:when test="${purchaseOrder.status == 'pending'}">
-                                                        <span class="status-badge status-pending">Pending</span>
-                                                    </c:when>
-                                                    <c:when test="${purchaseOrder.status == 'approved'}">
-                                                        <span class="status-badge status-approved">Approved</span>
-                                                    </c:when>
-                                                    <c:when test="${purchaseOrder.status == 'rejected'}">
-                                                        <span class="status-badge status-rejected">Rejected</span>
-                                                    </c:when>
-                                                    <c:when test="${purchaseOrder.status == 'sent_to_supplier'}">
-                                                        <span class="status-badge status-sent_to_supplier">Sent to Supplier</span>
-                                                    </c:when>
-                                                    <c:when test="${purchaseOrder.status == 'cancelled'}">
-                                                        <span class="status-badge status-cancelled">Cancelled</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="status-badge status-pending">${purchaseOrder.status}</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>Created By:</strong></div>
-                                            <div class="col-sm-8">${purchaseOrder.createdByName}</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>Created Date:</strong></div>
-                                            <div class="col-sm-8">${purchaseOrder.createdAt}</div>
-                                        </div>
-                                        <c:if test="${not empty purchaseOrder.note}">
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4"><strong>Note:</strong></div>
-                                                <div class="col-sm-8">${purchaseOrder.note}</div>
-                                            </div>
-                                        </c:if>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-user-check me-2"></i>Approval Information</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <c:if test="${not empty purchaseOrder.approvedByName}">
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4"><strong>Approved By:</strong></div>
-                                                <div class="col-sm-8">${purchaseOrder.approvedByName}</div>
-                                            </div>
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4"><strong>Approved Date:</strong></div>
-                                                <div class="col-sm-8">${purchaseOrder.approvedAt}</div>
-                                            </div>
-                                        </c:if>
-                                        <c:if test="${not empty purchaseOrder.rejectionReason}">
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4"><strong>Rejection Reason:</strong></div>
-                                                <div class="col-sm-8 text-danger">${purchaseOrder.rejectionReason}</div>
-                                            </div>
-                                        </c:if>
-                                        <c:if test="${not empty purchaseOrder.sentToSupplierAt}">
-                                            <div class="row mb-2">
-                                                <div class="col-sm-4"><strong>Sent to Supplier:</strong></div>
-                                                <div class="col-sm-8">${purchaseOrder.sentToSupplierAt}</div>
-                                            </div>
-                                        </c:if>
-                                        <div class="row mb-2">
-                                            <div class="col-sm-4"><strong>Total Amount:</strong></div>
-                                            <div class="col-sm-8">
-                                                <strong class="text-success">$<fmt:formatNumber value="${purchaseOrder.totalAmount}" type="number" minFractionDigits="2"/></strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Purchase Order Details -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Purchase Order Details</h5>
-                            </div>
-                            <div class="card-body">
-                                <c:if test="${not empty pagedDetails}">
-                                    <div class="table-responsive">
-                                        <table class="table custom-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Material Name</th>
-                                                    <th>Category</th>
-                                                    <th>Quantity</th>
-                                                    <th>Unit Price</th>
-                                                    <th>Total</th>
-                                                    <th>Supplier</th>
-                                                    <th>Note</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <c:forEach var="detail" items="${pagedDetails}">
-                                                    <tr>
-                                                        <td><strong>${detail.materialName}</strong></td>
-                                                        <td>${detail.categoryName}</td>
-                                                        <td>${detail.quantity}</td>
-                                                        <td>$<fmt:formatNumber value="${detail.unitPrice}" type="number" minFractionDigits="2"/></td>
-                                                        <td><strong>$<fmt:formatNumber value="${detail.quantity * detail.unitPrice}" type="number" minFractionDigits="2"/></strong></td>
-                                                        <td>
-                                                            <c:choose>
-                                                                <c:when test="${not empty detail.supplierName}">
-                                                                    ${detail.supplierName}
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="text-muted">Not specified</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                        <td>
-                                                            <c:choose>
-                                                                <c:when test="${not empty detail.note}">
-                                                                    ${detail.note}
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="text-muted">-</span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- Pagination -->
-                                    <nav class="mt-3">
-                                        <ul class="pagination justify-content-center">
-                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${currentPage - 1}">Previous</a>
-                                            </li>
-                                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                                <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${i}">${i}</a>
-                                                </li>
-                                            </c:forEach>
-                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${currentPage + 1}">Next</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </c:if>
-                                
-                                <c:if test="${empty pagedDetails}">
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
-                                        <p class="text-muted">No details found for this purchase order.</p>
-                                    </div>
-                                </c:if>
-                            </div>
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="mt-4 d-flex gap-2">
-                            <c:if test="${hasHandleRequestPermission && purchaseOrder.status == 'pending'}">
-                                <button type="button" class="btn btn-success" onclick="updateStatus('${purchaseOrder.poId}', 'approved')">
-                                    <i class="fas fa-check me-2"></i>Approve
-                                </button>
-                                <button type="button" class="btn btn-danger" onclick="updateStatus('${purchaseOrder.poId}', 'rejected')">
-                                    <i class="fas fa-times me-2"></i>Reject
-                                </button>
-                                <a href="PurchaseOrderList" class="btn btn-secondary">Cancel</a>
-                            </c:if>
-                            <c:if test="${!(hasHandleRequestPermission && purchaseOrder.status == 'pending')}">
-                                <a href="PurchaseOrderList" class="btn btn-secondary">Cancel</a>
-                            </c:if>
-                        </div>
-                    </c:if>
-                    
-                    <c:if test="${empty purchaseOrder}">
-                        <div class="text-center py-5">
-                            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                            <h4 class="text-warning">Purchase Order Not Found</h4>
-                            <p class="text-muted">The requested purchase order could not be found.</p>
-                            <a href="PurchaseOrderList" class="btn btn-back">
-                                <i class="fas fa-arrow-left me-2"></i>Back to List
-                            </a>
-                        </div>
-                    </c:if>
-                </c:if>
+<div class="container">
+    <h2>${purchaseOrder.poCode} <span class="status-tag status-${purchaseOrder.status}">${purchaseOrder.status}</span></h2>
+    <p>Created at: ${purchaseOrder.createdAt}</p>
+
+    <!-- Card: Created By (Full Info) -->
+    <div class="card">
+        <div class="card-header">Created By</div>
+        <div class="card-body d-flex align-items-center">
+            <div style="flex: 1;">
+                <p><strong>Full Name:</strong> ${creator.fullName}</p>
+                <p><strong>Email:</strong> ${creator.email}</p>
+                <p><strong>Phone Number:</strong> ${creator.phoneNumber}</p>
+                <p><strong>Department:</strong> ${creator.departmentName}</p>
+                <p><strong>Role:</strong> ${creator.roleName}</p>
             </div>
-        </main>
+            <div style="flex: 0 0 100px; margin-left: 20px;">
+                <img src="images/profiles/${not empty creator.userPicture ? creator.userPicture : 'DefaultUser.jpg'}" alt="${creator.fullName}" class="img-fluid rounded-circle" style="width:100px;height:100px;object-fit:cover;">
+            </div>
+        </div>
     </div>
+
+    <!-- Card: Order Information -->
+    <div class="card">
+        <div class="card-header">Order Information</div>
+        <div class="card-body">
+            <p><strong>Request Code:</strong> ${purchaseOrder.purchaseRequestCode}</p>
+            <p><strong>Status:</strong> <span class="status-tag status-${purchaseOrder.status}">${purchaseOrder.status}</span></p>
+            <p><strong>Created Date:</strong> ${purchaseOrder.createdAt}</p>
+            <c:if test="${not empty purchaseOrder.note}">
+                <p><strong>Note:</strong> ${purchaseOrder.note}</p>
+            </c:if>
+            <c:if test="${not empty purchaseOrder.approvedByName}">
+                <p><strong>Approved By:</strong> ${purchaseOrder.approvedByName}</p>
+                <p><strong>Approved Date:</strong> ${purchaseOrder.approvedAt}</p>
+            </c:if>
+            <c:if test="${not empty purchaseOrder.rejectionReason}">
+                <p><strong>Rejection Reason:</strong> <span class="text-danger">${purchaseOrder.rejectionReason}</span></p>
+            </c:if>
+            <c:if test="${not empty purchaseOrder.sentToSupplierAt}">
+                <p><strong>Sent to Supplier:</strong> ${purchaseOrder.sentToSupplierAt}</p>
+            </c:if>
+            <p><strong>Total Amount:</strong> <span class="total-amount">$<fmt:formatNumber value="${purchaseOrder.totalAmount}" type="number" minFractionDigits="2"/></span></p>
+        </div>
+    </div>
+
+    <!-- Card: Material List -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Material List</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive" id="printTableArea">
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>Material Name</th>
+                            <th>Image</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                            <th>Supplier</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="detail" items="${pagedDetails}">
+                            <tr>
+                                <td><strong>${detail.materialName}</strong></td>
+                                <td>
+                                    <img src="images/material/${materialImages[detail.materialId]}" alt="${detail.materialName}" style="width: 100px; height: auto; object-fit: cover;">
+                                </td>
+                                <td>${detail.quantity}</td>
+                                <td>$<fmt:formatNumber value="${detail.unitPrice}" type="number" minFractionDigits="2"/></td>
+                                <td><strong>$<fmt:formatNumber value="${detail.quantity * detail.unitPrice}" type="number" minFractionDigits="2"/></strong></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${not empty detail.supplierName}">
+                                            ${detail.supplierName}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">Not specified</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${not empty detail.note}">
+                                            ${detail.note}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">-</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+            <c:if test="${not empty pagedDetails}">
+                <nav class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${currentPage - 1}">Previous</a>
+                        </li>
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${i}">${i}</a>
+                            </li>
+                        </c:forEach>
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="PurchaseOrderDetail?id=${purchaseOrder.poId}&page=${currentPage + 1}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </c:if>
+            <c:if test="${empty pagedDetails}">
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+                    <p class="text-muted">No details found for this purchase order.</p>
+                </div>
+            </c:if>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <c:if test="${hasHandleRequestPermission && purchaseOrder.status == 'pending'}">
+        <div class="d-flex gap-2 mb-2">
+            <button type="button" class="btn" style="background-color: #198754; color: #fff; border: none;" onclick="updateStatus('${purchaseOrder.poId}', 'approved')">Approve</button>
+            <button type="button" class="btn" style="background-color: #dc3545; color: #fff; border: none;" onclick="updateStatus('${purchaseOrder.poId}', 'rejected')">Reject</button>
+            <a href="PurchaseOrderList" class="btn btn-warning">Cancel</a>
+        </div>
+    </c:if>
+    <c:if test="${!(hasHandleRequestPermission && purchaseOrder.status == 'pending')}">
+        <div class="mb-2">
+            <a href="PurchaseOrderList" class="btn btn-warning">Cancel</a>
+        </div>
+    </c:if>
 </div>
 
 <!-- Status Update Modal -->
@@ -361,26 +254,23 @@
                 <h5 class="modal-title">Update Purchase Order Status</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="statusForm" method="POST" action="PurchaseOrderList">
+            <form id="statusForm" method="POST" action="PurchaseOrderDetail">
                 <div class="modal-body">
                     <input type="hidden" name="action" value="updateStatus">
                     <input type="hidden" name="poId" id="poId">
-                    
                     <div class="mb-3">
                         <label for="status" class="form-label">New Status</label>
                         <select class="form-select" name="status" id="status" required onchange="onStatusChange()">
                             <option value="">Select Status</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
-                            <option value="sent_to_supplier">Sent to Supplier</option>
+                           
                         </select>
                     </div>
-                    
                     <div class="mb-3" id="approvalReasonDiv" style="display: none;">
                         <label for="approvalReason" class="form-label">Approval Reason</label>
                         <textarea class="form-control" name="approvalReason" id="approvalReason" rows="3" placeholder="Enter approval reason..."></textarea>
                     </div>
-                    
                     <div class="mb-3" id="rejectionReasonDiv" style="display: none;">
                         <label for="rejectionReason" class="form-label">Rejection Reason</label>
                         <textarea class="form-control" name="rejectionReason" id="rejectionReason" rows="3" placeholder="Enter rejection reason..." required></textarea>

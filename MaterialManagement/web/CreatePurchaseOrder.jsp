@@ -89,13 +89,13 @@
 
                     <h3 class="fw-normal mt-5 mb-3">Materials</h3>
                     <div id="materialList">
-                        <c:if test="${not empty details}">
+                        <c:if test="${not empty purchaseRequestDetailList}">
                             <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>Material</th>
-                                            <th>Category</th>
+                                            <th>Image</th>
                                             <th>Quantity</th>
                                             <th>Unit Price</th>
                                             <th>Supplier</th>
@@ -103,15 +103,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <c:forEach var="mat" items="${details}">
+                                        <c:forEach var="mat" items="${purchaseRequestDetailList}">
                                             <tr>
                                                 <td>
                                                     <input type="text" class="form-control" name="materialNames[]" value="${mat.materialName}" readonly>
                                                     <input type="hidden" name="materials[]" value="${mat.materialId}">
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="categoryNames[]" value="${mat.categoryName}" readonly>
-                                                    <input type="hidden" name="categoryIds[]" value="${mat.categoryId}">
+                                                    <img src="${not empty materialImages[mat.materialId] ? materialImages[mat.materialId] : 'images/placeholder.png'}" alt="${mat.materialName}" style="width: 80px; height: auto; object-fit: cover;">
                                                 </td>
                                                 <td>
                                                     <input type="number" class="form-control quantity-input" name="quantities[]" value="${mat.quantity}" readonly>

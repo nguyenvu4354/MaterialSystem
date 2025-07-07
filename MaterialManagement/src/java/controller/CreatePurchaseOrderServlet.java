@@ -69,9 +69,19 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             String purchaseRequestIdStr = request.getParameter("purchaseRequestId");
             if (purchaseRequestIdStr != null && !purchaseRequestIdStr.isEmpty()) {
                 int purchaseRequestId = Integer.parseInt(purchaseRequestIdStr);
-                List<entity.PurchaseRequestDetail> details = purchaseRequestDetailDAO.paginationOfDetails(purchaseRequestId, 1, 1000);
-                request.setAttribute("details", details);
+                List<entity.PurchaseRequestDetail> purchaseRequestDetailList = purchaseRequestDetailDAO.paginationOfDetails(purchaseRequestId, 1, 1000);
+                if (purchaseRequestDetailList == null) purchaseRequestDetailList = new java.util.ArrayList<>();
+                request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
                 request.setAttribute("selectedPurchaseRequestId", purchaseRequestId);
+                java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
+                for (entity.PurchaseRequestDetail detail : purchaseRequestDetailList) {
+                    Material material = materialDAO.getInformation(detail.getMaterialId());
+                    String url = (material != null && material.getMaterialsUrl() != null && !material.getMaterialsUrl().isEmpty())
+                        ? material.getMaterialsUrl()
+                        : "images/material/default.jpg";
+                    materialImages.put(detail.getMaterialId(), url);
+                }
+                request.setAttribute("materialImages", materialImages);
             }
             request.getRequestDispatcher("CreatePurchaseOrder.jsp").forward(request, response);
         } catch (Exception e) {
@@ -139,6 +149,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                     throw new Exception("Material with ID " + materialId + " not found.");
                 }
                 entity.PurchaseOrderDetail detail = new entity.PurchaseOrderDetail();
+                detail.setMaterialId(materialId);
                 detail.setMaterialName(material.getMaterialName());
                 detail.setCategoryId(material.getCategory().getCategory_id());
                 detail.setQuantity(quantity);
@@ -151,6 +162,8 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             purchaseOrder.setPurchaseRequestId(purchaseRequestId);
             purchaseOrder.setCreatedBy(user.getUserId());
             purchaseOrder.setNote(note);
+            // Đảm bảo luôn set status là 'pending' khi tạo mới
+            purchaseOrder.setStatus("pending");
             boolean success = purchaseOrderDAO.createPurchaseOrder(purchaseOrder, details);
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");

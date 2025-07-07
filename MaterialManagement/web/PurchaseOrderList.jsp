@@ -144,7 +144,7 @@
                         <input type="text" class="form-control" name="poCode" value="${poCode}" placeholder="Search by PO code" style="width:230px;">
                         <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
-                            <option value="draft" ${status == 'draft' ? 'selected' : ''}>Draft</option>
+      
                             <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                             <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                             <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
@@ -178,12 +178,6 @@
                                         <td>${po.createdAt}</td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${po.status == 'draft'}">
-                                                    <span class="status-badge status-draft">Draft</span>
-                                                </c:when>
-                                                <c:when test="${po.status == 'pending'}">
-                                                    <span class="status-badge status-pending">Pending</span>
-                                                </c:when>
                                                 <c:when test="${po.status == 'approved'}">
                                                     <span class="status-badge status-approved">Approved</span>
                                                 </c:when>
@@ -193,11 +187,11 @@
                                                 <c:when test="${po.status == 'sent_to_supplier'}">
                                                     <span class="status-badge status-sent_to_supplier">Sent to Supplier</span>
                                                 </c:when>
-                                                <c:when test="${po.status == 'cancelled'}">
-                                                    <span class="status-badge status-cancelled">Cancelled</span>
+                                                <c:when test="${po.status == 'cancel' || po.status == 'cancelled'}">
+                                                    <span class="status-badge status-cancel">Cancelled</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="status-badge status-pending">${po.status}</span>
+                                                    <span class="status-badge status-pending">Pending</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
@@ -219,6 +213,11 @@
                                                 <a href="PurchaseOrderDetail?id=${po.poId}" class="btn btn-detail btn-sm" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                <c:if test="${hasSendToSupplierPermission && po.status == 'approved'}">
+                                                    <button type="button" class="btn btn-detail btn-sm" style="background-color: #0d6efd; color: #fff; border: none;" title="Send to Supplier" onclick="updateStatus('${po.poId}', 'sent_to_supplier')">
+                                                        <i class="fas fa-paper-plane"></i>
+                                                    </button>
+                                                </c:if>
                                             </div>
                                         </td>
                                     </tr>
@@ -308,9 +307,22 @@
     </div>
 </div>
 
+<form id="sendToSupplierForm" method="POST" action="PurchaseOrderList" style="display:none;">
+    <input type="hidden" name="action" value="updateStatus">
+    <input type="hidden" name="poId" id="sendToSupplierPoId">
+    <input type="hidden" name="status" value="sent_to_supplier">
+</form>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function updateStatus(poId, status) {
+        if (status === 'sent_to_supplier') {
+            if (confirm('Are you sure you want to send this purchase order to the supplier?')) {
+                document.getElementById('sendToSupplierPoId').value = poId;
+                document.getElementById('sendToSupplierForm').submit();
+            }
+            return;
+        }
         document.getElementById('poId').value = poId;
         document.getElementById('status').value = status;
         

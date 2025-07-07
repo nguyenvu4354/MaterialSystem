@@ -16,6 +16,8 @@ public class PurchaseOrderDetail {
     private String note;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private int materialId;
+    private String materialImageUrl;
 
     public PurchaseOrderDetail() {
     }
@@ -121,5 +123,21 @@ public class PurchaseOrderDetail {
             return unitPrice.multiply(BigDecimal.valueOf(quantity));
         }
         return BigDecimal.ZERO;
+    }
+
+    public int getMaterialId() {
+        return materialId;
+    }
+
+    public void setMaterialId(int materialId) {
+        this.materialId = materialId;
+    }
+
+    public String getMaterialImageUrl() {
+        return materialImageUrl;
+    }
+
+    public void setMaterialImageUrl(String materialImageUrl) {
+        this.materialImageUrl = materialImageUrl;
     }
 } 
