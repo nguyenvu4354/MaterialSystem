@@ -45,6 +45,7 @@ public class UserDAO extends DBContext {
                 User user = new User();
                 user.setUserId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
                 user.setPhoneNumber(rs.getString("phone_number"));
@@ -154,7 +155,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, description = ?, status = ?, department_id = ? WHERE user_id = ?";
+        String sql = "UPDATE Users SET password = ?, full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, description = ?, status = ?, department_id = ? WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             System.out.println("🔄 Cập nhật user với user_id = " + user.getUserId());
             System.out.println("full_name = " + user.getFullName());
@@ -168,17 +169,18 @@ public class UserDAO extends DBContext {
             System.out.println("status = " + (user.getStatus() != null ? user.getStatus().toString() : "null"));
             System.out.println("department_id = " + user.getDepartmentId());
 
-            ps.setString(1, user.getFullName());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPhoneNumber());
-            ps.setString(4, user.getAddress());
-            ps.setString(5, user.getUserPicture());
-            ps.setObject(6, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
-            ps.setString(7, user.getGender() != null ? user.getGender().toString() : null);
-            ps.setString(8, user.getDescription());
-            ps.setString(9, user.getStatus() != null ? user.getStatus().toString() : null);
-            ps.setObject(10, user.getDepartmentId());
-            ps.setInt(11, user.getUserId());
+            ps.setString(1, user.getPassword());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getEmail());
+            ps.setString(4, user.getPhoneNumber());
+            ps.setString(5, user.getAddress());
+            ps.setString(6, user.getUserPicture());
+            ps.setObject(7, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
+            ps.setString(8, user.getGender() != null ? user.getGender().toString() : null);
+            ps.setString(9, user.getDescription());
+            ps.setString(10, user.getStatus() != null ? user.getStatus().toString() : null);
+            ps.setObject(11, user.getDepartmentId());
+            ps.setInt(12, user.getUserId());
 
             int rowsAffected = ps.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected + " for user_id: " + user.getUserId());
