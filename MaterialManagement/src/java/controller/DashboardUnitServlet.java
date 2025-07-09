@@ -16,8 +16,27 @@ public class DashboardUnitServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         UnitDAO unitDAO = new UnitDAO();
-        List<Unit> units = unitDAO.getAllUnits();
+        String keyword = request.getParameter("keyword");
+        String pageParam = request.getParameter("page");
+        int page = 1;
+        int pageSize = 10;
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int totalUnits = unitDAO.countUnits(keyword);
+        int totalPages = (int) Math.ceil((double) totalUnits / pageSize);
+        if (page > totalPages && totalPages > 0) page = totalPages;
+        int offset = (page - 1) * pageSize;
+        List<Unit> units = unitDAO.getUnitsByPage(offset, pageSize, keyword);
         request.setAttribute("units", units);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("keyword", keyword);
         request.getRequestDispatcher("DashboardUnit.jsp").forward(request, response);
     }
 

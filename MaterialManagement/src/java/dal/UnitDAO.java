@@ -84,4 +84,83 @@ public class UnitDAO extends DBContext {
             ex.printStackTrace();
         }
     }
+
+    public List<Unit> searchUnitsByNameOrSymbol(String keyword) {
+        List<Unit> units = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM units WHERE disable = 0 AND (LOWER(unit_name) LIKE ? OR LOWER(symbol) LIKE ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            String likeKeyword = "%" + keyword.toLowerCase() + "%";
+            ps.setString(1, likeKeyword);
+            ps.setString(2, likeKeyword);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Unit unit = new Unit();
+                unit.setId(rs.getInt("unit_id"));
+                unit.setUnitName(rs.getString("unit_name"));
+                unit.setSymbol(rs.getString("symbol"));
+                unit.setDescription(rs.getString("description"));
+                units.add(unit);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return units;
+    }
+
+    public List<Unit> getUnitsByPage(int offset, int limit, String keyword) {
+        List<Unit> units = new ArrayList<>();
+        try {
+            StringBuilder sql = new StringBuilder("SELECT * FROM units WHERE disable = 0");
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                sql.append(" AND (LOWER(unit_name) LIKE ? OR LOWER(symbol) LIKE ?)");
+            }
+            sql.append(" ORDER BY unit_id ASC LIMIT ? OFFSET ?");
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            int idx = 1;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String likeKeyword = "%" + keyword.toLowerCase() + "%";
+                ps.setString(idx++, likeKeyword);
+                ps.setString(idx++, likeKeyword);
+            }
+            ps.setInt(idx++, limit);
+            ps.setInt(idx, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Unit unit = new Unit();
+                unit.setId(rs.getInt("unit_id"));
+                unit.setUnitName(rs.getString("unit_name"));
+                unit.setSymbol(rs.getString("symbol"));
+                unit.setDescription(rs.getString("description"));
+                units.add(unit);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return units;
+    }
+
+    public int countUnits(String keyword) {
+        int count = 0;
+        try {
+            StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM units WHERE disable = 0");
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                sql.append(" AND (LOWER(unit_name) LIKE ? OR LOWER(symbol) LIKE ?)");
+            }
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            int idx = 1;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String likeKeyword = "%" + keyword.toLowerCase() + "%";
+                ps.setString(idx++, likeKeyword);
+                ps.setString(idx++, likeKeyword);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return count;
+    }
 } 
