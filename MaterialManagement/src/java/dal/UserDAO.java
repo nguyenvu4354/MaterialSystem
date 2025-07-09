@@ -289,6 +289,38 @@ public class UserDAO extends DBContext {
         return false;
     }
 
+    // Check if email exists (do not exclude userId)
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND verification_status = 'verified'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            System.out.println("❌ Error checking if email exists: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Reset password by email
+    public boolean updatePasswordByEmail(String email, String md5Password) {
+        String sql = "UPDATE Users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ? AND status != 'deleted' AND verification_status = 'verified'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, md5Password);
+            ps.setString(2, email);
+            int rows = ps.executeUpdate();
+            System.out.println("Updated password for email " + email + ": " + rows + " row(s) affected");
+            return rows > 0;
+        } catch (Exception e) {
+            System.out.println("❌ Error updating password by email: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean isEmailExist(String email, int excludeUserId) {
         String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND verification_status = 'verified' AND user_id != ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
