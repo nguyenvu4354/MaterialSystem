@@ -26,8 +26,6 @@
             font-weight: bold;
             font-size: 2.2rem;
             margin-bottom: 24px;
-            border-bottom: 2px solid #e2b77a;
-            padding-bottom: 8px;
         }
     </style>
 </head>
@@ -42,10 +40,19 @@
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="dashboard-title">Unit List</h2>
-                    <a href="AddUnit" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i> Add New Unit
+                    <h2 class="dashboard-title mb-0">Unit List</h2>
+                    <a href="AddUnit" class="btn flex-shrink-0" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 260px; font-size: 1.25rem; font-weight: 500; border-radius: 6px; padding: 0 32px; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plus me-2"></i> Add New Unit
                     </a>
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-4" style="flex-wrap: wrap;">
+                    <form class="d-flex align-items-center gap-3 flex-shrink-0" action="UnitList" method="get" style="margin-bottom:0;">
+                        <input class="form-control" type="search" name="keyword" placeholder="Search By Name Or Symbol" value="${keyword}" aria-label="Search" style="min-width: 260px; max-width: 320px; height: 60px; border: 2px solid gray; border-radius: 6px; font-size: 1.1rem;">
+                        <button class="btn" type="submit" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 150px; font-size: 1.1rem; font-weight: 500; border-radius: 6px;">
+                            <i class="fas fa-search me-2"></i> Search
+                        </button>
+                        <a href="UnitList" class="btn" style="background-color: #6c757d; color: #fff; height: 60px; min-width: 150px; font-size: 1.1rem; font-weight: 500; border-radius: 6px;">Clear</a>
+                    </form>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle text-center">
@@ -84,6 +91,24 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination -->
+                <c:if test="${totalPages > 1}">
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="UnitList?page=${currentPage - 1}&keyword=${keyword}">Previous</a>
+                            </li>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                    <a class="page-link" href="UnitList?page=${i}&keyword=${keyword}">${i}</a>
+                                </li>
+                            </c:forEach>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="UnitList?page=${currentPage + 1}&keyword=${keyword}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </c:if>
             </div> <!-- end content -->
         </div> <!-- end row -->
     </div> <!-- end container-fluid -->
