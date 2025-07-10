@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<html lang="en" >
+<html lang="en">
     <head>
         <title>Material Management - Professional Inventory System</title>
         <meta charset="utf-8">
@@ -15,27 +15,18 @@
         <meta name="description" content="A professional material management system for tracking and managing computer accessories and inventory.">
         <style>
             body {
-                --primary: #f4a261;
-                --primary-dark: #e76f51;
-                --primary-light: #fff5e6;
-                --success: #22c55e;
-                --danger: #ef4444;
-                --bg-main: #fff5e6;
-                --bg-light: #f1f5f9;
-                --border: #e0e0e0;
-                --white: #fff;
                 font-family: 'Inter', sans-serif;
-                background-color: var(--bg-main);
+                background-color: #faf4ee;
                 color: #222;
                 font-size: 16px;
                 line-height: 1.6;
             }
             .top-bar {
-                background: #d59f39;
+                background: #DEAD6F;
                 color: #fff;
                 font-size: 16px;
                 letter-spacing: 0.5px;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
             }
             .top-bar .contact-info span {
                 margin-right: 18px;
@@ -49,17 +40,17 @@
             }
             .login-buttons .btn:hover {
                 background: #fff;
-                color: var(--primary);
+                color: #DEAD6F;
             }
             .header-main {
-                box-shadow: 0 6px 24px rgba(244,161,97,0.10);
+                box-shadow: 0 6px 24px rgba(222,173,111,0.10);
                 border-radius: 0 0 24px 24px;
-                background: var(--white);
+                background: #fff;
                 min-height: 80px;
             }
             .header-main .navbar-nav .nav-link {
                 font-weight: 700;
-                color: var(--primary);
+                color: #DEAD6F;
                 border-radius: 12px;
                 font-size: 17px;
                 transition: background 0.2s, color 0.2s;
@@ -67,7 +58,7 @@
                 margin: 0 2px;
             }
             .header-main .navbar-nav .nav-link:hover, .header-main .navbar-nav .nav-link.active {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff;
             }
             .header-main .btn-main {
@@ -75,21 +66,21 @@
                 border-radius: 22px;
                 padding: 12px 32px;
                 font-weight: 700;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
                 transition: background 0.2s, color 0.2s, transform 0.2s;
             }
             .header-main .btn-main:hover {
-                background: var(--primary-dark);
+                background: #cfa856;
                 color: #fff !important;
                 transform: scale(1.04);
             }
             .main-logo img {
                 height: 54px;
                 border-radius: 10px;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
             }
             .navbar-nav .nav-link {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 700;
                 margin: 0 10px;
                 border-radius: 8px;
@@ -97,33 +88,33 @@
                 font-size: 16px;
             }
             .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff;
             }
             .offcanvas-body .btn {
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                background: #DEAD6F;
                 border: none;
                 color: #fff;
                 font-weight: 600;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
                 transition: background 0.2s, transform 0.2s;
             }
             .offcanvas-body .btn:hover {
-                background: var(--primary-dark);
+                background: #cfa856;
                 transform: translateY(-2px) scale(1.04);
             }
             .sidebar {
                 padding: 24px 18px;
                 border-radius: 18px;
-                background: var(--white);
-                box-shadow: 0 4px 18px rgba(244,161,97,0.08);
+                background: #fff;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.08);
                 margin-top: 0;
-                border: 1px solid var(--border);
+                border: 1px solid #e0e0e0;
             }
             .sidebar h3 {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 800;
-                border-bottom: 2px solid var(--primary-light);
+                border-bottom: 2px solid #f9f5f0;
                 padding-bottom: 10px;
                 margin-bottom: 24px;
                 letter-spacing: 1px;
@@ -135,19 +126,19 @@
                 padding: 13px 18px;
                 margin-bottom: 14px;
                 border-radius: 14px;
-                background: var(--bg-light);
-                box-shadow: 0 2px 8px rgba(244,161,97,0.06);
+                background: #f9f5f0;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.06);
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
                 text-decoration: none;
                 font-weight: 600;
-                color: var(--primary);
+                color: #DEAD6F;
                 font-size: 16px;
                 gap: 10px;
             }
             .sidebar-item:hover {
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                background: #DEAD6F;
                 color: #fff;
-                box-shadow: 0 4px 16px rgba(244,161,97,0.13);
+                box-shadow: 0 4px 16px rgba(222,173,111,0.13);
                 transform: translateX(6px) scale(1.04);
             }
             .sidebar-item:hover .category-icon {
@@ -156,7 +147,7 @@
             }
             .category-icon {
                 font-size: 1.5rem;
-                color: var(--primary);
+                color: #DEAD6F;
                 transition: color 0.2s, transform 0.2s;
                 min-width: 28px;
                 text-align: center;
@@ -180,24 +171,24 @@
                 width: 270px;
                 border-radius: 20px;
                 overflow: hidden;
-                background: var(--white);
-                box-shadow: 0 4px 18px rgba(244,161,97,0.10);
+                background: #fff;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.10);
                 transition: box-shadow 0.3s, transform 0.3s;
                 margin-bottom: 0;
-                border: 1px solid var(--border);
+                border: 1px solid #e0e0e0;
                 position: relative;
             }
             .product-card:hover {
-                box-shadow: 0 10px 32px rgba(244,161,97,0.18);
+                box-shadow: 0 10px 32px rgba(222,173,111,0.18);
                 transform: translateY(-8px) scale(1.04);
             }
             .product-card img {
                 width: 100%;
                 height: 180px;
                 object-fit: cover;
-                border-bottom: 1px solid var(--border);
+                border-bottom: 1px solid #e0e0e0;
                 border-radius: 20px 20px 0 0;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.06);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.06);
             }
             .card-content {
                 padding: 20px 18px 18px 18px;
@@ -205,13 +196,13 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                background: var(--white);
+                background: #fff;
             }
             .card-content h5 {
                 margin: 0 0 10px 0;
                 font-size: 1.15rem;
                 font-weight: 700;
-                color: var(--primary-dark);
+                color: #cfa856;
                 min-height: 44px;
                 letter-spacing: 0.5px;
                 text-overflow: ellipsis;
@@ -221,30 +212,30 @@
             .card-content p {
                 margin: 0 0 14px 0;
                 font-size: 1.08rem;
-                color: var(--primary-light);
+                color: #DEAD6F;
                 font-weight: 700;
             }
             .btn-main {
-                background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+                background: #DEAD6F;
                 color: #fff !important;
                 border: none;
                 border-radius: 24px;
                 font-weight: 700;
                 padding: 9px 28px;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
                 font-size: 16px;
                 transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
             }
             .btn-main:hover, .btn-main:focus {
-                background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
+                background: #cfa856;
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
                 transform: scale(1.05);
             }
             .btn-outline-main {
                 background: #fff;
-                color: var(--primary) !important;
-                border: 2px solid var(--primary);
+                color: #DEAD6F !important;
+                border: 2px solid #DEAD6F;
                 border-radius: 24px;
                 font-weight: 700;
                 padding: 9px 28px;
@@ -252,9 +243,9 @@
                 font-size: 16px;
             }
             .btn-outline-main:hover, .btn-outline-main:focus {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff !important;
-                border: 2px solid var(--primary-dark);
+                border: 2px solid #cfa856;
             }
             .btn-action {
                 background: #27ae60;
@@ -272,20 +263,24 @@
                 transform: scale(1.05);
             }
             .btn-detail {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff;
                 border: none;
                 border-radius: 18px;
                 font-weight: 600;
                 padding: 8px 20px;
                 transition: background 0.2s, color 0.2s, transform 0.2s;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.10);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
                 font-size: 15px;
             }
-
+            .btn-detail:hover {
+                background: #cfa856;
+                color: #fff;
+                transform: scale(1.05);
+            }
             .btn-contact-info {
                 border-radius: 24px;
                 background: #23272f;
@@ -293,7 +288,7 @@
                 border: none;
                 font-weight: 600;
                 padding: 8px 22px;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -301,7 +296,7 @@
                 font-size: 16px;
             }
             .btn-contact-info:hover {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff !important;
                 transform: scale(1.05);
             }
@@ -317,25 +312,25 @@
                 align-items: center;
                 justify-content: center;
                 font-size: 20px;
-                box-shadow: 0 2px 12px rgba(244,161,97,0.13);
+                box-shadow: 0 2px 12px rgba(222,173,111,0.13);
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s;
                 padding: 0;
             }
             .btn-login:hover, .btn-login:focus {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
             }
             .section-header h2 {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 800;
-                border-bottom: 2px solid var(--primary-light);
+                border-bottom: 2px solid #f9f5f0;
                 padding-bottom: 10px;
                 margin-bottom: 20px;
                 letter-spacing: 1px;
             }
             .pagination .page-link {
-                color: var(--primary);
+                color: #DEAD6F;
                 border-radius: 8px;
                 margin: 0 6px;
                 font-weight: 600;
@@ -344,29 +339,29 @@
                 border: none;
             }
             .pagination .page-link:hover, .pagination .page-item.active .page-link {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff;
             }
             footer {
                 background: #fff;
                 color: #222;
                 border-radius: 18px;
-                box-shadow: 0 4px 18px rgba(244,161,97,0.08);
+                box-shadow: 0 4px 18px rgba(222,173,111,0.08);
             }
             .footer-menu h3 {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 800;
                 margin-bottom: 18px;
                 font-size: 18px;
             }
             .footer-menu a {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 600;
                 transition: color 0.2s;
                 font-size: 16px;
             }
             .footer-menu a:hover {
-                color: var(--primary-dark);
+                color: #cfa856;
             }
             .footer-menu ul {
                 padding-left: 0;
@@ -377,18 +372,18 @@
             }
             .footer-menu img {
                 border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(244,161,97,0.12);
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
             }
             .social-links ul {
                 gap: 10px;
             }
             .social-icon {
                 font-size: 24px;
-                color: var(--primary);
+                color: #DEAD6F;
                 transition: color 0.2s;
             }
             .social-icon:hover {
-                color: var(--primary-dark);
+                color: #cfa856;
             }
             @media (max-width: 991px) {
                 .sidebar {
@@ -435,14 +430,14 @@
                 border-radius: 8px;
                 transition: background 0.2s, color 0.2s;
                 padding: 10px 18px;
-                color: var(--primary-dark);
+                color: #cfa856;
             }
             .dropdown-menu .dropdown-item:hover {
-                background: var(--primary-light);
+                background: #f9f5f0;
                 color: #fff;
             }
             .dropdown-menu .dropdown-item i {
-                color: var(--primary);
+                color: #DEAD6F;
                 min-width: 22px;
                 text-align: center;
             }
@@ -461,11 +456,11 @@
                 background: #23272f;
                 color: #f1f5f9;
                 border-radius: 16px 16px 0 0;
-                box-shadow: 0 2px 12px rgba(244,161,97,0.08);
+                box-shadow: 0 2px 12px rgba(222,173,111,0.08);
                 font-size: 15px;
             }
             .footer-mms .footer-title {
-                color: var(--primary);
+                color: #DEAD6F;
                 font-weight: 700;
                 margin-bottom: 16px;
                 font-size: 17px;
@@ -493,10 +488,10 @@
                 transition: color 0.2s;
             }
             .footer-mms .footer-list a:hover {
-                color: var(--primary-light);
+                color: #f9f5f0;
             }
             .footer-mms .footer-list i {
-                color: var(--primary-light);
+                color: #f9f5f0;
                 min-width: 20px;
                 text-align: center;
             }
@@ -515,20 +510,17 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 2px 12px rgba(244,161,97,0.13);
+                box-shadow: 0 2px 12px rgba(222,173,111,0.13);
                 font-size: 20px;
                 transition: background 0.2s, color 0.2s, box-shadow 0.2s;
                 padding: 0;
             }
             .btn-topbar:hover, .btn-topbar:focus {
-                background: var(--primary);
+                background: #DEAD6F;
                 color: #fff !important;
-                box-shadow: 0 4px 18px rgba(244,161,97,0.18);
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
             }
         </style>
-
-
-
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
@@ -540,11 +532,8 @@
     <body>
         <div class="top-bar py-2">
             <div class="container d-flex justify-content-between align-items-center flex-wrap position-relative">
-                
                 <div class="d-flex align-items-center ms-auto gap-2" style="z-index:3;">
-                    <!-- Nút search icon -->
                     <button id="showSearchBtn" class="btn btn-topbar me-1"><i class="fas fa-search"></i></button>
-                    <!-- Nút menu -->
                     <div class="dropdown">
                         <button class="btn btn-topbar" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-list-ul"></i>
@@ -564,7 +553,6 @@
                         <i class="fas fa-user"></i>
                     </button>
                 </div>
-                <!-- Thanh tìm kiếm overlay -->
                 <form id="searchOverlay" action="search" method="get" class="search-overlay-form position-absolute top-0 start-50 translate-middle-x d-none" style="z-index:20;max-width:400px;width:100%;">
                     <div class="input-group" style="border-radius:24px;box-shadow:0 2px 8px rgba(52,152,219,0.18);background:#fff;">
                         <span class="input-group-text bg-white border-0" style="border-radius:24px 0 0 24px;"><i class="fas fa-search"></i></span>
@@ -574,37 +562,28 @@
                 </form>
             </div>
         </div>
-        <!-- Header -->
         <jsp:include page="Header.jsp" />
-
         <section class="module-links py-4">
             <div class="container">
                 <div class="row g-4 justify-content-center text-center">
-                    <!-- Inventory Management -->
                     <div class="col-6 col-md-3">
                         <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-boxes-stacked fa-2x mb-2 text-primary"></i>
                             <div class="fw-semibold text-dark">Inventory Management</div>
                         </a>
                     </div>
-
-                    <!-- Allocation Tracking -->
                     <div class="col-6 col-md-3">
                         <a href="allocation" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-share-alt fa-2x mb-2 text-info"></i>
                             <div class="fw-semibold text-dark">Allocation Tracking</div>
                         </a>
                     </div>
-
-                    <!-- Maintenance Logs -->
                     <div class="col-6 col-md-3">
                         <a href="maintenance" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-tools fa-2x mb-2 text-warning"></i>
                             <div class="fw-semibold text-dark">Maintenance Logs</div>
                         </a>
                     </div>
-
-                    <!-- Reporting Tools -->
                     <div class="col-6 col-md-3">
                         <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-chart-line fa-2x mb-2 text-success"></i>
@@ -614,9 +593,6 @@
                 </div>
             </div>
         </section>
-
-
-
         <section class="my-5">
             <div class="container" style="padding-left: 82px">
                 <div class="section-header mb-4">
@@ -626,34 +602,33 @@
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Total Items</h5>
-                            <p style="color: #bb8e2d; font-weight: bold;">20</p>
+                            <p style="color: #DEAD6F; font-weight: bold;">20</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Assigned Devices</h5>
-                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
+                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Under Maintenance</h5>
-                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
+                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
                         </div>
                     </div>
                     <div class="product-card">
                         <div class="card-content">
                             <h5>Decommissioned</h5>
-                            <p style="color: #bb8e2d; font-weight: bold;">0</p>
+                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <div class="container-fluid my-5">
             <div class="row">
-                <div class="col-md-2 sidebar-col mt-5" style="background-color: white">
+                <div class="col-md-2 sidebar-col mt-5">
                     <div class="sidebar">
                         <h3 class="mb-4">Categories</h3>
                         <ul class="list-unstyled">
@@ -690,10 +665,6 @@
                         </ul>
                     </div>
                 </div>
-
-
-
-
                 <div class="col-md-10 mb-1">
                     <div class="content">
                         <section id="clothing" class="my-5 overflow-hidden">
@@ -701,39 +672,33 @@
                                 <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
                                     <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material Inventory</h2>
                                 </div>
-
                                 <div class="card-container">
                                     <c:forEach var="product" items="${productList}">
                                         <div class="product-card">
                                             <img src="images/material/${product.materialsUrl}" alt="${product.materialName}" width="200">
                                             <div class="card-content">
                                                 <h5>${product.materialName}</h5>
-                                                <p style="color: #d59f39; font-weight: bold;">$${product.price}</p>
+                                                <p style="color: #DEAD6F; font-weight: bold;">$${product.price}</p>
                                                 <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
                                                     <i class="fas fa-eye me-1"></i> View Detail
                                                 </a>
                                             </div>
                                         </div>
                                     </c:forEach>
-
                                     <nav aria-label="Page navigation" style="padding-left: 500px">
                                         <ul class="pagination justify-content-center mt-4" id="pagination">
                                             <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
                                             <li class="page-item"><a class="page-link" href="#" data-page="2">2</a></li>
                                             <li class="page-item"><a class="page-link" href="#" data-page="3">3</a></li>
-                                            <!-- Thêm hoặc bớt số trang tùy số lượng sản phẩm -->
                                         </ul>
                                     </nav>
                                 </div>
+                            </div>
                         </section>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
-
         <footer id="footer" class="footer-mms mt-5">
             <div class="container py-4">
                 <div class="row">
@@ -768,15 +733,10 @@
                         </ul>
                     </div>
                 </div>
-                <hr class="my-3" style="border-top:1.5px solid var(--primary-light);opacity:0.15;">
-                <div class="text-center small" style="color:#bbb;">&copy; 2024 Material Management System (Internal Use Only). All rights reserved.</div>
+                <hr class="my-3" style="border-top:1.5px solid #f9f5f0;opacity:0.15;">
+                <div class="text-center small" style="color:#bbb;">© 2024 Material Management System (Internal Use Only). All rights reserved.</div>
             </div>
         </footer>
-
-
-
-
-        <!-- Modal Contact Internal -->
         <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -792,27 +752,19 @@
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-
-
         <script src="js/jquery-1.11.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
+                crossorigin="anonymous"></script>
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-                        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-                        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-                            return new bootstrap.Popover(popoverTriggerEl);
-                        });
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
         </script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -845,10 +797,6 @@
                 const pagination = document.getElementById('pagination');
                 let currentPage = 1;
                 const totalPages = Math.ceil(products.length / productsPerPage);
-
-
-
-
                 function showPage(page) {
                     currentPage = page;
                     products.forEach((product, idx) => {
@@ -858,7 +806,6 @@
                             product.style.display = 'none';
                         }
                     });
-                    // Cập nhật active cho nút
                     document.querySelectorAll('#pagination .page-item').forEach((li, i) => {
                         if (i === page - 1) {
                             li.classList.add('active');
@@ -867,9 +814,6 @@
                         }
                     });
                 }
-
-
-                // Gán sự kiện click cho các nút phân trang
                 if (pagination) {
                     pagination.querySelectorAll('.page-link').forEach(link => {
                         link.addEventListener('click', function (e) {
@@ -878,18 +822,9 @@
                             showPage(page);
                         });
                     });
-                    // Hiển thị trang đầu tiên khi load
                     showPage(1);
                 }
             });
         </script>
     </body>
 </html>
-
-
-
-
-
-
-
-
