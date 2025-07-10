@@ -44,7 +44,7 @@
                 </c:if>
                 <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_DEPARTMENT')}">
                     <li class="nav-item mb-2">
-                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/DepartmentList">
+                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/depairmentlist">
                             <i class="fas fa-building fs-4 me-3"></i>
                             Department
                         </a>
