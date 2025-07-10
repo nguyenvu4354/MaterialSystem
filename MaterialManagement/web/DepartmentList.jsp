@@ -1,186 +1,139 @@
 <%@ page import="java.util.List" %>
 <%@ page import="entity.Department" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     List<Department> departments = (List<Department>) request.getAttribute("departments");
     String message = (String) request.getAttribute("message");
 %>
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Department Management</title>
-        <style>
-            body {
-                font-family: 'Roboto', Arial, sans-serif;
-                margin: 40px;
-                background-color: #f8f8f8;
-            }
-            h1 {
-                color: #d59f39;
-            }
-            .table-section {
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 30px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }
-            button, .add-button {
-                padding: 10px 18px;
-                background-color: #d59f39;
-                border: none;
-                color: white;
-                border-radius: 8px;
-                cursor: pointer;
-                margin-bottom: 20px;
-                text-decoration: none;
-                display: inline-block;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 16px;
-            }
-            th, td {
-                padding: 10px;
-                border-bottom: 1px solid #ddd;
-                text-align: left;
-            }
-            tr:hover {
-                background-color: #f1f1f1;
-            }
-            .actions a {
-                margin-right: 10px;
-                text-decoration: none;
-                color: #007bff;
-            }
-            input[type=text], input[type=email] {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 6px;
-            }
-            .edit-form button {
-                padding: 8px 12px;
-                margin-right: 5px;
-            }
-            .message {
-                color: green;
-                margin-bottom: 20px;
-            }
-            .form-add {
-                display: flex;
-                gap: 500px;
-            }
-            .form-search {
-                display: flex;
-                justify-content: center;
-            }
-            .form-searchdetail {
-                display: flex;
-                gap: 10px;
-            }
-            .col-auto input {
-                width: 250px;
-                height: 20px;
-            }
-            .col-auto button {
-                width: 100px;
-                height: 40px;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Department Management</h1>
-
-
-
-        <div class="table-section">
-            <div class="form-add">
-                <div>
-                    <a href="DepartmentForm.jsp" class="add-button">Add Department</a>
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Department Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .table-responsive {
+            margin: 20px 0;
+        }
+        .content {
+            padding-left: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .dashboard-title {
+            color: #e2b77a;
+            font-weight: bold;
+            font-size: 2.2rem;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <jsp:include page="Header.jsp" />
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 bg-light p-0">
+                <jsp:include page="Sidebar.jsp" />
+            </div>
+            <!-- Page Content -->
+            <div class="col-md-9 col-lg-10 content px-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="dashboard-title mb-0">Department Management</h2>
+                    <a href="DepartmentForm.jsp" class="btn flex-shrink-0" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 260px; font-size: 1.25rem; font-weight: 500; border-radius: 6px; padding: 0 32px; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-plus me-2"></i> Add Department
+                    </a>
                 </div>
-                <div class="form-search">
-                    <form method="get" action="depairmentlist" class="form-searchdetail">
-                        <div class="col-auto">
-                            <input type="text" name="search" class="form-control" placeholder="Search by Department Code"
-                                   value="${searchKeyword != null ? searchKeyword : ''}">
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn-filter">Filter</button>
-                        </div>
+                <div class="d-flex align-items-center gap-3 mb-4" style="flex-wrap: wrap;">
+                    <form class="d-flex align-items-center gap-3 flex-shrink-0" action="depairmentlist" method="get" style="margin-bottom:0;">
+                        <input class="form-control" type="search" name="search" placeholder="Search by Department Code" value="${searchKeyword != null ? searchKeyword : ''}" aria-label="Search" style="min-width: 260px; max-width: 320px; height: 60px; border: 2px solid gray; border-radius: 6px; font-size: 1.1rem;">
+                        <button class="btn" type="submit" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 150px; font-size: 1.1rem; font-weight: 500; border-radius: 6px;">
+                            <i class="fas fa-search me-2"></i> Search
+                        </button>
+                        <a href="depairmentlist" class="btn" style="background-color: #6c757d; color: #fff; height: 60px; min-width: 150px; font-size: 1.1rem; font-weight: 500; border-radius: 6px;">Clear</a>
                     </form>
                 </div>
-
-
-            </div>
-            <% if (message != null) { %>
-            <div class="message"><%= message %></div>
-            <% } %>
-            <table>
-                <thead style="background-color: #f9f5f0">
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Code</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (departments != null && !departments.isEmpty()) {
-                    for (Department d : departments) { %>
-                    <tr id="row-<%= d.getDepartmentId() %>">
-                        <td><%= d.getDepartmentId() %></td>
-                        <td class="name"><%= d.getDepartmentName() %></td>
-                        <td class="code"><%= d.getDepartmentCode() %></td>
-                        <td class="phone"><%= d.getPhoneNumber() %></td>
-                        <td class="email"><%= d.getEmail() %></td>
-                        <td class="location"><%= d.getLocation() %></td>
-                        <td class="status"><%= d.getStatus() %></td>
-                        <td class="actions">
-                            <a href="javascript:void(0)" onclick="editRow(<%= d.getDepartmentId() %>)" style="color: #DEAD6F">Edit</a>
-                            <a href="depairmentlist?action=delete&id=<%= d.getDepartmentId() %>"
-                               onclick="return confirm('Bạn có chắc muốn xoá phòng ban này không?');" style="color: #DEAD6F">Delete</a>
-                        </td>
-                    </tr>
-                    <tr id="edit-row-<%= d.getDepartmentId() %>" style="display:none;">
-                <form class="edit-form" action="depairmentlist" method="post">
-                    <input type="hidden" name="id" value="<%= d.getDepartmentId() %>"/>
-                    <td><%= d.getDepartmentId() %></td>
-                    <td><input type="text" name="name" value="<%= d.getDepartmentName() %>" required/></td>
-                    <td><input type="text" name="code" value="<%= d.getDepartmentCode() %>" required/></td>
-                    <td><input type="text" name="phone" value="<%= d.getPhoneNumber() %>" /></td>
-                    <td><input type="email" name="email" value="<%= d.getEmail() %>" /></td>
-                    <td><input type="text" name="location" value="<%= d.getLocation() %>" /></td>
-                    <td><%= d.getStatus() %></td>
-                    <td>
-                        <button type="submit">Save</button>
-                        <button type="button" onclick="cancelEdit(<%= d.getDepartmentId() %>)">Cancel</button>
-                    </td>
-                </form>
-                </tr>
-                <% } } else { %>
-                <tr><td colspan="8">Không có phòng ban nào.</td></tr>
+                <% if (message != null) { %>
+                <div class="alert alert-success" role="alert"><%= message %></div>
                 <% } %>
-                </tbody>
-            </table>
-        </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (departments != null && !departments.isEmpty()) {
+                                for (Department d : departments) { %>
+                                <tr id="row-<%= d.getDepartmentId() %>">
+                                    <td><%= d.getDepartmentId() %></td>
+                                    <td class="name"><%= d.getDepartmentName() %></td>
+                                    <td class="code"><%= d.getDepartmentCode() %></td>
+                                    <td class="phone"><%= d.getPhoneNumber() %></td>
+                                    <td class="email"><%= d.getEmail() %></td>
+                                    <td class="location"><%= d.getLocation() %></td>
+                                    <td class="status"><%= d.getStatus() %></td>
+                                    <td class="actions">
+                                        <a href="javascript:void(0)" onclick="editRow(<%= d.getDepartmentId() %>)" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                        <form action="depairmentlist" method="get" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xoá phòng ban này không?');">
+                                            <input type="hidden" name="action" value="delete" />
+                                            <input type="hidden" name="id" value="<%= d.getDepartmentId() %>" />
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr id="edit-row-<%= d.getDepartmentId() %>" style="display:none;">
+                                    <form class="edit-form" action="depairmentlist" method="post">
+                                        <input type="hidden" name="id" value="<%= d.getDepartmentId() %>"/>
+                                        <td><%= d.getDepartmentId() %></td>
+                                        <td><input type="text" name="name" value="<%= d.getDepartmentName() %>" class="form-control" required/></td>
+                                        <td><input type="text" name="code" value="<%= d.getDepartmentCode() %>" class="form-control" required/></td>
+                                        <td><input type="text" name="phone" value="<%= d.getPhoneNumber() %>" class="form-control" /></td>
+                                        <td><input type="email" name="email" value="<%= d.getEmail() %>" class="form-control" /></td>
+                                        <td><input type="text" name="location" value="<%= d.getLocation() %>" class="form-control" /></td>
+                                        <td><%= d.getStatus() %></td>
+                                        <td>
+                                            <button type="submit" class="btn btn-success btn-sm me-1">Save</button>
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit(<%= d.getDepartmentId() %>)">Cancel</button>
+                                        </td>
+                                    </form>
+                                </tr>
+                            <% } } else { %>
+                            <tr><td colspan="8" class="text-center text-muted">Không có phòng ban nào.</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div> <!-- end content -->
+        </div> <!-- end row -->
+    </div> <!-- end container-fluid -->
+    <jsp:include page="Footer.jsp" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editRow(id) {
+            document.getElementById('row-' + id).style.display = 'none';
+            document.getElementById('edit-row-' + id).style.display = 'table-row';
+        }
 
-        <script>
-            function editRow(id) {
-                document.getElementById('row-' + id).style.display = 'none';
-                document.getElementById('edit-row-' + id).style.display = 'table-row';
-            }
-
-            function cancelEdit(id) {
-                document.getElementById('row-' + id).style.display = 'table-row';
-                document.getElementById('edit-row-' + id).style.display = 'none';
-            }
-        </script>
-    </body>
+        function cancelEdit(id) {
+            document.getElementById('row-' + id).style.display = 'table-row';
+            document.getElementById('edit-row-' + id).style.display = 'none';
+        }
+    </script>
+</body>
 </html>

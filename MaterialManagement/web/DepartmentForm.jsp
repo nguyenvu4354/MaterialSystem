@@ -1,73 +1,136 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Department</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thêm Phòng Ban</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            margin: 40px;
-            background-color: #f8f8f8;
+        .card-header-brown {
+            background-color: #DEB887;
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            padding: 18px 32px;
         }
-        h1 {
-            color: #d59f39;
-        }
-        .form-section {
+        .unit-card {
+            border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
             background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 40px auto;
         }
-        input[type=text], input[type=email] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0 16px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
         }
-        button {
-            padding: 10px 18px;
-            background-color: #d59f39;
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        .error-alert {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .error-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .error-list li {
+            margin-bottom: 5px;
+        }
+        .btn-brown {
+            background-color: #DEB887 !important;
+            color: #fff !important;
             border: none;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-right: 10px;
         }
-        a.button-link {
-            display: inline-block;
-            padding: 10px 18px;
-            background-color: #ccc;
-            color: black;
-            text-decoration: none;
-            border-radius: 8px;
+        .btn-brown:hover, .btn-brown:focus {
+            background-color: #c49b63 !important;
+            color: #fff !important;
         }
     </style>
 </head>
-<body>
-    <h1>Add Department</h1>
-
-    <div class="form-section">
-        <form action="depairmentlist" method="post">
-            <label>Name:</label>
-            <input type="text" name="name" required/>
-
-            <label>Phone:</label>
-            <input type="text" name="phone" />
-
-            <label>Email:</label>
-            <input type="email" name="email" />
-
-            <label>Location:</label>
-            <input type="text" name="location" />
-
-            <label>Description:</label>
-            <input type="text" name="description" />
-
-            <button type="submit">Add</button>
-            <a class="button-link" href="depairmentlist">Cancel</a>
-        </form>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="unit-card card shadow">
+            <div class="card-header card-header-brown text-white">
+                Add Department
+            </div>
+            <div class="card-body p-4">
+                <!-- Error Alert Box -->
+                <c:if test="${not empty errors or not empty error}">
+                    <div class="error-alert">
+                        <h6 class="mb-2"><strong>Please fix the following errors:</strong></h6>
+                        <ul class="error-list">
+                            <c:if test="${not empty error}">
+                                <li>${error}</li>
+                            </c:if>
+                            <c:forEach var="entry" items="${errors}">
+                                <li><strong>${entry.key}:</strong> ${entry.value}</li>
+                            </c:forEach>
+                        </ul>
+                    </div>
+                </c:if>
+                <form action="depairmentlist" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Department Name</label>
+                            <input type="text" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" 
+                                   name="name" value="${name}" required>
+                            <c:if test="${not empty errors.name}">
+                                <div class="error-message">${errors.name}</div>
+                            </c:if>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone number</label>
+                            <input type="text" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}" 
+                                   name="phone" value="${phone}">
+                            <c:if test="${not empty errors.phone}">
+                                <div class="error-message">${errors.phone}</div>
+                            </c:if>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" 
+                                   name="email" value="${email}">
+                            <c:if test="${not empty errors.email}">
+                                <div class="error-message">${errors.email}</div>
+                            </c:if>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control ${not empty errors.location ? 'is-invalid' : ''}" 
+                                   name="location" value="${location}">
+                            <c:if test="${not empty errors.location}">
+                                <div class="error-message">${errors.location}</div>
+                            </c:if>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control ${not empty errors.description ? 'is-invalid' : ''}" 
+                                  name="description" rows="3">${description}</textarea>
+                        <c:if test="${not empty errors.description}">
+                            <div class="error-message">${errors.description}</div>
+                        </c:if>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type код="submit" class="btn btn-brown px-4">Add Department</button>
+                        <a href="depairmentlist" class="btn btn-secondary px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

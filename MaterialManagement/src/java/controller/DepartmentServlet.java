@@ -35,7 +35,7 @@ public class DepartmentServlet extends HttpServlet {
         if (action.equals("delete")) {
             int deleteId = Integer.parseInt(request.getParameter("id"));
             departmentDAO.deleteDepartment(deleteId);
-            request.setAttribute("message", "Xoá phòng ban thành công!");
+            request.setAttribute("message", "Department deleted successfully!");
             // Refresh list after deletion
             departments = departmentDAO.getAllDepartments();
             if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
@@ -79,11 +79,11 @@ public class DepartmentServlet extends HttpServlet {
             dept.setDepartmentCode(code);
             dept.setCreatedAt(LocalDateTime.now());
             departmentDAO.addDepartment(dept);
-            request.setAttribute("message", "Thêm phòng ban thành công!");
+            request.setAttribute("message", "Add department successfully!");
         } else {
             dept.setDepartmentCode(code); // Use existing code for update
             departmentDAO.updateDepartment(dept);
-            request.setAttribute("message", "Cập nhật phòng ban thành công!");
+            request.setAttribute("message", "Department update successful!");
         }
 
         List<Department> departments = departmentDAO.getAllDepartments();

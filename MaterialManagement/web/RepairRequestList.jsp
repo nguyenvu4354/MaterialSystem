@@ -1,8 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>Repair Request Management</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -10,7 +11,8 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <style>
             body {
-                font-family: 'Roboto', sans-serif;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background-color: #faf4ee;
             }
             .container-main {
                 max-width: 1200px;
@@ -20,11 +22,29 @@
                 border-radius: 12px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             }
-            h1 {
-                font-size: 2 rem;
+            h2 {
+                font-size: 1.75rem;
                 font-weight: bold;
                 margin-bottom: 0.5rem;
                 color: #DEAD6F;
+            }
+            .filter-bar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin: 20px 0;
+                align-items: center;
+            }
+            .filter-bar .form-control,
+            .filter-bar .form-select,
+            .filter-bar .btn {
+                height: 48px;
+                min-width: 120px;
+            }
+           
+            .btn-filter:hover {
+                background-color: #cfa856;
+                color: #fff;
             }
             .custom-table thead th {
                 background-color: #f9f5f0;
@@ -38,24 +58,23 @@
             .custom-table td {
                 vertical-align: middle;
                 min-height: 48px;
-                padding: 14px;
             }
             .status-badge {
-                padding: 6px 14px;
-                border-radius: 20px;
-                font-size: 14px;
-                font-weight: bold;
+                padding: 2px 10px;
+                border-radius: 10px;
+                font-size: 13px;
+                font-weight: 500;
                 display: inline-block;
                 min-width: 90px;
                 text-align: center;
             }
             .status-pending {
-                background-color: #d6d6d6;
-                color: #555;
+                background-color: #6c757d;
+                color: #fff;
             }
             .status-approved {
-                background-color: #c2f0c2;
-                color: #1b5e20;
+                background-color: #d4edda;
+                color: #155724;
             }
             .status-rejected {
                 background-color: #f8d7da;
@@ -75,100 +94,85 @@
                 text-align: center;
                 margin-top: 10px;
             }
-            .btn-filter {
-                font-family: 'Roboto', Arial, sans-serif;
-                width: 110px;
-                height: 50px;
-            }
-            .form-select {
-                width: 180px;
-            }
-
         </style>
     </head>
     <body>
         <jsp:include page="Header.jsp" />
-
         <div class="container-fluid">
             <div class="row">
                 <jsp:include page="SidebarDirector.jsp" />
-
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <div class="container-main">
-                        <h1><i class="fas fa-tools"></i> Repair Request List</h1>
-                        <form method="get" action="repairrequestlist" class="row g-3 align-items-center mb-4">
-                            <div class="col-auto">
-                                <input type="text" name="search" class="form-control" placeholder="Search by Request Code"
-                                       value="${searchKeyword != null ? searchKeyword : ''}">
-                            </div>
-                            <div class="col-auto">
-                                <select name="status" class="form-select">
-                                    <option value="all" ${selectedStatus == null || selectedStatus == 'all' ? 'selected' : ''}>All Status</option>
-                                    <option value="pending" ${selectedStatus == 'pending' ? 'selected' : ''}>Pending</option>
-                                    <option value="approved" ${selectedStatus == 'approved' ? 'selected' : ''}>Approved</option>
-                                    <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <button type="submit" class="btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;">
+                                <i class="fas fa-tools"></i> Repair Request Management
+                            </h2>
+                        </div>
+                        <form method="get" action="repairrequestlist" class="filter-bar align-items-center" style="gap: 8px; flex-wrap: nowrap;">
+                            <input type="text" name="search" class="form-control" placeholder="Search by Request Code"
+                                   value="${searchKeyword != null ? searchKeyword : ''}" style="width: 230px;">
+                            <select name="status" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
+                                <option value="all" ${selectedStatus == null || selectedStatus == 'all' ? 'selected' : ''}>All Status</option>
+                                <option value="pending" ${selectedStatus == 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="approved" ${selectedStatus == 'approved' ? 'selected' : ''}>Approved</option>
+                                <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
+                            <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                         </form>
-
-
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>
                         </c:if>
-
-                        <table class="table custom-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Request Code</th>
-                                    <th>User ID</th>
-                                    <th>Request Date</th>
-                                    <th>Status</th>
-                                    <th>Reason</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="r" items="${repairRequests}">
-                                    <c:if test="${r.status ne 'cancel'}">
-                                        <tr>
-                                            <td>${r.repairRequestId}</td>
-                                            <td>${r.requestCode}</td>
-                                            <td>${r.userId}</td>
-                                            <td>${r.requestDate}</td>
-                                            <td>
-                                                <span class="status-badge
-                                                      <c:choose>
-                                                          <c:when test="${r.status == 'pending'}">status-pending</c:when>
-                                                          <c:when test="${r.status == 'approved'}">status-approved</c:when>
-                                                          <c:when test="${r.status == 'rejected'}">status-rejected</c:when>
-                                                      </c:choose>">
-                                                    ${r.status}
-                                                </span>
-                                            </td>
-                                            <td>${r.reason}</td>
-                                            <td>
-                                                <form action="repairrequestdetailbyID" method="get">
-                                                    <input type="hidden" name="requestId" value="${r.repairRequestId}" />
-                                                    <button type="submit" class="btn-detail">
-                                                        <i class="fas fa-eye"></i> Detail
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    </c:if>
-                                </c:forEach>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Request Code</th>
+                                        <th>User ID</th>
+                                        <th>Request Date</th>
+                                        <th>Status</th>
+                                        <th>Reason</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="r" items="${repairRequests}">
+                                        <c:if test="${r.status ne 'cancel'}">
+                                            <tr>
+                                                <td>${r.repairRequestId}</td>
+                                                <td>${r.requestCode}</td>
+                                                <td>${r.userId}</td>
+                                                <td>${r.requestDate}</td>
+                                                <td>
+                                                    <span class="status-badge
+                                                          <c:choose>
+                                                              <c:when test="${r.status == 'pending'}">status-pending</c:when>
+                                                              <c:when test="${r.status == 'approved'}">status-approved</c:when>
+                                                              <c:when test="${r.status == 'rejected'}">status-rejected</c:when>
+                                                          </c:choose>">
+                                                        ${r.status}
+                                                    </span>
+                                                </td>
+                                                <td>${r.reason}</td>
+                                                <td>
+                                                    <form action="repairrequestdetailbyID" method="get">
+                                                        <input type="hidden" name="requestId" value="${r.repairRequestId}" />
+                                                        <button type="submit" class="btn-detail">
+                                                            <i class="fas fa-eye"></i> Detail
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </main>
             </div>
         </div>
-
-        <!-- Bootstrap JS -->
+        <jsp:include page="Footer.jsp" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
