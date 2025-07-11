@@ -48,30 +48,11 @@
                   </div>
                 </form>
                 <div class="text-center mt-3">
-                  <a href="Login.jsp" class="text-primary text-decoration-none">Back to Login</a>
-                </div>
-              <% } else if (step.equals("reset")) { %>
-                <% if (message != null) { %>
-                  <div class="alert alert-danger text-center"> <%= message %> </div>
-                <% } %>
-                <form method="post" action="ForgotPassword">
-                  <input type="hidden" name="email" value="<%= request.getAttribute("email") %>" />
-                  <div class="mb-3">
-                    <input type="password" class="form-control form-control-lg" id="password" name="password" placeholder="New Password" required>
-                  </div>
-                  <div class="mb-3">
-                    <input type="password" class="form-control form-control-lg" id="confirm" name="confirm" placeholder="Confirm Password" required>
-                  </div>
-                  <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-dark btn-lg rounded-1">Reset Password</button>
-                  </div>
-                </form>
-                <div class="text-center mt-3">
-                  <a href="Login.jsp" class="text-primary text-decoration-none">Back to Login</a>
+                  <a href="Login.jsp" class="btn btn-primary">Back to Login</a>
                 </div>
               <% } else if (step.equals("done")) { %>
                 <div class="alert alert-success text-center">
-                  Password has been reset successfully!
+                  <%= message != null ? message : "Your request has been sent to the admin. Please wait for the admin to reset your password." %>
                 </div>
                 <div class="text-center mt-3">
                   <a href="Login.jsp" class="btn btn-primary">Back to Login</a>

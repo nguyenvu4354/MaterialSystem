@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import dal.UserDAO;
+import utils.EmailUtils;
 
 /**
  *
@@ -73,63 +74,32 @@ public class ForgotPasswordServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        String step = request.getParameter("step");
         String email = request.getParameter("email");
-        if (step == null) step = "email";
         UserDAO userDAO = new UserDAO();
-        if (step.equals("email")) {
-            // Step 1: Receive email, check existence
-            if (email == null || email.isEmpty()) {
-                request.setAttribute("message", "Please enter your email.");
-                request.setAttribute("step", "email");
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-                return;
-            }
-            if (!userDAO.isEmailExists(email)) {
-                request.setAttribute("message", "Email does not exist in the system.");
-                request.setAttribute("step", "email");
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-                return;
-            }
-            // Valid email, move to new password input step
-            request.setAttribute("step", "reset");
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-        } else if (step.equals("reset") || (request.getParameter("password") != null && request.getParameter("confirm") != null)) {
-            // Step 2: Receive new password
-            String password = request.getParameter("password");
-            String confirm = request.getParameter("confirm");
-            if (password == null || confirm == null || password.isEmpty() || confirm.isEmpty()) {
-                request.setAttribute("message", "Please enter the new password.");
-                request.setAttribute("step", "reset");
-                request.setAttribute("email", email);
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-                return;
-            }
-            if (!password.equals(confirm)) {
-                request.setAttribute("message", "Password confirmation does not match.");
-                request.setAttribute("step", "reset");
-                request.setAttribute("email", email);
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-                return;
-            }
-            // Hash with MD5 and update DB
-            String md5Password = md5(password);
-            boolean updated = userDAO.updatePasswordByEmail(email, md5Password);
-            if (updated) {
-                request.setAttribute("step", "done");
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-            } else {
-                request.setAttribute("message", "Failed to reset password. Please try again or contact support.");
-                request.setAttribute("step", "reset");
-                request.setAttribute("email", email);
-                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
-            }
-        } else {
-            // Default: return to email input step
+        if (email == null || email.isEmpty()) {
+            request.setAttribute("message", "Please enter your email.");
             request.setAttribute("step", "email");
             request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
+            return;
         }
+        if (!userDAO.isEmailExists(email)) {
+            request.setAttribute("message", "Email does not exist in the system.");
+            request.setAttribute("step", "email");
+            request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
+            return;
+        }
+        // Send email to admin
+        String adminEmail = "admin@company.com"; // Change to your admin email
+        String subject = "Password Reset Request";
+        String content = "User with email: " + email + " has requested a password reset. Please assist them in resetting their password.";
+        try {
+            EmailUtils.sendEmail(adminEmail, subject, content);
+            request.setAttribute("message", "Your request has been sent to the admin. Please wait for the admin to reset your password.");
+        } catch (Exception e) {
+            request.setAttribute("message", "Failed to send email to admin. Please try again later.");
+        }
+        request.setAttribute("step", "done");
+        request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
     }
 
     // MD5 hash function
