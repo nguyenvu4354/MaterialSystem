@@ -4,6 +4,7 @@ import dal.PurchaseRequestDAO;
 import dal.PurchaseRequestDetailDAO;
 import dal.RolePermissionDAO;
 import dal.UserDAO;
+import dal.MaterialDAO;
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
 import entity.User;
@@ -15,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 @WebServlet(name="PurchaseRequestDetailServlet", urlPatterns={"/PurchaseRequestDetail"})
 public class PurchaseRequestDetailServlet extends HttpServlet {
 
@@ -34,6 +37,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         PurchaseRequestDetailDAO purchaseRequestDetailDAO = new PurchaseRequestDetailDAO();
         UserDAO userDAO = new UserDAO();
         RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+        MaterialDAO materialDAO = new MaterialDAO();
 
         boolean hasPermission = rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_PURCHASE_REQUEST_LIST");
         if (!hasPermission) {
@@ -86,6 +90,15 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
                 request.setAttribute("showPagination", false);
             }
 
+            // Lấy danh sách material IDs để lấy thông tin hình ảnh
+            List<Integer> materialIds = new ArrayList<>();
+            for (PurchaseRequestDetail detail : purchaseRequestDetailList) {
+                materialIds.add(detail.getMaterialId());
+            }
+            
+            // Lấy thông tin hình ảnh của materials
+            Map<Integer, String> materialImages = materialDAO.getMaterialImages(materialIds);
+
             User requester = userDAO.getUserById(purchaseRequest.getUserId());
             String requesterName = requester != null ? requester.getFullName() : "Không xác định";
 
@@ -95,6 +108,7 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
             request.setAttribute("requester", requester);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.setAttribute("hasHandleRequestPermission", rolePermissionDAO.hasPermission(currentUser.getRoleId(), "HANDLE_REQUEST"));
+            request.setAttribute("materialImages", materialImages); // Truyền thông tin hình ảnh vào JSP
 
             request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
 
@@ -127,26 +141,26 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
         }
 
         try {
-            String action = request.getParameter("action");
+            String modalStatus = request.getParameter("modalStatus");
             int purchaseRequestId = Integer.parseInt(request.getParameter("id"));
             String reason = request.getParameter("reason");
             
             boolean success = false;
-            if ("approve".equals(action)) {
+            if ("approved".equals(modalStatus)) {
                 success = purchaseRequestDAO.updatePurchaseRequestStatus(purchaseRequestId, "approved", currentUser.getUserId(), reason);
-            } else if ("reject".equals(action)) {
+            } else if ("rejected".equals(modalStatus)) {
                 success = purchaseRequestDAO.updatePurchaseRequestStatus(purchaseRequestId, "rejected", currentUser.getUserId(), reason);
             } else {
-                request.setAttribute("error", "Invalid action.");
+                request.setAttribute("error", "Invalid status.");
                 request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
                 return;
             }
             
             if (success) {
-                request.setAttribute("success", "The request has been " + ("approve".equals(action) ? "approved" : "rejected") + " successfully!");
+                request.setAttribute("success", "The request has been " + ("approved".equals(modalStatus) ? "approved" : "rejected") + " successfully!");
                 doGet(request, response);
             } else {
-                request.setAttribute("error", "Could not " + ("approve".equals(action) ? "approve" : "reject") + " the request. Please try again.");
+                request.setAttribute("error", "Could not " + ("approved".equals(modalStatus) ? "approve" : "reject") + " the request. Please try again.");
                 doGet(request, response);
             }
             
