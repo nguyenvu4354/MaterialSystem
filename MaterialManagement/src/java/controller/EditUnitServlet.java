@@ -1,7 +1,9 @@
 package controller;
 
 import dal.UnitDAO;
+import dal.RolePermissionDAO;
 import entity.Unit;
+import entity.User;
 import utils.UnitValidator;
 import java.io.IOException;
 import java.util.Map;
@@ -10,12 +12,35 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "EditUnitServlet", urlPatterns = {"/EditUnit"})
 public class EditUnitServlet extends HttpServlet {
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        rolePermissionDAO = new RolePermissionDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
+            request.setAttribute("error", "Bạn không có quyền chỉnh sửa đơn vị.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         UnitDAO unitDAO = new UnitDAO();
         String idStr = request.getParameter("id");
         if (idStr != null) {
@@ -29,6 +54,21 @@ public class EditUnitServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
+            request.setAttribute("error", "Bạn không có quyền chỉnh sửa đơn vị.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         

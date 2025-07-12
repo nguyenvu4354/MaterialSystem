@@ -1,7 +1,9 @@
 package controller;
 
 import dal.UnitDAO;
+import dal.RolePermissionDAO;
 import entity.Unit;
+import entity.User;
 import utils.UnitValidator;
 import java.io.IOException;
 import java.util.Map;
@@ -10,18 +12,61 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "AddUnitServlet", urlPatterns = {"/AddUnit"})
 public class AddUnitServlet extends HttpServlet {
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        rolePermissionDAO = new RolePermissionDAO();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            String requestURI = request.getRequestURI();
+            String queryString = request.getQueryString();
+            if (queryString != null) {
+                requestURI += "?" + queryString;
+            }
+            session = request.getSession();
+            session.setAttribute("redirectURL", requestURI);
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
+            request.setAttribute("error", "Bạn không có quyền thêm mới đơn vị.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         request.getRequestDispatcher("AddUnit.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int roleId = user.getRoleId();
+        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
+            request.setAttribute("error", "Bạn không có quyền thêm mới đơn vị.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         
