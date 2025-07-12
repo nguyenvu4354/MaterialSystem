@@ -631,37 +631,15 @@
                 <div class="col-md-2 sidebar-col mt-5">
                     <div class="sidebar">
                         <h3 class="mb-4">Categories</h3>
+
                         <ul class="list-unstyled">
-                            <li>
-                                <a href="filter?categoryId=1" class="sidebar-item">
-                                    <i class="fas fa-usb category-icon me-2"></i>
-                                    <h5>USB & OTG</h5>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="filter?categoryId=2" class="sidebar-item">
-                                    <i class="fas fa-microchip category-icon me-2"></i>
-                                    <h5>SSD</h5>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="filter?categoryId=5" class="sidebar-item">
-                                    <i class="fas fa-network-wired category-icon me-2"></i>
-                                    <h5>NAS</h5>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="filter?categoryId=4" class="sidebar-item">
-                                    <i class="fas fa-compact-disc category-icon me-2"></i>
-                                    <h5>CD/DVD</h5>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="filter?categoryId=3" class="sidebar-item">
-                                    <i class="fas fa-hdd category-icon me-2"></i>
-                                    <h5>Portable Hard Drive</h5>
-                                </a>
-                            </li>
+                            <c:forEach var="c" items="${categories}">
+                                <li>
+                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item">
+                                        <h5>${c.category_name}</h5>
+                                    </a>
+                                </li>
+                            </c:forEach>
                         </ul>
                     </div>
                 </div>
@@ -756,15 +734,15 @@
         <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
                 integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-                crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
+                        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+                        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                            return new bootstrap.Popover(popoverTriggerEl);
+                        });
         </script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
