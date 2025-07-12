@@ -251,24 +251,24 @@ public class RepairRequestDAO extends DBContext {
         }
         return list;
     }
-    
+
     public RepairRequest getRepairRequestById(int repairRequestId) throws SQLException {
-    String sql = "SELECT * FROM RepairRequest WHERE repair_request_id = ?";
-    try (
-         PreparedStatement ps = connection.prepareStatement(sql)) {
-        ps.setInt(1, repairRequestId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            RepairRequest request = new RepairRequest();
-            request.setRepairRequestId(rs.getInt("repair_request_id"));
-            request.setRequestCode(rs.getString("request_code"));
-            request.setRequestDate(rs.getTimestamp("request_date"));
-            request.setStatus(rs.getString("status"));
-            request.setUserId(rs.getInt("user_id"));
-            return request;
+        String sql = "SELECT * FROM RepairRequest WHERE repair_request_id = ?";
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, repairRequestId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                RepairRequest request = new RepairRequest();
+                request.setRepairRequestId(rs.getInt("repair_request_id"));
+                request.setRequestCode(rs.getString("request_code"));
+                request.setRequestDate(rs.getTimestamp("request_date"));
+                request.setStatus(rs.getString("status"));
+                request.setUserId(rs.getInt("user_id"));
+                return request;
+            }
         }
+        return null;
     }
-    return null;
-}
 
 }
