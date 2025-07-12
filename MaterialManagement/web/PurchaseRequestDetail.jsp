@@ -85,6 +85,23 @@
         vertical-align: middle;
         min-height: 48px;
     }
+    .pagination .page-link {
+        background-color: #DEAD6F;
+        color: #fff;
+        border: none;
+        margin: 0 2px;
+    }
+    .pagination .page-link:hover,
+    .pagination .page-item.active .page-link {
+        background-color: #c79b5a;
+        color: #fff;
+        border: none;
+    }
+    .pagination .page-item.disabled .page-link {
+        background-color: #f1e5d0;
+        color: #b5a07a;
+        border: none;
+    }
     </style>
 </head>
 <body>

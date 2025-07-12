@@ -597,17 +597,54 @@ public class MaterialDAO extends DBContext {
     }
 
     public int getMaterialIdByName(String name) {
-        String sql = "SELECT material_id FROM materials WHERE material_name = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        int materialId = 0;
+        try {
+            String sql = "SELECT material_id FROM materials WHERE material_name = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getInt("material_id");
+                materialId = rs.getInt("material_id");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;
+        return materialId;
+    }
+    
+    // Method để lấy Map chứa thông tin hình ảnh của các material
+    public java.util.Map<Integer, String> getMaterialImages(List<Integer> materialIds) {
+        java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
+        if (materialIds == null || materialIds.isEmpty()) {
+            return materialImages;
+        }
+        
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT material_id, materials_url FROM materials WHERE material_id IN (");
+            
+            // Tạo placeholders cho IN clause
+            for (int i = 0; i < materialIds.size(); i++) {
+                if (i > 0) sql.append(",");
+                sql.append("?");
+            }
+            sql.append(")");
+            
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < materialIds.size(); i++) {
+                ps.setInt(i + 1, materialIds.get(i));
+            }
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int materialId = rs.getInt("material_id");
+                String materialsUrl = rs.getString("materials_url");
+                materialImages.put(materialId, materialsUrl);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return materialImages;
     }
 
     public static void main(String[] args) {
