@@ -41,9 +41,12 @@
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="dashboard-title mb-0">Unit List</h2>
-                    <a href="AddUnit" class="btn flex-shrink-0" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 260px; font-size: 1.25rem; font-weight: 500; border-radius: 6px; padding: 0 32px; display: inline-flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-plus me-2"></i> Add New Unit
-                    </a>
+                    <!-- Chỉ hiển thị nút Add New Unit nếu user có quyền CREATE_UNIT hoặc là admin -->
+                    <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_UNIT')}">
+                        <a href="AddUnit" class="btn flex-shrink-0" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 260px; font-size: 1.25rem; font-weight: 500; border-radius: 6px; padding: 0 32px; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-plus me-2"></i> Add New Unit
+                        </a>
+                    </c:if>
                 </div>
                 <div class="d-flex align-items-center gap-3 mb-4" style="flex-wrap: wrap;">
                     <form class="d-flex align-items-center gap-3 flex-shrink-0" action="UnitList" method="get" style="margin-bottom:0;">
@@ -62,7 +65,10 @@
                                 <th>Unit Name</th>
                                 <th>Symbol</th>
                                 <th>Description</th>
-                                <th>Actions</th>
+                                <!-- Chỉ hiển thị cột Actions nếu user có quyền UPDATE_UNIT hoặc DELETE_UNIT hoặc là admin -->
+                                <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT') or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
+                                    <th>Actions</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,18 +80,32 @@
                                             <td>${unit.unitName}</td>
                                             <td>${unit.symbol}</td>
                                             <td>${unit.description}</td>
-                                            <td>
-                                                <a href="EditUnit?id=${unit.id}" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <form action="DeleteUnit" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this unit?');">
-                                                    <input type="hidden" name="id" value="${unit.id}" />
-                                                    <button type="submit" class="btn btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
-                                                </form>
-                                            </td>
+                                            <!-- Chỉ hiển thị các nút action nếu user có quyền tương ứng -->
+                                            <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT') or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
+                                                <td>
+                                                    <!-- Nút Edit - chỉ hiển thị nếu có quyền UPDATE_UNIT hoặc là admin -->
+                                                    <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT')}">
+                                                        <a href="EditUnit?id=${unit.id}" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                                    </c:if>
+                                                    <!-- Nút Delete - chỉ hiển thị nếu có quyền DELETE_UNIT hoặc là admin -->
+                                                    <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
+                                                        <form action="DeleteUnit" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this unit?');">
+                                                            <input type="hidden" name="id" value="${unit.id}" />
+                                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </c:if>
+                                                </td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="5" class="text-center text-muted">No units found.</td></tr>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No units found.</td>
+                                        <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT') or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
+                                            <td></td>
+                                        </c:if>
+                                    </tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

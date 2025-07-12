@@ -55,63 +55,85 @@
             background-color: #c49b63 !important;
             color: #fff !important;
         }
+        .permission-denied {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 40px auto;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
-        <div class="unit-card card shadow">
-            <div class="card-header card-header-brown text-white">
-                Add New Unit
-            </div>
-            <div class="card-body p-4">
-                <!-- Error Alert Box -->
-                <c:if test="${not empty errors or not empty error}">
-                    <div class="error-alert">
-                        <h6 class="mb-2"><strong>Please correct the following errors:</strong></h6>
-                        <ul class="error-list">
-                            <c:if test="${not empty error}">
-                                <li>${error}</li>
-                            </c:if>
-                            <c:forEach var="entry" items="${errors}">
-                                <li><strong>${entry.key}:</strong> ${entry.value}</li>
-                            </c:forEach>
-                        </ul>
+        <!-- Kiểm tra quyền trước khi hiển thị form -->
+        <c:choose>
+            <c:when test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_UNIT')}">
+                <div class="unit-card card shadow">
+                    <div class="card-header card-header-brown text-white">
+                        Add New Unit
                     </div>
-                </c:if>
-                <form action="AddUnit" method="post">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Unit Name</label>
-                            <input type="text" class="form-control ${not empty errors.unitName ? 'is-invalid' : ''}" 
-                                   name="unitName" value="${unitName}">
-                            <c:if test="${not empty errors.unitName}">
-                                <div class="error-message">${errors.unitName}</div>
-                            </c:if>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Symbol</label>
-                            <input type="text" class="form-control ${not empty errors.symbol ? 'is-invalid' : ''}" 
-                                   name="symbol" value="${symbol}">
-                            <c:if test="${not empty errors.symbol}">
-                                <div class="error-message">${errors.symbol}</div>
-                            </c:if>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control ${not empty errors.description ? 'is-invalid' : ''}" 
-                                  name="description" rows="3">${description}</textarea>
-                        <c:if test="${not empty errors.description}">
-                            <div class="error-message">${errors.description}</div>
+                    <div class="card-body p-4">
+                        <!-- Error Alert Box -->
+                        <c:if test="${not empty errors or not empty error}">
+                            <div class="error-alert">
+                                <h6 class="mb-2"><strong>Please correct the following errors:</strong></h6>
+                                <ul class="error-list">
+                                    <c:if test="${not empty error}">
+                                        <li>${error}</li>
+                                    </c:if>
+                                    <c:forEach var="entry" items="${errors}">
+                                        <li><strong>${entry.key}:</strong> ${entry.value}</li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
                         </c:if>
+                        <form action="AddUnit" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Unit Name</label>
+                                    <input type="text" class="form-control ${not empty errors.unitName ? 'is-invalid' : ''}" 
+                                           name="unitName" value="${unitName}">
+                                    <c:if test="${not empty errors.unitName}">
+                                        <div class="error-message">${errors.unitName}</div>
+                                    </c:if>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Symbol</label>
+                                    <input type="text" class="form-control ${not empty errors.symbol ? 'is-invalid' : ''}" 
+                                           name="symbol" value="${symbol}">
+                                    <c:if test="${not empty errors.symbol}">
+                                        <div class="error-message">${errors.symbol}</div>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control ${not empty errors.description ? 'is-invalid' : ''}" 
+                                          name="description" rows="3">${description}</textarea>
+                                <c:if test="${not empty errors.description}">
+                                    <div class="error-message">${errors.description}</div>
+                                </c:if>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-brown px-4">Add Unit</button>
+                                <a href="UnitList" class="btn btn-secondary px-4">Cancel</a>
+                            </div>
+                        </form>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-brown px-4">Add Unit</button>
-                        <a href="UnitList" class="btn btn-secondary px-4">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="permission-denied">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Access Denied</h4>
+                    <p>Bạn không có quyền thêm mới đơn vị.</p>
+                    <a href="UnitList" class="btn btn-primary">Quay lại danh sách</a>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
