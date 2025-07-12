@@ -196,40 +196,85 @@
         <div class="card">
             <div class="card-header">Action</div>
             <div class="card-body">
-                <form action="PurchaseRequestDetail" method="POST">
-                    <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}">
-                    <input type="hidden" id="actionType" name="action" value="">
-                    <div class="mb-2">
-                        <c:if test="${purchaseRequest.status eq 'pending'}">
-                            <textarea name="reason" id="reasonInput" class="form-control" placeholder="Enter reason..." required></textarea>
-                        </c:if>
+                <!-- Nút Approve/Reject mở modal -->
+                <div class="d-flex gap-2 mb-2">
+                    <c:choose>
+                        <c:when test="${purchaseRequest.status eq 'pending'}">
+                            <button type="button" class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('approve')">Approve</button>
+                            <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('reject')">Reject</button>
+                            <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+                <!-- Modal Popup giống ViewRequests.jsp, có Select Status -->
+                <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="updateStatusModalLabel">Update Purchase Request Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form action="PurchaseRequestDetail" method="post" id="updateStatusForm">
+                        <div class="modal-body">
+                          <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}" />
+                          <input type="hidden" id="modalActionType" name="action" value="approve" />
+                          <div class="mb-3">
+                            <label for="statusSelect" class="form-label">New Status <span style="color:#DEAD6F">*</span></label>
+                            <select class="form-select" id="statusSelect" name="modalStatus" style="border:2px solid #DEAD6F; color:#5c4434;">
+                              <option value="">Select Status</option>
+                              <option value="approved">Approved</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+                          </div>
+                          <div class="mb-3" id="reasonGroup" style="display:none;">
+                            <label for="modalReason" class="form-label">Approval Reason <span style="color:#DEAD6F">*</span></label>
+                            <textarea class="form-control" id="modalReason" name="reason" rows="3" placeholder="Enter approval reason..." style="border:2px solid #DEAD6F; color:#5c4434;"></textarea>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn" style="background-color:#DEAD6F; color:#fff;" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" id="updateStatusBtn" class="btn" style="background-color:#DEAD6F; color:#fff;" disabled>Update Status</button>
+                        </div>
+                      </form>
                     </div>
-                    <div class="d-flex gap-2 mb-2">
-                        <c:choose>
-                            <c:when test="${purchaseRequest.status eq 'pending'}">
-                                <button type="submit" class="btn btn-approve" onclick="return setActionType('approve')">Approve</button>
-                                <button type="submit" class="btn btn-reject" onclick="return setActionType('reject')">Reject</button>
-                                <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>
-                            </c:when>
-                            <c:otherwise>
-                                <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                </form>
+                  </div>
+                </div>
                 <script>
-                    function setActionType(type) {
-                        document.getElementById('actionType').value = type;
-                        if(type === 'approve') {
-                            return confirm('Are you sure you want to approve this request?');
-                        } else if(type === 'reject') {
-                            return confirm('Are you sure you want to reject this request?');
-                        }
-                        return true;
-                    }
+                  function setModalAction(type) {
+                    document.getElementById('modalActionType').value = type;
+                    document.getElementById('statusSelect').value = '';
+                    document.getElementById('reasonGroup').style.display = 'none';
+                    document.getElementById('updateStatusBtn').disabled = true;
+                  }
+                  document.addEventListener('DOMContentLoaded', function() {
+                    var statusSelect = document.getElementById('statusSelect');
+                    var reasonGroup = document.getElementById('reasonGroup');
+                    var updateBtn = document.getElementById('updateStatusBtn');
+                    statusSelect.addEventListener('change', function() {
+                      if (this.value === '') {
+                        reasonGroup.style.display = 'none';
+                        updateBtn.disabled = true;
+                      } else {
+                        reasonGroup.style.display = '';
+                        updateBtn.disabled = false;
+                      }
+                    });
+                    // Ngăn submit nếu chưa chọn status
+                    document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
+                      if (statusSelect.value === '') {
+                        statusSelect.focus();
+                        updateBtn.disabled = true;
+                        e.preventDefault();
+                      }
+                    });
+                  });
                 </script>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
