@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/vendor.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/date-validation.css">
     <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
@@ -82,6 +83,7 @@
                             <div class="col-md-6">
                                 <label for="deliveryDate" class="form-label text-muted">Delivery Date</label>
                                 <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
+                                <div class="invalid-feedback" id="dateError" style="display:none;">Delivery date cannot be in the past.</div>
                             </div>
                             <div class="col-12">
                                 <label for="reason" class="form-label text-muted">Reason</label>
@@ -103,9 +105,9 @@
                             <div class="row material-row align-items-center gy-2">
                                 <div class="col-md-3">
                                     <label class="form-label text-muted">Material</label>
-                                    <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off">
+                                    <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off" data-touched="false">
                                     <input type="hidden" name="materials[]" class="material-id-input">
-                                    <div class="invalid-feedback">Please enter a valid material name or code.</div>
+                                    <div class="invalid-feedback" style="display:none;">Please enter a valid material name or code.</div>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">In Stock</label>
@@ -113,8 +115,8 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Quantity</label>
-                                    <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required>
-                                    <div class="invalid-feedback">Not enough stock!</div>
+                                    <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required data-touched="false">
+                                    <div class="invalid-feedback" style="display:none;">Not enough stock!</div>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label text-muted">Condition</label>
@@ -151,6 +153,7 @@
 <script src="js/jquery-1.11.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/date-validation.js"></script>
 <script>
 var materialsData = [];
 <c:forEach var="material" items="${materials}">
@@ -236,11 +239,88 @@ function updateMaterialRowAutocomplete(row) {
     });
 }
 
-// Initial setup for the first row
+function validateMaterialNameInput(input, showError = false) {
+    const invalidFeedback = input.parentElement.querySelector('.invalid-feedback');
+    const touched = input.getAttribute('data-touched') === 'true';
+    const value = input.value.trim();
+    const idInput = input.parentElement.querySelector('.material-id-input');
+    let isValid = !!idInput.value;
+    if ((showError || touched) && !isValid) {
+        input.classList.add('is-invalid');
+        if (invalidFeedback) invalidFeedback.style.display = 'block';
+    } else {
+        input.classList.remove('is-invalid');
+        if (invalidFeedback) invalidFeedback.style.display = 'none';
+    }
+    return isValid;
+}
+
+function validateQuantityInput(input, showError = false) {
+    const invalidFeedback = input.parentElement.querySelector('.invalid-feedback');
+    const touched = input.getAttribute('data-touched') === 'true';
+    const stock = parseInt(input.max, 10);
+    const quantity = parseInt(input.value, 10);
+    let isValid = !isNaN(stock) && !isNaN(quantity) && quantity > 0 && quantity <= stock;
+    if ((showError || touched) && !isValid) {
+        input.classList.add('is-invalid');
+        if (invalidFeedback) invalidFeedback.style.display = 'block';
+    } else {
+        input.classList.remove('is-invalid');
+        if (invalidFeedback) invalidFeedback.style.display = 'none';
+    }
+    return isValid;
+}
+
+// Initial setup for the first row and date validation
 document.addEventListener('DOMContentLoaded', function() {
+    // Setup material rows
     document.querySelectorAll('.material-row').forEach(row => {
         updateMaterialRowAutocomplete(row);
+        // Material name input
+        const nameInput = row.querySelector('.material-name-input');
+        nameInput.addEventListener('input', function() {
+            nameInput.setAttribute('data-touched', 'true');
+            validateMaterialNameInput(nameInput, false);
+        });
+        nameInput.addEventListener('blur', function() {
+            nameInput.setAttribute('data-touched', 'true');
+            validateMaterialNameInput(nameInput, true);
+        });
+        // Quantity input
+        const quantityInput = row.querySelector('.quantity-input');
+        quantityInput.addEventListener('input', function() {
+            quantityInput.setAttribute('data-touched', 'true');
+            validateQuantityInput(quantityInput, false);
+        });
+        quantityInput.addEventListener('blur', function() {
+            quantityInput.setAttribute('data-touched', 'true');
+            validateQuantityInput(quantityInput, true);
+        });
     });
+    // Initialize date validation
+    if (window.dateValidation) {
+        window.dateValidation.initDateValidation();
+    }
+    // Validate all on submit
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+            document.querySelectorAll('.material-row').forEach(row => {
+                const nameInput = row.querySelector('.material-name-input');
+                const quantityInput = row.querySelector('.quantity-input');
+                nameInput.setAttribute('data-touched', 'true');
+                quantityInput.setAttribute('data-touched', 'true');
+                if (!validateMaterialNameInput(nameInput, true)) valid = false;
+                if (!validateQuantityInput(quantityInput, true)) valid = false;
+            });
+            if (!valid) {
+                e.preventDefault();
+                alert('Please fix the errors in the materials section.');
+                return false;
+            }
+        });
+    }
 });
 
 // When add material row
@@ -287,6 +367,8 @@ function validateQuantity(quantityInput) {
         quantityInput.classList.remove('is-invalid');
     }
 }
+
+
 </script>
 </body>
 </html>

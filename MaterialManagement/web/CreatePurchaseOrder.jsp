@@ -137,29 +137,7 @@
                         </c:if>
                     </div>
 
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Purchase Request Details</h5>
-                                    <div id="purchaseRequestDetails">
-                                        <p class="text-muted">Select a purchase request to view details</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Order Summary</h5>
-                                    <div class="d-flex justify-content-between">
-                                        <span>Total Amount:</span>
-                                        <span class="total-amount" id="grandTotal">$0.00</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+               
 
                     <div class="mt-5 d-grid gap-2">
                         <button type="submit" class="btn btn-dark btn-lg rounded-1">Create Purchase Order</button>

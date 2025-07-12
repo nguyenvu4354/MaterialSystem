@@ -99,8 +99,11 @@ public class CreateExportRequestServlet extends HttpServlet {
                 throw new Exception("Request code, delivery date, and reason are required.");
             }
             Date deliveryDate = Date.valueOf(deliveryDateStr);
-            if (deliveryDate.toLocalDate().isBefore(LocalDate.now())) {
-                throw new Exception("Delivery date cannot be in the past.");
+            LocalDate deliveryLocalDate = deliveryDate.toLocalDate();
+            LocalDate today = LocalDate.now();
+            
+            if (deliveryLocalDate.isBefore(today)) {
+                throw new Exception("Delivery date cannot be in the past. Please select today or a future date.");
             }
             int recipientId = 0;
             if (recipientIdStr != null && !recipientIdStr.trim().isEmpty()) {
@@ -153,6 +156,13 @@ public class CreateExportRequestServlet extends HttpServlet {
             }
             boolean success = exportRequestDAO.add(exportRequest, details);
             if (success) {
+                // Gửi email thông báo cho giám đốc
+                try {
+                    sendExportRequestNotification(exportRequest, details, user);
+                } catch (Exception e) {
+                    System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
+                    e.printStackTrace();
+                }
                 response.sendRedirect(request.getContextPath() + "/ExportRequestList");
             } else {
                 request.setAttribute("error", "Failed to create export request.");
@@ -161,6 +171,66 @@ public class CreateExportRequestServlet extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
             doGet(request, response);
+        }
+    }
+
+    private void sendExportRequestNotification(ExportRequest exportRequest, 
+                                            List<ExportRequestDetail> details, 
+                                            User creator) {
+        try {
+            List<User> allUsers = userDAO.getAllUsers();
+            List<User> directors = new ArrayList<>();
+            
+            // Lấy danh sách giám đốc (roleId = 2)
+            for (User u : allUsers) {
+                if (u.getRoleId() == 2) {
+                    directors.add(u);
+                }
+            }
+            
+            // Tạo nội dung email
+            String subject = "[Thông báo] Export Request mới đã được tạo";
+            StringBuilder content = new StringBuilder();
+            content.append("<html><body>");
+            content.append("<h2>Export Request mới đã được tạo</h2>");
+            content.append("<p><strong>Mã Export Request:</strong> ").append(exportRequest.getRequestCode()).append("</p>");
+            content.append("<p><strong>Người tạo:</strong> ").append(creator.getFullName()).append(" (ID: ").append(creator.getUserId()).append(")</p>");
+            content.append("<p><strong>Ngày giao hàng:</strong> ").append(exportRequest.getDeliveryDate()).append("</p>");
+            content.append("<p><strong>Lý do:</strong> ").append(exportRequest.getReason()).append("</p>");
+            content.append("<p><strong>Thời gian tạo:</strong> ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</p>");
+            
+            content.append("<h3>Chi tiết vật tư:</h3>");
+            content.append("<table border='1' style='border-collapse: collapse; width: 100%;'>");
+            content.append("<tr><th>Vật tư</th><th>Số lượng</th><th>Tình trạng</th></tr>");
+            
+            for (ExportRequestDetail detail : details) {
+                Material material = materialDAO.getInformation(detail.getMaterialId());
+                String materialName = (material != null) ? material.getMaterialName() : "Unknown Material";
+                content.append("<tr>");
+                content.append("<td>").append(materialName).append("</td>");
+                content.append("<td>").append(detail.getQuantity()).append("</td>");
+                content.append("<td>").append(detail.getExportCondition()).append("</td>");
+                content.append("</tr>");
+            }
+            content.append("</table>");
+            content.append("<p>Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý export request.</p>");
+            content.append("</body></html>");
+            
+            // Chỉ gửi email cho giám đốc
+            for (User director : directors) {
+                if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
+                    try {
+                        EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
+                        System.out.println("✅ Đã gửi email thông báo export request cho giám đốc: " + director.getEmail());
+                    } catch (Exception e) {
+                        System.err.println("❌ Lỗi khi gửi email cho giám đốc " + director.getEmail() + ": " + e.getMessage());
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -6,9 +6,11 @@ import dal.PurchaseRequestDAO;
 import dal.SupplierDAO;
 import dal.PurchaseRequestDetailDAO;
 import dal.RolePermissionDAO;
+import dal.UserDAO;
 import entity.Material;
 import entity.PurchaseRequest;
 import entity.Supplier;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import utils.EmailUtils;
 
 @WebServlet(name = "CreatePurchaseOrderServlet", urlPatterns = {"/CreatePurchaseOrder"})
 public class CreatePurchaseOrderServlet extends HttpServlet {
@@ -166,6 +169,13 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             purchaseOrder.setStatus("pending");
             boolean success = purchaseOrderDAO.createPurchaseOrder(purchaseOrder, details);
             if (success) {
+                // Gửi email thông báo cho supplier và admin
+                try {
+                    sendPurchaseOrderNotification(purchaseOrder, details, purchaseRequest, user);
+                } catch (Exception e) {
+                    System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
+                    e.printStackTrace();
+                }
                 response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");
             } else {
                 request.setAttribute("error", "Failed to create purchase order.");
@@ -174,6 +184,71 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
             doGet(request, response);
+        }
+    }
+
+    private void sendPurchaseOrderNotification(entity.PurchaseOrder purchaseOrder, 
+                                            List<entity.PurchaseOrderDetail> details, 
+                                            PurchaseRequest purchaseRequest, 
+                                            User creator) {
+        try {
+            UserDAO userDAO = new UserDAO();
+            List<User> allUsers = userDAO.getAllUsers();
+            List<User> directors = new ArrayList<>();
+            
+            // Lấy danh sách giám đốc (roleId = 2)
+            for (User u : allUsers) {
+                if (u.getRoleId() == 2) {
+                    directors.add(u);
+                }
+            }
+            
+            // Tạo nội dung email
+            String subject = "[Thông báo] Purchase Order mới đã được tạo";
+            StringBuilder content = new StringBuilder();
+            content.append("<html><body>");
+            content.append("<h2>Purchase Order mới đã được tạo</h2>");
+            content.append("<p><strong>Mã Purchase Order:</strong> ").append(purchaseOrder.getPoCode()).append("</p>");
+            content.append("<p><strong>Người tạo:</strong> ").append(creator.getFullName()).append(" (ID: ").append(creator.getUserId()).append(")</p>");
+            content.append("<p><strong>Mã Purchase Request:</strong> ").append(purchaseRequest.getRequestCode()).append("</p>");
+            content.append("<p><strong>Ghi chú:</strong> ").append(purchaseOrder.getNote() != null ? purchaseOrder.getNote() : "Không có").append("</p>");
+            content.append("<p><strong>Thời gian tạo:</strong> ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</p>");
+            
+            content.append("<h3>Chi tiết vật tư:</h3>");
+            content.append("<table border='1' style='border-collapse: collapse; width: 100%;'>");
+            content.append("<tr><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>");
+            
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (entity.PurchaseOrderDetail detail : details) {
+                BigDecimal lineTotal = detail.getUnitPrice().multiply(new BigDecimal(detail.getQuantity()));
+                totalAmount = totalAmount.add(lineTotal);
+                content.append("<tr>");
+                content.append("<td>").append(detail.getMaterialName()).append("</td>");
+                content.append("<td>").append(detail.getQuantity()).append("</td>");
+                content.append("<td>").append(detail.getUnitPrice()).append(" $</td>");
+                content.append("<td>").append(lineTotal).append(" $</td>");
+                content.append("</tr>");
+            }
+            content.append("</table>");
+            content.append("<p><strong>Tổng tiền:</strong> ").append(totalAmount).append(" $</p>");
+            content.append("<p>Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý purchase order.</p>");
+            content.append("</body></html>");
+            
+            // Chỉ gửi email cho giám đốc
+            for (User director : directors) {
+                if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
+                    try {
+                        EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
+                        System.out.println("✅ Đã gửi email thông báo purchase order cho giám đốc: " + director.getEmail());
+                    } catch (Exception e) {
+                        System.err.println("❌ Lỗi khi gửi email cho giám đốc " + director.getEmail() + ": " + e.getMessage());
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
