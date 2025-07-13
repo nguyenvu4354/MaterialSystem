@@ -4,7 +4,9 @@
  */
 package controller;
 
+import dal.RepairRequestDAO;
 import dal.RepairRequestDetailDAO;
+import entity.RepairRequest;
 import entity.RepairRequestDetail;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -61,27 +63,33 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            int requestId = Integer.parseInt(request.getParameter("requestId"));
-            RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
-            List<RepairRequestDetail> details = dao.getRepairRequestDetailsByRequestId(requestId);
+      try {
+        int requestId = Integer.parseInt(request.getParameter("requestId"));
+        RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
+        List<RepairRequestDetail> details = dao.getRepairRequestDetailsByRequestId(requestId);
 
-            // Lấy thông tin người dùng từ session
-            HttpSession session = request.getSession();
-            entity.User user = (entity.User) session.getAttribute("user");
+        // Lấy thông tin RepairRequest từ RepairRequestDAO
+        RepairRequestDAO repairRequestDAO = new RepairRequestDAO();
+        RepairRequest repairRequest = repairRequestDAO.getRepairRequestById(requestId);
 
-            int roleId = user != null ? user.getRoleId() : 0;
+        // Lấy thông tin người dùng từ session
+        HttpSession session = request.getSession();
+        entity.User user = (entity.User) session.getAttribute("user");
 
-            request.setAttribute("details", details);
-            request.setAttribute("requestId", requestId);
-            request.setAttribute("roleId", roleId);
+        int roleId = user != null ? user.getRoleId() : 0;
 
-            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Failed to load repair request details.");
-            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
-        }
+        // Đặt các thuộc tính vào request
+        request.setAttribute("details", details);
+        request.setAttribute("requestId", requestId);
+        request.setAttribute("roleId", roleId);
+        request.setAttribute("status", repairRequest != null ? repairRequest.getStatus() : "N/A");
+
+        request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.setAttribute("error", "Failed to load repair request details.");
+        request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
+    }
     }
 
     /**

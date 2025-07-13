@@ -253,7 +253,7 @@ public class RepairRequestDAO extends DBContext {
     }
 
     public RepairRequest getRepairRequestById(int repairRequestId) throws SQLException {
-        String sql = "SELECT * FROM RepairRequest WHERE repair_request_id = ?";
+        String sql = "SELECT * FROM Repair_Requests WHERE repair_request_id = ?";
         try (
                 PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
