@@ -1,8 +1,4 @@
-<%-- 
-    Document   : ChangePassword
-    Created on : 7 thg 7, 2025, 00:27:39
-    Author     : Admin
---%>
+
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User" %>
@@ -16,7 +12,7 @@
 %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8"/>
     <title>Change Password</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -29,13 +25,14 @@
         .change-password-section .form-label { font-size: 0.9rem; margin-bottom: 0.25rem; }
         .change-password-section .btn { font-size: 1rem; padding: 0.75rem 1.5rem; }
     </style>
-</head>
-<body>
+    </head>
+    <body>
 <jsp:include page="Header.jsp" />
 <section class="py-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 p-4 bg-white rounded shadow change-password-section">
+                <jsp:include page="Navigation.jsp" />
                 <h2 class="text-center display-5 mb-4">Change Password</h2>
                 <c:if test="${not empty message}">
                     <div class="alert alert-success text-center" role="alert">
@@ -55,20 +52,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="newPassword" class="form-label text-muted">New Password</label>
-                        <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="6">
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="3">
                     </div>
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label text-muted">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="6">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="3">
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg rounded-1">Change Password</button>
                     </div>
                 </form>
                 </c:if>
-                <div class="mt-3 text-center">
-                    <a href="profile" class="btn btn-link">← Back to Profile</a>
-                </div>
             </div>
         </div>
     </div>
@@ -77,5 +71,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="js/plugins.js"></script>
 <script src="js/script.js"></script>
-</body>
+    </body>
 </html>

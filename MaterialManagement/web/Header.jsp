@@ -164,6 +164,9 @@ if (user != null) {
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_PURCHASE_ORDER_LIST')}">
                                 <option value="PurchaseOrderList">Purchase Order List</option>
                             </c:if>
+                            <c:if test="${not empty sessionScope.user && sessionScope.user.roleId == 1}">
+                                <option value="PasswordResetRequests">Password Reset Requests</option>
+                            </c:if>
                         </select>
                     </c:if>
 

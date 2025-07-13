@@ -95,12 +95,11 @@ public class ChangePasswordServlet extends HttpServlet {
             error = "Current password is incorrect.";
         } else if (!newPassword.equals(confirmPassword)) {
             error = "New password and confirmation do not match.";
-        } else if (newPassword.length() < 6) {
-            error = "New password must be at least 6 characters.";
+        } else if (newPassword.length() < 3) {
+            error = "New password must be at least 3 characters.";
         } else if (userDAO.md5(newPassword).equals(user.getPassword())) {
             error = "New password must be different from the old password.";
         } else {
-            // Update password
             user.setPassword(userDAO.md5(newPassword));
             boolean updated = userDAO.updateUser(user);
             if (updated) {
@@ -125,3 +124,4 @@ public class ChangePasswordServlet extends HttpServlet {
     }// </editor-fold>
 
 }
+ 
