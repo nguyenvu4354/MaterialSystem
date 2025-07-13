@@ -110,7 +110,7 @@
                                                     <input type="hidden" name="materials[]" value="${mat.materialId}">
                                                 </td>
                                                 <td>
-                                                    <img src="${not empty materialImages[mat.materialId] ? materialImages[mat.materialId] : 'images/placeholder.png'}" alt="${mat.materialName}" style="width: 80px; height: auto; object-fit: cover;">
+                                                    <img src="images/material/${not empty materialImages[mat.materialId] ? materialImages[mat.materialId] : 'default.jpg'}" alt="${mat.materialName}" style="width: 80px; height: auto; object-fit: cover;">
                                                 </td>
                                                 <td>
                                                     <input type="number" class="form-control quantity-input" name="quantities[]" value="${mat.quantity}" readonly>

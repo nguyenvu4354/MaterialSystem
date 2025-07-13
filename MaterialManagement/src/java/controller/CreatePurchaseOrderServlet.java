@@ -79,10 +79,10 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
                 for (entity.PurchaseRequestDetail detail : purchaseRequestDetailList) {
                     Material material = materialDAO.getInformation(detail.getMaterialId());
-                    String url = (material != null && material.getMaterialsUrl() != null && !material.getMaterialsUrl().isEmpty())
+                    String fileName = (material != null && material.getMaterialsUrl() != null && !material.getMaterialsUrl().isEmpty())
                         ? material.getMaterialsUrl()
-                        : "images/material/default.jpg";
-                    materialImages.put(detail.getMaterialId(), url);
+                        : "default.jpg";
+                    materialImages.put(detail.getMaterialId(), fileName);
                 }
                 request.setAttribute("materialImages", materialImages);
             }
