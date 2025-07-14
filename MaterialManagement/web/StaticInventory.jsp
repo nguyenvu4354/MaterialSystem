@@ -352,9 +352,9 @@
                     <th>Category</th>
                     <th>Stock</th>
                     <th>Location</th>
-                    <th>Note</th>
                     <th>Last Updated</th>
                     <th>Updated By</th>
+                    <th>Note</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -374,16 +374,16 @@
                         </c:choose>
                       </td>
                       <td><div class="material-name">${inv.location}</div></td>
-                      <td>
-                        <c:choose>
-                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
-                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                        </c:choose>
-                      </td>
                       <td><small class="text-muted">${inv.lastUpdated}</small></td>
                       <td>
                         <c:choose>
                           <c:when test="${not empty userMap[inv.updatedBy]}"><span style="color: black; font-weight: 500">${userMap[inv.updatedBy].fullName}</span></c:when>
+                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
                           <c:otherwise><span class="text-muted">-</span></c:otherwise>
                         </c:choose>
                       </td>
@@ -397,23 +397,21 @@
                 </tbody>
               </table>
             </div>
-            <c:if test="${totalPages > 1}">
-              <nav>
-                <ul class="pagination">
-                  <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
-                  </li>
-                  <c:forEach begin="1" end="${totalPages}" var="i">
-                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                      <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
+            <nav>
+                <ul class="pagination justify-content-center mt-4">
+                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
                     </li>
-                  </c:forEach>
-                  <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                    <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
-                  </li>
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
+                        </li>
+                    </c:forEach>
+                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
+                    </li>
                 </ul>
-              </nav>
-            </c:if>
+            </nav>
           </c:if>
         </div>
       </div>

@@ -71,8 +71,28 @@
                     <div class="alert alert-danger mt-4">You do not have permission to view password reset requests.</div>
                 </c:if>
                 <c:if test="${sessionScope.user.roleId == 1}">
+                    <c:if test="${not empty message}">
+                        <div id="reset-msg" class="alert alert-success alert-dismissible fade show text-center my-3" role="alert">
+                            ${message}
+                            <c:if test="${not empty newPassword}">
+                                <br/>
+                                <strong>New Password: </strong>
+                                <span style="font-family:monospace; font-size:1.1em;">${newPassword}</span>
+                            </c:if>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <script>
+                            setTimeout(function() {
+                                var msg = document.getElementById('reset-msg');
+                                if (msg) {
+                                    var alert = bootstrap.Alert.getOrCreateInstance(msg);
+                                    alert.close();
+                                }
+                            }, 5000);
+                        </script>
+                    </c:if>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="fas fa-key"></i> Password Reset Requests</h2>
+                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="fas fa-lock"></i> Password Reset Requests</h2>
                     </div>
                     <div class="row search-box">
                         <div class="col-md-8">
@@ -96,21 +116,21 @@
                             <table class="table table-bordered table-hover align-middle text-center">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>ID</th>
-                                        <th>User Email</th>
-                                        <th>Request Date</th>
-                                        <th>Status</th>
-                                        <th>New Password</th>
-                                        <th>Action</th>
+                                        <th style="width: 60px;">ID</th>
+                                        <th style="width: 240px;">User Email</th>
+                                        <th style="width: 160px;">Request Date</th>
+                                        <th style="width: 120px;">Status</th>
+                                        <!-- <th>New Password</th> -->
+                                        <th style="width: 160px;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="req" items="${requests}">
                                         <tr>
-                                            <td>${req.requestId}</td>
-                                            <td>${req.userEmail}</td>
-                                            <td>${req.requestDate}</td>
-                                            <td>
+                                            <td style="width: 60px;">${req.requestId}</td>
+                                            <td style="width: 240px; word-break: break-all;">${req.userEmail}</td>
+                                            <td style="width: 160px;">${req.requestDate}</td>
+                                            <td style="width: 120px;"> 
                                                 <c:choose>
                                                     <c:when test="${req.status == 'pending'}">
                                                         <span class="status-badge status-pending">Pending</span>
@@ -129,19 +149,19 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td>
+                                            <!-- <td>
                                                 <input type="text" name="newPassword" class="form-control form-control-sm w-auto" placeholder="New Password" value="${req.newPassword}" style="min-width:120px;" readonly />
-                                            </td>
-                                            <td>
-                                                <form method="post" action="PasswordResetRequests" class="d-flex gap-2 align-items-center mb-0">
+                                            </td> -->
+                                            <td style="width: 160px; text-align: center; vertical-align: middle;">
+                                                <form method="post" action="PasswordResetRequests" class="d-flex flex-column align-items-center justify-content-center gap-2 mb-0" style="min-width: 120px;">
                                                     <input type="hidden" name="requestId" value="${req.requestId}" />
                                                     <input type="hidden" name="newPassword" value="${req.newPassword}" />
-                                                    <select name="status" class="form-select form-select-sm w-auto d-inline-block" style="min-width:80px; border: 2px solid #000;"
+                                                    <select name="status" class="form-select form-select-sm w-auto d-inline-block mx-auto" style="min-width:80px; border: 2px solid #000; text-align: center;"
                                                         <c:if test="${req.status != 'pending'}">disabled</c:if>>
                                                         <option value="completed" ${req.status == 'completed' ? 'selected' : ''}>Completed</option>
                                                         <option value="rejected" ${req.status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                                     </select>
-                                                    <button type="submit" class="btn btn-warning btn-action" style="width: 100px;"
+                                                    <button type="submit" class="btn btn-warning btn-action mx-auto" style="width: 100px;"
                                                         <c:if test="${req.status != 'pending'}">disabled</c:if>>
                                                         <i class="fas fa-save"></i> Update
                                                     </button>
@@ -152,23 +172,21 @@
                                 </tbody>
                             </table>
                         </div>
-                        <c:if test="${totalPages > 1}">
-                            <nav>
-                                <ul class="pagination">
-                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}&searchEmail=${param.searchEmail}&status=${status}">Previous</a>
+                        <nav>
+                            <ul class="pagination justify-content-center mt-4">
+                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}">Previous</a>
+                                </li>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="PasswordResetRequests?page=${i}">${i}</a>
                                     </li>
-                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="PasswordResetRequests?page=${i}&searchEmail=${param.searchEmail}&status=${status}">${i}</a>
-                                        </li>
-                                    </c:forEach>
-                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}&searchEmail=${param.searchEmail}&status=${status}">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </c:if>
+                                </c:forEach>
+                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </c:if>
                     <c:if test="${empty requests}">
                         <div class="text-center py-5">

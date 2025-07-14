@@ -83,18 +83,24 @@ if (user != null) {
                                 || sessionScope.userPermissions.contains('VIEW_LIST_UNIT')}">
                         <select class="filter-categories border-0 mb-0 me-5" onchange="location.href = this.value;">
                             <option selected disabled>System Management</option>
+                            <c:if test="${sessionScope.userPermissions.contains('VIEW_INVENTORY')}">
+                                <option value="StaticInventory">Manage Inventory</option>
+                            </c:if>                            
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_USER')}">
                                 <option value="UserList">Manage Users</option>
                             </c:if>
+                            <c:if test="${not empty sessionScope.user && sessionScope.user.roleId == 1}">
+                                <option value="PasswordResetRequests">Manager Password</option>
+                            </c:if>                                
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_DEPARTMENT')}">
                                 <option value="depairmentlist">Manage Department</option>
                             </c:if>
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_UNIT')}">
                                 <option value="Unit">Manage Unit</option>
                             </c:if>
-                            <c:if test="${sessionScope.userPermissions.contains('VIEW_INVENTORY')}">
-                                <option value="StaticInventory">Manage Inventory</option>
-                            </c:if>
+                            <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_UNIT')}">
+                                <option value="UnitList">Manage Units</option>
+                            </c:if>                                
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_MATERIAL')}">
                                 <option value="dashboardmaterial">Manage Materials</option>
                             </c:if>
@@ -103,13 +109,7 @@ if (user != null) {
                             </c:if>
                             <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_SUPPLIER')}">
                                 <option value="Supplier">Manage Suppliers</option>
-                            </c:if>
-                            <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_UNIT')}">
-                                <option value="UnitList">Manage Units</option>
-                            </c:if>
-                            <c:if test="${not empty sessionScope.user && sessionScope.user.roleId == 1}">
-                                <option value="PasswordResetRequests">Password Reset Requests</option>
-                            </c:if>
+                            </c:if>                                
                         </select>
                     </c:if>
 

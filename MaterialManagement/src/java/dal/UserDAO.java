@@ -566,6 +566,18 @@ public class UserDAO extends DBContext {
         return userList;
     }
 
+    public String getAdminEmail() {
+        String sql = "SELECT email FROM Users WHERE role_id = 1 LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
         User user = new User();

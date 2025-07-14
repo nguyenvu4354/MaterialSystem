@@ -140,7 +140,9 @@
                                         <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
                                     </div>
                                     <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-dark btn-lg rounded-1">Add to Export List</button>
+                                        <button type="submit" class="btn btn-dark btn-lg rounded-1 w-100">
+                                            <i class="fas fa-plus-circle me-2"></i>Add to Export List
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -246,7 +248,7 @@
                                     <div class="col-12 mt-4">
                                         <div class="d-grid gap-2">
                                             <button type="submit" class="btn btn-dark btn-lg rounded-1">Confirm Export</button>
-                                            <a href="StaticInventory" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
+                                            <a href="StaticInventory" class="btn btn-outline-secondary btn-lg rounded-1">Back to Inventory</a>
                                         </div>
                                     </div>
                                 </div>
@@ -263,7 +265,7 @@
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-        <!-- jQuery UI -->
+
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {

@@ -34,6 +34,14 @@
                         </a>
                     </li>
                 </c:if>
+                <c:if test="${sessionScope.userPermissions.contains('VIEW_INVENTORY')}">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/StaticInventory">
+                            <i class="fas fa-tachometer-alt fs-4 me-3"></i>
+                            Inventory Report
+                        </a>
+                    </li>
+                </c:if>                      
                 <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_USER')}">
                     <li class="nav-item mb-2">
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UserList">
@@ -45,11 +53,11 @@
                 <c:if test="${sessionScope.user.roleId == 1}">
                     <li class="nav-item mb-2">
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/PasswordResetRequests">
-                            <i class="fas fa-key fs-4 me-3"></i>
+                            <i class="fas fa-lock fs-4 me-3"></i>
                             Password Reset Requests
                         </a>
                     </li>
-                </c:if>
+                </c:if>                  
                 <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_DEPARTMENT')}">
                     <li class="nav-item mb-2">
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/depairmentlist">
@@ -63,14 +71,6 @@
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UnitList">
                             <i class="fas fa-cubes fs-4 me-3"></i>
                             Unit
-                        </a>
-                    </li>
-                </c:if>
-                <c:if test="${sessionScope.userPermissions.contains('VIEW_INVENTORY')}">
-                    <li class="nav-item mb-2">
-                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/StaticInventory">
-                            <i class="fas fa-tachometer-alt fs-4 me-3"></i>
-                            Inventory Report
                         </a>
                     </li>
                 </c:if>
