@@ -66,7 +66,7 @@
                 <section id="CreateUser" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
                     <div class="container">
                         <div class="row my-5 py-5">
-                            <div class="col-12 bg-white p-4 rounded shadow two-column-form">
+                            <div class="col-10 bg-white p-4 mx-auto rounded shadow two-column-form">
                                 <h2 class="display-4 fw-normal text-center mb-4">Create New <span class="text-primary">User</span></h2>
                                 <%
                                     String message = (String) request.getAttribute("message");

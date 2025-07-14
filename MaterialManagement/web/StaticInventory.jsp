@@ -272,52 +272,6 @@
                 </div>
               </div>
             </c:if>
-            <div class="row mb-4">
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-stock">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalStock}</h3>
-                      <p>Total Stock</p>
-                    </div>
-                    <i class="fas fa-boxes stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-imported">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalImported}</h3>
-                      <p>Total Imported</p>
-                    </div>
-                    <i class="fas fa-arrow-down stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-exported">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalExported}</h3>
-                      <p>Total Exported</p>
-                    </div>
-                    <i class="fas fa-arrow-up stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-out">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${outOfStockCount}</h3>
-                      <p>Out of Stock</p>
-                    </div>
-                    <i class="fas fa-exclamation-triangle stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="row search-section">
               <div class="col-md-12">
                 <form method="GET" action="StaticInventory" class="d-flex gap-2 align-items-center">
@@ -352,9 +306,9 @@
                     <th>Category</th>
                     <th>Stock</th>
                     <th>Location</th>
-                    <th>Note</th>
                     <th>Last Updated</th>
                     <th>Updated By</th>
+                    <th>Note</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -374,16 +328,16 @@
                         </c:choose>
                       </td>
                       <td><div class="material-name">${inv.location}</div></td>
-                      <td>
-                        <c:choose>
-                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
-                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                        </c:choose>
-                      </td>
                       <td><small class="text-muted">${inv.lastUpdated}</small></td>
                       <td>
                         <c:choose>
                           <c:when test="${not empty userMap[inv.updatedBy]}"><span style="color: black; font-weight: 500">${userMap[inv.updatedBy].fullName}</span></c:when>
+                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
                           <c:otherwise><span class="text-muted">-</span></c:otherwise>
                         </c:choose>
                       </td>
@@ -397,14 +351,13 @@
                 </tbody>
               </table>
             </div>
-            <c:if test="${totalPages > 1}">
               <nav>
-                <ul class="pagination">
+                <ul class="pagination justify-content-center mt-4">
                   <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                     <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
                   </li>
                   <c:forEach begin="1" end="${totalPages}" var="i">
-                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
                       <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
                     </li>
                   </c:forEach>
@@ -413,7 +366,6 @@
                   </li>
                 </ul>
               </nav>
-            </c:if>
           </c:if>
         </div>
       </div>

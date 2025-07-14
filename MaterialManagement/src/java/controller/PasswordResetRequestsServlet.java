@@ -141,16 +141,20 @@ public class PasswordResetRequestsServlet extends HttpServlet {
             String randomPassword = generateRandomPassword(8);
             userDAO.updatePasswordByEmail(userEmail, UserDAO.md5(randomPassword));
             String subject = "Your Password Has Been Reset";
-            String content = "Your new password is: " + randomPassword + "\nPlease log in and change your password immediately.";
+            String content = "Your new password is: <b>" + randomPassword + "</b><br>Please log in and change your password immediately.";
             try {
                 EmailUtils.sendEmail(userEmail, subject, content);
             } catch (jakarta.mail.MessagingException e) {
                 e.printStackTrace(); 
             }
             newPassword = randomPassword;
+            request.setAttribute("message", "Password has been reset and emailed to the user.");
+            request.setAttribute("newPassword", randomPassword);
+        } else if ("rejected".equals(status)) {
+            request.setAttribute("message", "Password reset request has been rejected.");
         }
         dao.updateStatus(requestId, status, newPassword, adminId);
-        response.sendRedirect("PasswordResetRequests");
+        doGet(request, response);
     }
     private String generateRandomPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&";

@@ -34,6 +34,10 @@
                 justify-content: center;
                 margin: 0 2px;
             }
+            .btn-info.btn-action {
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
+            }
             .content {
                 padding-left: 20px;
                 font-family: 'Roboto', sans-serif;
@@ -71,30 +75,39 @@
                         </div>
 
                         <!-- Filter Form -->
-                        <form method="get" action="UserList" class="mb-3 d-flex flex-wrap gap-2 align-items-center">
-                            <input type="text" name="username" class="form-control" placeholder="Search by username" value="${usernameFilter != null ? usernameFilter : ''}" style="max-width: 200px;"/>
-                            <select name="status" class="form-select" style="max-width: 150px;">
-                                <option value="">All Status</option>
-                                <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
-                                <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
-                            </select>
-                            <select name="roleId" class="form-select" style="max-width: 150px;">
-                                <option value="">All Roles</option>
-                                <c:forEach var="role" items="${roleList}">
-                                    <c:if test="${role.roleId != 1}">
-                                        <option value="${role.roleId}" ${roleIdFilter == role.roleId ? 'selected' : ''}>${role.roleName}</option>
-                                    </c:if>
-                                </c:forEach>
-                            </select>
-                            <select name="departmentId" class="form-select" style="max-width: 150px;">
-                                <option value="">All Departments</option>
-                                <c:forEach var="dept" items="${departmentList}">
-                                    <option value="${dept.departmentId}" ${departmentIdFilter == dept.departmentId ? 'selected' : ''}>${dept.departmentName}</option>
-                                </c:forEach>
-                            </select>
-                            <button type="submit" class="btn btn-primary">Search</button>
-                            <a href="UserList" class="btn btn-secondary">Clear</a>
-                        </form>
+                        <div class="row search-box">
+                            <div class="col-md-8">
+                                <form action="UserList" method="GET" class="d-flex gap-2 align-items-center">
+                                    <input type="text" name="username" class="form-control" 
+                                           placeholder="Search by username" 
+                                           value="${usernameFilter != null ? usernameFilter : ''}" 
+                                           style="width: 180px; height: 50px; border: 2px solid gray" />
+                                    <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                        <option value="">All Status</option>
+                                        <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
+                                        <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
+                                    </select>
+                                    <select name="roleId" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                        <option value="">All Roles</option>
+                                        <c:forEach var="role" items="${roleList}">
+                                            <c:if test="${role.roleId != 1}">
+                                                <option value="${role.roleId}" ${roleIdFilter == role.roleId ? 'selected' : ''}>${role.roleName}</option>
+                                            </c:if>
+                                        </c:forEach>
+                                    </select>
+                                    <select name="departmentId" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
+                                        <option value="">All Departments</option>
+                                        <c:forEach var="dept" items="${departmentList}">
+                                            <option value="${dept.departmentId}" ${departmentIdFilter == dept.departmentId ? 'selected' : ''}>${dept.departmentName}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
+                                        <i class="fas fa-search me-2"></i> Search
+                                    </button>
+                                    <a href="UserList" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
+                                </form>
+                            </div>
+                        </div>
 
                         <!-- Messages -->
                         <c:if test="${not empty successMessage}">

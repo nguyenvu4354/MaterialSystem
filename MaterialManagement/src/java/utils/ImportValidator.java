@@ -113,4 +113,30 @@ public class ImportValidator {
 
         return errors;
     }
+
+    public static Map<String, String> validateAddMaterial(String materialIdStr, String quantityStr, String unitPriceStr, dal.MaterialDAO materialDAO) {
+        Map<String, String> errors = new HashMap<>();
+        int materialId = 0;
+        int quantity = 0;
+        double unitPrice = 0;
+        try {
+            materialId = Integer.parseInt(materialIdStr);
+            quantity = Integer.parseInt(quantityStr);
+            unitPrice = Double.parseDouble(unitPriceStr);
+        } catch (NumberFormatException e) {
+            errors.put("numberFormat", "Invalid number format for material, quantity, or unit price.");
+        }
+        if (quantity <= 0) errors.put("quantity", "Quantity must be greater than 0.");
+        if (unitPrice < 0) errors.put("unitPrice", "Unit price cannot be negative.");
+        if (materialId <= 0 || materialDAO.getInformation(materialId) == null) errors.put("materialId", "Material is required and must exist.");
+        return errors;
+    }
+
+    public static double calculateTotalImportValue(java.util.List<entity.ImportDetail> details) {
+        double total = 0;
+        for (entity.ImportDetail d : details) {
+            total += d.getQuantity() * d.getUnitPrice();
+        }
+        return total;
+    }
 } 

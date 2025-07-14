@@ -5,6 +5,7 @@ import dal.InventoryDAO;
 import dal.MaterialDAO;
 import dal.SupplierDAO;
 import dal.RolePermissionDAO;
+import dal.DepartmentDAO;
 import entity.Import;
 import entity.ImportDetail;
 import entity.Material;
@@ -30,6 +31,7 @@ public class ImportMaterialServlet extends HttpServlet {
     private MaterialDAO materialDAO;
     private InventoryDAO inventoryDAO;
     private RolePermissionDAO rolePermissionDAO;
+    private DepartmentDAO departmentDAO;
 
     @Override
     public void init() throws ServletException {
@@ -38,6 +40,7 @@ public class ImportMaterialServlet extends HttpServlet {
         materialDAO = new MaterialDAO();
         inventoryDAO = new InventoryDAO();
         rolePermissionDAO = new RolePermissionDAO();
+        departmentDAO = new DepartmentDAO();
     }
 
     @Override
@@ -116,26 +119,10 @@ public class ImportMaterialServlet extends HttpServlet {
         String quantityStr = request.getParameter("quantity");
         String unitPriceStr = request.getParameter("unitPrice");
 
-        if (materialIdStr == null || materialIdStr.isEmpty() || 
-            quantityStr == null || quantityStr.isEmpty() || 
-            unitPriceStr == null || unitPriceStr.isEmpty()) {
-            request.setAttribute("error", "Please fill in all required fields.");
-            loadDataAndForward(request, response);
-            return;
-        }
-        
-        int materialId = Integer.parseInt(materialIdStr);
-        int quantity = Integer.parseInt(quantityStr);
-        double unitPrice = Double.parseDouble(unitPriceStr);
-
-        if (quantity <= 0) {
-            request.setAttribute("error", "Quantity must be greater than 0.");
-            loadDataAndForward(request, response);
-            return;
-        }
-
-        if (unitPrice < 0) {
-            request.setAttribute("error", "Unit price cannot be negative.");
+        // Validate nghiệp vụ phía backend
+        Map<String, String> errors = utils.ImportValidator.validateAddMaterial(materialIdStr, quantityStr, unitPriceStr, materialDAO);
+        if (!errors.isEmpty()) {
+            request.setAttribute("formErrors", errors);
             loadDataAndForward(request, response);
             return;
         }
@@ -152,10 +139,12 @@ public class ImportMaterialServlet extends HttpServlet {
 
         ImportDetail detail = new ImportDetail();
         detail.setImportId(tempImportId);
-        detail.setMaterialId(materialId);
-        detail.setQuantity(quantity);
-        detail.setUnitPrice(unitPrice);
+        detail.setMaterialId(Integer.parseInt(materialIdStr));
+        detail.setQuantity(Integer.parseInt(quantityStr));
+        detail.setUnitPrice(Double.parseDouble(unitPriceStr));
         detail.setStatus("draft");
+        // Tính lại total value phía backend nếu cần (quantity * unitPrice)
+        // (Nếu ImportDetail có trường totalValue thì set ở đây)
 
         importDAO.createImportDetails(Collections.singletonList(detail));
         request.setAttribute("success", "Material added to import list successfully.");
@@ -224,7 +213,7 @@ public class ImportMaterialServlet extends HttpServlet {
         String batchNumber = request.getParameter("batchNumber");
         String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
-        Map<String, String> formErrors = ImportValidator.validateImportFormData(
+        Map<String, String> formErrors = utils.ImportValidator.validateImportFormData(
             supplierIdStr, destination, batchNumber, actualArrivalStr, note, supplierDAO
         );
         if (!formErrors.isEmpty()) {
@@ -247,12 +236,17 @@ public class ImportMaterialServlet extends HttpServlet {
         imports.setActualArrival(actualArrival);
         imports.setNote(note);
 
+        double totalImportValue = utils.ImportValidator.calculateTotalImportValue(details);
+
         importDAO.updateImport(imports);
         importDAO.confirmImport(tempImportId);
         importDAO.updateInventoryByImportId(tempImportId, user.getUserId());
+        for (ImportDetail detail : details) {
+            inventoryDAO.updateNote(detail.getMaterialId(), note);
+        }
 
         session.setAttribute("tempImportId", 0);
-        request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode());
+        request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + ". Total value: $" + String.format("%.2f", totalImportValue));
         loadDataAndForward(request, response);
     }
 
@@ -262,9 +256,10 @@ public class ImportMaterialServlet extends HttpServlet {
         try {
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
-            
+            List<entity.Department> departments = departmentDAO.getDepartments();
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", allMaterials);
+            request.setAttribute("departments", departments);
 
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
             if (tempImportId == null) {

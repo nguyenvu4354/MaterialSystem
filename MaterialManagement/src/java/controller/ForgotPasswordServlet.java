@@ -73,7 +73,12 @@ public class ForgotPasswordServlet extends HttpServlet {
         String email = request.getParameter("email");
         PasswordResetRequestsDAO dao = new PasswordResetRequestsDAO();
         dao.insertRequest(email);
-        request.setAttribute("message", "Your password reset request has been sent to the admin. Please wait for further instructions.");
+        try {
+            utils.EmailUtils.sendAdminNotificationForResetRequest(email);
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
+        request.setAttribute("message", "Your password reset request has been sent to the admin. Please check your email to receive a new password.");
         request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
     }
     private String md5(String input) {

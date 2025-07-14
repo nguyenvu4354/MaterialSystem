@@ -20,6 +20,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/vendor.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         .material-form {
             border-radius: 12px;
@@ -172,38 +173,36 @@
                         <form id="addMaterialForm" action="ImportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
                             <input type="hidden" name="action" value="add">
                             <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted">Material</label>
-                                    <select name="materialId" class="form-select" required>
-                                        <option value="">Select Material</option>
-                                        <c:forEach var="material" items="${materials}">
-                                            <option value="${material.materialId}">${material.materialName} (${material.materialCode})</option>
-                                        </c:forEach>
-                                    </select>
+                                <div class="col-12">
+                                    <label for="materialName" class="form-label text-muted">Material</label>
+                                    <input type="text" id="materialName" name="materialName" class="form-control" required placeholder="Type material name or code" autocomplete="off">
+                                    <input type="hidden" name="materialId" id="materialId">
+                                    <div class="invalid-feedback">Please enter a valid material name or code.</div>
                                     <c:if test="${not empty formErrors['materialId']}">
                                         <div class="text-danger small mt-1">${formErrors['materialId']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted">Quantity</label>
-                                    <input type="number" name="quantity" class="form-control" min="1" required placeholder="Qty">
+                                <div class="col-md-4">
+                                    <label for="quantity" class="form-label text-muted">Quantity</label>
+                                    <input type="number" name="quantity" id="quantity" class="form-control" min="1" required placeholder="Qty">
+                                    <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
                                     <c:if test="${not empty formErrors['quantity']}">
                                         <div class="text-danger small mt-1">${formErrors['quantity']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted">Unit Price ($)</label>
-                                    <input type="number" name="unitPrice" class="form-control" min="0" step="0.01" required placeholder="Unit Price ($)">
+                                <div class="col-md-4">
+                                    <label for="unitPrice" class="form-label text-muted">Unit Price ($)</label>
+                                    <input type="number" name="unitPrice" id="unitPrice" class="form-control" min="0" step="0.01" required placeholder="Unit Price ($)">
                                     <c:if test="${not empty formErrors['unitPrice']}">
                                         <div class="text-danger small mt-1">${formErrors['unitPrice']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-muted">Total Value</label>
+                                <div class="col-md-4">
+                                    <label for="totalValue" class="form-label text-muted">Total Value</label>
                                     <input type="text" id="totalValue" class="form-control" readonly placeholder="Auto">
                                 </div>
-                                <div class="col-12 mt-4 d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-dark btn-lg rounded-1 px-4">
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-dark btn-lg rounded-1 w-100">
                                         <i class="fas fa-plus-circle me-2"></i>Add to Import List
                                     </button>
                                 </div>
@@ -301,19 +300,28 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Supplier</label>
-                                    <select name="supplierId" class="form-select" required>
-                                        <option value="">Select Supplier</option>
+                                    <input type="text" id="supplierName" name="supplierName" class="form-control" list="supplierList" required placeholder="Type or select supplier">
+                                    <input type="hidden" name="supplierId" id="supplierId">
+                                    <datalist id="supplierList">
                                         <c:forEach var="supplier" items="${suppliers}">
-                                            <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                            <option value="${supplier.supplierName}" data-id="${supplier.supplierId}"></option>
                                         </c:forEach>
-                                    </select>
+                                    </datalist>
+                                    <div class="invalid-feedback">Please select a valid supplier.</div>
                                     <c:if test="${not empty formErrors['supplierId']}">
                                         <div class="text-danger small mt-1">${formErrors['supplierId']}</div>
                                     </c:if>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Destination</label>
-                                    <input type="text" name="destination" class="form-control" placeholder="e.g., Warehouse A, Building 1" required>
+                                    <input type="text" id="destination" name="destination" class="form-control" list="departmentList" required placeholder="Type or select department">
+                                    <datalist id="departmentList">
+                                        <c:forEach var="dept" items="${departments}">
+                                            <option value="${dept.departmentName}"></option>
+                                        </c:forEach>
+                                        <option value="other">Other (Enter manually)</option>
+                                    </datalist>
+                                    <div class="invalid-feedback">Please select a valid destination.</div>
                                     <c:if test="${not empty formErrors['destination']}">
                                         <div class="text-danger small mt-1">${formErrors['destination']}</div>
                                     </c:if>
@@ -353,6 +361,8 @@
         </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const alerts = document.querySelectorAll('.alert');
@@ -398,15 +408,25 @@
         function validateAddForm() {
             const form = document.getElementById('addMaterialForm');
             let isValid = true;
-            const materialId = form.querySelector('select[name="materialId"]');
+            const materialNameInput = form.querySelector('input[name="materialName"]');
+            const materialIdInput = form.querySelector('input[name="materialId"]');
             const quantity = form.querySelector('input[name="quantity"]');
             const unitPrice = form.querySelector('input[name="unitPrice"]');
-            if (!materialId.value) { 
-                materialId.classList.add('is-invalid'); 
-                isValid = false; 
+
+            if (!materialNameInput.value.trim()) {
+                materialNameInput.classList.add('is-invalid');
+                isValid = false;
             } else {
-                materialId.classList.remove('is-invalid'); 
+                materialNameInput.classList.remove('is-invalid');
             }
+
+            if (!materialIdInput.value) {
+                materialIdInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                materialIdInput.classList.remove('is-invalid');
+            }
+
             if (!quantity.value || quantity.value <= 0) {
                 quantity.classList.add('is-invalid'); 
                 isValid = false; 
@@ -425,22 +445,37 @@
         function validateConfirmForm() {
             const form = document.getElementById('confirmImportForm');
             let isValid = true;
-            const supplierId = form.querySelector('select[name="supplierId"]');
+            const supplierNameInput = form.querySelector('input[name="supplierName"]');
+            const supplierIdInput = form.querySelector('input[name="supplierId"]');
             const destination = form.querySelector('input[name="destination"]');
+            const destinationOther = form.querySelector('input[name="destinationOther"]');
             const batchNumber = form.querySelector('input[name="batchNumber"]');
             const actualArrival = form.querySelector('input[name="actualArrival"]');
-            if (!supplierId.value) { 
-                supplierId.classList.add('is-invalid'); 
-                isValid = false; 
+
+            if (!supplierNameInput.value.trim()) {
+                supplierNameInput.classList.add('is-invalid');
+                isValid = false;
             } else {
-                supplierId.classList.remove('is-invalid'); 
+                supplierNameInput.classList.remove('is-invalid');
             }
-            if (!destination.value.trim()) {
-                destination.classList.add('is-invalid'); 
-                isValid = false; 
-            } else { 
-                destination.classList.remove('is-invalid'); 
+            if (!supplierIdInput.value) {
+                supplierIdInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                supplierIdInput.classList.remove('is-invalid');
             }
+
+            if (destination.value === 'other') {
+                if (!destinationOther.value.trim()) {
+                    destinationOther.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    destinationOther.classList.remove('is-invalid');
+                }
+            } else {
+                destination.classList.remove('is-invalid');
+            }
+
             if (!batchNumber.value.trim()) {
                 batchNumber.classList.add('is-invalid');
                 isValid = false; 
@@ -455,6 +490,74 @@
             }
             return isValid;
         }
+    </script>
+    <script>
+        $(function() {
+            var materials = [
+                <c:forEach var="material" items="${materials}" varStatus="loop">
+                {
+                    label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+                    value: "${fn:escapeXml(material.materialName)}",
+                    id: "${material.materialId}",
+                    name: "${fn:escapeXml(material.materialName)}",
+                    code: "${fn:escapeXml(material.materialCode)}"
+                }${loop.last ? '' : ','}
+                </c:forEach>
+            ];
+            $("#materialName").autocomplete({
+                source: function(request, response) {
+                    var term = request.term.toLowerCase();
+                    var matches = materials.filter(function(material) {
+                        return material.name.toLowerCase().includes(term) || material.code.toLowerCase().includes(term);
+                    });
+                    response(matches);
+                },
+                select: function(event, ui) {
+                    $("#materialId").val(ui.item.id);
+                    $("#materialName").val(ui.item.name);
+                    $("#materialName").removeClass('is-invalid');
+                },
+                change: function(event, ui) {
+                    if (!ui.item) {
+                        var inputValue = $("#materialName").val().toLowerCase().trim();
+                        var selectedMaterial = materials.find(function(material) {
+                            return material.name.toLowerCase() === inputValue || material.code.toLowerCase() === inputValue;
+                        });
+                        if (selectedMaterial) {
+                            $("#materialId").val(selectedMaterial.id);
+                            $("#materialName").val(selectedMaterial.name);
+                            $("#materialName").removeClass('is-invalid');
+                        } else {
+                            $("#materialId").val('');
+                            $("#materialName").addClass('is-invalid');
+                        }
+                    }
+                },
+                minLength: 1
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var supplierNameInput = document.getElementById('supplierName');
+            var supplierIdInput = document.getElementById('supplierId');
+            var supplierList = document.getElementById('supplierList');
+            if (supplierNameInput && supplierIdInput && supplierList) {
+                supplierNameInput.addEventListener('input', function() {
+                    var inputValue = supplierNameInput.value.toLowerCase().trim();
+                    var options = supplierList.querySelectorAll('option');
+                    var selectedOption = Array.from(options).find(function(option) {
+                        return option.value.toLowerCase() === inputValue;
+                    });
+                    supplierIdInput.value = selectedOption ? selectedOption.getAttribute('data-id') : '';
+                    if (!selectedOption) {
+                        supplierNameInput.classList.add('is-invalid');
+                    } else {
+                        supplierNameInput.classList.remove('is-invalid');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
