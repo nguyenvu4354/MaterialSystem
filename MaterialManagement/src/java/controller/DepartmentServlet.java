@@ -76,7 +76,7 @@ public class DepartmentServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         if (user.getRoleId() != 1) {
-            response.sendRedirect("accessDenied.jsp");
+            response.sendRedirect("error.jsp");
             return;
         }
 

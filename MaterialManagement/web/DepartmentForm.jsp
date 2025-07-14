@@ -1,5 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="entity.User" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || user.getRoleId() != 1) {
+        response.sendRedirect("error.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,53 +86,35 @@
                         </ul>
                     </div>
                 </c:if>
-                <form action="depairmentlist" method="post">
+                <form action="depairmentlist" method="post" id="departmentForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Department Name</label>
-                            <input type="text" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" 
-                                   name="name" value="${name}" required>
-                            <c:if test="${not empty errors.name}">
-                                <div class="error-message">${errors.name}</div>
-                            </c:if>
+                            <input type="text" class="form-control" name="name" value="${name}" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone number</label>
-                            <input type="text" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}" 
-                                   name="phone" value="${phone}">
-                            <c:if test="${not empty errors.phone}">
-                                <div class="error-message">${errors.phone}</div>
-                            </c:if>
+                            <input type="text" class="form-control" name="phone" value="${phone}">
+                            <div class="error-message" id="phoneError"></div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" 
-                                   name="email" value="${email}">
-                            <c:if test="${not empty errors.email}">
-                                <div class="error-message">${errors.email}</div>
-                            </c:if>
+                            <input type="email" class="form-control" name="email" value="${email}">
+                            <div class="error-message" id="emailError"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Location</label>
-                            <input type="text" class="form-control ${not empty errors.location ? 'is-invalid' : ''}" 
-                                   name="location" value="${location}">
-                            <c:if test="${not empty errors.location}">
-                                <div class="error-message">${errors.location}</div>
-                            </c:if>
+                            <input type="text" class="form-control" name="location" value="${location}">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control ${not empty errors.description ? 'is-invalid' : ''}" 
-                                  name="description" rows="3">${description}</textarea>
-                        <c:if test="${not empty errors.description}">
-                            <div class="error-message">${errors.description}</div>
-                        </c:if>
+                        <textarea class="form-control" name="description" rows="3">${description}</textarea>
                     </div>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type код="submit" class="btn btn-brown px-4">Add Department</button>
+                        <button type="submit" class="btn btn-brown px-4">Add Department</button>
                         <a href="depairmentlist" class="btn btn-secondary px-4">Cancel</a>
                     </div>
                 </form>
@@ -132,5 +122,34 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('departmentForm').addEventListener('submit', function(event) {
+            let isValid = true;
+            const phone = document.querySelector('input[name="phone"]').value.trim();
+            const email = document.querySelector('input[name="email"]').value.trim();
+
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+
+            // Validate phone
+            if (phone && !/^\d{10,12}$/.test(phone)) {
+                document.getElementById('phoneError').textContent = 'Số điện thoại phải chứa từ 10 đến 12 chữ số.';
+                document.querySelector('input[name="phone"]').classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validate email
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('emailError').textContent = 'Email không hợp lệ.';
+                document.querySelector('input[name="email"]').classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
