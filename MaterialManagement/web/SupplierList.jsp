@@ -91,7 +91,7 @@
                                 <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
                                     <i class="fas fa-search me-2"></i> Search
                                 </button>
-                                <a href="Supplier?action=list" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
+                                <a href="Supplier?action=list" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
                             </form>
                         </div>
                     </div>

@@ -10,132 +10,32 @@
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #faf4ee;
+         body {
+            background-color: #f8f9fa;
+            padding: 20px;
         }
-        .container-main {
-            max-width: 1200px;
-            margin: 30px auto;
-            background: #fff;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        .content {
+            padding-left: 20px;
+            font-family: 'Roboto', sans-serif;
         }
-        h2 {
-            font-size: 1.75rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #5c4434;
+        .search-box {
+            margin-bottom: 20px;
         }
-        .custom-table thead th {
-            background-color: #f9f5f0;
-            color: #5c4434;
-            font-weight: 600;
+        .table-responsive {
+            margin: 20px 0;
         }
-        .custom-table tbody tr:hover {
-            background-color: #f1f1f1;
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
         }
-        .custom-table th,
-        .custom-table td {
-            vertical-align: middle;
-            min-height: 48px;
-        }
-        .status-badge {
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .status-pending {
-            background-color: #6c757d;
-            color: #fff;
-        }
-        .status-processing {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .btn-update {
-            background-color: #DEAD6F;
-            color: #fff;
-            border: 1px solid #DEAD6F;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background 0.2s, border 0.2s;
-        }
-        .btn-update:hover {
-            background-color: #cfa856;
-            color: #fff;
-            border: 1px solid #cfa856;
-        }
-        .form-control-sm, .form-select-sm {
-            min-height: 36px;
-            font-size: 15px;
-        }
-        /* Style giống ExportRequestList */
-        .filter-bar {
-            gap: 12px;
-            margin: 20px 0 24px 0;
-        }
-        .filter-bar .form-control,
-        .filter-bar .form-select,
-        .filter-bar .btn-filter {
-            height: 48px;
-            min-width: 120px;
-            border-radius: 12px;
-            font-size: 16px;
-        }
-        .filter-bar .filter-input {
-            min-width: 220px;
-            max-width: 260px;
-            border-radius: 12px;
-            font-size: 16px;
-        }
-        .filter-bar .filter-select {
-            min-width: 140px;
-            max-width: 180px;
-            border-radius: 12px;
-            font-size: 16px;
-        }
-        .btn-filter {
-            background-color: #DEAD6F;
-            color: #fff;
-            border: none;
-            padding: 10px 28px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 17px;
-            transition: background 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-        }
-        .btn-filter:hover {
-            background-color: #cfa856;
-            color: #fff;
-        }
-        .custom-table thead th {
-            background-color: #f9f5f0;
-            color: #5c4434;
-            font-weight: 700;
-            font-size: 17px;
-            border-bottom: 2px solid #e7d3b7;
-        }
-        .custom-table tbody tr:hover {
-            background-color: #f1f1f1;
-        }
-        .custom-table th,
-        .custom-table td {
-            vertical-align: middle;
-            min-height: 48px;
-            font-size: 16px;
+        .btn-action {
+            width: 50px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
         }
         .status-badge {
             padding: 4px 16px;
@@ -149,10 +49,6 @@
             background-color: #6c757d;
             color: #fff;
         }
-        .status-processing {
-            background-color: #cce5ff;
-            color: #004085;
-        }
         .status-completed {
             background-color: #d4edda;
             color: #155724;
@@ -161,58 +57,43 @@
             background-color: #f8d7da;
             color: #721c24;
         }
-        .btn-action {
-            background-color: #fff7e6;
-            color: #b8860b;
-            border: 1px solid #ffe58f;
-            border-radius: 10px;
-            padding: 8px 18px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: background 0.2s, color 0.2s, border 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-        }
-        .btn-action:hover {
-            background-color: #DEAD6F;
-            color: #fff;
-            border: 1px solid #DEAD6F;
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #DEAD6F;
-            border-color: #DEAD6F;
-            color: #fff;
-        }
     </style>
     </head>
     <body>
-<jsp:include page="Header.jsp" />
-<div class="container-fluid">
-    <div class="row">
-        <jsp:include page="SidebarDirector.jsp"/>
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="container-main">
+    <jsp:include page="Header.jsp" />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 bg-light p-0">
+                <jsp:include page="Sidebar.jsp" />
+            </div>
+            <div class="col-md-9 col-lg-10 content px-md-4">
                 <c:if test="${sessionScope.user.roleId != 1}">
                     <div class="alert alert-danger mt-4">You do not have permission to view password reset requests.</div>
                 </c:if>
                 <c:if test="${sessionScope.user.roleId == 1}">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-key"></i> Password Reset Requests</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2"><i class="fas fa-key"></i> Password Reset Requests</h2>
                     </div>
-                    <div class="filter-bar d-flex flex-wrap gap-3 align-items-center mb-4">
-                        <form method="get" action="PasswordResetRequests" class="d-flex flex-wrap gap-2 align-items-center w-100">
-                            <input type="text" name="searchEmail" class="form-control filter-input" placeholder="Search by email" value="${param.searchEmail != null ? param.searchEmail : ''}" />
-                            <select name="status" class="form-select filter-select">
-                                <option value="all" ${status == 'all' ? 'selected' : ''}>All Statuses</option>
-                                <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
-                                <option value="completed" ${status == 'completed' ? 'selected' : ''}>Completed</option>
-                                <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
-                            </select>
-                            <button type="submit" class="btn btn-filter"><i class="fas fa-search"></i> Search</button>
-                        </form>
+                    <div class="row search-box">
+                        <div class="col-md-8">
+                            <form method="get" action="PasswordResetRequests" class="d-flex gap-2">
+                                <input type="text" name="searchEmail" class="form-control" placeholder="Search by email" value="${param.searchEmail != null ? param.searchEmail : ''}" style="width: 200px; height: 50px; border: 2px solid gray" />
+                                <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid #000">
+                                    <option value="all" ${status == 'all' ? 'selected' : ''}>All Statuses</option>
+                                    <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="completed" ${status == 'completed' ? 'selected' : ''}>Completed</option>
+                                    <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 100px; height: 50px;">
+                                    <i class="fas fa-search me-2"></i> Search
+                                </button>
+                                <a href="PasswordResetRequests" class="btn btn-secondary d-flex align-items-center justify-content-center " style="width: 100px; height: 50px">Clear</a>
+                            </form>
+                        </div>
                     </div>
                     <c:if test="${not empty requests}">
                         <div class="table-responsive">
-                            <table class="table custom-table table-bordered table-hover">
+                            <table class="table table-bordered table-hover align-middle text-center">
                                 <thead class="table-light">
                                     <tr>
                                         <th>ID</th>
@@ -255,11 +136,15 @@
                                                 <form method="post" action="PasswordResetRequests" class="d-flex gap-2 align-items-center mb-0">
                                                     <input type="hidden" name="requestId" value="${req.requestId}" />
                                                     <input type="hidden" name="newPassword" value="${req.newPassword}" />
-                                                    <select name="status" class="form-select form-select-sm w-auto d-inline-block" style="min-width:120px;">
+                                                    <select name="status" class="form-select form-select-sm w-auto d-inline-block" style="min-width:80px; border: 2px solid #000;"
+                                                        <c:if test="${req.status != 'pending'}">disabled</c:if>>
                                                         <option value="completed" ${req.status == 'completed' ? 'selected' : ''}>Completed</option>
                                                         <option value="rejected" ${req.status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                                     </select>
-                                                    <button type="submit" class="btn btn-action"><i class="fas fa-save"></i> Update</button>
+                                                    <button type="submit" class="btn btn-warning btn-action" style="width: 100px;"
+                                                        <c:if test="${req.status != 'pending'}">disabled</c:if>>
+                                                        <i class="fas fa-save"></i> Update
+                                                    </button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -267,22 +152,23 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Pagination -->
-                        <nav class="mt-3">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}&searchEmail=${param.searchEmail}&status=${status}">Previous</a>
-                                </li>
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="PasswordResetRequests?page=${i}&searchEmail=${param.searchEmail}&status=${status}">${i}</a>
+                        <c:if test="${totalPages > 1}">
+                            <nav>
+                                <ul class="pagination">
+                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}&searchEmail=${param.searchEmail}&status=${status}">Previous</a>
                                     </li>
-                                </c:forEach>
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}&searchEmail=${param.searchEmail}&status=${status}">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                            <a class="page-link" href="PasswordResetRequests?page=${i}&searchEmail=${param.searchEmail}&status=${status}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}&searchEmail=${param.searchEmail}&status=${status}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </c:if>
                     </c:if>
                     <c:if test="${empty requests}">
                         <div class="text-center py-5">
@@ -293,9 +179,10 @@
                     </c:if>
                 </c:if>
             </div>
-        </main>
+        </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <jsp:include page="Footer.jsp" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     </body>
 </html>
