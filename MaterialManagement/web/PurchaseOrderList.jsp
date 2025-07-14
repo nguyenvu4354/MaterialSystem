@@ -121,7 +121,7 @@
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="container-main">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice"></i> Purchase Order Management</h2>
+                    <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice"></i> Purchase Order List</h2>
                     <div class="d-flex gap-2">
                         <!-- Đã xóa nút Export to Excel và Print List -->
                     </div>
@@ -227,12 +227,12 @@
                         </div>
                         
                         <!-- Pagination -->
-                        <c:if test="${totalPages > 1}">
+                       
                             <nav aria-label="Purchase Order pagination">
                                 <ul class="pagination justify-content-center">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                                         <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                            <i class="fas fa-chevron-left"></i> Previous
+                                            Previous
                                         </a>
                                     </li>
                                     
@@ -244,12 +244,12 @@
                                     
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
                                         <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                            Next <i class="fas fa-chevron-right"></i>
+                                            Next
                                         </a>
                                     </li>
                                 </ul>
                             </nav>
-                        </c:if>
+                       
                     </c:if>
                     
                     <c:if test="${empty purchaseOrders}">
