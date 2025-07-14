@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -57,21 +58,25 @@
             .request-section th {
                 background-color: #f8f9fa;
             }
+            .request-section .pagination {
+                justify-content: center;
+                margin-top: 20px;
+            }
             .request-section .pagination .page-link {
-                color: #0d6efd;
+                color: #DEAD6F;
                 border-radius: 0.25rem;
                 margin: 0 3px;
                 padding: 0.5rem 0.75rem;
             }
             .request-section .pagination .page-item.active .page-link {
-                background-color: #0d6efd;
-                border-color: #0d6efd;
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
                 color: white;
             }
             .request-section .pagination .page-item.disabled .page-link {
                 color: #6c757d;
-                pointer-events: none;
                 background-color: #f8f9fa;
+                border-color: #dee2e6;
             }
             .request-section .nav-buttons .btn {
                 margin: 0 0.5rem;
@@ -173,7 +178,7 @@
                                                 <c:forEach var="request" items="${exportRequests}">
                                                     <tr>
                                                         <td>${request.requestCode}</td>
-                                                        <td>${request.requestDate}</td>
+                                                        <td><fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
                                                         <td>${request.recipientName}</td>
                                                         <td>${request.status}</td>
                                                         <td>
@@ -197,7 +202,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <nav aria-label="Export Requests Pagination" class="mt-4">
+                                    <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
@@ -232,7 +237,7 @@
                                                 <c:forEach var="request" items="${purchaseRequests}">
                                                     <tr>
                                                         <td>${request.requestCode}</td>
-                                                        <td>${request.requestDate}</td>
+                                                        <td><fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
                                                         <td>${request.status}</td>
                                                         <td>
                                                             <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=purchase&id=${request.purchaseRequestId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
@@ -255,7 +260,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <nav aria-label="Purchase Requests Pagination" class="mt-4">
+                                    <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
@@ -290,7 +295,7 @@
                                                 <c:forEach var="request" items="${repairRequests}">
                                                     <tr>
                                                         <td>${request.requestCode}</td>
-                                                        <td>${request.requestDate}</td>
+                                                        <td><fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
                                                         <td>${request.status}</td>
                                                         <td>
                                                             <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=repair&id=${request.repairRequestId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
@@ -313,7 +318,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <nav aria-label="Repair Requests Pagination" class="mt-4">
+                                    <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>

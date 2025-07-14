@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -106,14 +107,24 @@
                 margin-top: 20px;
             }
             .pagination .page-item.active .page-link {
-                background-color: #0d6efd;
-                border-color: #0d6efd;
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
+                color: #fff;
             }
             .pagination .page-link {
-                color: #0d6efd;
+                color: #DEAD6F;
+                border-radius: 0.25rem;
+                margin: 0 3px;
+                padding: 0.5rem 0.75rem;
             }
             .pagination .page-link:hover {
-                background-color: #e9ecef;
+                background-color: #f8f9fa;
+                color: #DEAD6F;
+            }
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                background-color: #f8f9fa;
+                border-color: #dee2e6;
             }
         </style>
     </head>
@@ -132,7 +143,7 @@
                 </c:if>
 
                 <p><strong>Request Code:</strong> ${request.requestCode}</p>
-                <p><strong>Request Date:</strong> ${request.requestDate}</p>
+                <p><strong>Request Date:</strong> <fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></p>
                 <p><strong>Status:</strong> ${request.status}</p>
                 <p><strong>Reason:</strong> ${request.reason != null ? request.reason : "N/A"}</p>
                 <p><strong>Approval Reason:</strong> ${request.approvalReason != null ? request.approvalReason : "N/A"}</p>
@@ -141,8 +152,18 @@
                 <c:if test="${requestType == 'Export'}">
                     <p><strong>Recipient:</strong> ${request.recipientName}</p>
                     <p><strong>Approver:</strong> ${request.approverName != null ? request.approverName : "N/A"}</p>
-                    <p><strong>Approved At:</strong> ${request.approvedAt != null ? request.approvedAt : "N/A"}</p>
-                    <p><strong>Delivery Date:</strong> ${request.deliveryDate != null ? request.deliveryDate : "N/A"}</p>
+                    <p><strong>Approved At:</strong> <c:choose>
+                        <c:when test="${request.approvedAt != null}">
+                            <fmt:formatDate value="${request.approvedAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                        </c:when>
+                        <c:otherwise>N/A</c:otherwise>
+                    </c:choose></p>
+                    <p><strong>Delivery Date:</strong> <c:choose>
+                        <c:when test="${request.deliveryDate != null}">
+                            <fmt:formatDate value="${request.deliveryDate}" pattern="dd/MM/yyyy" />
+                        </c:when>
+                        <c:otherwise>N/A</c:otherwise>
+                    </c:choose></p>
                 </c:if>
                 <c:if test="${requestType == 'Purchase'}">
                     <p><strong>Estimated Price:</strong> ${request.estimatedPrice != null ? request.estimatedPrice : "N/A"}</p>
@@ -151,7 +172,12 @@
                     <p><strong>Repair Person Phone:</strong> ${request.repairPersonPhoneNumber != null ? request.repairPersonPhoneNumber : "N/A"}</p>
                     <p><strong>Repair Person Email:</strong> ${request.repairPersonEmail != null ? request.repairPersonEmail : "N/A"}</p>
                     <p><strong>Repair Location:</strong> ${request.repairLocation != null ? request.repairLocation : "N/A"}</p>
-                    <p><strong>Estimated Return Date:</strong> ${request.estimatedReturnDate != null ? request.estimatedReturnDate : "N/A"}</p>
+                    <p><strong>Estimated Return Date:</strong> <c:choose>
+                        <c:when test="${request.estimatedReturnDate != null}">
+                            <fmt:formatDate value="${request.estimatedReturnDate}" pattern="dd/MM/yyyy" />
+                        </c:when>
+                        <c:otherwise>N/A</c:otherwise>
+                    </c:choose></p>
                 </c:if>
 
                 <h3>Details</h3>
@@ -281,23 +307,19 @@
 
                 <!-- Phân trang -->
                 <c:if test="${totalPages > 1}">
-                    <nav aria-label="Details pagination">
-                        <ul class="pagination">
-                            <c:if test="${currentPage > 1}">
-                                <li class="page-item">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage - 1}">Previous</a>
-                                </li>
-                            </c:if>
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage - 1}">Previous</a>
+                            </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
                                     <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${i}">${i}</a>
                                 </li>
                             </c:forEach>
-                            <c:if test="${currentPage < totalPages}">
-                                <li class="page-item">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage + 1}">Next</a>
-                                </li>
-                            </c:if>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage + 1}">Next</a>
+                            </li>
                         </ul>
                     </nav>
                 </c:if>
