@@ -141,6 +141,41 @@
         .condition-good { background-color: #28a745; }
         .condition-warning { background-color: #ffc107; }
         .condition-bad { background-color: #dc3545; }
+        .material-img {
+            max-height: 100px;
+            max-width: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .material-form table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .material-form th, .material-form td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 1rem;
+        }
+        .material-form th {
+            background-color: #f8f9fa;
+            font-weight: 700;
+        }
+        .material-form .alert {
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .material-form .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            outline: 0;
+        }
+        .material-form .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        .material-form .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
     </style>
 </head>
 <body>
@@ -212,7 +247,7 @@
                         <!-- Current Import List -->
                         <h3 class="fw-normal mb-3">Current Import List</h3>
                         <c:if test="${not empty importDetails}">
-                            <div class="table-responsive">
+                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                                 <table class="table align-middle text-center">
                                     <thead>
                                         <tr>
@@ -244,20 +279,21 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                                 <td>
-                                                    <img src="${finalUrl}" alt="${materialMap[detail.materialId].materialName}" class="img-thumbnail">
+                                                    <img src="${finalUrl}" class="material-img" alt="${materialMap[detail.materialId].materialName}">
                                                 </td>
                                                 <td>
                                                     <strong>${materialMap[detail.materialId].materialName}</strong><br>
                                                     <small class="text-muted">${materialMap[detail.materialId].materialCode}</small>
                                                 </td>
-                                                <td><span class="badge bg-secondary">${materialMap[detail.materialId].unit.unitName}</span></td>
-                                                <td><span class="badge bg-info">${materialMap[detail.materialId].category.category_name}</span></td>
+                                                <td>${materialMap[detail.materialId].unit.unitName}</td>
+                                                <td>${materialMap[detail.materialId].category.category_name}</td>
                                                 <td>
-                                                    <form action="ImportMaterial" method="post" class="d-flex align-items-center justify-content-center gap-2 mb-0">
+                                                    <form action="ImportMaterial" method="post" class="d-flex align-items-center">
                                                         <input type="hidden" name="action" value="update">
                                                         <input type="hidden" name="materialId" value="${detail.materialId}">
-                                                        <input type="number" name="newQuantity" value="${detail.quantity}" class="form-control form-control-sm me-2 text-center" min="1" required style="width:80px;">
-                                                        <button type="submit" class="btn btn-outline-primary btn-sm px-2" title="Update Quantity">
+                                                        <input type="number" name="newQuantity" value="${detail.quantity}" min="1"
+                                                               class="form-control me-2" style="width: 100px; text-align: center;" required>
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm" title="Update Quantity">
                                                             <i class="fas fa-sync-alt"></i>
                                                         </button>
                                                     </form>
@@ -271,13 +307,28 @@
                                                     </div>
                                                     <small class="text-muted">${materialMap[detail.materialId].conditionPercentage}%</small>
                                                 </td>
-                                                <td><span class="badge bg-success">${stockMap[detail.materialId]}</span></td>
                                                 <td>
-                                                    <form action="ImportMaterial" method="post" class="mb-0">
+                                                    <c:choose>
+                                                        <c:when test="${stockMap[detail.materialId] > 50}">
+                                                            <span style="background:#4ade80;color:#000;border-radius:20px;padding:6px 18px;font-weight:600;display:inline-block;min-width:40px;text-align:center;border:2px solid #22c55e;">${stockMap[detail.materialId]}</span>
+                                                        </c:when>
+                                                        <c:when test="${stockMap[detail.materialId] >= 10}">
+                                                            <span style="background:#fde047;color:#000;border-radius:20px;padding:6px 18px;font-weight:600;display:inline-block;min-width:40px;text-align:center;border:2px solid #facc15;">${stockMap[detail.materialId]}</span>
+                                                        </c:when>
+                                                        <c:when test="${stockMap[detail.materialId] > 0}">
+                                                            <span style="background:#fd7e14;color:#fff;border-radius:20px;padding:6px 18px;font-weight:600;display:inline-block;min-width:40px;text-align:center;border:2px solid #b35c00;">${stockMap[detail.materialId]}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span style="background:#dc2626;color:#fff;border-radius:20px;padding:6px 18px;font-weight:600;display:inline-block;min-width:40px;text-align:center;border:2px solid #b91c1c;">${stockMap[detail.materialId]}</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <form action="ImportMaterial" method="post">
                                                         <input type="hidden" name="action" value="remove">
                                                         <input type="hidden" name="materialId" value="${detail.materialId}">
                                                         <input type="hidden" name="quantity" value="${detail.quantity}">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm px-2">Remove</button>
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -314,14 +365,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Destination</label>
-                                    <input type="text" id="destination" name="destination" class="form-control" list="departmentList" required placeholder="Type or select department">
-                                    <datalist id="departmentList">
-                                        <c:forEach var="dept" items="${departments}">
-                                            <option value="${dept.departmentName}"></option>
-                                        </c:forEach>
-                                        <option value="other">Other (Enter manually)</option>
-                                    </datalist>
-                                    <div class="invalid-feedback">Please select a valid destination.</div>
+                                    <input type="text" id="destination" name="destination" class="form-control" required placeholder="Enter destination (e.g. warehouse, room, etc.)">
+                                    <div class="invalid-feedback">Please enter a destination.</div>
                                     <c:if test="${not empty formErrors['destination']}">
                                         <div class="text-danger small mt-1">${formErrors['destination']}</div>
                                     </c:if>
@@ -422,7 +467,7 @@
 
             if (!materialIdInput.value) {
                 materialIdInput.classList.add('is-invalid');
-                isValid = false;
+                isValid = false; 
             } else {
                 materialIdInput.classList.remove('is-invalid');
             }
@@ -460,7 +505,7 @@
             }
             if (!supplierIdInput.value) {
                 supplierIdInput.classList.add('is-invalid');
-                isValid = false;
+                isValid = false; 
             } else {
                 supplierIdInput.classList.remove('is-invalid');
             }
@@ -468,12 +513,12 @@
             if (destination.value === 'other') {
                 if (!destinationOther.value.trim()) {
                     destinationOther.classList.add('is-invalid');
-                    isValid = false;
+                isValid = false; 
                 } else {
                     destinationOther.classList.remove('is-invalid');
                 }
-            } else {
-                destination.classList.remove('is-invalid');
+            } else { 
+                destination.classList.remove('is-invalid'); 
             }
 
             if (!batchNumber.value.trim()) {

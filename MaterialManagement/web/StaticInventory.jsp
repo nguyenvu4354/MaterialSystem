@@ -210,7 +210,7 @@
         <div class="col-md-9 col-lg-10 content px-md-4">
           <c:set var="hasViewInventoryPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_INVENTORY')}" scope="request" />
           <c:if test="${!hasViewInventoryPermission}">
-            <div class="alert alert-danger">Bạn không có quyền truy cập dữ liệu kho.</div>
+            <div class="alert alert-danger">You do not have access to the warehouse data..</div>
           </c:if>
           <c:if test="${hasViewInventoryPermission}">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -308,7 +308,6 @@
                     <th>Location</th>
                     <th>Last Updated</th>
                     <th>Updated By</th>
-                    <th>Note</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -335,17 +334,11 @@
                           <c:otherwise><span class="text-muted">-</span></c:otherwise>
                         </c:choose>
                       </td>
-                      <td>
-                        <c:choose>
-                          <c:when test="${not empty inv.note}"><span title="${inv.note}">${inv.note}</span></c:when>
-                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                        </c:choose>
-                      </td>
                     </tr>
                   </c:forEach>
                   <c:if test="${empty inventoryList}">
                     <tr>
-                      <td colspan="10" class="text-center text-muted">No inventory data available</td>
+                      <td colspan="9" class="text-center text-muted">No inventory data available</td>
                     </tr>
                   </c:if>
                 </tbody>
