@@ -131,7 +131,6 @@ public class RepairRequestServlet extends HttpServlet {
                     request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                     return;
                 }
-
                 int quantity;
                 try {
                     quantity = Integer.parseInt(quantities[i]);
@@ -182,13 +181,13 @@ public class RepairRequestServlet extends HttpServlet {
 
             // Lưu yêu cầu vào DB
             boolean success = new RepairRequestDAO().createRepairRequest(requestObj, detailList);
+            System.out.println("[DEBUG] [doPost] Kết quả lưu yêu cầu vào DB: " + success);
 
             // Nếu thành công thì gửi email cho giám đốc
             if (success) {
                 UserDAO userDAO = new UserDAO();
                 List<User> allUsers = userDAO.getAllUsers();
                 List<User> managers = new ArrayList<>();
-
                 for (User u : allUsers) {
                     if (u.getRoleId() == 2) {
                         managers.add(u);
@@ -214,17 +213,27 @@ public class RepairRequestServlet extends HttpServlet {
                             try {
                                 EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
                             } catch (Exception e) {
+                                System.out.println("[DEBUG] [MAIL] Lỗi gửi mail cho manager: " + manager.getEmail());
                                 e.printStackTrace();
                             }
+                        } else {
+                            System.out.println("[DEBUG] [MAIL] Manager không có email hợp lệ: " + manager.getFullName());
                         }
                     }
 
+                    System.out.println("[DEBUG] [MAIL] Email user hiện tại: " + user.getEmail());
                     if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
                         try {
+                            System.out.println("[DEBUG] [MAIL] Sending email to user: " + user.getEmail());
+                            System.out.println("[DEBUG] [MAIL] Subject: " + subject);
+                            System.out.println("[DEBUG] [MAIL] Content: " + content.toString());
                             EmailUtils.sendEmail(user.getEmail(), subject, content.toString());
                         } catch (Exception e) {
+                            System.out.println("[DEBUG] [MAIL] Lỗi gửi mail cho user: " + user.getEmail());
                             e.printStackTrace();
                         }
+                    } else {
+                        System.out.println("[DEBUG] [MAIL] User không có email hợp lệ: " + user.getFullName());
                     }
                 }
             }
