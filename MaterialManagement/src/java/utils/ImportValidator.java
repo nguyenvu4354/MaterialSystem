@@ -17,11 +17,11 @@ public class ImportValidator {
             errors.put("supplierId", "Supplier is required and must exist.");
         }
 
-        // Validate destination
+        // Validate destination 
         if (imp.getDestination() == null || imp.getDestination().trim().isEmpty()) {
             errors.put("destination", "Destination cannot be empty.");
-        } else if (imp.getDestination().trim().length() > 200) {
-            errors.put("destination", "Destination cannot exceed 200 characters.");
+        } else if (imp.getDestination().trim().length() > 50) {
+            errors.put("destination", "Destination cannot exceed 50 characters.");
         }
 
         // Validate batchNumber
@@ -81,11 +81,11 @@ public class ImportValidator {
             errors.put("supplierId", "Supplier is required and must exist.");
         }
 
-        // Validate destination
+        // Validate destination 
         if (destination == null || destination.trim().isEmpty()) {
             errors.put("destination", "Destination cannot be empty.");
-        } else if (destination.trim().length() > 200) {
-            errors.put("destination", "Destination cannot exceed 200 characters.");
+        } else if (destination.trim().length() > 50) {
+            errors.put("destination", "Destination cannot exceed 50 characters.");
         }
 
         // Validate batchNumber

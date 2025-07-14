@@ -198,6 +198,45 @@ public class DepartmentDAO extends DBContext {
         return false;
     }
 
+    public int getTotalDepartmentCount() {
+        String query = "SELECT COUNT(*) FROM Departments";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    public List<Department> getDepartmentsWithPagination(int offset, int pageSize) {
+        List<Department> departments = new ArrayList<>();
+        String query = "SELECT * FROM Departments ORDER BY department_id LIMIT ? OFFSET ?";
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Department dept = new Department();
+                dept.setDepartmentId(rs.getInt("department_id"));
+                dept.setDepartmentName(rs.getString("department_name"));
+                dept.setDepartmentCode(rs.getString("department_code"));
+                dept.setPhoneNumber(rs.getString("phone_number"));
+                dept.setEmail(rs.getString("email"));
+                dept.setLocation(rs.getString("location"));
+                dept.setDescription(rs.getString("description"));
+                dept.setStatus(Department.Status.valueOf(rs.getString("status")));
+                dept.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                dept.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                departments.add(dept);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return departments;
+    }
+
     public static void main(String[] args) {
         DepartmentDAO dao = new DepartmentDAO();
         List<Department> list = dao.getAllDepartments();

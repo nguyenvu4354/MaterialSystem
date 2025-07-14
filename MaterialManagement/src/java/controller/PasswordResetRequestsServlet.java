@@ -26,7 +26,7 @@ import utils.EmailUtils;
 @WebServlet(name="PasswordResetRequestsServlet", urlPatterns={"/PasswordResetRequests"})
 public class PasswordResetRequestsServlet extends HttpServlet {
     private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
-
+   
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request

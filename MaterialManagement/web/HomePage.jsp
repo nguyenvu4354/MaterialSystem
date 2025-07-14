@@ -593,39 +593,7 @@
                 </div>
             </div>
         </section>
-        <section class="my-5">
-            <div class="container" style="padding-left: 82px">
-                <div class="section-header mb-4">
-                    <h2 class="display-6 fw-semibold">Inventory Summary</h2>
-                </div>
-                <div class="card-container">
-                    <div class="product-card">
-                        <div class="card-content">
-                            <h5>Total Items</h5>
-                            <p style="color: #DEAD6F; font-weight: bold;">20</p>
-                        </div>
-                    </div>
-                    <div class="product-card">
-                        <div class="card-content">
-                            <h5>Assigned Devices</h5>
-                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
-                        </div>
-                    </div>
-                    <div class="product-card">
-                        <div class="card-content">
-                            <h5>Under Maintenance</h5>
-                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
-                        </div>
-                    </div>
-                    <div class="product-card">
-                        <div class="card-content">
-                            <h5>Decommissioned</h5>
-                            <p style="color: #DEAD6F; font-weight: bold;">0</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+      
         <div class="container-fluid my-5">
             <div class="row">
                 <div class="col-md-2 sidebar-col mt-5">

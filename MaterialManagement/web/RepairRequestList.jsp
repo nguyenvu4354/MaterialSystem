@@ -41,7 +41,6 @@
                 height: 48px;
                 min-width: 120px;
             }
-           
             .btn-filter:hover {
                 background-color: #cfa856;
                 color: #fff;
@@ -94,6 +93,30 @@
                 text-align: center;
                 margin-top: 10px;
             }
+            .pagination {
+                margin-top: 20px;
+                justify-content: center;
+            }
+            .pagination .page-link {
+                color: #DEAD6F;
+                border: 1px solid #DEAD6F;
+                margin: 0 4px;
+                border-radius: 6px;
+            }
+            .pagination .page-link:hover {
+                background-color: #DEAD6F;
+                color: #fff;
+            }
+            .pagination .page-item.active .page-link {
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
+                color: #fff;
+            }
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                border-color: #dee2e6;
+                background-color: #f8f9fa;
+            }
         </style>
     </head>
     <body>
@@ -117,8 +140,9 @@
                                 <option value="approved" ${selectedStatus == 'approved' ? 'selected' : ''}>Approved</option>
                                 <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
                             </select>
+                            <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">
                             <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                             <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
+                            <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                         </form>
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>
@@ -169,6 +193,27 @@
                                 </tbody>
                             </table>
                         </div>
+                        <c:if test="${totalPages > 1}">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}" aria-label="Previous">
+                                            <span aria-hidden="true">« Previous</span>
+                                        </a>
+                                    </li>
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                            <a class="page-link" href="repairrequestlist?page=${i}&search=${searchKeyword}&status=${selectedStatus}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}" aria-label="Next">
+                                            <span aria-hidden="true">Next »</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </c:if>
                     </div>
                 </main>
             </div>

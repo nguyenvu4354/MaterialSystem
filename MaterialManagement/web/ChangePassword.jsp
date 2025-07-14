@@ -21,9 +21,9 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
         section.py-5 { background: url('images/background-img.png') no-repeat center center fixed; background-size: contain; }
-        .change-password-section .form-control { height: 48px; font-size: 1rem; }
-        .change-password-section .form-label { font-size: 0.9rem; margin-bottom: 0.25rem; }
-        .change-password-section .btn { font-size: 1rem; padding: 0.75rem 1.5rem; }
+        .change-password-section .form-control { height: 48px; font-size: 16px; }
+        .change-password-section .form-label { font-size: 14px; margin-bottom: 4px; }
+        .change-password-section .btn { font-size: 16px; padding: 12px 24px; }
     </style>
     </head>
     <body>
