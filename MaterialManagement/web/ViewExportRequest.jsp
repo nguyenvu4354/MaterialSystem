@@ -93,8 +93,8 @@
     }
 
     .pagination .page-item.active .page-link {
-        background-color: #DEAD6F;
-        border-color: #DEAD6F;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
         color: #fff;
     }
 

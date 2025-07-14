@@ -21,6 +21,7 @@
         }
         .search-box {
             margin-bottom: 20px;
+          
         }
         .pagination {
             justify-content: center;
@@ -43,8 +44,8 @@
             max-width: 400px;
         }
         .pagination .page-item.active .page-link {
-            background-color: #DEAD6F;
-            border-color: #DEAD6F;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
             color: #fff;
         }
     </style>
@@ -64,12 +65,12 @@
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;">
+                    <h2 class="text-primary fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;">
                         <i class="bi bi-list-ul"></i> Category List
                     </h2>
                     <!-- Show Create Category button only if user has CREATE_CATEGORY permission -->
                     <c:if test="${sessionScope.user != null && rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_CATEGORY')}">
-                        <a href="${pageContext.request.contextPath}/Category?service=addCategory" class="btn" style="width: 180px; height: 50px; background-color: #DEAD6F; color: white;">
+                        <a href="${pageContext.request.contextPath}/Category?service=addCategory" class="btn btn-primary" style="width: 250px; height: 65px; background-color: #DEAD6F; color: white;">
                             <i class="fas fa-plus me-1"></i> Create Category
                         </a>
                     </c:if>
@@ -105,10 +106,10 @@
                                 <option value="code_asc" ${sortBy == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
                                 <option value="code_desc" ${sortBy == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
                             </select>
-                            <button type="submit" class="btn d-flex align-items-center justify-content-center" style="width: 150px; height: 50px; background-color: #DEAD6F; color: white;">
+                            <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px !important; height: 50px; background-color: #DEAD6F; color: white;">
                                 <i class="fas fa-search me-2"></i> Search
                             </button>
-                            <a href="${pageContext.request.contextPath}/Category?service=listCategory" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
+                                <a href="Supplier?action=list" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
                         </form>
                     </div>
                 </div>

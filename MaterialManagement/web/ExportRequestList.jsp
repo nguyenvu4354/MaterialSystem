@@ -99,8 +99,9 @@
             font-weight: 500;
         }
         .pagination .page-item.active .page-link {
-            background-color: #DEAD6F;
-            border-color: #DEAD6F;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: #fff;
         }
     </style>
 </head>
@@ -131,7 +132,7 @@
                         <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
                     <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white; width: 150px; height: 50px;">Filter</button>
-                    <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
+                    <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 75px; height: 50px">Clear</a>
                 </form>
                 <c:if test="${canViewExportRequest}">
                     <c:if test="${not empty exportRequests}">

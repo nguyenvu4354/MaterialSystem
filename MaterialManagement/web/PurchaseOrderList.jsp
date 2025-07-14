@@ -108,8 +108,8 @@
             font-weight: 500;
         }
         .pagination .page-item.active .page-link {
-            background-color: #DEAD6F;
-            border-color: #DEAD6F;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
         }
     </style>
 </head>
@@ -312,7 +312,7 @@
     <input type="hidden" name="poId" id="sendToSupplierPoId">
     <input type="hidden" name="status" value="sent_to_supplier">
 </form>
-
+ <jsp:include page="Footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function updateStatus(poId, status) {
