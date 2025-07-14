@@ -68,14 +68,6 @@ transform: scale(1.02);
                             </a>
                         </li>
                     </c:if>
-                    <c:if test="${sessionScope.user.roleId == 1}">
-                        <li class="nav-item mb-2">
-                            <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/PasswordResetRequests">
-                                <i class="fas fa-key fs-4 me-3"></i>
-                                Password Reset Requests
-                            </a>
-                        </li>
-                    </c:if>
                 </c:if>
             </ul>
         </div>
