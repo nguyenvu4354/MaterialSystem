@@ -195,9 +195,12 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                     for (User manager : managers) {
                         if (manager.getEmail() != null && !manager.getEmail().trim().isEmpty()) {
                             try {
-                                // utils.EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
+                                System.out.println("Sending email to: " + manager.getEmail());
+                                utils.EmailUtils.sendEmail(manager.getEmail(), subject, content.toString());
+                                System.out.println("Email sent successfully to: " + manager.getEmail());
                             } catch (Exception e) {
-                                // Log the error if needed, but don't rethrow to prevent breaking the flow
+                                System.out.println("Failed to send email to: " + manager.getEmail());
+                                e.printStackTrace();
                             }
                         }
                     }
