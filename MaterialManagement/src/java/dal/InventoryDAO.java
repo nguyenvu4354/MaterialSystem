@@ -280,4 +280,13 @@ public class InventoryDAO extends DBContext {
         }
         return 0;
     }
+
+    public void updateNote(int materialId, String note) throws SQLException {
+        String sql = "UPDATE Inventory SET note = ? WHERE material_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, note);
+            stmt.setInt(2, materialId);
+            stmt.executeUpdate();
+        }
+    }
 }
