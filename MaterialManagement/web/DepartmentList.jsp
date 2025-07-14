@@ -1,10 +1,12 @@
 <%@ page import="java.util.List" %>
 <%@ page import="entity.Department" %>
+<%@ page import="entity.User" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     List<Department> departments = (List<Department>) request.getAttribute("departments");
     String message = (String) request.getAttribute("message");
+    User user = (User) session.getAttribute("user");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,6 +47,11 @@
             </div>
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
+                <% if (user == null) { %>
+                <div class="alert alert-danger" role="alert">Vui lòng đăng nhập để truy cập trang này.</div>
+                <% } else if (user.getRoleId() != 1) { %>
+                <div class="alert alert-danger" role="alert">Bạn không có quyền truy cập trang quản lý phòng ban.</div>
+                <% } else { %>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="dashboard-title mb-0">Department Management</h2>
                     <a href="DepartmentForm.jsp" class="btn flex-shrink-0" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 260px; font-size: 1.25rem; font-weight: 500; border-radius: 6px; padding: 0 32px; display: inline-flex; align-items: center; justify-content: center;">
@@ -119,6 +126,7 @@
                         </tbody>
                     </table>
                 </div>
+                <% } %>
             </div> <!-- end content -->
         </div> <!-- end row -->
     </div> <!-- end container-fluid -->

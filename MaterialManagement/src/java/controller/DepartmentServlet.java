@@ -1,23 +1,37 @@
 import dal.DepartmentDAO;
 import entity.Department;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(urlPatterns = {"/depairmentlist"})
 public class DepartmentServlet extends HttpServlet {
 
-    DepartmentDAO departmentDAO = new DepartmentDAO();
+    private DepartmentDAO departmentDAO = new DepartmentDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user.getRoleId() != 1) {
+            response.sendRedirect("error.jsp");
+            return;
+        }
+
         String action = request.getParameter("action");
         String searchKeyword = request.getParameter("search");
         if (action == null) action = "list";
@@ -54,6 +68,18 @@ public class DepartmentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("Login.jsp");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user.getRoleId() != 1) {
+            response.sendRedirect("accessDenied.jsp");
+            return;
+        }
+
         int id = request.getParameter("id") == null || request.getParameter("id").isEmpty() ? 0 : Integer.parseInt(request.getParameter("id"));
         String name = request.getParameter("name");
         String phone = request.getParameter("phone");
