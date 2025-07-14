@@ -41,12 +41,13 @@ public class AddUnitServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
             request.setAttribute("error", "Bạn không có quyền thêm mới đơn vị.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
         request.getRequestDispatcher("AddUnit.jsp").forward(request, response);
     }
 
@@ -61,7 +62,7 @@ public class AddUnitServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "CREATE_UNIT")) {
             request.setAttribute("error", "Bạn không có quyền thêm mới đơn vị.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
