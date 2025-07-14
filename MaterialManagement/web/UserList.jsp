@@ -34,6 +34,10 @@
                 justify-content: center;
                 margin: 0 2px;
             }
+            .btn-info.btn-action {
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
+            }
             .content {
                 padding-left: 20px;
                 font-family: 'Roboto', sans-serif;
