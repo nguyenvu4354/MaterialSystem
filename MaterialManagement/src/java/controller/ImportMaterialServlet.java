@@ -5,7 +5,6 @@ import dal.InventoryDAO;
 import dal.MaterialDAO;
 import dal.SupplierDAO;
 import dal.RolePermissionDAO;
-import dal.DepartmentDAO;
 import entity.Import;
 import entity.ImportDetail;
 import entity.Material;
@@ -31,7 +30,6 @@ public class ImportMaterialServlet extends HttpServlet {
     private MaterialDAO materialDAO;
     private InventoryDAO inventoryDAO;
     private RolePermissionDAO rolePermissionDAO;
-    private DepartmentDAO departmentDAO;
 
     @Override
     public void init() throws ServletException {
@@ -40,7 +38,6 @@ public class ImportMaterialServlet extends HttpServlet {
         materialDAO = new MaterialDAO();
         inventoryDAO = new InventoryDAO();
         rolePermissionDAO = new RolePermissionDAO();
-        departmentDAO = new DepartmentDAO();
     }
 
     @Override
@@ -241,10 +238,6 @@ public class ImportMaterialServlet extends HttpServlet {
         importDAO.updateImport(imports);
         importDAO.confirmImport(tempImportId);
         importDAO.updateInventoryByImportId(tempImportId, user.getUserId());
-        for (ImportDetail detail : details) {
-            inventoryDAO.updateNote(detail.getMaterialId(), note);
-        }
-
         session.setAttribute("tempImportId", 0);
         request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + ". Total value: $" + String.format("%.2f", totalImportValue));
         loadDataAndForward(request, response);
@@ -256,10 +249,11 @@ public class ImportMaterialServlet extends HttpServlet {
         try {
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
-            List<entity.Department> departments = departmentDAO.getDepartments();
+            // Remove department loading for destination
+            // List<entity.Department> departments = departmentDAO.getDepartments();
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", allMaterials);
-            request.setAttribute("departments", departments);
+            // request.setAttribute("departments", departments);
 
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
             if (tempImportId == null) {
