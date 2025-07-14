@@ -42,6 +42,11 @@
         .custom-search {
             max-width: 400px;
         }
+        .pagination .page-item.active .page-link {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -79,10 +84,7 @@
                                    placeholder="Search by Code" 
                                    value="${code != null ? code : ''}" 
                                    style="width: 200px; height: 50px; border: 2px solid gray"/>
-                            <input type="text" name="categoryName" class="form-control" 
-                                   placeholder="Search by Name" 
-                                   value="${categoryName != null ? categoryName : ''}" 
-                                   style="width: 200px; height: 50px; border: 2px solid gray"/>
+                            <!-- Đã loại bỏ trường search by name (categoryName) -->
                             <select name="priority" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                 <option value="">All Priorities</option>
                                 <option value="high" ${priority == 'high' ? 'selected' : ''}>High</option>
@@ -177,18 +179,18 @@
 
                 <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
-                    <nav>
-                        <ul class="pagination">
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage - 1}&code=${code}&priority=${priority}&categoryName=${categoryName}&status=${status}&sortBy=${sortBy}">Previous</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage - 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${i}&code=${code}&priority=${priority}&categoryName=${categoryName}&status=${status}&sortBy=${sortBy}">${i}</a>
+                                    <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${i}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage + 1}&code=${code}&priority=${priority}&categoryName=${categoryName}&status=${status}&sortBy=${sortBy}">Next</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage + 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Next</a>
                             </li>
                         </ul>
                     </nav>

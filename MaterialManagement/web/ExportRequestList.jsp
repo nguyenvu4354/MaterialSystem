@@ -113,10 +113,7 @@
             <div class="container-main">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('exportRequestTable', 'ExportRequestList')">Export to Excel</button>
-                        <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
-                    </div>
+                    <!-- Đã xóa hoàn toàn các hàm exportTableToExcel và printTableList ở cuối file, cũng như mọi đoạn mã liên quan đến in và xuất excel. -->
                 </div>
                 <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
                     <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
@@ -133,7 +130,8 @@
                         <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                         <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
-                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white; width: 150px; height: 50px;">Filter</button>
+                    <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                 </form>
                 <c:if test="${canViewExportRequest}">
                     <c:if test="${not empty exportRequests}">
@@ -242,35 +240,6 @@
 </div>
 <jsp:include page="Footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Xuất Excel
-function exportTableToExcel(tableID, filename = '') {
-    var downloadLink;
-    var dataType = 'application/vnd.ms-excel';
-    var tableSelect = document.getElementById(tableID);
-    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-    filename = filename? filename+'.xls':'excel_data.xls';
-    downloadLink = document.createElement("a");
-    document.body.appendChild(downloadLink);
-    if(navigator.msSaveOrOpenBlob){
-        var blob = new Blob(['\ufeff', tableHTML], { type: dataType });
-        navigator.msSaveOrOpenBlob( blob, filename);
-    }else{
-        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-        downloadLink.download = filename;
-        downloadLink.click();
-    }
-    document.body.removeChild(downloadLink);
-}
-
-function printTableList() {
-    var printContents = document.getElementById('printTableListArea').innerHTML;
-    var originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    location.reload();
-}
-</script>
+<!-- Đã xóa hoàn toàn các hàm exportTableToExcel và printTableList ở cuối file, cũng như mọi đoạn mã liên quan đến in và xuất excel. -->
 </body>
 </html>

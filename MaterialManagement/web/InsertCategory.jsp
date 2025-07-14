@@ -91,12 +91,6 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="createdAt">Created At <span class="text-danger">*</span></label>
-                                <input type="datetime-local" id="createdAt" name="createdAt" class="form-control" required>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="form-group">

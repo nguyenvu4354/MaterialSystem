@@ -156,11 +156,41 @@ public class CategoryDAO extends DBContext {
         }
     }
 
-    public List<Category> searchCategoriesByName(String keyword) {
+    /**
+     * Tìm kiếm danh mục theo nhiều điều kiện kết hợp: code, priority, status, sort
+     */
+    public List<Category> searchCategories(String code, String priority, String status, String sortBy, String sortOrder) {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE category_name LIKE ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
+        StringBuilder sql = new StringBuilder("SELECT * FROM Categories WHERE disable = 0");
+        List<Object> params = new ArrayList<>();
+        if (code != null && !code.trim().isEmpty()) {
+            sql.append(" AND code LIKE ?");
+            params.add("%" + code.trim() + "%");
+        }
+        if (priority != null && !priority.trim().isEmpty()) {
+            sql.append(" AND priority = ?");
+            params.add(priority.trim());
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND status = ?");
+            params.add(status.trim());
+        }
+        // Xử lý sort
+        if (sortBy != null && !sortBy.isEmpty()) {
+            String col = "category_name";
+            switch (sortBy) {
+                case "name": col = "category_name"; break;
+                case "status": col = "status"; break;
+                case "code": col = "code"; break;
+                case "priority": col = "priority"; break;
+            }
+            String order = (sortOrder != null && sortOrder.equalsIgnoreCase("desc")) ? "DESC" : "ASC";
+            sql.append(" ORDER BY ").append(col).append(" ").append(order);
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Category category = new Category();
@@ -176,336 +206,7 @@ public class CategoryDAO extends DBContext {
                 list.add(category);
             }
         } catch (Exception e) {
-            lastError = "Error searchCategoriesByName: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByCode(String code) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE code LIKE ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + code + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByCode: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByPriorityNameAndStatus(String priority, String keyword, String status) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE priority = ? AND category_name LIKE ? AND status = ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, priority);
-            ps.setString(2, "%" + keyword + "%");
-            ps.setString(3, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByPriorityNameAndStatus: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByPriorityAndName(String priority, String keyword) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE priority = ? AND category_name LIKE ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, priority);
-            ps.setString(2, "%" + keyword + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByPriorityAndName: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByPriorityAndStatus(String priority, String status) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE priority = ? AND status = ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, priority);
-            ps.setString(2, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByPriorityAndStatus: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByNameAndStatus(String keyword, String status) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE category_name LIKE ? AND status = ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByNameAndStatus: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByPriority(String priority) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE priority = ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, priority);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByPriority: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByStatus(String status) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE status = ? AND disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error searchCategoriesByStatus: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> getAllCategoriesSortedByName(String order) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE disable = 0 ORDER BY category_name " + ("desc".equalsIgnoreCase(order) ? "DESC" : "ASC");
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category c = new Category(
-                    rs.getInt("category_id"),
-                    rs.getString("category_name"),
-                    rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null,
-                    rs.getTimestamp("created_at"),
-                    rs.getInt("disable"),
-                    rs.getString("status"),
-                    rs.getString("description"),
-                    rs.getString("priority"),
-                    rs.getString("code")
-                );
-                list.add(c);
-            }
-        } catch (Exception e) {
-            lastError = "Error in getAllCategoriesSortedByName: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> getAllCategoriesSortedByStatus(String order) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE disable = 0 ORDER BY status " + ("desc".equalsIgnoreCase(order) ? "DESC" : "ASC");
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category c = new Category(
-                    rs.getInt("category_id"),
-                    rs.getString("category_name"),
-                    rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null,
-                    rs.getTimestamp("created_at"),
-                    rs.getInt("disable"),
-                    rs.getString("status"),
-                    rs.getString("description"),
-                    rs.getString("priority"),
-                    rs.getString("code")
-                );
-                list.add(c);
-            }
-        } catch (Exception e) {
-            lastError = "Error in getAllCategoriesSortedByStatus: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> getAllCategoriesSortedByCode(String order) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE disable = 0 ORDER BY code " + ("desc".equalsIgnoreCase(order) ? "DESC" : "ASC");
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category c = new Category(
-                    rs.getInt("category_id"),
-                    rs.getString("category_name"),
-                    rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null,
-                    rs.getTimestamp("created_at"),
-                    rs.getInt("disable"),
-                    rs.getString("status"),
-                    rs.getString("description"),
-                    rs.getString("priority"),
-                    rs.getString("code")
-                );
-                list.add(c);
-            }
-        } catch (Exception e) {
-            lastError = "Error in getAllCategoriesSortedByCode: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByNameSorted(String keyword, String order) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE category_name LIKE ? AND disable = 0 ORDER BY category_name " + ("desc".equalsIgnoreCase(order) ? "DESC" : "ASC");
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error in searchCategoriesByNameSorted: " + e.getMessage();
-            System.out.println("❌ " + lastError);
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Category> searchCategoriesByStatusSorted(String status, String order) {
-        List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM Categories WHERE status = ? AND disable = 0 ORDER BY status " + ("desc".equalsIgnoreCase(order) ? "DESC" : "ASC");
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Category category = new Category();
-                category.setCategory_id(rs.getInt("category_id"));
-                category.setCategory_name(rs.getString("category_name"));
-                category.setParent_id(rs.getObject("parent_id") != null ? rs.getInt("parent_id") : null);
-                category.setCreated_at(rs.getTimestamp("created_at"));
-                category.setDisable(rs.getInt("disable"));
-                category.setStatus(rs.getString("status"));
-                category.setDescription(rs.getString("description"));
-                category.setPriority(rs.getString("priority"));
-                category.setCode(rs.getString("code"));
-                list.add(category);
-            }
-        } catch (Exception e) {
-            lastError = "Error in searchCategoriesByStatusSorted: " + e.getMessage();
+            lastError = "Error searchCategories: " + e.getMessage();
             System.out.println("❌ " + lastError);
             e.printStackTrace();
         }

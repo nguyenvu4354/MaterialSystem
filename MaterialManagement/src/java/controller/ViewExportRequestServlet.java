@@ -60,6 +60,22 @@ public class ViewExportRequestServlet extends HttpServlet {
                 return;
             }
             List<ExportRequestDetail> details = exportRequestDetailDAO.getByRequestId(requestId);
+            // Phân trang cho details
+            int itemsPerPage = 10;
+            int currentPage = 1;
+            String pageStr = request.getParameter("page");
+            if (pageStr != null) {
+                try {
+                    currentPage = Integer.parseInt(pageStr);
+                    if (currentPage < 1) currentPage = 1;
+                } catch (NumberFormatException ignore) {}
+            }
+            int totalItems = details.size();
+            int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            int start = (currentPage - 1) * itemsPerPage;
+            int end = Math.min(start + itemsPerPage, totalItems);
+            List<ExportRequestDetail> paginatedDetails = (start < end) ? details.subList(start, end) : java.util.Collections.emptyList();
             User sender = userDAO.getUserById(exportRequest.getUserId());
             User recipient = exportRequest.getRecipientId() > 0 ? userDAO.getUserById(exportRequest.getRecipientId()) : null;
             String senderImg = (sender == null || sender.getUserPicture() == null || sender.getUserPicture().isEmpty())
@@ -73,7 +89,9 @@ public class ViewExportRequestServlet extends HttpServlet {
                         ? recipient.getUserPicture()
                         : "images/profiles/" + recipient.getUserPicture());
             request.setAttribute("exportRequest", exportRequest);
-            request.setAttribute("details", details);
+            request.setAttribute("details", paginatedDetails);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("sender", sender);
             request.setAttribute("recipient", recipient);
             request.setAttribute("senderImg", senderImg);

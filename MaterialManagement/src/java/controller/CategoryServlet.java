@@ -92,7 +92,8 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            List<Category> existingCategories = categoryDAO.searchCategoriesByCode(code.trim());
+                            // Thay thế searchCategoriesByCode bằng searchCategories
+                            List<Category> existingCategories = categoryDAO.searchCategories(code.trim(), null, null, null, null);
                             for (Category existing : existingCategories) {
                                 if (existing.getCategory_id() != categoryId && existing.getCode().equalsIgnoreCase(code.trim())) {
                                     request.setAttribute("error", "Category code '" + code + "' already exists. Please choose a different code.");
@@ -104,19 +105,8 @@ public class CategoryServlet extends HttpServlet {
                                 }
                             }
 
-                            Timestamp createdAt;
-                            try {
-                                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                                Date date = inputFormat.parse(createdAtRaw);
-                                createdAt = new Timestamp(date.getTime());
-                            } catch (Exception e) {
-                                request.setAttribute("error", "Invalid date and time format.");
-                                request.setAttribute("c", categoryDAO.getCategoryById(categoryId));
-                                request.setAttribute("categories", categoryDAO.getAllCategories());
-                                request.setAttribute("rolePermissionDAO", rolePermissionDAO);
-                                request.getRequestDispatcher("/UpdateCategory.jsp").forward(request, response);
-                                return;
-                            }
+                            // Luôn set createdAt = new Timestamp(System.currentTimeMillis()) khi update
+                            Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
                             Integer parentId = null;
                             if (parentIDRaw != null && !parentIDRaw.trim().isEmpty()) {
@@ -235,7 +225,8 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            List<Category> existingCategories = categoryDAO.searchCategoriesByCode(code.trim());
+                            // Thay thế searchCategoriesByCode bằng searchCategories
+                            List<Category> existingCategories = categoryDAO.searchCategories(code.trim(), null, null, null, null);
                             if (!existingCategories.isEmpty()) {
                                 request.setAttribute("error", "Category code '" + code + "' already exists. Please choose a different code.");
                                 request.setAttribute("categories", categoryDAO.getAllCategories());
@@ -244,18 +235,8 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            Timestamp createdAt;
-                            try {
-                                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                                Date date = inputFormat.parse(createdAtRaw);
-                                createdAt = new Timestamp(date.getTime());
-                            } catch (Exception e) {
-                                request.setAttribute("error", "Invalid date and time format.");
-                                request.setAttribute("categories", categoryDAO.getAllCategories());
-                                request.setAttribute("rolePermissionDAO", rolePermissionDAO);
-                                request.getRequestDispatcher("/InsertCategory.jsp").forward(request, response);
-                                return;
-                            }
+                            // Thay vì lấy createdAtRaw từ request, set createdAt = new Timestamp(System.currentTimeMillis())
+                            Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
                             Integer parentId = null;
                             if (parentIDRaw != null && !parentIDRaw.trim().isEmpty()) {
@@ -297,12 +278,11 @@ public class CategoryServlet extends HttpServlet {
                         return;
                     }
                     String code = request.getParameter("code");
-                    String keyword = request.getParameter("categoryName");
                     String priority = request.getParameter("priority");
                     String status = request.getParameter("status");
                     String sortBy = request.getParameter("sortBy");
-                    String pageStr = request.getParameter("page");
                     int currentPage = 1;
+                    String pageStr = request.getParameter("page");
                     try {
                         if (pageStr != null && !pageStr.trim().isEmpty()) {
                             currentPage = Integer.parseInt(pageStr);
@@ -312,103 +292,37 @@ public class CategoryServlet extends HttpServlet {
                         System.out.println("CategoryServlet - Invalid page number: " + pageStr);
                     }
 
-                    System.out.println("CategoryServlet - Parameters: code=" + code + ", categoryName=" + keyword +
-                            ", priority=" + priority + ", status=" + status + ", sortBy=" + sortBy + ", page=" + currentPage);
-
-                    List<Category> list;
-                    int totalCategories;
-
-                    try {
-                        if (code != null && !code.trim().isEmpty()) {
-                            list = categoryDAO.searchCategoriesByCode(code.trim());
-                            totalCategories = list.size();
-                            request.setAttribute("code", code);
-                        } else if (keyword != null && !keyword.trim().isEmpty() ||
-                                priority != null && !priority.trim().isEmpty() ||
-                                status != null && !status.trim().isEmpty()) {
-                            boolean hasPriority = priority != null && !priority.trim().isEmpty();
-                            boolean hasName = keyword != null && !keyword.trim().isEmpty();
-                            boolean hasStatus = status != null && !status.trim().isEmpty();
-                            if (hasPriority && hasName && hasStatus) {
-                                list = categoryDAO.searchCategoriesByPriorityNameAndStatus(priority.trim(), keyword.trim(), status.trim());
-                            } else if (hasPriority && hasName) {
-                                list = categoryDAO.searchCategoriesByPriorityAndName(priority.trim(), keyword.trim());
-                            } else if (hasPriority && hasStatus) {
-                                list = categoryDAO.searchCategoriesByPriorityAndStatus(priority.trim(), status.trim());
-                            } else if (hasName && hasStatus) {
-                                list = categoryDAO.searchCategoriesByNameAndStatus(keyword.trim(), status.trim());
-                            } else if (hasPriority) {
-                                list = categoryDAO.searchCategoriesByPriority(priority.trim());
-                            } else if (hasStatus) {
-                                list = categoryDAO.searchCategoriesByStatusSorted(status.trim(), sortBy != null && sortBy.endsWith("_desc") ? "desc" : "asc");
-                            } else {
-                                list = categoryDAO.searchCategoriesByNameSorted(keyword.trim(), sortBy != null && sortBy.endsWith("_desc") ? "desc" : "asc");
-                            }
-                            totalCategories = list.size();
-                            request.setAttribute("categoryName", keyword);
-                            request.setAttribute("priority", priority);
-                            request.setAttribute("status", status);
-                        } else {
-                            list = categoryDAO.getAllCategories();
-                            totalCategories = list.size();
+                    // Xác định sortBy/sortOrder
+                    String sortCol = null;
+                    String sortOrder = null;
+                    if (sortBy != null && !sortBy.isEmpty()) {
+                        if (sortBy.endsWith("_asc")) {
+                            sortCol = sortBy.replace("_asc", "");
+                            sortOrder = "asc";
+                        } else if (sortBy.endsWith("_desc")) {
+                            sortCol = sortBy.replace("_desc", "");
+                            sortOrder = "desc";
                         }
-
-                        System.out.println("CategoryServlet - Total categories fetched: " + totalCategories);
-
-                        if (sortBy != null && !sortBy.isEmpty()) {
-                            switch (sortBy) {
-                                case "name_asc":
-                                    Collections.sort(list, Comparator.comparing(Category::getCategory_name));
-                                    break;
-                                case "name_desc":
-                                    Collections.sort(list, Comparator.comparing(Category::getCategory_name).reversed());
-                                    break;
-                                case "status_asc":
-                                    Collections.sort(list, Comparator.comparing(Category::getStatus));
-                                    break;
-                                case "status_desc":
-                                    Collections.sort(list, Comparator.comparing(Category::getStatus).reversed());
-                                    break;
-                                case "code_asc":
-                                    Collections.sort(list, Comparator.comparing(Category::getCode));
-                                    break;
-                                case "code_desc":
-                                    Collections.sort(list, Comparator.comparing(Category::getCode).reversed());
-                                    break;
-                            }
-                            request.setAttribute("sortBy", sortBy);
-                        }
-
-                        int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
-                        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-
-                        int start = (currentPage - 1) * PAGE_SIZE;
-                        int end = Math.min(start + PAGE_SIZE, list.size());
-                        if (start < list.size()) {
-                            list = list.subList(start, end);
-                        } else {
-                            list = Collections.emptyList();
-                        }
-
-                        System.out.println("CategoryServlet - Paginated list size: " + list.size());
-
-                        request.setAttribute("data", list);
-                        request.setAttribute("currentPage", currentPage);
-                        request.setAttribute("totalPages", totalPages);
-                        request.setAttribute("code", code);
-                        request.setAttribute("categoryName", keyword);
-                        request.setAttribute("priority", priority);
-                        request.setAttribute("status", status);
-                        request.setAttribute("sortBy", sortBy);
-                        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
-                        request.getRequestDispatcher("/Category.jsp").forward(request, response);
-                    } catch (Exception e) {
-                        System.out.println("CategoryServlet - Error fetching categories: " + e.getMessage());
-                        e.printStackTrace();
-                        request.setAttribute("error", "Error loading categories: " + e.getMessage());
-                        request.setAttribute("data", Collections.emptyList());
-                        request.getRequestDispatcher("/Category.jsp").forward(request, response);
                     }
+
+                    // Lấy toàn bộ danh sách đã lọc
+                    List<Category> filteredList = categoryDAO.searchCategories(code, priority, status, sortCol, sortOrder);
+                    int totalCategories = filteredList.size();
+                    int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
+                    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+                    int start = (currentPage - 1) * PAGE_SIZE;
+                    int end = Math.min(start + PAGE_SIZE, filteredList.size());
+                    List<Category> paginatedList = (start < filteredList.size()) ? filteredList.subList(start, end) : Collections.emptyList();
+
+                    request.setAttribute("data", paginatedList);
+                    request.setAttribute("currentPage", currentPage);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("code", code);
+                    request.setAttribute("priority", priority);
+                    request.setAttribute("status", status);
+                    request.setAttribute("sortBy", sortBy);
+                    request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+                    request.getRequestDispatcher("/Category.jsp").forward(request, response);
                     break;
                 }
 

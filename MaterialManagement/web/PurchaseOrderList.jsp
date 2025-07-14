@@ -123,8 +123,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice"></i> Purchase Order Management</h2>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-export" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="exportTableToExcel('purchaseOrderTable', 'PurchaseOrderList')">Export to Excel</button>
-                        <button type="button" class="btn btn-print" style="background-color: #DEAD6F; color: #fff; border: none;" onclick="printTableList()">Print List</button>
+                        <!-- Đã xóa nút Export to Excel và Print List -->
                     </div>
                 </div>
                 
@@ -154,6 +153,7 @@
                         <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:200px;">
                         <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:200px;">
                         <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                         <a href="${pageContext.request.contextPath}/PurchaseOrderList" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                     </form>
                     
                     <c:if test="${not empty purchaseOrders}">
@@ -348,43 +348,7 @@
         new bootstrap.Modal(document.getElementById('statusModal')).show();
     }
     
-    function exportTableToExcel(tableID, filename = '') {
-        var downloadLink;
-        var dataType = 'application/vnd.ms-excel';
-        var tableSelect = document.getElementById(tableID);
-        var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-        
-        filename = filename?filename+'.xls':'excel_data.xls';
-        
-        // Create download link element
-        downloadLink = document.createElement("a");
-        
-        document.body.appendChild(downloadLink);
-        
-        if(navigator.msSaveOrOpenBlob){
-            var blob = new Blob(['\ufeff', tableHTML], {
-                type: dataType
-            });
-            navigator.msSaveOrOpenBlob( blob, filename);
-        } else {
-            // Create a link to the file
-            downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-        
-            // Setting the file name
-            downloadLink.download = filename;
-            
-            //triggering the function
-            downloadLink.click();
-        }
-    }
-    
-    function printTableList() {
-        var printContents = document.getElementById('printTableListArea').innerHTML;
-        var originalContents = document.body.innerHTML;
-        document.body.innerHTML = printContents;
-        window.print();
-        document.body.innerHTML = originalContents;
-    }
+    // Đã xóa hàm exportTableToExcel và printTableList ở cuối file
 </script>
 </body>
 </html> 

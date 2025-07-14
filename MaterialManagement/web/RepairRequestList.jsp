@@ -118,6 +118,7 @@
                                 <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
                             </select>
                             <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                             <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                         </form>
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>

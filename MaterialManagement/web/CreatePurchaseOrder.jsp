@@ -141,7 +141,7 @@
 
                     <div class="mt-5 d-grid gap-2">
                         <button type="submit" class="btn btn-dark btn-lg rounded-1">Create Purchase Order</button>
-                        <a href="purchaseorderlist" class="btn btn-outline-secondary btn-lg rounded-1">Back to Purchase Order List</a>
+                        <a href="ListPurchaseRequests" class="btn btn-outline-secondary btn-lg rounded-1">Back to Purchase Request List</a>
                     </div>
                 </form>
                 </c:if>

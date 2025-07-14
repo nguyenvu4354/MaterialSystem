@@ -116,14 +116,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="createdAt">Created At</label>
-                                    <fmt:formatDate value="${c.created_at}" pattern="yyyy-MM-dd'T'HH:mm" var="formattedCreatedAt"/>
-                                    <input type="datetime-local" id="createdAt" name="createdAt" class="form-control" 
-                                           value="${formattedCreatedAt}" required>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="form-group">

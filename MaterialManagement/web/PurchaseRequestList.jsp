@@ -149,6 +149,7 @@
                                         <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                                     </select>
                                     <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
+                                     <a href="${pageContext.request.contextPath}/ListPurchaseRequests" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                                 </form>
                                 <c:if test="${not empty purchaseRequests}">
                                     <div class="table-responsive" id="printTableListArea">

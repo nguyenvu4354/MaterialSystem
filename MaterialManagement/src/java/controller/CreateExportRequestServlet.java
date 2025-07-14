@@ -235,10 +235,9 @@ public class CreateExportRequestServlet extends HttpServlet {
     }
 
     private String generateRequestCode() {
-        String prefix = "EXP";
-        String year = String.valueOf(LocalDate.now().getYear());
+        String prefix = "ER";
         String sql = "SELECT request_code FROM Export_Requests WHERE request_code LIKE ? ORDER BY request_code DESC LIMIT 1";
-        String likePattern = prefix + "-" + year + "-%";
+        String likePattern = prefix + "%";
         try (java.sql.Connection conn = exportRequestDAO.getConnection();
              java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, likePattern);
@@ -246,18 +245,17 @@ public class CreateExportRequestServlet extends HttpServlet {
                 int nextSeq = 1;
                 if (rs.next()) {
                     String lastCode = rs.getString("request_code");
-                    String[] parts = lastCode.split("-");
-                    if (parts.length == 3) {
-                        try {
-                            nextSeq = Integer.parseInt(parts[2]) + 1;
-                        } catch (NumberFormatException ignore) {}
-                    }
+                    // Lấy số thứ tự cuối cùng từ mã (ví dụ EX004 -> 4)
+                    String numberPart = lastCode.replace(prefix, "");
+                    try {
+                        nextSeq = Integer.parseInt(numberPart) + 1;
+                    } catch (NumberFormatException ignore) {}
                 }
-                return prefix + "-" + year + "-" + String.format("%03d", nextSeq);
+                return prefix + String.format("%03d", nextSeq);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return prefix + "-" + year + "-001";
+            return prefix + "001";
         }
     }
 }
