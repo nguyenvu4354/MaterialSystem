@@ -10,11 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for managing Repair Requests and their details.
- */
 public class RepairRequestDAO extends DBContext {
-
 
     public boolean createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
         String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, repair_person_phone_number, repair_person_email, "
@@ -72,34 +68,80 @@ public class RepairRequestDAO extends DBContext {
         }
     }
 
-    public List<RepairRequest> getAllRepairRequests() throws SQLException {
+    public List<RepairRequest> getRepairRequestsWithPagination(int offset, int pageSize, String searchKeyword, String status) throws SQLException {
         List<RepairRequest> requests = new ArrayList<>();
-        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                RepairRequest request = new RepairRequest();
-                request.setRepairRequestId(rs.getInt("repair_request_id"));
-                request.setRequestCode(rs.getString("request_code"));
-                request.setUserId(rs.getInt("user_id"));
-                request.setRequestDate(rs.getTimestamp("request_date"));
-                request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                request.setRepairPersonEmail(rs.getString("repair_person_email"));
-                request.setRepairLocation(rs.getString("repair_location"));
-                request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
-                request.setStatus(rs.getString("status"));
-                request.setReason(rs.getString("reason"));
-                request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
-                request.setApprovalReason(rs.getString("approval_reason"));
-                request.setApprovedAt(rs.getTimestamp("approved_at"));
-                request.setRejectionReason(rs.getString("rejection_reason"));
-                request.setCreatedAt(rs.getTimestamp("created_at"));
-                request.setUpdatedAt(rs.getTimestamp("updated_at"));
-                request.setDisable(rs.getBoolean("disable"));
-                requests.add(request);
+        StringBuilder sql = new StringBuilder("SELECT * FROM Repair_Requests WHERE disable = 0 AND status != 'cancel'");
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append(" AND request_code LIKE ?");
+        }
+        if (status != null && !status.equalsIgnoreCase("all")) {
+            sql.append(" AND status = ?");
+        }
+        sql.append(" ORDER BY repair_request_id LIMIT ? OFFSET ?");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+            }
+            if (status != null && !status.equalsIgnoreCase("all")) {
+                ps.setString(paramIndex++, status);
+            }
+            ps.setInt(paramIndex++, pageSize);
+            ps.setInt(paramIndex, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    RepairRequest request = new RepairRequest();
+                    request.setRepairRequestId(rs.getInt("repair_request_id"));
+                    request.setRequestCode(rs.getString("request_code"));
+                    request.setUserId(rs.getInt("user_id"));
+                    request.setRequestDate(rs.getTimestamp("request_date"));
+                    request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
+                    request.setRepairPersonEmail(rs.getString("repair_person_email"));
+                    request.setRepairLocation(rs.getString("repair_location"));
+                    request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
+                    request.setStatus(rs.getString("status"));
+                    request.setReason(rs.getString("reason"));
+                    request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
+                    request.setApprovalReason(rs.getString("approval_reason"));
+                    request.setApprovedAt(rs.getTimestamp("approved_at"));
+                    request.setRejectionReason(rs.getString("rejection_reason"));
+                    request.setCreatedAt(rs.getTimestamp("created_at"));
+                    request.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    request.setDisable(rs.getBoolean("disable"));
+                    requests.add(request);
+                }
             }
         }
         return requests;
+    }
+
+    public int getTotalRepairRequestCount(String searchKeyword, String status) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Repair_Requests WHERE disable = 0 AND status != 'cancel'");
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append(" AND request_code LIKE ?");
+        }
+        if (status != null && !status.equalsIgnoreCase("all")) {
+            sql.append(" AND status = ?");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+            }
+            if (status != null && !status.equalsIgnoreCase("all")) {
+                ps.setString(paramIndex++, status);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
     public List<RepairRequestDetail> getRepairRequestDetails(int repairRequestId) throws SQLException {
@@ -148,7 +190,7 @@ public class RepairRequestDAO extends DBContext {
 
     public List<RepairRequest> getRepairRequestsByUser(int userId) throws SQLException {
         List<RepairRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM Repair_Requests WHERE user_id = ?";
+        String sql = "SELECT * FROM Repair_Requests WHERE user_id = ? AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -168,7 +210,6 @@ public class RepairRequestDAO extends DBContext {
     }
 
     public void updateStatus(int repairRequestId, String action, Integer approvedBy, String reason) throws SQLException {
-        // Validate input
         if (action == null || (!"approve".equalsIgnoreCase(action) && !"reject".equalsIgnoreCase(action))) {
             throw new IllegalArgumentException("Hành động không hợp lệ: " + action);
         }
@@ -176,7 +217,6 @@ public class RepairRequestDAO extends DBContext {
             throw new IllegalArgumentException("ID người duyệt không hợp lệ.");
         }
 
-        // Check current status
         String checkSql = "SELECT status FROM Repair_Requests WHERE repair_request_id = ?";
         try (PreparedStatement checkPs = connection.prepareStatement(checkSql)) {
             checkPs.setInt(1, repairRequestId);
@@ -213,7 +253,7 @@ public class RepairRequestDAO extends DBContext {
 
     public List<RepairRequest> searchByRequestCode(String code) throws SQLException {
         List<RepairRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND request_code LIKE ?";
+        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND status != 'cancel' AND request_code LIKE ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, "%" + (code == null ? "" : code) + "%");
             try (ResultSet rs = ps.executeQuery()) {
@@ -221,6 +261,7 @@ public class RepairRequestDAO extends DBContext {
                     RepairRequest req = new RepairRequest();
                     req.setRepairRequestId(rs.getInt("repair_request_id"));
                     req.setRequestCode(rs.getString("request_code"));
+                    req.setUserId(rs.getInt("user_id"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
                     req.setRepairLocation(rs.getString("repair_location"));
                     req.setReason(rs.getString("reason"));
@@ -234,7 +275,7 @@ public class RepairRequestDAO extends DBContext {
 
     public List<RepairRequest> filterByStatus(String status) throws SQLException {
         List<RepairRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND status = ?";
+        String sql = "SELECT * FROM Repair_Requests WHERE disable = 0 AND status != 'cancel' AND status = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             try (ResultSet rs = ps.executeQuery()) {
@@ -242,6 +283,7 @@ public class RepairRequestDAO extends DBContext {
                     RepairRequest req = new RepairRequest();
                     req.setRepairRequestId(rs.getInt("repair_request_id"));
                     req.setRequestCode(rs.getString("request_code"));
+                    req.setUserId(rs.getInt("user_id"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
                     req.setRepairLocation(rs.getString("repair_location"));
                     req.setReason(rs.getString("reason"));
@@ -254,7 +296,7 @@ public class RepairRequestDAO extends DBContext {
     }
 
     public RepairRequest getRepairRequestById(int repairRequestId) throws SQLException {
-        String sql = "SELECT * FROM Repair_Requests WHERE repair_request_id = ?";
+        String sql = "SELECT * FROM Repair_Requests WHERE repair_request_id = ? AND disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, repairRequestId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -262,9 +304,10 @@ public class RepairRequestDAO extends DBContext {
                     RepairRequest request = new RepairRequest();
                     request.setRepairRequestId(rs.getInt("repair_request_id"));
                     request.setRequestCode(rs.getString("request_code"));
+                    request.setUserId(rs.getInt("user_id"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
                     request.setStatus(rs.getString("status"));
-                    request.setUserId(rs.getInt("user_id"));
+                    request.setReason(rs.getString("reason"));
                     return request;
                 }
             }
