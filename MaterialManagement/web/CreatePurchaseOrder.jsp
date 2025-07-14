@@ -50,6 +50,9 @@
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success text-center" style="font-size:1.1rem; font-weight:600;">${success}</div>
+                </c:if>
 
                 <c:if test="${!hasCreatePurchaseOrderPermission}">
                     <div class="alert alert-danger">You do not have permission to create purchase orders.</div>

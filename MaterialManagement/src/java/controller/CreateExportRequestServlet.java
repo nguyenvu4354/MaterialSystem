@@ -163,10 +163,13 @@ public class CreateExportRequestServlet extends HttpServlet {
                     System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
                     e.printStackTrace();
                 }
-                response.sendRedirect(request.getContextPath() + "/ExportRequestList");
+                request.setAttribute("success", "Export request created successfully!");
+                doGet(request, response);
+                return;
             } else {
                 request.setAttribute("error", "Failed to create export request.");
                 doGet(request, response);
+                return;
             }
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
@@ -245,7 +248,6 @@ public class CreateExportRequestServlet extends HttpServlet {
                 int nextSeq = 1;
                 if (rs.next()) {
                     String lastCode = rs.getString("request_code");
-                    // Lấy số thứ tự cuối cùng từ mã (ví dụ EX004 -> 4)
                     String numberPart = lastCode.replace(prefix, "");
                     try {
                         nextSeq = Integer.parseInt(numberPart) + 1;

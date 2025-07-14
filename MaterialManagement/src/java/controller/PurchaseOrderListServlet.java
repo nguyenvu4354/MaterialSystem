@@ -161,10 +161,7 @@ public class PurchaseOrderListServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-        if (user.getRoleId() != 1 && user.getRoleId() != 2) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-            return;
-        }
+        // Đã bỏ kiểm tra cứng quyền UPDATE_PURCHASE_ORDER_STATUS ở đây
 
         try {
             String action = request.getParameter("action");
@@ -174,12 +171,53 @@ public class PurchaseOrderListServlet extends HttpServlet {
                 String approvalReason = request.getParameter("approvalReason");
                 String rejectionReason = request.getParameter("rejectionReason");
 
+                // Phân quyền động cho SENT_TO_SUPPLIER
+                if ("sent_to_supplier".equals(status)) {
+                    boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
+                    if (!hasSendToSupplierPermission) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+                        return;
+                    }
+                }
+
                 boolean success = purchaseOrderDAO.updatePurchaseOrderStatus(poId, status, user.getUserId(), approvalReason, rejectionReason);
 
                 if (success) {
+                    if ("sent_to_supplier".equals(status)) {
+                        // Gửi email cho các supplier trong đơn hàng
+                        try {
+                            dal.PurchaseOrderDAO poDAO = new dal.PurchaseOrderDAO();
+                            dal.SupplierDAO supplierDAO = new dal.SupplierDAO();
+                            entity.PurchaseOrder po = poDAO.getPurchaseOrderById(poId);
+                            java.util.Set<Integer> supplierIds = new java.util.HashSet<>();
+                            if (po != null && po.getDetails() != null) {
+                                for (entity.PurchaseOrderDetail detail : po.getDetails()) {
+                                    supplierIds.add(detail.getSupplierId());
+                                }
+                            }
+                            for (Integer supplierId : supplierIds) {
+                                entity.Supplier supplier = supplierDAO.getSupplierByID(supplierId);
+                                if (supplier != null && supplier.getEmail() != null && !supplier.getEmail().trim().isEmpty()) {
+                                    String subject = "[Notification] New Purchase Order Sent To You";
+                                    String content = "Dear Supplier,<br><br>You have a new purchase order (PO Code: " + po.getPoCode() + ") sent to you. Please log in to the system to view details.<br><br>Thank you.";
+                                    try {
+                                        utils.EmailUtils.sendEmail(supplier.getEmail(), subject, content);
+                                    } catch (Exception e) {
+                                        System.err.println("[MAIL] Failed to send email to supplier: " + supplier.getEmail());
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("[MAIL] Error when sending email to suppliers: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
                     response.sendRedirect(request.getContextPath() + "/PurchaseOrderList?message=Status updated successfully");
+                    return;
                 } else {
                     response.sendRedirect(request.getContextPath() + "/PurchaseOrderList?message=Error updating status");
+                    return;
                 }
             } else {
                 doGet(request, response);

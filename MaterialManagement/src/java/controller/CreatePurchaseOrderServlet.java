@@ -169,17 +169,20 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             purchaseOrder.setStatus("pending");
             boolean success = purchaseOrderDAO.createPurchaseOrder(purchaseOrder, details);
             if (success) {
-                // Gửi email thông báo cho supplier và admin
+                // Gửi email thông báo cho giám đốc
                 try {
                     sendPurchaseOrderNotification(purchaseOrder, details, purchaseRequest, user);
                 } catch (Exception e) {
                     System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
                     e.printStackTrace();
                 }
-                response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");
+                request.setAttribute("success", "Purchase order created successfully!");
+                doGet(request, response);
+                return;
             } else {
                 request.setAttribute("error", "Failed to create purchase order.");
                 doGet(request, response);
+                return;
             }
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
