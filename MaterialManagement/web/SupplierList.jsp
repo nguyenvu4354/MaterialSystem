@@ -164,23 +164,21 @@
                         </table>
                     </div>
 
-                    <c:if test="${totalPages > 1}">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="Supplier?action=list&page=${currentPage - 1}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">Previous</a>
+                    <nav>
+                        <ul class="pagination justify-content-center mt-4">
+                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="SupplierList?page=${currentPage - 1}">Previous</a>
+                            </li>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="SupplierList?page=${i}">${i}</a>
                                 </li>
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="Supplier?action=list&page=${i}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">${i}</a>
-                                    </li>
-                                </c:forEach>
-                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="Supplier?action=list&page=${currentPage + 1}&keyword=${keyword}&code=${code}&sortBy=${sortBy}">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </c:if>
+                            </c:forEach>
+                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="SupplierList?page=${currentPage + 1}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </c:if>
             </div> 
         </div> 
