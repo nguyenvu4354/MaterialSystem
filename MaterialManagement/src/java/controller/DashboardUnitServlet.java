@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import dal.RolePermissionDAO;
 
 @WebServlet(name = "DashboardUnitServlet", urlPatterns = {"/UnitList"})
 public class DashboardUnitServlet extends HttpServlet {
@@ -33,6 +34,8 @@ public class DashboardUnitServlet extends HttpServlet {
         if (page > totalPages && totalPages > 0) page = totalPages;
         int offset = (page - 1) * pageSize;
         List<Unit> units = unitDAO.getUnitsByPage(offset, pageSize, keyword);
+        RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
         request.setAttribute("units", units);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
