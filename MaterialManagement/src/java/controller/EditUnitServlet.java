@@ -35,7 +35,7 @@ public class EditUnitServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
             request.setAttribute("error", "Bạn không có quyền chỉnh sửa đơn vị.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
@@ -48,6 +48,7 @@ public class EditUnitServlet extends HttpServlet {
             Unit unit = unitDAO.getUnitById(id);
             request.setAttribute("unit", unit);
         }
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
         request.getRequestDispatcher("EditUnit.jsp").forward(request, response);
     }
 
@@ -63,7 +64,7 @@ public class EditUnitServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "UPDATE_UNIT")) {
             request.setAttribute("error", "Bạn không có quyền chỉnh sửa đơn vị.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
