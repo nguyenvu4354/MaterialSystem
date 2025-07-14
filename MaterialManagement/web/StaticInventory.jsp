@@ -272,52 +272,6 @@
                 </div>
               </div>
             </c:if>
-            <div class="row mb-4">
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-stock">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalStock}</h3>
-                      <p>Total Stock</p>
-                    </div>
-                    <i class="fas fa-boxes stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-imported">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalImported}</h3>
-                      <p>Total Imported</p>
-                    </div>
-                    <i class="fas fa-arrow-down stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-exported">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${totalExported}</h3>
-                      <p>Total Exported</p>
-                    </div>
-                    <i class="fas fa-arrow-up stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-3 col-md-6 mb-4">
-                <div class="stat-card stat-out">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3>${outOfStockCount}</h3>
-                      <p>Out of Stock</p>
-                    </div>
-                    <i class="fas fa-exclamation-triangle stat-icon"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="row search-section">
               <div class="col-md-12">
                 <form method="GET" action="StaticInventory" class="d-flex gap-2 align-items-center">
@@ -397,21 +351,21 @@
                 </tbody>
               </table>
             </div>
-            <nav>
+              <nav>
                 <ul class="pagination justify-content-center mt-4">
-                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
-                    </li>
-                    <c:forEach begin="1" end="${totalPages}" var="i">
+                  <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="StaticInventory?page=${currentPage - 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Previous</a>
+                  </li>
+                  <c:forEach begin="1" end="${totalPages}" var="i">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
-                        </li>
-                    </c:forEach>
-                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
+                      <a class="page-link" href="StaticInventory?page=${i}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">${i}</a>
                     </li>
+                  </c:forEach>
+                  <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="StaticInventory?page=${currentPage + 1}&search=${searchTerm}&filter=${stockFilter}&sortStock=${sortStock}">Next</a>
+                  </li>
                 </ul>
-            </nav>
+              </nav>
           </c:if>
         </div>
       </div>
