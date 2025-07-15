@@ -174,28 +174,20 @@
                         <!-- Danh mục và đơn vị -->
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="categoryId" class="form-label">Category</label>
-                                <select class="form-select" id="categoryId" name="categoryId">
-                                    <option value="">Select Category</option>
-                                    <c:forEach items="${categories}" var="category">
-                                        <option value="${category.category_id}"
-                                            <c:if test="${param.categoryId != null ? param.categoryId == category.category_id : (m.category != null && m.category.category_id == category.category_id)}">selected</c:if>>
-                                            ${category.category_name}
-                                        </option>
-                                    </c:forEach>
-                                </select>
+                                <label for="categoryInput" class="form-label">Category</label>
+                                <div style="position: relative; display: inline-block; width: 100%;">
+                                    <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" value="${param.categoryName != null ? param.categoryName : (m.category != null ? m.category.category_name : '')}" />
+                                    <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : (m.category != null ? m.category.category_id : '')}" />
+                                    <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="unitId" class="form-label">Unit</label>
-                                <select class="form-select" id="unitId" name="unitId">
-                                    <option value="">Select Unit</option>
-                                    <c:forEach items="${units}" var="unit">
-                                        <option value="${unit.id}"
-                                            <c:if test="${param.unitId != null ? param.unitId == unit.id : (m.unit != null && m.unit.id == unit.id)}">selected</c:if>>
-                                            ${unit.unitName}
-                                        </option>
-                                    </c:forEach>
-                                </select>
+                                <label for="unitInput" class="form-label">Unit</label>
+                                <div style="position: relative; display: inline-block; width: 100%;">
+                                    <input type="text" id="unitInput" name="unitName" class="form-control" placeholder="Unit..." autocomplete="off" value="${param.unitName != null ? param.unitName : (m.unit != null ? m.unit.unitName : '')}" />
+                                    <input type="hidden" id="unitId" name="unitId" value="${param.unitId != null ? param.unitId : (m.unit != null ? m.unit.id : '')}" />
+                                    <div id="unitSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -318,5 +310,96 @@
             }
         });
         </script>
+        <script>
+        // Truyền categories và units sang JS
+        var categories = [
+            <c:forEach var="cat" items="${categories}" varStatus="loop">
+                {id: ${cat.category_id}, name: "${cat.category_name}"}<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+        var units = [
+            <c:forEach var="u" items="${units}" varStatus="loop">
+                {id: ${u.id}, name: "${u.unitName}"}<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+
+        // Autocomplete cho category
+        const categoryInput = document.getElementById('categoryInput');
+        const categorySuggestions = document.getElementById('categorySuggestions');
+        const categoryHiddenId = document.getElementById('categoryId');
+        categoryInput.addEventListener('input', function() {
+            const value = this.value.trim().toLowerCase();
+            categorySuggestions.innerHTML = '';
+            categoryHiddenId.value = '';
+            if (value.length === 0) {
+                categorySuggestions.style.display = 'none';
+                return;
+            }
+            const matches = categories.filter(cat => cat.name.toLowerCase().includes(value));
+            if (matches.length === 0) {
+                categorySuggestions.style.display = 'none';
+                return;
+            }
+            matches.forEach(cat => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = cat.name;
+                item.onclick = function() {
+                    categoryInput.value = cat.name;
+                    categoryHiddenId.value = cat.id;
+                    categorySuggestions.innerHTML = '';
+                    categorySuggestions.style.display = 'none';
+                };
+                categorySuggestions.appendChild(item);
+            });
+            categorySuggestions.style.display = 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!categoryInput.contains(e.target) && !categorySuggestions.contains(e.target)) {
+                categorySuggestions.innerHTML = '';
+                categorySuggestions.style.display = 'none';
+            }
+        });
+
+        // Autocomplete cho unit
+        const unitInput = document.getElementById('unitInput');
+        const unitSuggestions = document.getElementById('unitSuggestions');
+        const unitHiddenId = document.getElementById('unitId');
+        unitInput.addEventListener('input', function() {
+            const value = this.value.trim().toLowerCase();
+            unitSuggestions.innerHTML = '';
+            unitHiddenId.value = '';
+            if (value.length === 0) {
+                unitSuggestions.style.display = 'none';
+                return;
+            }
+            const matches = units.filter(u => u.name.toLowerCase().includes(value));
+            if (matches.length === 0) {
+                unitSuggestions.style.display = 'none';
+                return;
+            }
+            matches.forEach(u => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = u.name;
+                item.onclick = function() {
+                    unitInput.value = u.name;
+                    unitHiddenId.value = u.id;
+                    unitSuggestions.innerHTML = '';
+                    unitSuggestions.style.display = 'none';
+                };
+                unitSuggestions.appendChild(item);
+            });
+            unitSuggestions.style.display = 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!unitInput.contains(e.target) && !unitSuggestions.contains(e.target)) {
+                unitSuggestions.innerHTML = '';
+                unitSuggestions.style.display = 'none';
+            }
+        });
+    </script>
     </body>
 </html>

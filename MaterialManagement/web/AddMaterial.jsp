@@ -117,22 +117,20 @@
                     <!-- Category and Unit -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="categoryId" class="form-label required-field">Category</label>
-                            <select class="form-select" id="categoryId" name="categoryId">
-                                <option value="">Select Category</option>
-                                <c:forEach items="${categories}" var="category">
-                                    <option value="${category.category_id}" <c:if test="${(param.categoryId != null ? param.categoryId : categoryId) == category.category_id}">selected</c:if>>${category.category_name}</option>
-                                </c:forEach>
-                            </select>
+                            <label for="categoryInput" class="form-label required-field">Category</label>
+                            <div style="position: relative; display: inline-block; width: 100%;">
+                                <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" value="${param.categoryName != null ? param.categoryName : ''}" />
+                                <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : ''}" />
+                                <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="unitId" class="form-label required-field">Unit</label>
-                            <select class="form-select" id="unitId" name="unitId">
-                                <option value="" selected disabled>Select Unit</option>
-                                <c:forEach items="${units}" var="unit">
-                                    <option value="${unit.id}" <c:if test="${(param.unitId != null ? param.unitId : unitId) == unit.id}">selected</c:if>>${unit.unitName}</option>
-                                </c:forEach>
-                            </select>
+                            <label for="unitInput" class="form-label required-field">Unit</label>
+                            <div style="position: relative; display: inline-block; width: 100%;">
+                                <input type="text" id="unitInput" name="unitName" class="form-control" placeholder="Unit..." autocomplete="off" value="${param.unitName != null ? param.unitName : ''}" />
+                                <input type="hidden" id="unitId" name="unitId" value="${param.unitId != null ? param.unitId : ''}" />
+                                <div id="unitSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -198,23 +196,96 @@
             const url = event.target.value.trim();
             if (url) {
                 document.getElementById('imageFile').value = '';
-                // Nếu là tên file, tự động thêm prefix images/material/
-                let previewUrl = url;
-                if (!url.startsWith('http')) {
-                    previewUrl = 'images/material/' + url;
-                }
-                document.getElementById('previewImg').src = previewUrl;
-                document.getElementById('imagePreview').style.display = 'block';
-                const urlTab = document.getElementById('url-tab');
-                bootstrap.Tab.getOrCreateInstance(urlTab).show();
             }
         });
 
-        document.getElementById('imageInputTabs').addEventListener('shown.bs.tab', function (event) {
-            if (event.target.id === 'upload-tab') {
-                document.getElementById('materialsUrl').value = '';
-            } else if (event.target.id === 'url-tab') {
-                document.getElementById('imageFile').value = '';
+        // Truyền categories và units sang JS
+        var categories = [
+            <c:forEach var="cat" items="${categories}" varStatus="loop">
+                {id: ${cat.category_id}, name: "${cat.category_name}"}<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+        var units = [
+            <c:forEach var="u" items="${units}" varStatus="loop">
+                {id: ${u.id}, name: "${u.unitName}"}<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+
+        // Autocomplete cho category
+        const categoryInput = document.getElementById('categoryInput');
+        const categorySuggestions = document.getElementById('categorySuggestions');
+        const categoryHiddenId = document.getElementById('categoryId');
+        categoryInput.addEventListener('input', function() {
+            const value = this.value.trim().toLowerCase();
+            categorySuggestions.innerHTML = '';
+            categoryHiddenId.value = '';
+            if (value.length === 0) {
+                categorySuggestions.style.display = 'none';
+                return;
+            }
+            const matches = categories.filter(cat => cat.name.toLowerCase().includes(value));
+            if (matches.length === 0) {
+                categorySuggestions.style.display = 'none';
+                return;
+            }
+            matches.forEach(cat => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = cat.name;
+                item.onclick = function() {
+                    categoryInput.value = cat.name;
+                    categoryHiddenId.value = cat.id;
+                    categorySuggestions.innerHTML = '';
+                    categorySuggestions.style.display = 'none';
+                };
+                categorySuggestions.appendChild(item);
+            });
+            categorySuggestions.style.display = 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!categoryInput.contains(e.target) && !categorySuggestions.contains(e.target)) {
+                categorySuggestions.innerHTML = '';
+                categorySuggestions.style.display = 'none';
+            }
+        });
+
+        // Autocomplete cho unit
+        const unitInput = document.getElementById('unitInput');
+        const unitSuggestions = document.getElementById('unitSuggestions');
+        const unitHiddenId = document.getElementById('unitId');
+        unitInput.addEventListener('input', function() {
+            const value = this.value.trim().toLowerCase();
+            unitSuggestions.innerHTML = '';
+            unitHiddenId.value = '';
+            if (value.length === 0) {
+                unitSuggestions.style.display = 'none';
+                return;
+            }
+            const matches = units.filter(u => u.name.toLowerCase().includes(value));
+            if (matches.length === 0) {
+                unitSuggestions.style.display = 'none';
+                return;
+            }
+            matches.forEach(u => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = u.name;
+                item.onclick = function() {
+                    unitInput.value = u.name;
+                    unitHiddenId.value = u.id;
+                    unitSuggestions.innerHTML = '';
+                    unitSuggestions.style.display = 'none';
+                };
+                unitSuggestions.appendChild(item);
+            });
+            unitSuggestions.style.display = 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!unitInput.contains(e.target) && !unitSuggestions.contains(e.target)) {
+                unitSuggestions.innerHTML = '';
+                unitSuggestions.style.display = 'none';
             }
         });
     </script>
