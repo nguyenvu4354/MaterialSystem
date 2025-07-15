@@ -1,4 +1,4 @@
-image.png<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -379,7 +379,7 @@ image.png<%@ page language="java" contentType="text/html; charset=UTF-8" pageEnc
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Destination</label>
-                                    <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>" required placeholder="Enter destination (e.g. warehouse, room, etc.)" value="${param.destination}">
+                                    <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>"  value="${param.destination}">
                                     <div class="invalid-feedback" id="destinationError">
                                         <c:choose>
                                             <c:when test="${not empty formErrors['destination']}">
