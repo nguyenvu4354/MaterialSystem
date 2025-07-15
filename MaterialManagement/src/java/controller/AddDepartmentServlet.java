@@ -15,26 +15,40 @@ import java.time.LocalDateTime;
 
 @WebServlet(urlPatterns = {"/adddepartment"})
 public class AddDepartmentServlet extends HttpServlet {
-    private DepartmentDAO departmentDAO = new DepartmentDAO();
-    private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+    private DepartmentDAO departmentDAO;
+    private RolePermissionDAO rolePermissionDAO;
+
+    @Override
+    public void init() throws ServletException {
+        departmentDAO = new DepartmentDAO();
+        rolePermissionDAO = new RolePermissionDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        if (session == null || session.getAttribute("user") == null) {
+            String requestURI = request.getRequestURI();
+            String queryString = request.getQueryString();
+            if (queryString != null) {
+                requestURI += "?" + queryString;
+            }
+            session = request.getSession();
+            session.setAttribute("redirectURL", requestURI);
+            response.sendRedirect("LoginServlet");
             return;
         }
 
+        User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
             request.setAttribute("error", "Bạn không có quyền thêm phòng ban.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
+        request.setAttribute("rolePermissionDAO", rolePermissionDAO);
         request.getRequestDispatcher("DepartmentForm.jsp").forward(request, response);
     }
 
@@ -42,19 +56,21 @@ public class AddDepartmentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
-        if (user == null) {
-            response.sendRedirect("Login.jsp");
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("LoginServlet");
             return;
         }
 
-        System.out.println("✅ POST request received for /adddepartment at " + LocalDateTime.now());
+        User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
-        if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
+        if (!rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
             request.setAttribute("error", "Bạn không có quyền thêm phòng ban.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
 
         try {
             String name = request.getParameter("name");
@@ -63,10 +79,13 @@ public class AddDepartmentServlet extends HttpServlet {
             String location = request.getParameter("location");
             String description = request.getParameter("description");
 
-            System.out.println("✅ Received data - Name: " + name + ", Phone: " + phone + ", Email: " + email);
-
             if (name == null || name.trim().isEmpty()) {
                 request.setAttribute("error", "Tên phòng ban không được để trống.");
+                request.setAttribute("name", name);
+                request.setAttribute("phone", phone);
+                request.setAttribute("email", email);
+                request.setAttribute("location", location);
+                request.setAttribute("description", description);
                 request.getRequestDispatcher("DepartmentForm.jsp").forward(request, response);
                 return;
             }
@@ -81,16 +100,16 @@ public class AddDepartmentServlet extends HttpServlet {
             dept.setCreatedAt(LocalDateTime.now());
             dept.setUpdatedAt(LocalDateTime.now());
             dept.setDepartmentCode(departmentDAO.generateUniqueDepartmentCode());
-            System.out.println("✅ Generated department code: " + dept.getDepartmentCode());
 
             departmentDAO.addDepartment(dept);
-            System.out.println("✅ Department added successfully, ID: " + dept.getDepartmentId());
-            request.setAttribute("message", "Thêm phòng ban thành công!");
             response.sendRedirect(request.getContextPath() + "/depairmentlist");
         } catch (Exception e) {
-            System.out.println("❌ Lỗi khi thêm phòng ban: " + e.getMessage());
-            e.printStackTrace();
             request.setAttribute("error", "Lỗi khi thêm phòng ban: " + e.getMessage());
+            request.setAttribute("name", request.getParameter("name"));
+            request.setAttribute("phone", request.getParameter("phone"));
+            request.setAttribute("email", request.getParameter("email"));
+            request.setAttribute("location", request.getParameter("location"));
+            request.setAttribute("description", request.getParameter("description"));
             request.getRequestDispatcher("DepartmentForm.jsp").forward(request, response);
         }
     }

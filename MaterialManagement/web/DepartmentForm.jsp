@@ -71,7 +71,8 @@
     <div class="container mt-5">
         <!-- Kiểm tra quyền trước khi hiển thị form -->
         <c:choose>
-            <c:when test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_DEPARTMENT')}">
+                        <c:when test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_DEPARTMENT')}">
+
                 <div class="unit-card card shadow">
                     <div class="card-header card-header-brown text-white">
                         Add Department
