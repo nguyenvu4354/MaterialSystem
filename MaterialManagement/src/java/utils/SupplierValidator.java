@@ -17,29 +17,30 @@ public class SupplierValidator {
             errors.put("supplierCode", "Supplier code already exists, please enter a different one!");
         }
 
-        // Validate supplierName
+        // Validate supplier name
         if (supplier.getSupplierName() == null || supplier.getSupplierName().trim().isEmpty()) {
             errors.put("supplierName", "Supplier name cannot be empty.");
+        } else if (supplier.getSupplierName().trim().length() < 3) {
+            errors.put("supplierName", "Supplier name must be at least 3 characters.");
         } else if (supplier.getSupplierName().trim().length() > 100) {
             errors.put("supplierName", "Supplier name cannot exceed 100 characters.");
-        } else if (!supplier.getSupplierName().trim().matches(".*\\S.*")) {
-            errors.put("supplierName", "Supplier name cannot be just spaces.");
         }
-
-        // Validate contactInfo
+        // Validate contact info
         if (supplier.getContactInfo() == null || supplier.getContactInfo().trim().isEmpty()) {
-            errors.put("contactInfo", "Contact Info is required.");
+            errors.put("contactInfo", "Contact info cannot be empty.");
+        } else if (supplier.getContactInfo().trim().length() < 3) {
+            errors.put("contactInfo", "Contact info must be at least 3 characters.");
         } else if (supplier.getContactInfo().trim().length() > 100) {
-            errors.put("contactInfo", "Contact Info cannot exceed 100 characters.");
+            errors.put("contactInfo", "Contact info cannot exceed 100 characters.");
         }
-
         // Validate address
         if (supplier.getAddress() == null || supplier.getAddress().trim().isEmpty()) {
-            errors.put("address", "Address is required.");
+            errors.put("address", "Address cannot be empty.");
+        } else if (supplier.getAddress().trim().length() < 5) {
+            errors.put("address", "Address must be at least 5 characters.");
         } else if (supplier.getAddress().trim().length() > 200) {
             errors.put("address", "Address cannot exceed 200 characters.");
         }
-
         // Validate phoneNumber
         if (supplier.getPhoneNumber() == null || supplier.getPhoneNumber().trim().isEmpty()) {
             errors.put("phoneNumber", "Phone Number is required.");
@@ -54,11 +55,15 @@ public class SupplierValidator {
             errors.put("email", "Please enter a valid email address.");
         }
 
-        // Validate taxId
+        // Validate tax id
         if (supplier.getTaxId() == null || supplier.getTaxId().trim().isEmpty()) {
-            errors.put("taxId", "Tax ID is required.");
-        } else if (!supplier.getTaxId().trim().matches("[A-Za-z0-9]{1,20}")) {
-            errors.put("taxId", "Please enter a valid Tax ID (letters and numbers only, max 20 characters).");
+            errors.put("taxId", "Tax ID cannot be empty.");
+        } else if (supplier.getTaxId().trim().length() < 5) {
+            errors.put("taxId", "Tax ID must be at least 5 characters.");
+        } else if (supplier.getTaxId().trim().length() > 20) {
+            errors.put("taxId", "Tax ID cannot exceed 20 characters.");
+        } else if (!supplier.getTaxId().matches("[A-Za-z0-9]+")) {
+            errors.put("taxId", "Tax ID must contain only letters and numbers.");
         }
 
         // Validate description (optional field)

@@ -29,8 +29,12 @@
           <div class="card p-4 shadow border-0">
             <div class="card-body">
               <% String step = (String) request.getAttribute("step");
-                 String message = (String) request.getAttribute("message"); %>
+                 String message = (String) request.getAttribute("message");
+                 String error = (String) request.getAttribute("error"); %>
               <% if (step == null || step.equals("email")) { %>
+                <% if (error != null) { %>
+                  <div class="alert alert-danger text-center"> <%= error %> </div>
+                <% } %>
                 <% if (message != null) { %>
                   <div class="alert alert-info text-center"> <%= message %> </div>
                 <% } %>

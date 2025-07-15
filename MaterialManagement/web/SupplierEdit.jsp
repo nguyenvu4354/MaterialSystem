@@ -69,20 +69,20 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               </div>
               <div class="col-md-6">
                 <label for="supplier_name" class="form-label required-field">Supplier Name</label>
-                <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="${supplier != null ? supplier.supplierName : ''}" required maxlength="100" pattern=".*\S.*" />
-                <div class="invalid-feedback">Please enter a valid supplier name (not empty, max 100 characters).</div>
+                <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="${supplier != null ? supplier.supplierName : ''}" required maxlength="100" minlength="3" pattern=".*\S.*" />
+                <div class="invalid-feedback">Please enter a valid supplier name (not empty, 3-100 characters).</div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="contact_info" class="form-label required-field">Contact Info</label>
-                <input type="text" class="form-control" id="contact_info" name="contact_info" value="${supplier != null ? supplier.contactInfo : ''}" maxlength="100" required />
-                <div class="invalid-feedback">Please enter contact information.</div>
+                <input type="text" class="form-control" id="contact_info" name="contact_info" value="${supplier != null ? supplier.contactInfo : ''}" maxlength="100" required minlength="3" />
+                <div class="invalid-feedback">Please enter contact information (at least 3 characters).</div>
               </div>
               <div class="col-md-6">
                 <label for="address" class="form-label required-field">Address</label>
-                <input type="text" class="form-control" id="address" name="address" value="${supplier != null ? supplier.address : ''}" maxlength="200" required />
-                <div class="invalid-feedback">Please enter supplier address.</div>
+                <input type="text" class="form-control" id="address" name="address" value="${supplier != null ? supplier.address : ''}" maxlength="200" required minlength="5" />
+                <div class="invalid-feedback">Please enter supplier address (at least 5 characters).</div>
               </div>
             </div>
             <div class="row mb-3">
@@ -104,8 +104,8 @@ uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
               </div>
               <div class="col-md-6">
                 <label for="tax_id" class="form-label required-field">Tax ID</label>
-                <input type="text" class="form-control" id="tax_id" name="tax_id" value="${supplier != null ? supplier.taxId : ''}" pattern="[A-Za-z0-9]{1,20}" maxlength="20" required />
-                <div class="invalid-feedback">Please enter a valid Tax ID (letters and numbers only, max 20 characters).</div>
+                <input type="text" class="form-control" id="tax_id" name="tax_id" value="${supplier != null ? supplier.taxId : ''}" pattern="[A-Za-z0-9]{1,20}" maxlength="20" minlength="5" required />
+                <div class="invalid-feedback">Please enter a valid Tax ID (letters and numbers only, 5-20 characters).</div>
                 <div class="form-text">Enter the supplier's tax identification number.</div>
               </div>
             </div>

@@ -6,6 +6,7 @@
 package controller;
 
 import dal.PasswordResetRequestsDAO;
+import dal.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -71,6 +72,14 @@ public class ForgotPasswordServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         String email = request.getParameter("email");
+        UserDAO userDAO = new UserDAO();
+        if (!userDAO.isEmailExists(email)) {
+            request.setAttribute("error", "This email does not exist or has not been verified!");
+            request.setAttribute("step", "email");
+            request.setAttribute("enteredEmail", email);
+            request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
+            return;
+        }
         PasswordResetRequestsDAO dao = new PasswordResetRequestsDAO();
         dao.insertRequest(email);
         try {

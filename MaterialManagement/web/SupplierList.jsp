@@ -167,15 +167,15 @@
                     <nav>
                         <ul class="pagination justify-content-center mt-4">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierList?page=${currentPage - 1}">Previous</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage - 1}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="SupplierList?page=${i}">${i}</a>
+                                    <a class="page-link" href="Supplier?action=list&page=${i}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="SupplierList?page=${currentPage + 1}">Next</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage + 1}">Next</a>
                             </li>
                         </ul>
                     </nav>
