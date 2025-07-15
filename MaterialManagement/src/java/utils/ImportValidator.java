@@ -20,8 +20,8 @@ public class ImportValidator {
         // Validate destination 
         if (imp.getDestination() == null || imp.getDestination().trim().isEmpty()) {
             errors.put("destination", "Destination cannot be empty.");
-        } else if (imp.getDestination().trim().length() > 50) {
-            errors.put("destination", "Destination cannot exceed 50 characters.");
+        } else if (imp.getDestination().trim().length() > 100) {
+            errors.put("destination", "Destination cannot exceed 100 characters.");
         }
 
         // Validate batchNumber
@@ -84,8 +84,8 @@ public class ImportValidator {
         // Validate destination 
         if (destination == null || destination.trim().isEmpty()) {
             errors.put("destination", "Destination cannot be empty.");
-        } else if (destination.trim().length() > 50) {
-            errors.put("destination", "Destination cannot exceed 50 characters.");
+        } else if (destination.trim().length() > 100) {
+            errors.put("destination", "Destination cannot exceed 100 characters.");
         }
 
         // Validate batchNumber
