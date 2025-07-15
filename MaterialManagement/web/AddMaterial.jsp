@@ -69,7 +69,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${param.materialCode != null ? param.materialCode : (materialCode != null ? materialCode : '')}" readonly>
+                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="materialName" class="form-label required-field">Material Name</label>

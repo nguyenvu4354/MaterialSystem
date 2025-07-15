@@ -647,6 +647,20 @@ public class MaterialDAO extends DBContext {
         return materialImages;
     }
 
+    // Lấy số lớn nhất sau tiền tố 'MAT' trong mã vật tư
+    public int getMaxMaterialNumber() {
+        int max = 0;
+        String sql = "SELECT MAX(CAST(SUBSTRING(material_code, 4) AS UNSIGNED)) AS max_num FROM materials WHERE material_code LIKE 'MAT%'";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                max = rs.getInt("max_num");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return max;
+    }
+
     public static void main(String[] args) {
         MaterialDAO md = new MaterialDAO();
 

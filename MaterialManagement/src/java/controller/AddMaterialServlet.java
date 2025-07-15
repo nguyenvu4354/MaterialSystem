@@ -65,8 +65,10 @@ public class AddMaterialServlet extends HttpServlet {
         request.setAttribute("categories", cd.getAllCategories());
         request.setAttribute("units", ud.getAllUnits());
 
-        String code = "MTL-" + new java.text.SimpleDateFormat("yyyyMMdd-HHmmss").format(new java.util.Date()) + "-" + (int)(Math.random()*900+100);
-        request.setAttribute("materialCode", code);
+        MaterialDAO materialDAO = new MaterialDAO();
+        int maxNum = materialDAO.getMaxMaterialNumber();
+        String newMaterialCode = "MAT" + (maxNum + 1);
+        request.setAttribute("materialCode", newMaterialCode);
 
         request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
     }
