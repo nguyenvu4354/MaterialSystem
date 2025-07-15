@@ -611,30 +611,32 @@ public class MaterialDAO extends DBContext {
         }
         return materialId;
     }
-    
+
     // Method để lấy Map chứa thông tin hình ảnh của các material
     public java.util.Map<Integer, String> getMaterialImages(List<Integer> materialIds) {
         java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
         if (materialIds == null || materialIds.isEmpty()) {
             return materialImages;
         }
-        
+
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT material_id, materials_url FROM materials WHERE material_id IN (");
-            
+
             // Tạo placeholders cho IN clause
             for (int i = 0; i < materialIds.size(); i++) {
-                if (i > 0) sql.append(",");
+                if (i > 0) {
+                    sql.append(",");
+                }
                 sql.append("?");
             }
             sql.append(")");
-            
+
             PreparedStatement ps = connection.prepareStatement(sql.toString());
             for (int i = 0; i < materialIds.size(); i++) {
                 ps.setInt(i + 1, materialIds.get(i));
             }
-            
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int materialId = rs.getInt("material_id");
@@ -681,6 +683,114 @@ public class MaterialDAO extends DBContext {
         System.out.println("Sau khi update:");
         System.out.println("Tên: " + m2.getMaterialName());
         System.out.println("Updated_at: " + m2.getUpdatedAt());
+    }
+
+    public List<Material> searchMaterialsByPrice(Double minPrice, Double maxPrice, int pageIndex, int pageSize, String sortOption) {
+        List<Material> list = new ArrayList<>();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT m.*, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS quantity ")
+                    .append("FROM materials m ")
+                    .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
+                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("LEFT JOIN inventory i ON m.material_id = i.material_id ")
+                    .append("WHERE m.disable = 0 ");
+
+            List<Object> params = new ArrayList<>();
+
+            // Thêm điều kiện lọc theo giá
+            if (minPrice != null) {
+                sql.append("AND m.price >= ? ");
+                params.add(minPrice);
+            }
+            if (maxPrice != null) {
+                sql.append("AND m.price <= ? ");
+                params.add(maxPrice);
+            }
+
+            // Xử lý sắp xếp
+            String sortBy = "m.material_code"; // default
+            String sortOrder = "ASC";
+
+            switch (sortOption) {
+                case "name_asc":
+                    sortBy = "m.material_name";
+                    sortOrder = "ASC";
+                    break;
+                case "name_desc":
+                    sortBy = "m.material_name";
+                    sortOrder = "DESC";
+                    break;
+                case "code_asc":
+                    sortBy = "m.material_code";
+                    sortOrder = "ASC";
+                    break;
+                case "code_desc":
+                    sortBy = "m.material_code";
+                    sortOrder = "DESC";
+                    break;
+                case "condition_asc":
+                    sortBy = "m.condition_percentage";
+                    sortOrder = "ASC";
+                    break;
+                case "condition_desc":
+                    sortBy = "m.condition_percentage";
+                    sortOrder = "DESC";
+                    break;
+                case "price_asc":
+                    sortBy = "m.price";
+                    sortOrder = "ASC";
+                    break;
+                case "price_desc":
+                    sortBy = "m.price";
+                    sortOrder = "DESC";
+                    break;
+            }
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
+
+            // Phân trang
+            sql.append("LIMIT ? OFFSET ?");
+            params.add(pageSize);
+            params.add((pageIndex - 1) * pageSize);
+
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+
+            // Gán tham số
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Material m = new Material();
+                m.setMaterialId(rs.getInt("material_id"));
+                m.setMaterialCode(rs.getString("material_code"));
+                m.setMaterialName(rs.getString("material_name"));
+                m.setMaterialsUrl(rs.getString("materials_url"));
+                m.setMaterialStatus(rs.getString("material_status"));
+                m.setConditionPercentage(rs.getInt("condition_percentage"));
+                m.setPrice(rs.getDouble("price"));
+                m.setQuantity(rs.getInt("quantity"));
+
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                Category c = new Category();
+                c.setCategory_id(rs.getInt("category_id"));
+                c.setCategory_name(rs.getString("category_name"));
+                m.setCategory(c);
+
+                Unit u = new Unit();
+                u.setId(rs.getInt("unit_id"));
+                u.setUnitName(rs.getString("unit_name"));
+                m.setUnit(u);
+
+                list.add(m);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return list;
     }
 
 }

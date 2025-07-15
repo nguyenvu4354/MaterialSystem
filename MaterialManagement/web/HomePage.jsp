@@ -531,33 +531,16 @@
     </head>
     <body>
         <div class="top-bar py-2">
-            <div class="container d-flex justify-content-between align-items-center flex-wrap position-relative">
-                <div class="d-flex align-items-center ms-auto gap-2" style="z-index:3;">
-                    <button id="showSearchBtn" class="btn btn-topbar me-1"><i class="fas fa-search"></i></button>
-                    <div class="dropdown">
-                        <button class="btn btn-topbar" type="button" id="menuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-list-ul"></i>
+            <div class="container d-flex justify-content-center align-items-center position-relative">
+                <form id="searchOverlay" action="search" method="get" class="search-overlay-form" style="max-width: 400px; width: 100%;">
+                    <div class="input-group" style="border-radius: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff;">
+                        <span class="input-group-text bg-white border-0" style="border-radius: 24px 0 0 24px;">
+                            <i class="fas fa-search" style="color: #DEAD6F;"></i>
+                        </span>
+                        <input class="form-control border-0" type="search" name="keyword" placeholder="Find material..." required style="border-radius: 0 24px 24px 0; height: 44px; background: #fff; color: #222;">
+                        <button class="btn btn-main" type="submit" style="border-radius: 24px; height: 44px; min-width: 44px;">
+                            <i class="fas fa-search"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="menuDropdown" style="min-width:220px;">
-                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="home"><i class="fas fa-home"></i> Home</a></li>
-                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="view"><i class="fas fa-list"></i> Material List</a></li>
-                            <li><a class="dropdown-item d-flex align-items-center gap-2" href="viewsupplier"><i class="fas fa-truck"></i> Suppliers</a></li>
-                            <li>
-                                <a href="#" class="dropdown-item d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#contactModal">
-                                    <i class="fas fa-user-shield me-2"></i>Contact
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <button type="button" class="btn btn-login ms-1" onclick="window.location.href = 'Login.jsp'">
-                        <i class="fas fa-user"></i>
-                    </button>
-                </div>
-                <form id="searchOverlay" action="search" method="get" class="search-overlay-form position-absolute top-0 start-50 translate-middle-x d-none" style="z-index:20;max-width:400px;width:100%;">
-                    <div class="input-group" style="border-radius:24px;box-shadow:0 2px 8px rgba(52,152,219,0.18);background:#fff;">
-                        <span class="input-group-text bg-white border-0" style="border-radius:24px 0 0 24px;"><i class="fas fa-search"></i></span>
-                        <input class="form-control border-0" type="search" name="keyword" placeholder="Find material..." required style="border-radius:0 24px 24px 0;height:44px;">
-                        <button class="btn btn-main" type="submit" style="border-radius:24px;height:44px;min-width:44px;"><i class="fas fa-search"></i></button>
                     </div>
                 </form>
             </div>
@@ -593,17 +576,16 @@
                 </div>
             </div>
         </section>
-      
+
         <div class="container-fluid my-5">
             <div class="row">
                 <div class="col-md-2 sidebar-col mt-5">
                     <div class="sidebar">
                         <h3 class="mb-4">Categories</h3>
-
                         <ul class="list-unstyled">
                             <c:forEach var="c" items="${categories}">
                                 <li>
-                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item">
+                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item" data-category-id="${c.category_id}">
                                         <h5>${c.category_name}</h5>
                                     </a>
                                 </li>
@@ -611,13 +593,39 @@
                         </ul>
                     </div>
                 </div>
+
                 <div class="col-md-10 mb-1">
                     <div class="content">
                         <section id="clothing" class="my-5 overflow-hidden">
                             <div class="container pb-5">
-                                <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
+                                <div class="section-header d-md-flex justify-content-between align-items-center mb-4">
                                     <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material Inventory</h2>
+                                    <!-- Form tìm kiếm theo giá -->
+                                    <form action="searchPrice" method="get" style="display: flex; margin-right: 200px">
+                                        <div class="input-group" style="max-width: 300px;">
+                                            <span class="input-group-text bg-white border-0" style="border-radius: 24px 0 0 24px;">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </span>
+                                            <input type="number" name="minPrice" class="form-control" placeholder="Min Price" 
+                                                   value="${minPrice}" min="0" step="0.01" style="border-radius: 0;">
+                                            <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" 
+                                                   value="${maxPrice}" min="0" step="0.01" style="border-radius: 0 24px 24px 0;">
+                                        </div>
+                                        <!--                            <select name="sort" class="form-select" style="max-width: 200px; height: 44px;">
+                                                                        <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code ↑</option>
+                                                                        <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code ↓</option>
+                                                                        <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name ↑</option>
+                                                                        <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name ↓</option>
+                                                                        <option value="price_asc" ${sortOption == 'price_asc' ? 'selected' : ''}>Price ↑</option>
+                                                                        <option value="price_desc" ${sortOption == 'price_desc' ? 'selected' : ''}>Price ↓</option>
+                                                                        <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition ↑</option>
+                                                                        <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition ↓</option>
+                                                                    </select>-->
+                                        <button type="submit" class="btn btn-main" style="height: 44px;">Search</button>
+                                        <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-main" style="height: 44px;">Clear</a>
+                                    </form>
                                 </div>
+
                                 <div class="card-container">
                                     <c:forEach var="product" items="${productList}">
                                         <div class="product-card">
@@ -631,6 +639,8 @@
                                             </div>
                                         </div>
                                     </c:forEach>
+
+                                    <!-- Pagination -->
                                     <nav aria-label="Page navigation" style="padding-left: 500px">
                                         <ul class="pagination justify-content-center mt-4" id="pagination">
                                             <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
@@ -643,6 +653,7 @@
                         </section>
                     </div>
                 </div>
+
             </div>
         </div>
         <footer id="footer" class="footer-mms mt-5">
@@ -707,10 +718,10 @@
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-                        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-                        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-                            return new bootstrap.Popover(popoverTriggerEl);
-                        });
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
         </script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -770,6 +781,31 @@
                     });
                     showPage(1);
                 }
+            });
+        </script>
+        <script>
+            // JavaScript đơn giản (chỉ giữ thanh tìm kiếm nếu cần)
+            document.addEventListener('DOMContentLoaded', function () {
+                var showBtn = document.getElementById('showSearchBtn');
+                var overlay = document.getElementById('searchOverlay');
+                var input = overlay.querySelector('input');
+                showBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    overlay.classList.toggle('d-none');
+                    if (!overlay.classList.contains('d-none')) {
+                        setTimeout(function () {
+                            input.focus();
+                        }, 100);
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!overlay.classList.contains('d-none') && !overlay.contains(e.target) && e.target !== showBtn) {
+                        overlay.classList.add('d-none');
+                    }
+                });
+                overlay.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
             });
         </script>
     </body>
