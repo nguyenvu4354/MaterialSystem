@@ -32,7 +32,7 @@ public class DepartmentServlet extends HttpServlet {
         // Check VIEW_LIST_DEPARTMENT permission
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền xem danh sách phòng ban.");
+            request.setAttribute("error", "You do not have permission to view the department list.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -56,8 +56,8 @@ public class DepartmentServlet extends HttpServlet {
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.getRequestDispatcher("DepartmentList.jsp").forward(request, response);
         } catch (Exception e) {
-            System.out.println("❌ Lỗi khi lấy danh sách phòng ban: " + e.getMessage());
-            request.setAttribute("error", "Lỗi khi lấy danh sách phòng ban: " + e.getMessage());
+            System.out.println("❌ Error when getting department list: " + e.getMessage());
+            request.setAttribute("error", "Error when getting department list: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }

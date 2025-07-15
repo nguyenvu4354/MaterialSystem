@@ -24,43 +24,46 @@
                 border-radius: 12px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 display: inline-block;
+                border: 2px solid #DEB887;
             }
 
             .success {
                 font-size: 24px;
-                color: #4CAF50;
+                color: #DEB887; 
                 margin-bottom: 20px;
+                font-weight: bold;
             }
 
             .status {
                 font-size: 18px;
-                color: #ff9800;
+                color: #c49b63; 
+                margin-bottom: 20px;
             }
 
             .btn {
-                margin-top: 30px;
+                margin-top: 20px;
                 display: inline-block;
-                padding: 10px 20px;
+                padding: 12px 25px;
                 font-size: 16px;
                 text-decoration: none;
                 color: #fff;
-                background-color: #2196F3;
+                background-color: #DEB887; 
                 border-radius: 8px;
                 transition: background-color 0.3s ease;
+                margin-right: 10px;
             }
 
             .btn:hover {
-                background-color: #1976D2;
+                background-color: #c49b63; 
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="success">🛠 ️Repair request created successfully!</div>
-            <div class="status">⏳ Trạng thái hiện tại: <strong> Waiting for boss approval (Pending)</strong></div>
-            <a href="home" class="btn">Back To Home</a>
-            <a href="repairrequestlist" class="btn">List</a>
-
+            <div class="success">🛠️ Repair Request Created Successfully!</div>
+            <div class="status">⏳ Current Status: <strong>Waiting for Manager Approval (Pending)</strong></div>
+            <a href="home" class="btn">Back to Home</a>
+            <a href="repairrequestlist" class="btn">View List</a>
         </div>
     </body>
 </html>

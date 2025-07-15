@@ -61,7 +61,7 @@ public class RepairRequestListServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi truy xuất danh sách yêu cầu!");
+            request.setAttribute("error", "Error retrieving request list!");
         }
 
         request.getRequestDispatcher("RepairRequestList.jsp").forward(request, response);
