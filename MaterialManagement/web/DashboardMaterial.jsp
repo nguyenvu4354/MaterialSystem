@@ -129,6 +129,11 @@
                                     <option value="USED" ${status == 'USED' ? 'selected' : ''}>Used</option>
                                     <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
                                 </select>
+                                <div style="position: relative; display: inline-block;">
+                                    <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" style="width: 180px; height: 50px; border: 2px solid gray" value="${param.categoryName != null ? param.categoryName : ''}" />
+                                    <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : ''}" />
+                                    <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 180px;"></div>
+                                </div>
                                 <select name="sortOption" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                     <option value="">Sort By</option>
                                     <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
@@ -266,5 +271,55 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
+    <script>
+        // Chuyển categories sang mảng JSON cho JS
+        var categories = [
+            <c:forEach var="cat" items="${categories}" varStatus="loop">
+                {id: ${cat.category_id}, name: "${cat.category_name}"}<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+
+        // Autocomplete cho category
+        const input = document.getElementById('categoryInput');
+        const suggestions = document.getElementById('categorySuggestions');
+        const hiddenId = document.getElementById('categoryId');
+
+        input.addEventListener('input', function() {
+            const value = this.value.trim().toLowerCase();
+            suggestions.innerHTML = '';
+            hiddenId.value = '';
+            if (value.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            const matches = categories.filter(cat => cat.name.toLowerCase().includes(value));
+            if (matches.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            matches.forEach(cat => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = cat.name;
+                item.onclick = function() {
+                    input.value = cat.name;
+                    hiddenId.value = cat.id;
+                    suggestions.innerHTML = '';
+                    suggestions.style.display = 'none';
+                };
+                suggestions.appendChild(item);
+            });
+            suggestions.style.display = 'block';
+        });
+
+        // Ẩn gợi ý khi click ra ngoài
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+                suggestions.innerHTML = '';
+                suggestions.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
