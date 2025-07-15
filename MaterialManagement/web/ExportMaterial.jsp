@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="entity.User, java.util.Map" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -24,7 +23,6 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
               rel="stylesheet">
-        <!-- jQuery UI CSS -->
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <style>
             .material-form .form-control, .material-form .form-select {
@@ -77,7 +75,6 @@
             .material-form .form-control.is-invalid:focus {
                 box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
             }
-            /* Customize autocomplete UI */
             .ui-autocomplete {
                 max-height: 200px;
                 overflow-y: auto;
@@ -95,6 +92,31 @@
             }
             .ui-menu-item:hover {
                 background-color: #f8f9fa;
+            }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+            .pagination a {
+                margin: 0 5px;
+                padding: 8px 12px;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                background-color: #fff;
+                color: #0d6efd;
+                text-decoration: none;
+                font-size: 1rem;
+            }
+            .pagination a.active {
+                background-color: #0d6efd;
+                color: #fff;
+                border-color: #0d6efd;
+            }
+            .pagination a.disabled {
+                color: #6c757d;
+                cursor: not-allowed;
+                opacity: 0.5;
             }
         </style>
     </head>
@@ -119,10 +141,9 @@
                                 <div class="alert alert-success">${success}</div>
                             </c:if>
                             <c:if test="${not empty error}">
-                                <div class=" alert alert-danger">${error}</div>
+                                <div class="alert alert-danger">${error}</div>
                             </c:if>
 
-                            <!-- Add Material Form -->
                             <h3 class="fw-normal mb-3">Add Material to Export List</h3>
                             <form action="ExportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
                                 <input type="hidden" name="action" value="add">
@@ -147,7 +168,6 @@
                                 </div>
                             </form>
 
-                            <!-- Current Export List -->
                             <h3 class="fw-normal mb-3">Current Export List</h3>
                             <c:if test="${not empty exportDetails}">
                                 <div class="table-responsive">
@@ -186,6 +206,7 @@
                                                         <form action="ExportMaterial" method="post" class="d-flex align-items-center">
                                                             <input type="hidden" name="action" value="updateQuantity">
                                                             <input type="hidden" name="materialId" value="${detail.materialId}">
+                                                            <input type="hidden" name="page" value="${currentPage}">
                                                             <input type="number" name="quantity" value="${detail.quantity}" min="1"
                                                                    class="form-control me-2" style="width: 100px;" required>
                                                             <button type="submit" class="btn btn-outline-primary btn-sm" title="Update Quantity">
@@ -199,6 +220,7 @@
                                                             <input type="hidden" name="action" value="remove">
                                                             <input type="hidden" name="materialId" value="${detail.materialId}">
                                                             <input type="hidden" name="quantity" value="${detail.quantity}">
+                                                            <input type="hidden" name="page" value="${currentPage}">
                                                             <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
                                                         </form>
                                                     </td>
@@ -206,6 +228,25 @@
                                             </c:forEach>
                                         </tbody>
                                     </table>
+                                    <c:if test="${totalPages > 1}">
+                                        <div class="pagination">
+                                            <c:if test="${currentPage > 1}">
+                                                <a href="ExportMaterial?page=${currentPage - 1}">Previous</a>
+                                            </c:if>
+                                            <c:if test="${currentPage <= 1}">
+                                                <a class="disabled">Previous</a>
+                                            </c:if>
+                                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                                <a href="ExportMaterial?page=${i}" class="${i == currentPage ? 'active' : ''}">${i}</a>
+                                            </c:forEach>
+                                            <c:if test="${currentPage < totalPages}">
+                                                <a href="ExportMaterial?page=${currentPage + 1}">Next</a>
+                                            </c:if>
+                                            <c:if test="${currentPage >= totalPages}">
+                                                <a class="disabled">Next</a>
+                                            </c:if>
+                                        </div>
+                                    </c:if>
                                 </div>
                             </c:if>
                             <c:if test="${empty exportDetails}">
@@ -215,10 +256,10 @@
                                 </div>
                             </c:if>
 
-                            <!-- Confirm Export Form -->
                             <h3 class="fw-normal mb-3 mt-5">Confirm Export</h3>
                             <form action="ExportMaterial" method="post" class="confirm-form" onsubmit="return validateConfirmForm()">
                                 <input type="hidden" name="action" value="export">
+                                <input type="hidden" name="page" value="${currentPage}">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="recipientName" class="form-label text-muted">Recipient</label>
@@ -240,10 +281,12 @@
                                     <div class="col-md-6">
                                         <label for="batchNumber" class="form-label text-muted">Batch Number</label>
                                         <input type="text" name="batchNumber" id="batchNumber" maxlength="50" class="form-control" placeholder="Enter batch number">
+                                        <div class="invalid-feedback">Please enter a valid batch number.</div>
                                     </div>
                                     <div class="col-12">
                                         <label for="note" class="form-label text-muted">Note</label>
                                         <input type="text" name="note" id="note" maxlength="100" class="form-control" placeholder="Enter note">
+                                        <div class="invalid-feedback">Please enter a valid note.</div>
                                     </div>
                                     <div class="col-12 mt-4">
                                         <div class="d-grid gap-2">
@@ -265,7 +308,6 @@
         <script src="js/plugins.js"></script>
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -283,7 +325,6 @@
                     }, 3000);
                 });
 
-                // Material list for autocomplete
                 const materials = [
                     <c:forEach var="material" items="${materials}" varStatus="loop">
                         {
@@ -296,7 +337,6 @@
                     </c:forEach>
                 ];
 
-                // Initialize autocomplete for materialName
                 $("#materialName").autocomplete({
                     source: function(request, response) {
                         const term = request.term.toLowerCase();
@@ -394,6 +434,8 @@
                     let isValid = true;
                     const recipientId = form.querySelector('#recipientUserId');
                     const recipientName = form.querySelector('#recipientName');
+                    const batchNumber = form.querySelector('#batchNumber');
+                    const note = form.querySelector('#note');
 
                     if (!recipientId.value) {
                         recipientName.classList.add('is-invalid');
@@ -402,7 +444,25 @@
                         recipientName.classList.remove('is-invalid');
                     }
 
-                    if (${fn:length(exportDetails)} === 0) {
+                    if (batchNumber.value.length > 50) {
+                        batchNumber.classList.add('is-invalid');
+                        batchNumber.nextElementSibling.textContent = 'Batch number must not exceed 50 characters.';
+                        isValid = false;
+                    } else {
+                        batchNumber.classList.remove('is-invalid');
+                        batchNumber.nextElementSibling.textContent = 'Please enter a valid batch number.';
+                    }
+
+                    if (note.value.length > 100) {
+                        note.classList.add('is-invalid');
+                        note.nextElementSibling.textContent = 'Note must not exceed 100 characters.';
+                        isValid = false;
+                    } else {
+                        note.classList.remove('is-invalid');
+                        note.nextElementSibling.textContent = 'Please enter a valid note.';
+                    }
+
+                    if (${fn:length(fullExportDetails)} === 0) {
                         alert("Cannot confirm export: The material list is empty.");
                         isValid = false;
                     }
