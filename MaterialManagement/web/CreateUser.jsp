@@ -20,7 +20,6 @@
     <title>Waggy - Create New User</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap & Custom CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
@@ -34,19 +33,19 @@
             padding-left: 20px;
             font-family: 'Roboto', sans-serif;
         }
-        .two-column-form .form-control, .two-column-form .form-select {
+        .form-container .form-control, .form-container .form-select {
             height: 48px;
             font-size: 1rem;
         }
-        .two-column-form .form-label {
+        .form-container .form-label {
             font-size: 0.9rem;
             margin-bottom: 0.25rem;
         }
-        .two-column-form .btn {
+        .form-container .btn {
             font-size: 1rem;
             padding: 0.75rem;
         }
-        .two-column-form .img-thumbnail {
+        .form-container .img-thumbnail {
             max-height: 150px;
         }
     </style>
@@ -56,17 +55,15 @@
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 bg-light p-0">
                 <jsp:include page="Sidebar.jsp" />
             </div>
 
-            <!-- Content -->
             <div class="col-md-9 col-lg-10 px-md-4 py-4">
                 <section id="CreateUser" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
                     <div class="container">
                         <div class="row my-5 py-5">
-                            <div class="col-10 bg-white p-4 mx-auto rounded shadow two-column-form">
+                            <div class="col-10 bg-white p-4 mx-auto rounded shadow form-container">
                                 <h2 class="display-4 fw-normal text-center mb-4">Create New <span class="text-primary">User</span></h2>
                                 <%
                                     String message = (String) request.getAttribute("message");
@@ -80,7 +77,6 @@
                                 <% } %>
                                 <form action="${pageContext.request.contextPath}/CreateUser" method="post" enctype="multipart/form-data">
                                     <div class="row">
-                                        <!-- Left Column -->
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="username" class="form-label text-muted">Username</label>
@@ -127,14 +123,18 @@
                                                     <div class="invalid-feedback"><%= errors.get("phoneNumber") %></div>
                                                 <% } %>
                                             </div>
-                                        </div>
-                                        <!-- Right Column -->
-                                        <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="address" class="form-label text-muted">Address</label>
                                                 <input type="text" class="form-control" name="address" id="address"
                                                        placeholder="Enter Address" maxlength="255"
                                                        value="<%= enteredUser != null && enteredUser.getAddress() != null ? enteredUser.getAddress() : "" %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="userPicture" class="form-label text-muted">User Picture</label>
+                                                <input class="form-control" type="file" name="userPicture" id="userPicture" accept="image/*">
+                                                <img id="previewImage" src="#" alt="Image Preview" class="img-thumbnail mt-3" style="display:none; max-height: 150px;">
                                             </div>
                                             <div class="mb-3">
                                                 <label for="dateOfBirth" class="form-label text-muted">Date of Birth</label>
@@ -179,14 +179,9 @@
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="description" class="form-label text-muted">Description</label>
+                                                <label for="description" class="seqform-label text-muted">Description</label>
                                                 <textarea class="form-control" name="description" id="description" rows="3"
                                                           placeholder="Enter Description"><%= enteredUser != null && enteredUser.getDescription() != null ? enteredUser.getDescription() : "" %></textarea>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="userPicture" class="form-label text-muted">User Picture</label>
-                                                <input class="form-control" type="file" name="userPicture" id="userPicture" accept="image/*">
-                                                <img id="previewImage" src="#" alt="Image Preview" class="img-thumbnail mt-3" style="display:none; max-height: 150px;">
                                             </div>
                                         </div>
                                     </div>
@@ -209,14 +204,12 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer py-4 bg-light mt-auto">
         <div class="container text-center">
             <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     <script src="js/jquery-1.11.0.min.js"></script>

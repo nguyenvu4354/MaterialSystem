@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Random;
 
 @WebServlet(name = "CreateUserServlet", value = "/CreateUser")
 @MultipartConfig
@@ -33,6 +34,7 @@ public class CreateUserServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
     private DepartmentDAO departmentDAO = new DepartmentDAO();
+    private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -85,6 +87,8 @@ public class CreateUserServlet extends HttpServlet {
             int roleId = 0;
             Integer departmentId = null;
 
+            String modifiedUsername = username + generateRandomLetters(5);
+
             try {
                 roleId = Integer.parseInt(roleIdStr);
             } catch (NumberFormatException e) {
@@ -102,7 +106,7 @@ public class CreateUserServlet extends HttpServlet {
             }
 
             User newUser = new User();
-            newUser.setUsername(username);
+            newUser.setUsername(modifiedUsername);
             String hashedPassword = hashPasswordWithMD5(password);
             newUser.setPassword(hashedPassword);
             newUser.setFullName(fullName);
@@ -251,5 +255,14 @@ public class CreateUserServlet extends HttpServlet {
 
     private String generateVerificationToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private String generateRandomLetters(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(LETTERS.charAt(random.nextInt(LETTERS.length())));
+        }
+        return sb.toString();
     }
 }
