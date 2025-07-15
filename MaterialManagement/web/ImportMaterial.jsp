@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+image.png<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -176,6 +176,12 @@
         .material-form .form-control.is-invalid:focus {
             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
         }
+        .invalid-feedback {
+            color: #dc3545 !important;
+            font-weight: bold;
+            font-size: 1rem;
+            opacity: 1 !important;
+        }
     </style>
 </head>
 <body>
@@ -343,9 +349,17 @@
                                 <p class="text-muted">No materials added to the import list yet.</p>
                             </div>
                         </c:if>
-
-                        <!-- Confirm Import Form -->
+                     
                         <h3 class="fw-normal mb-3 mt-5">Confirm Import</h3>
+                        <c:if test="${not empty formErrors}">
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    <c:forEach var="err" items="${formErrors.values()}">
+                                        <li>${err}</li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                        </c:if>
                         <form id="confirmImportForm" action="ImportMaterial" method="post" onsubmit="return validateConfirmForm()">
                             <input type="hidden" name="action" value="import">
                             <div class="row g-3">
@@ -365,29 +379,42 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Destination</label>
-                                    <input type="text" id="destination" name="destination" class="form-control" required placeholder="Enter destination (e.g. warehouse, room, etc.)">
-                                    <div class="invalid-feedback">Please enter a destination.</div>
-                                    <c:if test="${not empty formErrors['destination']}">
-                                        <div class="text-danger small mt-1">${formErrors['destination']}</div>
-                                    </c:if>
+                                    <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>" required placeholder="Enter destination (e.g. warehouse, room, etc.)" value="${param.destination}">
+                                    <div class="invalid-feedback" id="destinationError">
+                                        <c:choose>
+                                            <c:when test="${not empty formErrors['destination']}">
+                                                ${formErrors['destination']}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Please enter a destination (max 100 characters).
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Batch Number</label>
-                                    <input type="text" name="batchNumber" class="form-control" maxlength="50" required>
-                                    <c:if test="${not empty formErrors['batchNumber']}">
-                                        <div class="text-danger small mt-1">${formErrors['batchNumber']}</div>
-                                    </c:if>
+                                    <input type="text" name="batchNumber" class="form-control<c:if test='${not empty formErrors["batchNumber"]}'> is-invalid</c:if>" required value="${param.batchNumber}">
+                                    <div class="invalid-feedback" id="batchNumberError">
+                                        <c:choose>
+                                            <c:when test="${not empty formErrors['batchNumber']}">
+                                                ${formErrors['batchNumber']}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Please enter a batch number (max 50 characters).
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Actual Arrival</label>
-                                    <input type="datetime-local" name="actualArrival" class="form-control" required>
+                                    <input type="datetime-local" name="actualArrival" class="form-control" required value="${param.actualArrival}">
                                     <c:if test="${not empty formErrors['actualArrival']}">
                                         <div class="text-danger small mt-1">${formErrors['actualArrival']}</div>
                                     </c:if>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label text-muted">Notes</label>
-                                    <input type="text" name="note" class="form-control" placeholder="Enter Note">
+                                    <input type="text" name="note" class="form-control" placeholder="Enter Note" value="${param.note}">
                                     <c:if test="${not empty formErrors['note']}">
                                         <div class="text-danger small mt-1">${formErrors['note']}</div>
                                     </c:if>
@@ -513,14 +540,13 @@
             if (destination.value === 'other') {
                 if (!destinationOther.value.trim()) {
                     destinationOther.classList.add('is-invalid');
-                isValid = false; 
+                    isValid = false; 
                 } else {
                     destinationOther.classList.remove('is-invalid');
                 }
             } else { 
                 destination.classList.remove('is-invalid'); 
             }
-
             if (!batchNumber.value.trim()) {
                 batchNumber.classList.add('is-invalid');
                 isValid = false; 
