@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.SQLException;
 
 public class CategoryDAO extends DBContext {
     private String lastError;
@@ -211,6 +212,20 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+
+    // Lấy số lớn nhất sau tiền tố 'CAT' trong mã category
+    public int getMaxCategoryNumber() {
+        int max = 0;
+        String sql = "SELECT MAX(CAST(SUBSTRING(code, 4) AS UNSIGNED)) AS max_num FROM categories WHERE code LIKE 'CAT%'";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                max = rs.getInt("max_num");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return max;
     }
 
     public static void main(String[] args) {

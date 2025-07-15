@@ -203,6 +203,10 @@ public class CategoryServlet extends HttpServlet {
                     }
                     String submit = request.getParameter("submit");
                     if (submit == null) {
+                        int maxNum = categoryDAO.getMaxCategoryNumber();
+                        System.out.println("DEBUG maxNum (category): " + maxNum);
+                        String newCategoryCode = "CAT" + (maxNum + 1);
+                        request.setAttribute("categoryCode", newCategoryCode);
                         request.setAttribute("categories", categoryDAO.getAllCategories());
                         request.setAttribute("rolePermissionDAO", rolePermissionDAO);
                         request.getRequestDispatcher("/InsertCategory.jsp").forward(request, response);
