@@ -27,7 +27,7 @@ public class CleanupScheduler implements ServletContextListener {
                 System.err.println("❌ Lỗi khi xóa tài khoản hết hạn: " + e.getMessage());
                 e.printStackTrace();
             }
-        }, 0, 30, TimeUnit.SECONDS); // Bắt đầu ngay và chạy mỗi 30 giây
+        }, 0, 30, TimeUnit.SECONDS); 
     }
 
     @Override
