@@ -23,14 +23,14 @@ public class UserDetailServlet extends HttpServlet {
 
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null || !rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_DETAIL_USER")) {
-            request.setAttribute("error", "Bạn không có quyền xem chi tiết người dùng.");
+            request.setAttribute("error", "You do not have permission to view user details.");
             request.getRequestDispatcher("UserList").forward(request, response);
             return;
         }
 
         String userIdStr = request.getParameter("userId");
         if (userIdStr == null || userIdStr.trim().isEmpty()) {
-            request.setAttribute("error", "Thiếu hoặc không hợp lệ userId.");
+            request.setAttribute("error", "Missing or invalid userId.");
             request.getRequestDispatcher("UserList").forward(request, response);
             return;
         }
@@ -44,15 +44,15 @@ public class UserDetailServlet extends HttpServlet {
                 request.setAttribute("user", user);
                 request.getRequestDispatcher("UserDetail.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Không tìm thấy người dùng với ID: " + userId);
+                request.setAttribute("error", "User not found with ID: " + userId);
                 request.getRequestDispatcher("UserList.jsp").forward(request, response);
             }
 
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "ID người dùng không hợp lệ: " + userIdStr);
+            request.setAttribute("error", "Invalid user ID: " + userIdStr);
             request.getRequestDispatcher("UserList.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("error", "Lỗi khi lấy thông tin chi tiết: " + e.getMessage());
+            request.setAttribute("error", "Error retrieving details: " + e.getMessage());
             e.printStackTrace();
             request.getRequestDispatcher("UserList.jsp").forward(request, response);
         }
