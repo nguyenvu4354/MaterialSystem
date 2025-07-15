@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="entity.User, entity.Department, java.util.Map" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
     User admin = (User) session.getAttribute("user");
     if (admin == null || admin.getRoleId() != 1) {
@@ -13,6 +14,7 @@
     String enteredGender = (String) request.getAttribute("enteredGender");
     String enteredRoleId = (String) request.getAttribute("enteredRoleId");
     String enteredDepartmentId = (String) request.getAttribute("enteredDepartmentId");
+    String enteredDepartmentName = (String) request.getAttribute("enteredDepartmentName");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +26,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -47,6 +51,25 @@
         }
         .form-container .img-thumbnail {
             max-height: 150px;
+        }
+        /* Customize autocomplete UI */
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            z-index: 1000;
+        }
+        .ui-menu-item {
+            padding: 8px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .ui-menu-item:hover {
+            background-color: #f8f9fa;
         }
     </style>
 </head>
@@ -164,22 +187,14 @@
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="departmentId" class="form-label text-muted">Department</label>
-                                                <select class="form-select <% if(errors != null && errors.containsKey("departmentId")) { %>is-invalid<% } %>" 
-                                                        name="departmentId" id="departmentId">
-                                                    <option value="" <%= enteredDepartmentId == null || enteredDepartmentId.isEmpty() ? "selected" : "" %>>Select Department</option>
-                                                    <c:forEach var="dept" items="${departments}">
-                                                        <option value="${dept.departmentId}" <%= enteredDepartmentId != null && enteredDepartmentId.equals(String.valueOf(((Department)pageContext.getAttribute("dept")).getDepartmentId())) ? "selected" : "" %>>
-                                                            ${dept.departmentName}
-                                                        </option>
-                                                    </c:forEach>
-                                                </select>
-                                                <% if (errors != null && errors.containsKey("departmentId")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("departmentId") %></div>
-                                                <% } %>
+                                                <label for="departmentName" class="form-label text-muted">Department</label>
+                                                <input type="text" id="departmentName" name="departmentName" class="form-control <% if(errors != null && errors.containsKey("departmentId")) { %>is-invalid<% } %>"
+                                                       placeholder="Type department name" value="<%= enteredDepartmentName != null ? enteredDepartmentName : "" %>">
+                                                <input type="hidden" name="departmentId" id="departmentId" value="<%= enteredDepartmentId != null ? enteredDepartmentId : "" %>">
+                                                <div class="invalid-feedback"><%= errors != null && errors.containsKey("departmentId") ? errors.get("departmentId") : "Please select a valid department." %></div>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="description" class="seqform-label text-muted">Description</label>
+                                                <label for="description" class="form-label text-muted">Description</label>
                                                 <textarea class="form-control" name="description" id="description" rows="3"
                                                           placeholder="Enter Description"><%= enteredUser != null && enteredUser.getDescription() != null ? enteredUser.getDescription() : "" %></textarea>
                                             </div>
@@ -211,8 +226,9 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
-    <script src="js/jquery-1.11.0.min.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/script.js"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
@@ -231,6 +247,52 @@
                 previewImage.src = "#";
                 previewImage.style.display = "none";
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Department list for autocomplete
+            const departments = [
+                <c:forEach var="dept" items="${departments}" varStatus="loop">
+                    {
+                        label: "${fn:escapeXml(dept.departmentName)}",
+                        value: "${fn:escapeXml(dept.departmentName)}",
+                        id: "${dept.departmentId}"
+                    }${loop.last ? '' : ','}
+                </c:forEach>
+            ];
+
+            // Initialize autocomplete for departmentName
+            $("#departmentName").autocomplete({
+                source: function(request, response) {
+                    const term = request.term.toLowerCase();
+                    const matches = departments.filter(dept => 
+                        dept.label.toLowerCase().includes(term)
+                    );
+                    response(matches);
+                },
+                select: function(event, ui) {
+                    document.getElementById('departmentId').value = ui.item.id;
+                    document.getElementById('departmentName').value = ui.item.value;
+                    document.getElementById('departmentName').classList.remove('is-invalid');
+                },
+                change: function(event, ui) {
+                    if (!ui.item) {
+                        const inputValue = document.getElementById('departmentName').value.toLowerCase().trim();
+                        const selectedDept = departments.find(dept => 
+                            dept.label.toLowerCase() === inputValue
+                        );
+                        if (selectedDept) {
+                            document.getElementById('departmentId').value = selectedDept.id;
+                            document.getElementById('departmentName').value = selectedDept.label;
+                            document.getElementById('departmentName').classList.remove('is-invalid');
+                        } else {
+                            document.getElementById('departmentId').value = '';
+                            document.getElementById('departmentName').classList.add('is-invalid');
+                        }
+                    }
+                },
+                minLength: 1
+            });
         });
     </script>
 </body>
