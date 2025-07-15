@@ -12,10 +12,25 @@ import java.util.List;
 
 public class ExportDAO extends DBContext {
 
+    private int getNextExportNumber() throws SQLException {
+        String sql = "SELECT MAX(export_id) AS max_id FROM Exports";
+        try (PreparedStatement stmt = connection.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("max_id") + 1;
+            }
+            return 1;
+        }
+    }
+
+    private String generateExportCode(int exportId) throws SQLException {
+        return String.format("EXP%06d", exportId);
+    }
+
     public int createExport(Export export) throws SQLException {
         String sql = "INSERT INTO Exports (export_code, export_date, exported_by, recipient_user_id, batch_number, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, export.getExportCode());
+            int exportId = getNextExportNumber();
+            stmt.setString(1, generateExportCode(exportId));
             stmt.setObject(2, export.getExportDate());
             stmt.setInt(3, export.getExportedBy());
             stmt.setInt(4, export.getRecipientUserId());
@@ -37,6 +52,19 @@ public class ExportDAO extends DBContext {
                 }
             }
         }
+    }
+
+    public String getExportCode(int exportId) throws SQLException {
+        String sql = "SELECT export_code FROM Exports WHERE export_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, exportId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("export_code");
+                }
+            }
+        }
+        throw new SQLException("Export code not found for export ID: " + exportId);
     }
 
     public void addMaterialToExport(ExportDetail detail) throws SQLException {
@@ -186,16 +214,15 @@ public class ExportDAO extends DBContext {
     }
 
     public void updateExport(Export export) throws SQLException {
-        String sql = "UPDATE Exports SET export_code = ?, export_date = ?, exported_by = ?, recipient_user_id = ?, batch_number = ?, note = ?, updated_at = ? WHERE export_id = ?";
+        String sql = "UPDATE Exports SET export_date = ?, exported_by = ?, recipient_user_id = ?, batch_number = ?, note = ?, updated_at = ? WHERE export_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, export.getExportCode());
-            stmt.setObject(2, export.getExportDate());
-            stmt.setInt(3, export.getExportedBy());
-            stmt.setInt(4, export.getRecipientUserId());
-            stmt.setString(5, export.getBatchNumber());
-            stmt.setString(6, export.getNote());
-            stmt.setObject(7, export.getUpdatedAt());
-            stmt.setInt(8, export.getExportId());
+            stmt.setObject(1, export.getExportDate());
+            stmt.setInt(2, export.getExportedBy());
+            stmt.setInt(3, export.getRecipientUserId());
+            stmt.setString(4, export.getBatchNumber());
+            stmt.setString(5, export.getNote());
+            stmt.setObject(6, export.getUpdatedAt());
+            stmt.setInt(7, export.getExportId());
             
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {

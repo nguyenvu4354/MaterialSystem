@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @WebServlet(name = "ExportMaterialServlet", urlPatterns = {"/ExportMaterial"})
 public class ExportMaterialServlet extends HttpServlet {
@@ -194,7 +193,6 @@ public class ExportMaterialServlet extends HttpServlet {
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
             Export export = new Export();
-            export.setExportCode("TEMP-" + UUID.randomUUID().toString().substring(0, 8));
             export.setExportDate(LocalDateTime.now());
             export.setExportedBy(user.getUserId());
             export.setRecipientUserId(user.getUserId());
@@ -310,7 +308,6 @@ public class ExportMaterialServlet extends HttpServlet {
 
         Export export = new Export();
         export.setExportId(tempExportId);
-        export.setExportCode("EXP-" + UUID.randomUUID().toString().substring(0, 8));
         export.setExportDate(LocalDateTime.now());
         export.setExportedBy(user.getUserId());
         export.setRecipientUserId(recipientUserId);
@@ -329,7 +326,7 @@ public class ExportMaterialServlet extends HttpServlet {
 
             conn.commit();
             session.setAttribute("tempExportId", null);
-            request.setAttribute("success", "Export completed successfully with code: " + export.getExportCode());
+            request.setAttribute("success", "Export completed successfully with code: " + exportDAO.getExportCode(tempExportId));
         } catch (SQLException e) {
             if (conn != null) {
                 try {
