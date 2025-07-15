@@ -27,7 +27,7 @@ public class UserListServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null || !rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_LIST_USER")) {
-            request.setAttribute("error", "Bạn không có quyền truy cập danh sách người dùng.");
+            request.setAttribute("error", "You do not have permission to access the user list.");
             request.getRequestDispatcher("UserList.jsp").forward(request, response);
             return;
         }
@@ -98,7 +98,7 @@ public class UserListServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null || !rolePermissionDAO.hasPermission(currentUser.getRoleId(), "VIEW_LIST_USER")) {
-            request.setAttribute("error", "Bạn không có quyền truy cập danh sách người dùng.");
+            request.setAttribute("error", "You do not have permission to access the user list.");
             request.getRequestDispatcher("UserList.jsp").forward(request, response);
             return;
         }
@@ -131,7 +131,7 @@ public class UserListServlet extends HttpServlet {
         }
 
         if (userIdStr == null) {
-            request.getSession().setAttribute("error", "Thiếu userId.");
+            request.getSession().setAttribute("error", "Missing userId.");
             response.sendRedirect(queryString.toString());
             return;
         }
@@ -140,19 +140,19 @@ public class UserListServlet extends HttpServlet {
             int userId = Integer.parseInt(userIdStr);
             if ("delete".equals(action)) {
                 if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "DELETE_USER")) {
-                    request.getSession().setAttribute("error", "Bạn không có quyền xóa người dùng.");
+                    request.getSession().setAttribute("error", "You do not have permission to delete users.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
                 boolean deleted = userDAO.deleteUserById(userId);
                 if (deleted) {
-                    request.getSession().setAttribute("message", "Xóa người dùng thành công.");
+                    request.getSession().setAttribute("message", "User deleted successfully.");
                 } else {
-                    request.getSession().setAttribute("error", "Xóa người dùng thất bại.");
+                    request.getSession().setAttribute("error", "Failed to delete user.");
                 }
             } else if ("updateDepartment".equals(action)) {
                 if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "UPDATE_USER")) {
-                    request.getSession().setAttribute("error", "Bạn không có quyền cập nhật thông tin người dùng.");
+                    request.getSession().setAttribute("error", "You do not have permission to update user information.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
@@ -166,55 +166,55 @@ public class UserListServlet extends HttpServlet {
                 }
                 boolean updated = userDAO.updateDepartment(userId, departmentId);
                 if (updated) {
-                    request.getSession().setAttribute("message", "Cập nhật phòng ban thành công.");
+                    request.getSession().setAttribute("message", "Department updated successfully.");
                 } else {
-                    request.getSession().setAttribute("error", "Cập nhật phòng ban thất bại.");
+                    request.getSession().setAttribute("error", "Failed to update department.");
                 }
             } else if ("updateStatus".equals(action)) {
                 if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "UPDATE_USER")) {
-                    request.getSession().setAttribute("error", "Bạn không có quyền cập nhật thông tin người dùng.");
+                    request.getSession().setAttribute("error", "You do not have permission to update user information.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
                 String statusStr = request.getParameter("status");
                 if (statusStr == null || (!statusStr.equals("active") && !statusStr.equals("inactive"))) {
-                    request.getSession().setAttribute("error", "Trạng thái không hợp lệ.");
+                    request.getSession().setAttribute("error", "Invalid status.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
                 User.Status status = User.Status.valueOf(statusStr);
                 boolean updated = userDAO.updateStatus(userId, status);
                 if (updated) {
-                    request.getSession().setAttribute("message", "Cập nhật trạng thái thành công.");
+                    request.getSession().setAttribute("message", "Status updated successfully.");
                 } else {
-                    request.getSession().setAttribute("error", "Cập nhật trạng thái thất bại.");
+                    request.getSession().setAttribute("error", "Failed to update status.");
                 }
             } else if ("updateRole".equals(action)) {
                 if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "UPDATE_USER")) {
-                    request.getSession().setAttribute("error", "Bạn không có quyền cập nhật thông tin người dùng.");
+                    request.getSession().setAttribute("error", "You do not have permission to update user information.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
                 String roleIdStr = request.getParameter("roleId");
                 if (roleIdStr == null) {
-                    request.getSession().setAttribute("error", "Thiếu roleId.");
+                    request.getSession().setAttribute("error", "Missing roleId.");
                     response.sendRedirect(queryString.toString());
                     return;
                 }
                 int roleId = Integer.parseInt(roleIdStr);
                 boolean updated = userDAO.updateRole(userId, roleId);
                 if (updated) {
-                    request.getSession().setAttribute("message", "Cập nhật vai trò thành công.");
+                    request.getSession().setAttribute("message", "Role updated successfully.");
                 } else {
-                    request.getSession().setAttribute("error", "Cập nhật vai trò thất bại.");
+                    request.getSession().setAttribute("error", "Failed to update role.");
                 }
             } else {
-                request.getSession().setAttribute("error", "Hành động không hợp lệ.");
+                request.getSession().setAttribute("error", "Invalid action.");
             }
         } catch (NumberFormatException e) {
-            request.getSession().setAttribute("error", "Dữ liệu không hợp lệ.");
+            request.getSession().setAttribute("error", "Invalid data.");
         } catch (Exception e) {
-            request.getSession().setAttribute("error", "Lỗi: " + e.getMessage());
+            request.getSession().setAttribute("error", "Error: " + e.getMessage());
         }
 
         response.sendRedirect(queryString.toString());

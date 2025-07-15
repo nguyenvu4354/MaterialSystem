@@ -88,7 +88,7 @@ public class CreateUserServlet extends HttpServlet {
             try {
                 roleId = Integer.parseInt(roleIdStr);
             } catch (NumberFormatException e) {
-                request.setAttribute("error", "Role ID không hợp lệ.");
+                request.setAttribute("error", "Invalid role ID.");
                 List<Department> departments = departmentDAO.getAllDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -115,13 +115,13 @@ public class CreateUserServlet extends HttpServlet {
             newUser.setVerificationToken(UUID.randomUUID().toString());
             newUser.setVerificationStatus("pending");
             newUser.setVerificationExpiry(LocalDateTime.now().plusHours(24));
-            newUser.setStatus(User.Status.inactive); 
+            newUser.setStatus(User.Status.inactive);
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
                 try {
                     newUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
                 } catch (Exception e) {
-                    request.setAttribute("error", "Ngày sinh không hợp lệ.");
+                    request.setAttribute("error", "Invalid date of birth.");
                     List<Department> departments = departmentDAO.getAllDepartments();
                     request.setAttribute("departments", departments);
                     request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -134,10 +134,10 @@ public class CreateUserServlet extends HttpServlet {
                     if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
                         newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
                     } else {
-                        throw new IllegalArgumentException("Giới tính không hợp lệ.");
+                        throw new IllegalArgumentException("Invalid gender.");
                     }
                 } catch (Exception e) {
-                    request.setAttribute("error", "Giới tính không hợp lệ.");
+                    request.setAttribute("error", "Invalid gender.");
                     List<Department> departments = departmentDAO.getAllDepartments();
                     request.setAttribute("departments", departments);
                     request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -146,19 +146,17 @@ public class CreateUserServlet extends HttpServlet {
             }
 
             Map<String, String> errors = new HashMap<>();
-            
+
             if (userDAO.isEmailExist(email, 0)) {
-                errors.put("email", "Email này đã được sử dụng.");
+                errors.put("email", "This email is already in use.");
             }
 
-            // Validate dữ liệu người dùng
             errors.putAll(UserValidator.validate(newUser, userDAO));
 
-            // Xử lý file ảnh
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
-                if (filePart.getSize() > 2 * 1024 * 1024) { // Giới hạn 2MB
-                    errors.put("userPicture", "Kích thước file ảnh không được vượt quá 2MB.");
+                if (filePart.getSize() > 2 * 1024 * 1024) {
+                    errors.put("userPicture", "Image file size must not exceed 2MB.");
                 } else {
                     String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                     fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
@@ -175,7 +173,7 @@ public class CreateUserServlet extends HttpServlet {
                         filePart.write(savePath.toString());
                         newUser.setUserPicture(fileName);
                     } catch (IOException e) {
-                        errors.put("userPicture", "Lỗi khi lưu file ảnh: " + e.getMessage());
+                        errors.put("userPicture", "Error saving image file: " + e.getMessage());
                     }
                 }
             }
@@ -197,7 +195,7 @@ public class CreateUserServlet extends HttpServlet {
             if (created) {
                 try {
                     String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + newUser.getVerificationToken();
-                    String subject = "Xác thực tài khoản của bạn";
+                    String subject = "Verify Your Account";
                     String content = "<html><body>" +
                                     "<p>Hello " + newUser.getFullName() + ",</p>" +
                                     "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
@@ -210,27 +208,27 @@ public class CreateUserServlet extends HttpServlet {
                                     "</body></html>";
 
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
-                    session.setAttribute("successMessage", "Tạo tài khoản thành công! Email xác thực đã được gửi.");
+                    session.setAttribute("successMessage", "Account created successfully! Verification email sent.");
                     response.sendRedirect(request.getContextPath() + "/UserList");
                 } catch (Exception e) {
-                    System.err.println("❌ Lỗi khi gửi email xác thực: " + e.getMessage());
+                    System.err.println("❌ Error sending verification email: " + e.getMessage());
                     e.printStackTrace();
-                    request.setAttribute("error", "Tạo tài khoản thành công, nhưng không thể gửi email xác thực: " + e.getMessage());
+                    request.setAttribute("error", "Account created successfully, but failed to send verification email: " + e.getMessage());
                     List<Department> departments = departmentDAO.getAllDepartments();
                     request.setAttribute("departments", departments);
                     request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 }
             } else {
-                request.setAttribute("error", "Không thể tạo tài khoản. Vui lòng thử lại.");
+                request.setAttribute("error", "Failed to create account. Please try again.");
                 List<Department> departments = departmentDAO.getAllDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
-            System.err.println("❌ Lỗi hệ thống khi tạo tài khoản: " + e.getMessage());
+            System.err.println("❌ System error creating account: " + e.getMessage());
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("error", "System error: " + e.getMessage());
             List<Department> departments = departmentDAO.getAllDepartments();
             request.setAttribute("departments", departments);
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -247,7 +245,7 @@ public class CreateUserServlet extends HttpServlet {
             }
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
+            throw new RuntimeException("Error hashing password", e);
         }
     }
 
