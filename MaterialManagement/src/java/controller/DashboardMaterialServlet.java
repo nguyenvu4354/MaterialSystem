@@ -12,16 +12,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import entity.Material;
 import entity.User;
 import jakarta.servlet.http.HttpSession;
+import dal.CategoryDAO;
+import entity.Category;
 
 @WebServlet(name = "DashboardMaterialServlet", urlPatterns = {"/dashboardmaterial"})
 public class DashboardMaterialServlet extends HttpServlet {
     private MaterialDAO materialDAO;
     private RolePermissionDAO rolePermissionDAO;
+    private CategoryDAO categoryDAO;
 
     @Override
     public void init() throws ServletException {
         materialDAO = new MaterialDAO();
         rolePermissionDAO = new RolePermissionDAO();
+        categoryDAO = new CategoryDAO();
     }
 
     @Override
@@ -35,7 +39,6 @@ public class DashboardMaterialServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
-
             // Kiểm tra quyền VIEW_LIST_MATERIAL
             int roleId = user.getRoleId();
             if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_MATERIAL")) {
@@ -72,9 +75,37 @@ public class DashboardMaterialServlet extends HttpServlet {
                 sortOption = "";
             }
 
-            List<Material> list = materialDAO.searchMaterials(keyword, status, pageIndex, pageSize, sortOption);
-            int totalMaterials = materialDAO.countMaterials(keyword, status);
-            int totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
+            List<Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
+
+            String categoryIdParam = request.getParameter("categoryId");
+            Integer categoryId = null;
+            if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
+                try {
+                    categoryId = Integer.parseInt(categoryIdParam);
+                } catch (NumberFormatException e) {
+                    categoryId = null;
+                }
+            }
+
+            String categoryName = request.getParameter("categoryName");
+            List<Material> list;
+            int totalMaterials;
+            int totalPages;
+            if (categoryName != null && !categoryName.trim().isEmpty() && (categoryId == null)) {
+                // Nhập tên nhưng không chọn gợi ý, trả về rỗng
+                list = java.util.Collections.emptyList();
+                totalMaterials = 0;
+                totalPages = 1;
+            } else if (categoryId != null) {
+                list = materialDAO.searchMaterialsByCategoriesID(categoryId);
+                totalMaterials = list.size();
+                totalPages = 1;
+            } else {
+                list = materialDAO.searchMaterials(keyword, status, pageIndex, pageSize, sortOption);
+                totalMaterials = materialDAO.countMaterials(keyword, status);
+                totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
+            }
 
             request.setAttribute("list", list);
             request.setAttribute("currentPage", pageIndex);
