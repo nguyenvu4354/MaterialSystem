@@ -131,8 +131,8 @@
             <c:otherwise>
                 <div class="permission-denied">
                     <h4><i class="fas fa-exclamation-triangle"></i> Access Denied</h4>
-                    <p>Bạn không có quyền thêm phòng ban.</p>
-                    <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-primary">Quay lại danh sách</a>
+                    <p>You do not have permission to add departments.</p>
+                    <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-primary">Back to list</a>
                 </div>
             </c:otherwise>
         </c:choose>
@@ -151,21 +151,21 @@
 
             // Validate name
             if (!name) {
-                document.getElementById('nameError').textContent = 'Tên phòng ban không được để trống.';
+                document.getElementById('nameError').textContent = 'Department name cannot be left blank.';
                 document.querySelector('input[name="name"]').classList.add('is-invalid');
                 isValid = false;
             }
 
             // Validate phone
             if (phone && !/^\d{10,12}$/.test(phone)) {
-                document.getElementById('phoneError').textContent = 'Số điện thoại phải chứa từ 10 đến 12 chữ số.';
+                document.getElementById('phoneError').textContent = 'Phone number must contain 10 to 12 digits.';
                 document.querySelector('input[name="phone"]').classList.add('is-invalid');
                 isValid = false;
             }
 
             // Validate email
             if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('emailError').textContent = 'Email không hợp lệ.';
+                document.getElementById('emailError').textContent = 'Invalid email.';
                 document.querySelector('input[name="email"]').classList.add('is-invalid');
                 isValid = false;
             }

@@ -30,7 +30,7 @@ public class DeleteDepartmentServlet extends HttpServlet {
         // Check DELETE_DEPARTMENT permission
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "DELETE_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền xóa phòng ban.");
+            request.setAttribute("error", "You do not have permission to delete the department..");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -38,11 +38,11 @@ public class DeleteDepartmentServlet extends HttpServlet {
         try {
             int deleteId = Integer.parseInt(request.getParameter("id"));
             departmentDAO.deleteDepartment(deleteId);
-            request.setAttribute("message", "Xóa phòng ban thành công!");
+            request.setAttribute("message", "Department deleted successfully!");
             response.sendRedirect("depairmentlist");
         } catch (Exception e) {
             System.out.println("❌ Lỗi khi xóa phòng ban: " + e.getMessage());
-            request.setAttribute("error", "Lỗi khi xóa phòng ban: " + e.getMessage());
+            request.setAttribute("error", "Error when deleting department: " + e.getMessage());
             request.getRequestDispatcher("depairmentlist").forward(request, response);
         }
     }
