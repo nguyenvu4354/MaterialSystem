@@ -106,6 +106,11 @@
             border-radius: 6px;
             padding: 6px 14px;
             font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn-detail:hover {
+            background-color: #ffecb3;
+            color: #b8860b;
         }
         .pagination .page-item.active .page-link {
             background-color: #0d6efd;
@@ -210,8 +215,8 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-1">
-                                                <a href="PurchaseOrderDetail?id=${po.poId}" class="btn btn-detail btn-sm" title="View Details">
-                                                    <i class="fas fa-eye"></i>
+                                                <a href="PurchaseOrderDetail?id=${po.poId}" class="btn-detail" title="View Details" style="pointer-events:auto;z-index:9999;position:relative;">
+                                                    <i class="fas fa-eye"></i> Detail
                                                 </a>
                                                 <c:if test="${hasSendToSupplierPermission && po.status == 'approved'}">
                                                     <button type="button" class="btn btn-detail btn-sm" style="background-color: #0d6efd; color: #fff; border: none;" title="Send to Supplier" onclick="updateStatus('${po.poId}', 'sent_to_supplier')">

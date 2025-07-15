@@ -45,7 +45,7 @@ public class EditDepartmentServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (!rolePermissionDAO.hasPermission(roleId, "UPDATE_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền chỉnh sửa phòng ban.");
+            request.setAttribute("error", "You do not have permission to edit departments.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -61,7 +61,7 @@ public class EditDepartmentServlet extends HttpServlet {
             int id = Integer.parseInt(idStr);
             Department dept = departmentDAO.getDepartmentById(id);
             if (dept == null) {
-                request.setAttribute("error", "Phòng ban không tồn tại hoặc đã bị xóa.");
+                request.setAttribute("error", "Department does not exist or has been deleted.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
@@ -86,7 +86,7 @@ public class EditDepartmentServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (!rolePermissionDAO.hasPermission(roleId, "UPDATE_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền chỉnh sửa phòng ban.");
+            request.setAttribute("error", "You do not have permission to edit departments.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -105,21 +105,21 @@ public class EditDepartmentServlet extends HttpServlet {
         // Validate department ID
         Map<String, String> errors = new HashMap<>();
         if (idStr == null || idStr.trim().isEmpty()) {
-            errors.put("id", "Mã phòng ban không được để trống.");
+            errors.put("id", "Department code cannot be blank.");
         } else {
             try {
                 Integer.parseInt(idStr);
             } catch (NumberFormatException e) {
-                errors.put("id", "Mã phòng ban không hợp lệ.");
+                errors.put("id", "Invalid department code.");
             }
         }
 
         // Validate form data
         if (name == null || name.trim().isEmpty()) {
-            errors.put("name", "Tên phòng ban không được để trống.");
+            errors.put("name", "Department name cannot be left blank.");
         }
         if (code == null || code.trim().isEmpty()) {
-            errors.put("code", "Mã phòng ban không được để trống.");
+            errors.put("code", "Department code cannot be blank.");
         }
 
         int id = 0;

@@ -99,10 +99,10 @@
             min-height: 48px;
         }
         .status-approved {
-            background-color: #198754; /* Green for approved */
+            background-color: #198754; 
         }
         .status-rejected {
-            background-color: #dc3545; /* Red for rejected */
+            background-color: #dc3545; 
         }
     </style>
 </head>

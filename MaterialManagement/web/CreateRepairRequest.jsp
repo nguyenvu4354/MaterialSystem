@@ -37,18 +37,18 @@
                 margin-bottom: 1rem;
                 border-bottom: 1px solid #dee2e6;
                 padding-bottom: 1rem;
-                align-items: center; /* Căn giữa theo chiều dọc */
+                align-items: center; 
             }
             .repair-form .remove-material {
-                height: 48px; /* Cân bằng chiều cao với input */
-                width: 48px; /* Đảm bảo nút vuông vức và cân đối */
+                height: 48px; 
+                width: 48px; 
                 padding: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.2rem; /* Tăng kích thước chữ X */
-                margin-left: 0.5rem; /* Khoảng cách giữa nút và ô input */
-                border: 1px solid #dc3545; /* Giữ đường viền đỏ để đồng bộ với btn-outline-danger */
+                font-size: 1.2rem;
+                margin-left: 0.5rem; 
+                border: 1px solid #dc3545; 
             }
             .repair-cost-container {
                 display: flex;
@@ -138,8 +138,11 @@
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Set minimum date to today
-            document.getElementById('returnDate').setAttribute('min', new Date().toISOString().split('T')[0]);
+            // Set date to today only
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('returnDate').setAttribute('value', today);
+            document.getElementById('returnDate').setAttribute('min', today);
+            document.getElementById('returnDate').setAttribute('max', today);
 
             // Autocomplete for material names
             const availableMaterials = [
@@ -192,13 +195,12 @@
 
             // Form validation
             document.getElementById('repairForm').addEventListener('submit', function (e) {
-                const returnDate = new Date(document.getElementById('returnDate').value);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const returnDate = document.getElementById('returnDate').value;
+                const today = new Date().toISOString().split('T')[0];
 
-                if (returnDate < today) {
+                if (returnDate !== today) {
                     e.preventDefault();
-                    alert('Estimated return date cannot be in the past.');
+                    alert('Estimated return date must be today only.');
                     return;
                 }
 

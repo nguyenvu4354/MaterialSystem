@@ -567,25 +567,25 @@
             <div class="container">
                 <div class="row g-4 justify-content-center text-center">
                     <div class="col-6 col-md-3">
-                        <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-boxes-stacked fa-2x mb-2 text-primary"></i>
                             <div class="fw-semibold text-dark">Inventory Management</div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="allocation" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-share-alt fa-2x mb-2 text-info"></i>
                             <div class="fw-semibold text-dark">Allocation Tracking</div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="maintenance" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-tools fa-2x mb-2 text-warning"></i>
                             <div class="fw-semibold text-dark">Maintenance Logs</div>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="reports" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
+                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
                             <i class="fas fa-chart-line fa-2x mb-2 text-success"></i>
                             <div class="fw-semibold text-dark">Reporting Tools</div>
                         </a>

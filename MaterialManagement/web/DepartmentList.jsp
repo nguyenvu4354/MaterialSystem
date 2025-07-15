@@ -44,10 +44,10 @@
             <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <c:if test="${empty sessionScope.user}">
-                    <div class="alert alert-danger" role="alert">Vui lòng đăng nhập để truy cập trang này.</div>
+                    <div class="alert alert-danger" role="alert">You do not have permission to view the department list.</div>
                 </c:if>
                 <c:if test="${not empty sessionScope.user and sessionScope.user.roleId != 1 and !rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_LIST_DEPARTMENT')}">
-                    <div class="alert alert-danger" role="alert">Bạn không có quyền xem danh sách phòng ban.</div>
+                    <div class="alert alert-danger" role="alert">You do not have permission to view the department list.</div>
                 </c:if>
                 <c:if test="${not empty sessionScope.user and (sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_LIST_DEPARTMENT'))}">
                     <div class="d-flex justify-content-between align-items-center mb-3">

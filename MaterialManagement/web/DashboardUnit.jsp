@@ -27,6 +27,15 @@
             font-size: 2.2rem;
             margin-bottom: 24px;
         }
+        .btn-action {
+            width: 50px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+        }
     </style>
 </head>
 <body>
@@ -85,13 +94,13 @@
                                                 <td>
                                                     <!-- Nút Edit - chỉ hiển thị nếu có quyền UPDATE_UNIT hoặc là admin -->
                                                     <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT')}">
-                                                        <a href="EditUnit?id=${unit.id}" class="btn btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                                        <a href="EditUnit?id=${unit.id}" class="btn btn-action btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
                                                     </c:if>
                                                     <!-- Nút Delete - chỉ hiển thị nếu có quyền DELETE_UNIT hoặc là admin -->
                                                     <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
                                                         <form action="DeleteUnit" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this unit?');">
                                                             <input type="hidden" name="id" value="${unit.id}" />
-                                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
+                                                            <button type="submit" class="btn btn-action btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
                                                         </form>
                                                     </c:if>
                                                 </td>
