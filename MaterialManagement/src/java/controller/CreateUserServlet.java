@@ -84,6 +84,7 @@ public class CreateUserServlet extends HttpServlet {
             String description = request.getParameter("description");
             String roleIdStr = request.getParameter("roleId");
             String departmentIdStr = request.getParameter("departmentId");
+            String departmentName = request.getParameter("departmentName");
             int roleId = 0;
             Integer departmentId = null;
 
@@ -157,6 +158,13 @@ public class CreateUserServlet extends HttpServlet {
 
             errors.putAll(UserValidator.validate(newUser, userDAO));
 
+            if (departmentId != null) {
+                Department department = departmentDAO.getDepartmentById(departmentId);
+                if (department == null) {
+                    errors.put("departmentId", "Selected department does not exist.");
+                }
+            }
+
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 if (filePart.getSize() > 2 * 1024 * 1024) {
@@ -189,6 +197,7 @@ public class CreateUserServlet extends HttpServlet {
                 request.setAttribute("enteredGender", gender);
                 request.setAttribute("enteredRoleId", roleIdStr);
                 request.setAttribute("enteredDepartmentId", departmentIdStr);
+                request.setAttribute("enteredDepartmentName", departmentName);
                 List<Department> departments = departmentDAO.getAllDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -251,10 +260,6 @@ public class CreateUserServlet extends HttpServlet {
         } catch (Exception e) {
             throw new RuntimeException("Error hashing password", e);
         }
-    }
-
-    private String generateVerificationToken() {
-        return UUID.randomUUID().toString();
     }
 
     private String generateRandomLetters(int length) {
