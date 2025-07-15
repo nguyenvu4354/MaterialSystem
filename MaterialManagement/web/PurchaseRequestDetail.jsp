@@ -216,7 +216,7 @@
                 <!-- Nút Approve/Reject mở modal -->
                 <div class="d-flex gap-2 mb-2">
                     <c:choose>
-                        <c:when test="${purchaseRequest.status eq 'pending'}">
+                        <c:when test="${purchaseRequest.status eq 'pending' && hasHandleRequestPermission}">
                             <button type="button" class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('approve')">Approve</button>
                             <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('reject')">Reject</button>
                             <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>

@@ -117,6 +117,7 @@
                         <c:set var="roleId" value="${sessionScope.user.roleId}" />
                         <c:set var="hasViewPurchaseRequestListPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_PURCHASE_REQUEST_LIST')}" scope="request" />
                         <c:set var="hasCreatePurchaseRequestPermission" value="${rolePermissionDAO.hasPermission(roleId, 'CREATE_PURCHASE_REQUEST')}" scope="request" />
+                        <c:set var="hasDeletePurchaseRequestPermission" value="${rolePermissionDAO.hasPermission(roleId, 'DELETE_PURCHASE_REQUEST')}" scope="request" />
 
                         <c:if test="${empty sessionScope.user}">
                             <div class="alert alert-danger">Please log in to view purchase requests.</div>
@@ -192,7 +193,7 @@
                                                                     <i class="fas fa-eye"></i> Detail
                                                                 </a>
                                                             </c:if>
-                                                            <c:if test="${request.status == 'PENDING' && request.userId == sessionScope.user.userId}">
+                                                            <c:if test="${request.status == 'PENDING' && request.userId == sessionScope.user.userId && hasDeletePurchaseRequestPermission}">
                                                                 <button onclick="deleteRequest(${request.purchaseRequestId})" class="btn btn-danger btn-sm">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
