@@ -84,8 +84,9 @@
                 color: #b8860b;
                 border: 1px solid #ffe58f;
                 border-radius: 6px;
-                padding: 6px 14px;
-                font-weight: 500;
+                padding: 6px auto;
+                font-weight: 300;
+                width: 100px
             }
             .error {
                 color: red;
