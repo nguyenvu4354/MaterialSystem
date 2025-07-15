@@ -93,22 +93,22 @@
                                     String error = (String) request.getAttribute("error");
                                 %>
                                 <% if (message != null) { %>
-                                    <div class="alert alert-success">${message}</div>
+                                    <div class="alert alert-success">${fn:escapeXml(message)}</div>
                                 <% } %>
                                 <% if (error != null) { %>
-                                    <div class="alert alert-danger">${error}</div>
+                                    <div class="alert alert-danger">${fn:escapeXml(error)}</div>
                                 <% } %>
-                                <form action="${pageContext.request.contextPath}/CreateUser" method="post" enctype="multipart/form-data">
+                                <form action="${pageContext.request.contextPath}/CreateUser" method="post" enctype="multipart/form-data" id="createUserForm">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="username" class="form-label text-muted">Username</label>
                                                 <input type="text" class="form-control <% if(errors != null && errors.containsKey("username")) { %>is-invalid<% } %>" 
                                                        name="username" id="username"
-                                                       placeholder="Enter Username" maxlength="50"
-                                                       value="<%= enteredUser != null && enteredUser.getUsername() != null ? enteredUser.getUsername() : "" %>" required>
+                                                       placeholder="Enter Username" maxlength="10"
+                                                       value="${fn:escapeXml(enteredUser != null && enteredUser.getUsername() != null ? enteredUser.getUsername() : '')}" required>
                                                 <% if (errors != null && errors.containsKey("username")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("username") %></div>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("username"))}</div>
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
@@ -117,61 +117,81 @@
                                                        name="password" id="password"
                                                        placeholder="Enter Password" maxlength="255" required>
                                                 <% if (errors != null && errors.containsKey("password")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("password") %></div>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("password"))}</div>
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="fullName" class="form-label text-muted">Full Name</label>
-                                                <input type="text" class="form-control" name="fullName" id="fullName"
-                                                       placeholder="Enter Full Name" maxlength="100"
-                                                       value="<%= enteredUser != null && enteredUser.getFullName() != null ? enteredUser.getFullName() : "" %>">
+                                                <input type="text" class="form-control <% if(errors != null && errors.containsKey("fullName")) { %>is-invalid<% } %>" 
+                                                       name="fullName" id="fullName"
+                                                       placeholder="Enter Full Name"
+                                                       value="${fn:escapeXml(enteredUser != null && enteredUser.getFullName() != null ? enteredUser.getFullName() : '')}" required>
+                                                <% if (errors != null && errors.containsKey("fullName")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("fullName"))}</div>
+                                                <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="email" class="form-label text-muted">Email</label>
                                                 <input type="email" class="form-control <% if(errors != null && errors.containsKey("email")) { %>is-invalid<% } %>" 
                                                        name="email" id="email"
                                                        placeholder="Enter Email" maxlength="100"
-                                                       value="<%= enteredUser != null && enteredUser.getEmail() != null ? enteredUser.getEmail() : "" %>">
+                                                       value="${fn:escapeXml(enteredUser != null && enteredUser.getEmail() != null ? enteredUser.getEmail() : '')}" required>
                                                 <% if (errors != null && errors.containsKey("email")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("email") %></div>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("email"))}</div>
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="phoneNumber" class="form-label text-muted">Phone Number</label>
                                                 <input type="text" class="form-control <% if(errors != null && errors.containsKey("phoneNumber")) { %>is-invalid<% } %>" 
                                                        name="phoneNumber" id="phoneNumber"
-                                                       placeholder="Enter Phone Number" maxlength="20"
-                                                       value="<%= enteredUser != null && enteredUser.getPhoneNumber() != null ? enteredUser.getPhoneNumber() : "" %>">
+                                                       placeholder="Enter Phone Number" maxlength="15"
+                                                       value="${fn:escapeXml(enteredUser != null && enteredUser.getPhoneNumber() != null ? enteredUser.getPhoneNumber() : '')}" required>
                                                 <% if (errors != null && errors.containsKey("phoneNumber")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("phoneNumber") %></div>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("phoneNumber"))}</div>
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="address" class="form-label text-muted">Address</label>
-                                                <input type="text" class="form-control" name="address" id="address"
-                                                       placeholder="Enter Address" maxlength="255"
-                                                       value="<%= enteredUser != null && enteredUser.getAddress() != null ? enteredUser.getAddress() : "" %>">
+                                                <input type="text" class="form-control <% if(errors != null && errors.containsKey("address")) { %>is-invalid<% } %>" 
+                                                       name="address" id="address"
+                                                       placeholder="Enter Address"
+                                                       value="${fn:escapeXml(enteredUser != null && enteredUser.getAddress() != null ? enteredUser.getAddress() : '')}" required>
+                                                <% if (errors != null && errors.containsKey("address")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("address"))}</div>
+                                                <% } %>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="userPicture" class="form-label text-muted">User Picture</label>
-                                                <input class="form-control" type="file" name="userPicture" id="userPicture" accept="image/*">
+                                                <input class="form-control <% if(errors != null && errors.containsKey("userPicture")) { %>is-invalid<% } %>" 
+                                                       type="file" name="userPicture" id="userPicture" accept="image/*" required>
                                                 <img id="previewImage" src="#" alt="Image Preview" class="img-thumbnail mt-3" style="display:none; max-height: 150px;">
+                                                <% if (errors != null && errors.containsKey("userPicture")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("userPicture"))}</div>
+                                                <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="dateOfBirth" class="form-label text-muted">Date of Birth</label>
-                                                <input type="date" class="form-control" name="dateOfBirth" id="dateOfBirth"
-                                                       value="<%= dateOfBirthStr != null ? dateOfBirthStr : "" %>">
+                                                <input type="date" class="form-control <% if(errors != null && errors.containsKey("dateOfBirth")) { %>is-invalid<% } %>" 
+                                                       name="dateOfBirth" id="dateOfBirth"
+                                                       value="${fn:escapeXml(dateOfBirthStr != null ? dateOfBirthStr : '')}" required>
+                                                <% if (errors != null && errors.containsKey("dateOfBirth")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("dateOfBirth"))}</div>
+                                                <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="gender" class="form-label text-muted">Gender</label>
-                                                <select class="form-select" name="gender" id="gender">
+                                                <select class="form-select <% if(errors != null && errors.containsKey("gender")) { %>is-invalid<% } %>" 
+                                                        name="gender" id="gender" required>
                                                     <option value="" <%= enteredGender == null || enteredGender.isEmpty() ? "selected" : "" %>>Select Gender</option>
                                                     <option value="male" <%= "male".equalsIgnoreCase(enteredGender) ? "selected" : "" %>>Male</option>
                                                     <option value="female" <%= "female".equalsIgnoreCase(enteredGender) ? "selected" : "" %>>Female</option>
                                                     <option value="other" <%= "other".equalsIgnoreCase(enteredGender) ? "selected" : "" %>>Other</option>
                                                 </select>
+                                                <% if (errors != null && errors.containsKey("gender")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("gender"))}</div>
+                                                <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="roleId" class="form-label text-muted">Role</label>
@@ -183,20 +203,29 @@
                                                     <option value="4" <%= "4".equals(enteredRoleId) ? "selected" : "" %>>Employee</option>
                                                 </select>
                                                 <% if (errors != null && errors.containsKey("roleId")) { %>
-                                                    <div class="invalid-feedback"><%= errors.get("roleId") %></div>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("roleId"))}</div>
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="departmentName" class="form-label text-muted">Department</label>
-                                                <input type="text" id="departmentName" name="departmentName" class="form-control <% if(errors != null && errors.containsKey("departmentId")) { %>is-invalid<% } %>"
-                                                       placeholder="Type department name" value="<%= enteredDepartmentName != null ? enteredDepartmentName : "" %>">
-                                                <input type="hidden" name="departmentId" id="departmentId" value="<%= enteredDepartmentId != null ? enteredDepartmentId : "" %>">
-                                                <div class="invalid-feedback"><%= errors != null && errors.containsKey("departmentId") ? errors.get("departmentId") : "Please select a valid department." %></div>
+                                                <input type="text" id="departmentName" name="departmentName" 
+                                                       class="form-control <% if(errors != null && errors.containsKey("departmentId")) { %>is-invalid<% } %>"
+                                                       placeholder="Type department name" 
+                                                       value="${fn:escapeXml(enteredDepartmentName != null ? enteredDepartmentName : '')}" required>
+                                                <input type="hidden" name="departmentId" id="departmentId" 
+                                                       value="${fn:escapeXml(enteredDepartmentId != null ? enteredDepartmentId : '')}">
+                                                <% if (errors != null && errors.containsKey("departmentId")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("departmentId"))}</div>
+                                                <% } %>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="description" class="form-label text-muted">Description</label>
-                                                <textarea class="form-control" name="description" id="description" rows="3"
-                                                          placeholder="Enter Description"><%= enteredUser != null && enteredUser.getDescription() != null ? enteredUser.getDescription() : "" %></textarea>
+                                                <textarea class="form-control <% if(errors != null && errors.containsKey("description")) { %>is-invalid<% } %>" 
+                                                          name="description" id="description" rows="3"
+                                                          placeholder="Enter Description">${fn:escapeXml(enteredUser != null && enteredUser.getDescription() != null ? enteredUser.getDescription() : "")}</textarea>
+                                                <% if (errors != null && errors.containsKey("description")) { %>
+                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("description"))}</div>
+                                                <% } %>
                                             </div>
                                         </div>
                                     </div>
@@ -292,6 +321,147 @@
                     }
                 },
                 minLength: 1
+            });
+
+            // Client-side validation
+            document.getElementById('createUserForm').addEventListener('submit', function(event) {
+                let errors = [];
+
+                // Validate username
+                const username = document.getElementById('username').value;
+                if (!username) {
+                    errors.push('Username is required.');
+                    document.getElementById('username').classList.add('is-invalid');
+                    document.getElementById('username').nextElementSibling.textContent = 'Username is required.';
+                } else if (username.length > 10) {
+                    errors.push('Username must not exceed 10 characters.');
+                    document.getElementById('username').classList.add('is-invalid');
+                    document.getElementById('username').nextElementSibling.textContent = 'Username must not exceed 10 characters.';
+                } else {
+                    document.getElementById('username').classList.remove('is-invalid');
+                }
+
+                // Validate password
+                const password = document.getElementById('password').value;
+                if (!password) {
+                    errors.push('Password is required.');
+                    document.getElementById('password').classList.add('is-invalid');
+                    document.getElementById('password').nextElementSibling.textContent = 'Password is required.';
+                } else {
+                    document.getElementById('password').classList.remove('is-invalid');
+                }
+
+                // Validate fullName
+                const fullName = document.getElementById('fullName').value;
+                if (!fullName) {
+                    errors.push('Full name is required.');
+                    document.getElementById('fullName').classList.add('is-invalid');
+                    document.getElementById('fullName').nextElementSibling.textContent = 'Full name is required.';
+                } else if (fullName.length > 25) {
+                    errors.push('Full name must not exceed 25 characters.');
+                    document.getElementById('fullName').classList.add('is-invalid');
+                    document.getElementById('fullName').nextElementSibling.textContent = 'Full name must not exceed 25 characters.';
+                } else {
+                    document.getElementById('fullName').classList.remove('is-invalid');
+                }
+
+                // Validate email
+                const email = document.getElementById('email').value;
+                if (!email) {
+                    errors.push('Email is required.');
+                    document.getElementById('email').classList.add('is-invalid');
+                    document.getElementById('email').nextElementSibling.textContent = 'Email is required.';
+                } else {
+                    document.getElementById('email').classList.remove('is-invalid');
+                }
+
+                // Validate phoneNumber
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                if (!phoneNumber) {
+                    errors.push('Phone number is required.');
+                    document.getElementById('phoneNumber').classList.add('is-invalid');
+                    document.getElementById('phoneNumber').nextElementSibling.textContent = 'Phone number is required.';
+                } else {
+                    document.getElementById('phoneNumber').classList.remove('is-invalid');
+                }
+
+                // Validate address
+                const address = document.getElementById('address').value;
+                if (!address) {
+                    errors.push('Address is required.');
+                    document.getElementById('address').classList.add('is-invalid');
+                    document.getElementById('address').nextElementSibling.textContent = 'Address is required.';
+                } else if (address.length > 25) {
+                    errors.push('Address must not exceed 25 characters.');
+                    document.getElementById('address').classList.add('is-invalid');
+                    document.getElementById('address').nextElementSibling.textContent = 'Address must not exceed 25 characters.';
+                } else {
+                    document.getElementById('address').classList.remove('is-invalid');
+                }
+
+                // Validate userPicture
+                const userPicture = document.getElementById('userPicture').files;
+                if (!userPicture || userPicture.length === 0) {
+                    errors.push('User picture is required.');
+                    document.getElementById('userPicture').classList.add('is-invalid');
+                    document.getElementById('userPicture').nextElementSibling.nextElementSibling.textContent = 'User picture is required.';
+                } else {
+                    document.getElementById('userPicture').classList.remove('is-invalid');
+                }
+
+                // Validate dateOfBirth
+                const dateOfBirth = document.getElementById('dateOfBirth').value;
+                if (!dateOfBirth) {
+                    errors.push('Date of birth is required.');
+                    document.getElementById('dateOfBirth').classList.add('is-invalid');
+                    document.getElementById('dateOfBirth').nextElementSibling.textContent = 'Date of birth is required.';
+                } else {
+                    document.getElementById('dateOfBirth').classList.remove('is-invalid');
+                }
+
+                // Validate gender
+                const gender = document.getElementById('gender').value;
+                if (!gender) {
+                    errors.push('Gender is required.');
+                    document.getElementById('gender').classList.add('is-invalid');
+                    document.getElementById('gender').nextElementSibling.textContent = 'Gender is required.';
+                } else {
+                    document.getElementById('gender').classList.remove('is-invalid');
+                }
+
+                // Validate roleId
+                const roleId = document.getElementById('roleId').value;
+                if (!roleId) {
+                    errors.push('Role is required.');
+                    document.getElementById('roleId').classList.add('is-invalid');
+                    document.getElementById('roleId').nextElementSibling.textContent = 'Role is required.';
+                } else {
+                    document.getElementById('roleId').classList.remove('is-invalid');
+                }
+
+                // Validate departmentName
+                const departmentName = document.getElementById('departmentName').value;
+                if (!departmentName) {
+                    errors.push('Department is required.');
+                    document.getElementById('departmentName').classList.add('is-invalid');
+                    document.getElementById('departmentName').nextElementSibling.nextElementSibling.textContent = 'Department is required.';
+                } else {
+                    document.getElementById('departmentName').classList.remove('is-invalid');
+                }
+
+                // Validate description
+                const description = document.getElementById('description').value;
+                if (description.length > 25) {
+                    errors.push('Description must not exceed 25 characters.');
+                    document.getElementById('description').classList.add('is-invalid');
+                    document.getElementById('description').nextElementSibling.textContent = 'Description must not exceed 25 characters.';
+                } else {
+                    document.getElementById('description').classList.remove('is-invalid');
+                }
+
+                if (errors.length > 0) {
+                    event.preventDefault(); 
+                }
             });
         });
     </script>

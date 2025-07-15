@@ -85,6 +85,7 @@ public class CreateUserServlet extends HttpServlet {
             String roleIdStr = request.getParameter("roleId");
             String departmentIdStr = request.getParameter("departmentId");
             String departmentName = request.getParameter("departmentName");
+
             int roleId = 0;
             Integer departmentId = null;
 
@@ -99,6 +100,7 @@ public class CreateUserServlet extends HttpServlet {
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 return;
             }
+
             try {
                 if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
                     departmentId = Integer.parseInt(departmentIdStr);
@@ -108,47 +110,15 @@ public class CreateUserServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setUsername(modifiedUsername);
-            String hashedPassword = hashPasswordWithMD5(password);
-            newUser.setPassword(hashedPassword);
-            newUser.setFullName(fullName);
+            newUser.setPassword(hashPasswordWithMD5(password));
             newUser.setEmail(email);
             newUser.setPhoneNumber(phoneNumber);
-            newUser.setAddress(address);
             newUser.setRoleId(roleId);
             newUser.setDepartmentId(departmentId);
-            newUser.setDescription(description);
             newUser.setVerificationToken(UUID.randomUUID().toString());
             newUser.setVerificationStatus("pending");
             newUser.setVerificationExpiry(LocalDateTime.now().plusHours(24));
             newUser.setStatus(User.Status.inactive);
-
-            if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
-                try {
-                    newUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr));
-                } catch (Exception e) {
-                    request.setAttribute("error", "Invalid date of birth.");
-                    List<Department> departments = departmentDAO.getAllDepartments();
-                    request.setAttribute("departments", departments);
-                    request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
-                    return;
-                }
-            }
-
-            if (gender != null && !gender.isEmpty()) {
-                try {
-                    if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
-                        newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
-                    } else {
-                        throw new IllegalArgumentException("Invalid gender.");
-                    }
-                } catch (Exception e) {
-                    request.setAttribute("error", "Invalid gender.");
-                    List<Department> departments = departmentDAO.getAllDepartments();
-                    request.setAttribute("departments", departments);
-                    request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
-                    return;
-                }
-            }
 
             Map<String, String> errors = new HashMap<>();
 
@@ -156,15 +126,7 @@ public class CreateUserServlet extends HttpServlet {
                 errors.put("email", "This email is already in use.");
             }
 
-            errors.putAll(UserValidator.validate(newUser, userDAO));
-
-            if (departmentId != null) {
-                Department department = departmentDAO.getDepartmentById(departmentId);
-                if (department == null) {
-                    errors.put("departmentId", "Selected department does not exist.");
-                }
-            }
-
+            String userPicture = null;
             Part filePart = request.getPart("userPicture");
             if (filePart != null && filePart.getSize() > 0) {
                 if (filePart.getSize() > 2 * 1024 * 1024) {
@@ -172,6 +134,7 @@ public class CreateUserServlet extends HttpServlet {
                 } else {
                     String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                     fileName = fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+                    userPicture = fileName;
 
                     String buildPath = getServletContext().getRealPath("/");
                     Path projectRoot = Paths.get(buildPath).getParent().getParent();
@@ -190,6 +153,36 @@ public class CreateUserServlet extends HttpServlet {
                 }
             }
 
+            errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, description, dateOfBirthStr, gender, departmentIdStr, userPicture));
+
+            if (departmentId != null) {
+                Department department = departmentDAO.getDepartmentById(departmentId);
+                if (department == null) {
+                    errors.put("departmentId", "Selected department does not exist.");
+                }
+            }
+
+            if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
+                try {
+                    LocalDate dob = LocalDate.parse(dateOfBirthStr);
+                    if (dob.isAfter(LocalDate.now())) {
+                        errors.put("dateOfBirth", "Date of birth cannot be in the future.");
+                    } else {
+                        newUser.setDateOfBirth(dob);
+                    }
+                } catch (Exception e) {
+                    errors.put("dateOfBirth", "Invalid date of birth.");
+                }
+            }
+
+            if (gender != null && !gender.isEmpty()) {
+                if ("male".equalsIgnoreCase(gender) || "female".equalsIgnoreCase(gender) || "other".equalsIgnoreCase(gender)) {
+                    newUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
+                } else {
+                    errors.put("gender", "Invalid gender.");
+                }
+            }
+
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
                 request.setAttribute("enteredUser", newUser);
@@ -204,29 +197,30 @@ public class CreateUserServlet extends HttpServlet {
                 return;
             }
 
+            newUser.setFullName(fullName);
+            newUser.setAddress(address);
+            newUser.setDescription(description);
+
             boolean created = userDAO.createUser(newUser);
             if (created) {
                 try {
                     String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + newUser.getVerificationToken();
                     String subject = "Verify Your Account";
                     String content = "<html><body>" +
-                                    "<p>Hello " + newUser.getFullName() + ",</p>" +
-                                    "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
-                                    "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>" +
-                                    "<p>Your login credentials:</p>" +
-                                    "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>" +
-                                    "<p><strong>Password:</strong> " + password + "</p>" +
-                                    "<p>This link will expire in 24 hours.</p>" +
-                                    "<p>Best regards,<br>The Support Team</p>" +
-                                    "</body></html>";
+                            "<p>Hello " + newUser.getFullName() + ",</p>" +
+                            "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
+                            "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>" +
+                            "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>" +
+                            "<p><strong>Password:</strong> " + password + "</p>" +
+                            "<p>This link will expire in 24 hours.</p>" +
+                            "<p>Best regards,<br>The Support Team</p>" +
+                            "</body></html>";
 
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
                     session.setAttribute("successMessage", "Account created successfully! Verification email sent.");
                     response.sendRedirect(request.getContextPath() + "/UserList");
                 } catch (Exception e) {
-                    System.err.println("❌ Error sending verification email: " + e.getMessage());
-                    e.printStackTrace();
-                    request.setAttribute("error", "Account created successfully, but failed to send verification email: " + e.getMessage());
+                    request.setAttribute("error", "Account created, but email failed: " + e.getMessage());
                     List<Department> departments = departmentDAO.getAllDepartments();
                     request.setAttribute("departments", departments);
                     request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -239,9 +233,8 @@ public class CreateUserServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            System.err.println("❌ System error creating account: " + e.getMessage());
-            e.printStackTrace();
             request.setAttribute("error", "System error: " + e.getMessage());
+            e.printStackTrace();
             List<Department> departments = departmentDAO.getAllDepartments();
             request.setAttribute("departments", departments);
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
