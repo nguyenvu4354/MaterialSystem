@@ -43,7 +43,7 @@ public class AddDepartmentServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (!rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền thêm phòng ban.");
+            request.setAttribute("error", "You do not have permission to add departments.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -64,7 +64,7 @@ public class AddDepartmentServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (!rolePermissionDAO.hasPermission(roleId, "CREATE_DEPARTMENT")) {
-            request.setAttribute("error", "Bạn không có quyền thêm phòng ban.");
+            request.setAttribute("error", "You do not have permission to add departments");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -80,7 +80,7 @@ public class AddDepartmentServlet extends HttpServlet {
             String description = request.getParameter("description");
 
             if (name == null || name.trim().isEmpty()) {
-                request.setAttribute("error", "Tên phòng ban không được để trống.");
+                request.setAttribute("error", "Department name cannot be left blank.");
                 request.setAttribute("name", name);
                 request.setAttribute("phone", phone);
                 request.setAttribute("email", email);
@@ -104,7 +104,7 @@ public class AddDepartmentServlet extends HttpServlet {
             departmentDAO.addDepartment(dept);
             response.sendRedirect(request.getContextPath() + "/depairmentlist");
         } catch (Exception e) {
-            request.setAttribute("error", "Lỗi khi thêm phòng ban: " + e.getMessage());
+            request.setAttribute("error", "Error adding department: " + e.getMessage());
             request.setAttribute("name", request.getParameter("name"));
             request.setAttribute("phone", request.getParameter("phone"));
             request.setAttribute("email", request.getParameter("email"));
