@@ -45,19 +45,20 @@ public class RepairRequestListServlet extends HttpServlet {
         // Filter parameters
         String searchKeyword = request.getParameter("search");
         String selectedStatus = request.getParameter("status");
-        String fullName = request.getParameter("fullName");
-        String requestDate = request.getParameter("requestDate");
+        String sortByName = request.getParameter("sortByName"); // New sort parameter
+        String requestDateFrom = request.getParameter("requestDateFrom");
+        String requestDateTo = request.getParameter("requestDateTo");
         if (selectedStatus == null || selectedStatus.isEmpty()) {
             selectedStatus = "all";
         }
 
         try {
-            // Fetch repair requests with pagination and filters
+            // Fetch repair requests with pagination, filters, and sorting
             List<RepairRequest> repairRequests = repairRequestDAO.getRepairRequestsWithPagination(
-                    offset, pageSize, searchKeyword, selectedStatus, fullName, requestDate
+                    offset, pageSize, searchKeyword, selectedStatus, sortByName, requestDateFrom, requestDateTo
             );
             int totalRecords = repairRequestDAO.getTotalRepairRequestCount(
-                    searchKeyword, selectedStatus, fullName, requestDate
+                    searchKeyword, selectedStatus, requestDateFrom, requestDateTo
             );
             int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
@@ -65,8 +66,9 @@ public class RepairRequestListServlet extends HttpServlet {
             request.setAttribute("repairRequests", repairRequests);
             request.setAttribute("searchKeyword", searchKeyword);
             request.setAttribute("selectedStatus", selectedStatus);
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("requestDate", requestDate);
+            request.setAttribute("sortByName", sortByName); // Pass sortByName to JSP
+            request.setAttribute("requestDateFrom", requestDateFrom);
+            request.setAttribute("requestDateTo", requestDateTo);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
         } catch (Exception e) {
