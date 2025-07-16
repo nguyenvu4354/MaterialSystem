@@ -86,7 +86,7 @@
                 border-radius: 6px;
                 padding: 6px auto;
                 font-weight: 300;
-                width: 100px
+                width: 100px;
             }
             .error {
                 color: red;
@@ -143,7 +143,11 @@
                             </select>
                             <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">
                             <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                            <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px;display: flex; justify-content: center; align-items: center">Clear</a>
+                            <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px; display: flex; justify-content: center; align-items: center">Clear</a>
+                            <input type="text" name="fullName" class="form-control" placeholder="Search by Full Name"
+                                   value="${fullName != null ? fullName : ''}" style="width: 230px;">
+                            <input type="date" name="requestDate" class="form-control" placeholder="Search by Request Date"
+                                   value="${requestDate != null ? requestDate : ''}" style="width: 230px;">
                         </form>
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>
@@ -154,7 +158,7 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Request Code</th>
-                                        <th>User ID</th>
+                                        <th>Full Name</th>
                                         <th>Request Date</th>
                                         <th>Status</th>
                                         <th>Reason</th>
@@ -167,7 +171,7 @@
                                             <tr>
                                                 <td>${r.repairRequestId}</td>
                                                 <td>${r.requestCode}</td>
-                                                <td>${r.userId}</td>
+                                                <td>${r.fullName != null ? r.fullName : 'Unknown'}</td>
                                                 <td>${r.requestDate}</td>
                                                 <td>
                                                     <span class="status-badge
@@ -198,17 +202,17 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="repairrequestlist?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}" aria-label="Previous">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}" aria-label="Previous">
                                             <span aria-hidden="true">« Previous</span>
                                         </a>
                                     </li>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="repairrequestlist?page=${i}&search=${searchKeyword}&status=${selectedStatus}">${i}</a>
+                                            <a class="page-link" href="repairrequestlist?page=${i}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="repairrequestlist?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}" aria-label="Next">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}" aria-label="Next">
                                             <span aria-hidden="true">Next »</span>
                                         </a>
                                     </li>

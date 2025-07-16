@@ -5,27 +5,27 @@
 package entity;
 
 import java.sql.Timestamp;
+
 /**
  *
  * @author Nhat Anh
  */
 public class RepairRequestDetail {
+
     private int detailId;
     private int repairRequestId;
     private int materialId;
     private int quantity;
     private String damageDescription;
-    private Double repairCost; 
+    private Double repairCost;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
     private Material material;
-    // Constructor mặc định
+
     public RepairRequestDetail() {
     }
 
-    // Constructor với tất cả các thuộc tính
-  
     public RepairRequestDetail(int detailId, int repairRequestId, int materialId, int quantity, String damageDescription, Double repairCost, Timestamp createdAt, Timestamp updatedAt) {
         this.detailId = detailId;
         this.repairRequestId = repairRequestId;
@@ -48,7 +48,6 @@ public class RepairRequestDetail {
     public void setMaterial(Material material) {
         this.material = material;
     }
-    
 
     public void setDetailId(int detailId) {
         this.detailId = detailId;
@@ -112,15 +111,16 @@ public class RepairRequestDetail {
 
     @Override
     public String toString() {
-        return "RepairRequestDetail{" +
-                "detailId=" + detailId +
-                ", repairRequestId=" + repairRequestId +
-                ", materialId=" + materialId +
-                ", quantity=" + quantity +
-                ", damageDescription='" + damageDescription + '\'' +
-                ", repairCost=" + repairCost +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "RepairRequestDetail{"
+                + "detailId=" + detailId
+                + ", repairRequestId=" + repairRequestId
+                + ", materialId=" + materialId
+                + ", quantity=" + quantity
+                + ", damageDescription='" + damageDescription + '\''
+                + ", repairCost=" + repairCost
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
+
 }
