@@ -64,9 +64,14 @@ public class PasswordResetRequestsServlet extends HttpServlet {
     throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         User currentUser = (User) request.getSession().getAttribute("user");
-        if (currentUser == null || currentUser.getRoleId() != 1) {
+        if (currentUser == null) {
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+            return;
+        }
+        if (currentUser.getRoleId() != 1) {
             request.setAttribute("error", "You do not have permission to view password reset requests.");
-            request.getRequestDispatcher("PasswordResetRequests.jsp").forward(request, response);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
         PasswordResetRequestsDAO dao = new PasswordResetRequestsDAO();
@@ -154,7 +159,21 @@ public class PasswordResetRequestsServlet extends HttpServlet {
             request.setAttribute("message", "Password reset request has been rejected.");
         }
         dao.updateStatus(requestId, status, newPassword, adminId);
-        doGet(request, response);
+        // Lấy lại filter để redirect đúng trạng thái
+        String statusFilter = request.getParameter("statusFilter");
+        String searchEmail = request.getParameter("searchEmail");
+        String page = request.getParameter("page");
+        StringBuilder redirectUrl = new StringBuilder("PasswordResetRequests?");
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            redirectUrl.append("status=").append(statusFilter).append("&");
+        }
+        if (searchEmail != null && !searchEmail.isEmpty()) {
+            redirectUrl.append("searchEmail=").append(searchEmail).append("&");
+        }
+        if (page != null && !page.isEmpty()) {
+            redirectUrl.append("page=").append(page).append("&");
+        }
+        response.sendRedirect(redirectUrl.toString());
     }
     private String generateRandomPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*?&";

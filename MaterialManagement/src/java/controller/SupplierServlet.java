@@ -31,7 +31,8 @@ public class SupplierServlet extends HttpServlet {
             throws ServletException, IOException {
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please log in to access this page.");
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
@@ -42,17 +43,17 @@ public class SupplierServlet extends HttpServlet {
         if (roleId != 1) {
             if ("list".equals(action) && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_SUPPLIER")) {
                 request.setAttribute("error", "You do not have permission to view the supplier list.");
-                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
             if ("edit".equals(action) && !rolePermissionDAO.hasPermission(roleId, "UPDATE_SUPPLIER") && !rolePermissionDAO.hasPermission(roleId, "VIEW_DETAIL_SUPPLIER")) {
                 request.setAttribute("error", "You do not have permission to edit or view supplier details.");
-                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
             if ("delete".equals(action) && !rolePermissionDAO.hasPermission(roleId, "DELETE_SUPPLIER")) {
                 request.setAttribute("error", "You do not have permission to delete suppliers.");
-                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
         }
@@ -174,7 +175,8 @@ public class SupplierServlet extends HttpServlet {
             throws ServletException, IOException {
         User currentUser = (User) request.getSession().getAttribute("user");
         if (currentUser == null) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Please log in to access this page.");
+            request.setAttribute("error", "Please log in to access this page.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
 
@@ -184,12 +186,12 @@ public class SupplierServlet extends HttpServlet {
         if (roleId != 1) {
             if ((idStr == null || idStr.isEmpty()) && !rolePermissionDAO.hasPermission(roleId, "CREATE_SUPPLIER")) {
                 request.setAttribute("error", "You do not have permission to create suppliers.");
-                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
             if (idStr != null && !idStr.isEmpty() && !rolePermissionDAO.hasPermission(roleId, "UPDATE_SUPPLIER")) {
                 request.setAttribute("error", "You do not have permission to update suppliers.");
-                request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
         }
