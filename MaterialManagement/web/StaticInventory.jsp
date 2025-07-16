@@ -1,5 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="entity.User" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("Login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -210,7 +218,13 @@
         <div class="col-md-9 col-lg-10 content px-md-4">
           <c:set var="hasViewInventoryPermission" value="${rolePermissionDAO.hasPermission(roleId, 'VIEW_INVENTORY')}" scope="request" />
           <c:if test="${!hasViewInventoryPermission}">
-            <div class="alert alert-danger">You do not have access to the warehouse data..</div>
+            <div class="alert alert-danger text-center my-5">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h2>Access Denied</h2>
+                <p>You do not have permission to view inventory.</p>
+                <a href="home" class="btn btn-primary mt-3">Go to Homepage</a>
+            </div>
+            <c:remove var="inventoryList" scope="request"/>
           </c:if>
           <c:if test="${hasViewInventoryPermission}">
             <div class="d-flex justify-content-between align-items-center mb-3">
