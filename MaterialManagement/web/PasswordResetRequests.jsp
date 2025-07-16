@@ -156,6 +156,9 @@
                                                 <form method="post" action="PasswordResetRequests" class="d-flex flex-column align-items-center justify-content-center gap-2 mb-0" style="min-width: 120px;">
                                                     <input type="hidden" name="requestId" value="${req.requestId}" />
                                                     <input type="hidden" name="newPassword" value="${req.newPassword}" />
+                                                    <input type="hidden" name="statusFilter" value="${param.status}" />
+                                                    <input type="hidden" name="searchEmail" value="${param.searchEmail}" />
+                                                    <input type="hidden" name="page" value="${currentPage}" />
                                                     <select name="status" class="form-select form-select-sm w-auto d-inline-block mx-auto" style="min-width:80px; border: 2px solid #000; text-align: center;"
                                                         <c:if test="${req.status != 'pending'}">disabled</c:if>>
                                                         <option value="completed" ${req.status == 'completed' ? 'selected' : ''}>Completed</option>

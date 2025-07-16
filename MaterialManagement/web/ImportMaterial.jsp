@@ -448,7 +448,7 @@
                             alert.style.display = 'none';
                         }, 500);
                     }
-                }, 3000);
+                }, 5000);
                 
                 alert.addEventListener('click', function(e) {
                     if (e.target.classList.contains('btn-close') || e.target.classList.contains('alert')) {
