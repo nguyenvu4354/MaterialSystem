@@ -12,10 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet(urlPatterns = {"/depairmentlist"})
 public class DepartmentServlet extends HttpServlet {
+
     private DepartmentDAO departmentDAO = new DepartmentDAO();
     private RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
 
@@ -37,22 +37,57 @@ public class DepartmentServlet extends HttpServlet {
             return;
         }
 
+        // Pagination parameters
+        int page = 1;
+        int pageSize = 10;
+        try {
+            if (request.getParameter("page") != null) {
+                page = Integer.parseInt(request.getParameter("page"));
+                if (page < 1) {
+                    page = 1;
+                }
+            }
+            if (request.getParameter("pageSize") != null) {
+                pageSize = Integer.parseInt(request.getParameter("pageSize"));
+                if (pageSize < 1) {
+                    pageSize = 10;
+                }
+            }
+        } catch (NumberFormatException e) {
+            page = 1;
+            pageSize = 10;
+        }
+        int offset = (page - 1) * pageSize;
+
+        // Filter and sort parameters
         String searchKeyword = request.getParameter("search");
+        String sortByName = request.getParameter("sortByName");
+        String statusFilter = request.getParameter("statusFilter");
+        String locationFilter = request.getParameter("locationFilter");
 
         try {
-            // Get all departments
-            List<Department> departments = departmentDAO.getAllDepartments();
+            // Fetch locations and statuses for dropdowns
+            List<String> locations = departmentDAO.getAllLocations();
+            List<String> statuses = departmentDAO.getAllStatuses();
 
-            // Filter by searchKeyword if provided
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                String keyword = searchKeyword.trim().toUpperCase();
-                departments = departments.stream()
-                        .filter(d -> d.getDepartmentCode().toUpperCase().contains(keyword))
-                        .collect(Collectors.toList());
-            }
+            // Fetch departments with pagination, search, sort, and filter
+            List<Department> departments = departmentDAO.getDepartmentsWithPagination(
+                    offset, pageSize, searchKeyword, sortByName, statusFilter, locationFilter
+            );
+            int totalRecords = departmentDAO.getTotalDepartmentCount(searchKeyword, statusFilter, locationFilter);
+            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
+            // Set attributes for JSP
             request.setAttribute("departments", departments);
+            request.setAttribute("locations", locations);
+            request.setAttribute("statuses", statuses);
             request.setAttribute("searchKeyword", searchKeyword);
+            request.setAttribute("sortByName", sortByName);
+            request.setAttribute("statusFilter", statusFilter);
+            request.setAttribute("locationFilter", locationFilter);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("pageSize", pageSize);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.getRequestDispatcher("DepartmentList.jsp").forward(request, response);
         } catch (Exception e) {
@@ -60,6 +95,12 @@ public class DepartmentServlet extends HttpServlet {
             request.setAttribute("error", "Error when getting department list: " + e.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response); // Redirect POST to GET for simplicity
     }
 
     @Override
