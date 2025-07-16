@@ -20,8 +20,7 @@ public class RepairRequestDAO extends DBContext {
                 + "(repair_request_id, material_id, quantity, damage_description, repair_cost, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement psRequest = connection.prepareStatement(requestSql, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement psDetail = connection.prepareStatement(detailSql)) {
+        try (PreparedStatement psRequest = connection.prepareStatement(requestSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement psDetail = connection.prepareStatement(detailSql)) {
             // Validate input
             if (request == null || request.getRequestCode() == null || request.getUserId() <= 0) {
                 throw new IllegalArgumentException("Invalid repair request data.");
@@ -68,16 +67,27 @@ public class RepairRequestDAO extends DBContext {
         }
     }
 
-    public List<RepairRequest> getRepairRequestsWithPagination(int offset, int pageSize, String searchKeyword, String status) throws SQLException {
+    public List<RepairRequest> getRepairRequestsWithPagination(int offset, int pageSize, String searchKeyword, String status, String fullName, String requestDate) throws SQLException {
         List<RepairRequest> requests = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Repair_Requests WHERE disable = 0 AND status != 'cancel'");
+        StringBuilder sql = new StringBuilder(
+                "SELECT rr.*, u.full_name "
+                + "FROM Repair_Requests rr "
+                + "JOIN Users u ON rr.user_id = u.user_id "
+                + "WHERE rr.disable = 0 AND rr.status != 'cancel'"
+        );
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND request_code LIKE ?");
+            sql.append(" AND rr.request_code LIKE ?");
         }
         if (status != null && !status.equalsIgnoreCase("all")) {
-            sql.append(" AND status = ?");
+            sql.append(" AND rr.status = ?");
         }
-        sql.append(" ORDER BY repair_request_id LIMIT ? OFFSET ?");
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+        }
+        if (requestDate != null && !requestDate.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) = ?");
+        }
+        sql.append(" ORDER BY rr.repair_request_id LIMIT ? OFFSET ?");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
@@ -86,6 +96,12 @@ public class RepairRequestDAO extends DBContext {
             }
             if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
+            }
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + fullName.trim() + "%");
+            }
+            if (requestDate != null && !requestDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDate);
             }
             ps.setInt(paramIndex++, pageSize);
             ps.setInt(paramIndex, offset);
@@ -96,6 +112,7 @@ public class RepairRequestDAO extends DBContext {
                     request.setRepairRequestId(rs.getInt("repair_request_id"));
                     request.setRequestCode(rs.getString("request_code"));
                     request.setUserId(rs.getInt("user_id"));
+                    request.setFullName(rs.getString("full_name"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
                     request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
                     request.setRepairPersonEmail(rs.getString("repair_person_email"));
@@ -117,13 +134,24 @@ public class RepairRequestDAO extends DBContext {
         return requests;
     }
 
-    public int getTotalRepairRequestCount(String searchKeyword, String status) throws SQLException {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Repair_Requests WHERE disable = 0 AND status != 'cancel'");
+    public int getTotalRepairRequestCount(String searchKeyword, String status, String fullName, String requestDate) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM Repair_Requests rr "
+                + "JOIN Users u ON rr.user_id = u.user_id "
+                + "WHERE rr.disable = 0 AND rr.status != 'cancel'"
+        );
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND request_code LIKE ?");
+            sql.append(" AND rr.request_code LIKE ?");
         }
         if (status != null && !status.equalsIgnoreCase("all")) {
-            sql.append(" AND status = ?");
+            sql.append(" AND rr.status = ?");
+        }
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            sql.append(" AND u.full_name LIKE ?");
+        }
+        if (requestDate != null && !requestDate.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) = ?");
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -133,6 +161,12 @@ public class RepairRequestDAO extends DBContext {
             }
             if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
+            }
+            if (fullName != null && !fullName.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + fullName.trim() + "%");
+            }
+            if (requestDate != null && !requestDate.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDate);
             }
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -170,8 +204,7 @@ public class RepairRequestDAO extends DBContext {
     public List<RepairRequestDetail> getAllRepairRequestDetails() throws SQLException {
         List<RepairRequestDetail> details = new ArrayList<>();
         String sql = "SELECT * FROM Repair_Request_Details";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 RepairRequestDetail detail = new RepairRequestDetail();
                 detail.setDetailId(rs.getInt("detail_id"));

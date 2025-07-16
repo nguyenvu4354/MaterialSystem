@@ -31,6 +31,9 @@ public class RepairRequest {
     private Timestamp updatedAt;
     private boolean disable;
     private List<RepairRequestDetail> details; // Added field
+    
+    private String fullName;
+    
 
     // Constructor mặc định
     public RepairRequest() {
@@ -65,6 +68,17 @@ public class RepairRequest {
     public int getRepairRequestId() {
         return repairRequestId;
     }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+   
+    
 
     public void setRepairRequestId(int repairRequestId) {
         this.repairRequestId = repairRequestId;
