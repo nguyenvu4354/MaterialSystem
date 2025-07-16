@@ -67,7 +67,7 @@ public class RepairRequestDAO extends DBContext {
         }
     }
 
-    public List<RepairRequest> getRepairRequestsWithPagination(int offset, int pageSize, String searchKeyword, String status, String fullName, String requestDate) throws SQLException {
+    public List<RepairRequest> getRepairRequestsWithPagination(int offset, int pageSize, String searchKeyword, String status, String sortByName, String requestDateFrom, String requestDateTo) throws SQLException {
         List<RepairRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT rr.*, u.full_name "
@@ -81,13 +81,24 @@ public class RepairRequestDAO extends DBContext {
         if (status != null && !status.equalsIgnoreCase("all")) {
             sql.append(" AND rr.status = ?");
         }
-        if (fullName != null && !fullName.trim().isEmpty()) {
-            sql.append(" AND u.full_name LIKE ?");
+        if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND rr.request_date BETWEEN ? AND ?");
+        } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) >= ?");
+        } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) <= ?");
         }
-        if (requestDate != null && !requestDate.trim().isEmpty()) {
-            sql.append(" AND DATE(rr.request_date) = ?");
+        // Add sorting by full_name
+        if (sortByName != null && !sortByName.isEmpty()) {
+            if ("asc".equalsIgnoreCase(sortByName)) {
+                sql.append(" ORDER BY u.full_name ASC, rr.repair_request_id");
+            } else if ("desc".equalsIgnoreCase(sortByName)) {
+                sql.append(" ORDER BY u.full_name DESC, rr.repair_request_id");
+            }
+        } else {
+            sql.append(" ORDER BY rr.repair_request_id");
         }
-        sql.append(" ORDER BY rr.repair_request_id LIMIT ? OFFSET ?");
+        sql.append(" LIMIT ? OFFSET ?");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
@@ -97,11 +108,13 @@ public class RepairRequestDAO extends DBContext {
             if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
             }
-            if (fullName != null && !fullName.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + fullName.trim() + "%");
-            }
-            if (requestDate != null && !requestDate.trim().isEmpty()) {
-                ps.setString(paramIndex++, requestDate);
+            if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
+            } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+            } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
             }
             ps.setInt(paramIndex++, pageSize);
             ps.setInt(paramIndex, offset);
@@ -134,7 +147,7 @@ public class RepairRequestDAO extends DBContext {
         return requests;
     }
 
-    public int getTotalRepairRequestCount(String searchKeyword, String status, String fullName, String requestDate) throws SQLException {
+    public int getTotalRepairRequestCount(String searchKeyword, String status, String requestDateFrom, String requestDateTo) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) "
                 + "FROM Repair_Requests rr "
@@ -147,11 +160,12 @@ public class RepairRequestDAO extends DBContext {
         if (status != null && !status.equalsIgnoreCase("all")) {
             sql.append(" AND rr.status = ?");
         }
-        if (fullName != null && !fullName.trim().isEmpty()) {
-            sql.append(" AND u.full_name LIKE ?");
-        }
-        if (requestDate != null && !requestDate.trim().isEmpty()) {
-            sql.append(" AND DATE(rr.request_date) = ?");
+        if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND rr.request_date BETWEEN ? AND ?");
+        } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) >= ?");
+        } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND DATE(rr.request_date) <= ?");
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -162,11 +176,13 @@ public class RepairRequestDAO extends DBContext {
             if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
             }
-            if (fullName != null && !fullName.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + fullName.trim() + "%");
-            }
-            if (requestDate != null && !requestDate.trim().isEmpty()) {
-                ps.setString(paramIndex++, requestDate);
+            if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
+            } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+            } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
             }
 
             try (ResultSet rs = ps.executeQuery()) {

@@ -131,9 +131,12 @@
                             <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;">
                                 <i class="fas fa-tools"></i> Repair Request Management
                             </h2>
+                            <a href="${pageContext.request.contextPath}/repairrequest" class="btn btn-add ms-auto">
+                                <i class="fas fa-plus"></i> Add Repair Request
+                            </a>
                         </div>
                         <form method="get" action="repairrequestlist" class="filter-bar align-items-center" style="gap: 8px; flex-wrap: nowrap;">
-                            <input type="text" name="search" class="form-control" placeholder="Search by Request Code"
+                            <input type="text" name="search" class="form-control" placeholder="Search Request Code"
                                    value="${searchKeyword != null ? searchKeyword : ''}" style="width: 230px;">
                             <select name="status" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
                                 <option value="all" ${selectedStatus == null || selectedStatus == 'all' ? 'selected' : ''}>All Status</option>
@@ -141,13 +144,19 @@
                                 <option value="approved" ${selectedStatus == 'approved' ? 'selected' : ''}>Approved</option>
                                 <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
                             </select>
+                            <select name="sortByName" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
+                                <option value="" ${sortByName == null || sortByName == '' ? 'selected' : ''}>Sort by FullName</option>
+                                <option value="asc" ${sortByName == 'asc' ? 'selected' : ''}>Name (A-Z)</option>
+                                <option value="desc" ${sortByName == 'desc' ? 'selected' : ''}>Name (Z-A)</option>
+                            </select>
                             <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">
+
+                            <input type="date" name="requestDateFrom" class="form-control" placeholder="From Date"
+                                   value="${requestDateFrom != null ? requestDateFrom : ''}" style="width: 230px;">
+                            <input type="date" name="requestDateTo" class="form-control" placeholder="To Date"
+                                   value="${requestDateTo != null ? requestDateTo : ''}" style="width: 230px;">
                             <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
                             <a href="${pageContext.request.contextPath}/repairrequestlist" class="btn btn-secondary" style="width: 75px; height: 50px; display: flex; justify-content: center; align-items: center">Clear</a>
-                            <input type="text" name="fullName" class="form-control" placeholder="Search by Full Name"
-                                   value="${fullName != null ? fullName : ''}" style="width: 230px;">
-                            <input type="date" name="requestDate" class="form-control" placeholder="Search by Request Date"
-                                   value="${requestDate != null ? requestDate : ''}" style="width: 230px;">
                         </form>
                         <c:if test="${not empty error}">
                             <p class="error">${error}</p>
@@ -202,17 +211,17 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="repairrequestlist?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}" aria-label="Previous">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}" aria-label="Previous">
                                             <span aria-hidden="true">« Previous</span>
                                         </a>
                                     </li>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="repairrequestlist?page=${i}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}">${i}</a>
+                                            <a class="page-link" href="repairrequestlist?page=${i}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="repairrequestlist?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}&fullName=${fullName}&requestDate=${requestDate}" aria-label="Next">
+                                        <a class="page-link" href="repairrequestlist?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}" aria-label="Next">
                                             <span aria-hidden="true">Next »</span>
                                         </a>
                                     </li>
