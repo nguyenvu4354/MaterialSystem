@@ -15,7 +15,7 @@ public class DepartmentDAO extends DBContext {
 
     public List<Department> getAllDepartments() {
         List<Department> departmentList = new ArrayList<>();
-        String sql = "SELECT * FROM Departments WHERE status != 'deleted'";
+        String sql = "SELECT * FROM Departments";
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -38,24 +38,23 @@ public class DepartmentDAO extends DBContext {
         return departmentList;
     }
 
-    public List<Department> getDepartmentsWithPagination(int offset, int pageSize, String searchKeyword, String sortByName, String sortByStatus, String locationFilter) throws SQLException {
+    public List<Department> getDepartmentsWithPagination(int offset, int pageSize, String searchKeyword, String sortByName, String statusFilter, String locationFilter) throws SQLException {
         List<Department> departmentList = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-                "SELECT * FROM Departments WHERE status != 'deleted'"
-        );
+        StringBuilder sql = new StringBuilder("SELECT * FROM Departments");
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND UPPER(department_code) LIKE ?");
+            sql.append(" WHERE UPPER(department_code) LIKE ?");
+        } else {
+            sql.append(" WHERE 1=1");
+        }
+        if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+            sql.append(" AND status = ?");
         }
         if (locationFilter != null && !locationFilter.trim().isEmpty()) {
             sql.append(" AND location = ?");
         }
-        // Add sorting
         List<String> orderByClauses = new ArrayList<>();
         if (sortByName != null && (sortByName.equals("asc") || sortByName.equals("desc"))) {
             orderByClauses.add("department_name " + sortByName.toUpperCase());
-        }
-        if (sortByStatus != null && (sortByStatus.equals("asc") || sortByStatus.equals("desc"))) {
-            orderByClauses.add("status " + sortByStatus.toUpperCase());
         }
         if (!orderByClauses.isEmpty()) {
             sql.append(" ORDER BY ").append(String.join(", ", orderByClauses));
@@ -68,6 +67,9 @@ public class DepartmentDAO extends DBContext {
             int paramIndex = 1;
             if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
                 ps.setString(paramIndex++, "%" + searchKeyword.trim().toUpperCase() + "%");
+            }
+            if (statusFilter != null && !statusFilter.trim().isEmpty()) {
+                ps.setString(paramIndex++, statusFilter.trim());
             }
             if (locationFilter != null && !locationFilter.trim().isEmpty()) {
                 ps.setString(paramIndex++, locationFilter.trim());
@@ -97,70 +99,12 @@ public class DepartmentDAO extends DBContext {
         return departmentList;
     }
 
-    public int getTotalDepartmentCount(String searchKeyword, String locationFilter) throws SQLException {
-        StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Departments WHERE status != 'deleted'"
-        );
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND UPPER(department_code) LIKE ?");
-        }
-        if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-            sql.append(" AND location = ?");
-        }
-
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            int paramIndex = 1;
-            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                ps.setString(paramIndex++, "%" + searchKeyword.trim().toUpperCase() + "%");
-            }
-            if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-                ps.setString(paramIndex++, locationFilter.trim());
-            }
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw e;
-        }
-        return 0;
-    }
-
-    public List<String> getAllLocations() throws SQLException {
-        List<String> locations = new ArrayList<>();
-        String sql = "SELECT DISTINCT location FROM Departments WHERE status != 'deleted' AND location IS NOT NULL ORDER BY location";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                locations.add(rs.getString("location"));
-            }
-        } catch (SQLException e) {
-            throw e;
-        }
-        return locations;
-    }
-
-    public List<String> getAllStatuses() throws SQLException {
-        List<String> statuses = new ArrayList<>();
-        String sql = "SELECT DISTINCT status FROM Departments WHERE status != 'deleted' AND status IS NOT NULL ORDER BY status";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                statuses.add(rs.getString("status"));
-            }
-        } catch (SQLException e) {
-            throw e;
-        }
-        return statuses;
-    }
-
     public int getTotalDepartmentCount(String searchKeyword, String statusFilter, String locationFilter) throws SQLException {
-        StringBuilder sql = new StringBuilder(
-                "SELECT COUNT(*) FROM Departments WHERE status != 'deleted'"
-        );
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Departments");
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            sql.append(" AND UPPER(department_code) LIKE ?");
+            sql.append(" WHERE UPPER(department_code) LIKE ?");
+        } else {
+            sql.append(" WHERE 1=1");
         }
         if (statusFilter != null && !statusFilter.trim().isEmpty()) {
             sql.append(" AND status = ?");
@@ -190,6 +134,34 @@ public class DepartmentDAO extends DBContext {
             throw e;
         }
         return 0;
+    }
+
+    public List<String> getAllLocations() throws SQLException {
+        List<String> locations = new ArrayList<>();
+        String sql = "SELECT DISTINCT location FROM Departments WHERE location IS NOT NULL ORDER BY location";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                locations.add(rs.getString("location"));
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return locations;
+    }
+
+    public List<String> getAllStatuses() throws SQLException {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SELECT DISTINCT status FROM Departments WHERE status IS NOT NULL ORDER BY status";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                statuses.add(rs.getString("status"));
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return statuses;
     }
 
     public List<Department> getDepartments() throws SQLException {
@@ -279,7 +251,7 @@ public class DepartmentDAO extends DBContext {
     }
 
     public Department getDepartmentById(int id) {
-        String sql = "SELECT * FROM Departments WHERE department_id = ? AND status != 'deleted'";
+        String sql = "SELECT * FROM Departments WHERE department_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -308,7 +280,7 @@ public class DepartmentDAO extends DBContext {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random random = new Random();
         String code;
-        int maxAttempts = 100; // Limit attempts to avoid infinite loop
+        int maxAttempts = 100;
         int attempt = 0;
 
         do {
@@ -328,7 +300,7 @@ public class DepartmentDAO extends DBContext {
     }
 
     private boolean isCodeExists(String code) {
-        String sql = "SELECT COUNT(*) FROM Departments WHERE department_code = ? AND status != 'deleted'";
+        String sql = "SELECT COUNT(*) FROM Departments WHERE department_code = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, code);
             try (ResultSet rs = ps.executeQuery()) {
