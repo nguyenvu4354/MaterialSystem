@@ -3,6 +3,7 @@ package dal;
 import entity.DBContext;
 import entity.Export;
 import entity.ExportDetail;
+import entity.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +39,7 @@ public class ExportDAO extends DBContext {
             stmt.setString(6, export.getNote());
             stmt.setObject(7, export.getCreatedAt());
             stmt.setObject(8, export.getUpdatedAt());
-            
+
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating export failed, no rows affected.");
@@ -80,7 +81,7 @@ public class ExportDAO extends DBContext {
             stmt.setString(4, "draft");
             stmt.setObject(5, detail.getCreatedAt());
             stmt.setObject(6, detail.getUpdatedAt());
-            
+
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Adding material to export failed.");
@@ -182,7 +183,7 @@ public class ExportDAO extends DBContext {
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
                     details.add(detail);
-                }   
+                }
             }
         }
         return details;
@@ -223,7 +224,7 @@ public class ExportDAO extends DBContext {
             stmt.setString(5, export.getNote());
             stmt.setObject(6, export.getUpdatedAt());
             stmt.setInt(7, export.getExportId());
-            
+
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("No export updated for export ID: " + export.getExportId());
@@ -278,5 +279,39 @@ public class ExportDAO extends DBContext {
             }
         }
         return 0;
+    }
+
+    public List<User> getUsersByRoleIds(List<Integer> roleIds) throws SQLException {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT u.user_id, u.full_name, u.department_id, d.department_name "
+                + "FROM Users u "
+                + "LEFT JOIN Departments d ON u.department_id = d.department_id "
+                + "WHERE u.role_id IN (";
+
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < roleIds.size(); i++) {
+            placeholders.append("?");
+            if (i < roleIds.size() - 1) {
+                placeholders.append(",");
+            }
+        }
+        query += placeholders.toString() + ") AND u.status = 'active'";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            for (int i = 0; i < roleIds.size(); i++) {
+                stmt.setInt(i + 1, roleIds.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setDepartmentId(rs.getInt("department_id"));
+                    user.setDepartmentName(rs.getString("department_name"));
+                    users.add(user);
+                }
+            }
+        }
+        return users;
     }
 }

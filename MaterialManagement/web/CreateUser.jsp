@@ -26,7 +26,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <!-- jQuery UI CSS -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         body {
@@ -52,7 +51,6 @@
         .form-container .img-thumbnail {
             max-height: 150px;
         }
-        /* Customize autocomplete UI */
         .ui-autocomplete {
             max-height: 200px;
             overflow-y: auto;
@@ -279,7 +277,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Department list for autocomplete
             const departments = [
                 <c:forEach var="dept" items="${departments}" varStatus="loop">
                     {
@@ -290,7 +287,6 @@
                 </c:forEach>
             ];
 
-            // Initialize autocomplete for departmentName
             $("#departmentName").autocomplete({
                 source: function(request, response) {
                     const term = request.term.toLowerCase();
@@ -323,11 +319,9 @@
                 minLength: 1
             });
 
-            // Client-side validation
             document.getElementById('createUserForm').addEventListener('submit', function(event) {
                 let errors = [];
 
-                // Validate username
                 const username = document.getElementById('username').value;
                 if (!username) {
                     errors.push('Username is required.');
@@ -341,7 +335,6 @@
                     document.getElementById('username').classList.remove('is-invalid');
                 }
 
-                // Validate password
                 const password = document.getElementById('password').value;
                 if (!password) {
                     errors.push('Password is required.');
@@ -351,7 +344,6 @@
                     document.getElementById('password').classList.remove('is-invalid');
                 }
 
-                // Validate fullName
                 const fullName = document.getElementById('fullName').value;
                 if (!fullName) {
                     errors.push('Full name is required.');
@@ -365,7 +357,6 @@
                     document.getElementById('fullName').classList.remove('is-invalid');
                 }
 
-                // Validate email
                 const email = document.getElementById('email').value;
                 if (!email) {
                     errors.push('Email is required.');
@@ -375,7 +366,6 @@
                     document.getElementById('email').classList.remove('is-invalid');
                 }
 
-                // Validate phoneNumber
                 const phoneNumber = document.getElementById('phoneNumber').value;
                 if (!phoneNumber) {
                     errors.push('Phone number is required.');
@@ -385,7 +375,6 @@
                     document.getElementById('phoneNumber').classList.remove('is-invalid');
                 }
 
-                // Validate address
                 const address = document.getElementById('address').value;
                 if (!address) {
                     errors.push('Address is required.');
@@ -399,7 +388,6 @@
                     document.getElementById('address').classList.remove('is-invalid');
                 }
 
-                // Validate userPicture
                 const userPicture = document.getElementById('userPicture').files;
                 if (!userPicture || userPicture.length === 0) {
                     errors.push('User picture is required.');
@@ -409,7 +397,6 @@
                     document.getElementById('userPicture').classList.remove('is-invalid');
                 }
 
-                // Validate dateOfBirth
                 const dateOfBirth = document.getElementById('dateOfBirth').value;
                 if (!dateOfBirth) {
                     errors.push('Date of birth is required.');
@@ -419,7 +406,6 @@
                     document.getElementById('dateOfBirth').classList.remove('is-invalid');
                 }
 
-                // Validate gender
                 const gender = document.getElementById('gender').value;
                 if (!gender) {
                     errors.push('Gender is required.');
@@ -429,7 +415,6 @@
                     document.getElementById('gender').classList.remove('is-invalid');
                 }
 
-                // Validate roleId
                 const roleId = document.getElementById('roleId').value;
                 if (!roleId) {
                     errors.push('Role is required.');
@@ -439,7 +424,6 @@
                     document.getElementById('roleId').classList.remove('is-invalid');
                 }
 
-                // Validate departmentName
                 const departmentName = document.getElementById('departmentName').value;
                 if (!departmentName) {
                     errors.push('Department is required.');
@@ -449,7 +433,6 @@
                     document.getElementById('departmentName').classList.remove('is-invalid');
                 }
 
-                // Validate description
                 const description = document.getElementById('description').value;
                 if (description.length > 25) {
                     errors.push('Description must not exceed 25 characters.');

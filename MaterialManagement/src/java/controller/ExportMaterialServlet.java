@@ -3,7 +3,6 @@ package controller;
 import dal.DepartmentDAO;
 import dal.ExportDAO;
 import dal.InventoryDAO;
-import dal.UserDAO;
 import dal.RolePermissionDAO;
 import entity.Department;
 import entity.Export;
@@ -18,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ public class ExportMaterialServlet extends HttpServlet {
     private ExportDAO exportDAO;
     private DepartmentDAO departmentDAO;
     private InventoryDAO inventoryDAO;
-    private UserDAO userDAO;
     private RolePermissionDAO rolePermissionDAO;
     private static final int PAGE_SIZE = 3;
 
@@ -41,7 +38,6 @@ public class ExportMaterialServlet extends HttpServlet {
         exportDAO = new ExportDAO();
         departmentDAO = new DepartmentDAO();
         inventoryDAO = new InventoryDAO();
-        userDAO = new UserDAO();
         rolePermissionDAO = new RolePermissionDAO();
     }
 
@@ -295,10 +291,12 @@ public class ExportMaterialServlet extends HttpServlet {
         int recipientUserId;
         try {
             recipientUserId = Integer.parseInt(request.getParameter("recipientUserId"));
-            boolean validRecipient = userDAO.getAllUsers().stream()
+            List<Integer> roleIds = List.of(3, 4); // Only allow roleId 3 or 4
+            List<User> validRecipients = exportDAO.getUsersByRoleIds(roleIds);
+            boolean validRecipient = validRecipients.stream()
                     .anyMatch(u -> u.getUserId() == recipientUserId);
             if (!validRecipient) {
-                request.setAttribute("error", "Invalid recipient user ID.");
+                request.setAttribute("error", "Invalid recipient user ID. Must be a user with role ID 3 or 4.");
                 loadDataAndForward(request, response, currentPage);
                 return;
             }
@@ -323,46 +321,27 @@ public class ExportMaterialServlet extends HttpServlet {
             return;
         }
 
-        Export export = new Export();
-        export.setExportId(tempExportId);
-        export.setExportDate(LocalDateTime.now());
-        export.setExportedBy(user.getUserId());
-        export.setRecipientUserId(recipientUserId);
-        export.setBatchNumber(batchNumber);
-        export.setNote(note);
-        export.setUpdatedAt(LocalDateTime.now());
-
-        Connection conn = null;
         try {
-            conn = exportDAO.getConnection();
-            conn.setAutoCommit(false);
+            Export export = new Export();
+            export.setExportId(tempExportId);
+            export.setExportDate(LocalDateTime.now());
+            export.setExportedBy(user.getUserId());
+            export.setRecipientUserId(recipientUserId);
+            export.setBatchNumber(batchNumber);
+            export.setNote(note);
+            export.setUpdatedAt(LocalDateTime.now());
 
             exportDAO.updateExport(export);
             exportDAO.confirmExport(tempExportId);
             exportDAO.updateInventoryByExportId(tempExportId, user.getUserId());
 
-            conn.commit();
+            String exportCode = exportDAO.getExportCode(tempExportId);
             session.setAttribute("tempExportId", null);
-            request.setAttribute("success", "Export completed successfully with code: " + exportDAO.getExportCode(tempExportId));
-            currentPage = 1; // Reset to first page after export
+            request.setAttribute("success", "Export completed successfully with code: " + exportCode);
+            currentPage = 1;
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace();
-                }
-            }
             request.setAttribute("error", "Export failed: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeEx) {
-                    closeEx.printStackTrace();
-                }
-            }
+            e.printStackTrace();
         }
         loadDataAndForward(request, response, currentPage);
     }
@@ -372,7 +351,8 @@ public class ExportMaterialServlet extends HttpServlet {
         try {
             List<Department> departments = departmentDAO.getDepartments();
             List<Material> materials = departmentDAO.getMaterials();
-            List<User> users = userDAO.getAllUsers();
+            List<Integer> roleIds = List.of(3, 4); 
+            List<User> users = exportDAO.getUsersByRoleIds(roleIds);
             Integer tempExportId = (Integer) request.getSession().getAttribute("tempExportId");
             List<ExportDetail> fullExportDetails = (tempExportId != null) 
                     ? exportDAO.getDraftExportDetails(tempExportId) 

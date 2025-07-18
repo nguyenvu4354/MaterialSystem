@@ -1,6 +1,5 @@
 package controller;
 
-import dal.DepartmentDAO;
 import dal.UserDAO;
 import dal.RoleDAO;
 import dal.RolePermissionDAO;
@@ -67,10 +66,9 @@ public class UserListServlet extends HttpServlet {
         }
 
         UserDAO userDAO = new UserDAO();
-        DepartmentDAO departmentDAO = new DepartmentDAO();
         RoleDAO roleDAO = new RoleDAO();
 
-        List<Department> departmentList = departmentDAO.getAllDepartments();
+        List<Department> departmentList = userDAO.getActiveDepartments(); 
         List<Role> roleList = roleDAO.getAllRoles();
         request.setAttribute("departmentList", departmentList);
         request.setAttribute("roleList", roleList);
