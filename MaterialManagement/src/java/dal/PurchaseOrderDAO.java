@@ -68,7 +68,7 @@ public class PurchaseOrderDAO extends DBContext {
         }
 
         sql.append("GROUP BY po.po_id ");
-        sql.append("ORDER BY po.created_at DESC LIMIT ? OFFSET ?");
+        sql.append("ORDER BY po.po_id ASC LIMIT ? OFFSET ?");
         params.add(pageSize);
         params.add((page - 1) * pageSize);
 
@@ -280,6 +280,20 @@ public class PurchaseOrderDAO extends DBContext {
         return detail;
     }
 
+    // Sinh mã PO code tự động theo định dạng PO001, PO002, ...
+    public String generateNextPOCode() throws SQLException {
+        String sql = "SELECT MAX(CAST(SUBSTRING(po_code, 3) AS UNSIGNED)) AS max_num FROM Purchase_Orders WHERE po_code LIKE 'PO%'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                int nextNum = 1;
+                if (rs.next()) {
+                    nextNum = rs.getInt("max_num") + 1;
+                }
+                return String.format("PO%03d", nextNum);
+            }
+        }
+    }
+
     // Tạo Purchase Order mới
     public boolean createPurchaseOrder(PurchaseOrder purchaseOrder, List<PurchaseOrderDetail> details) {
         Connection conn = null;
@@ -289,6 +303,10 @@ public class PurchaseOrderDAO extends DBContext {
             // Insert Purchase Order
             String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
             try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                // Sinh mã PO code tự động nếu chưa có
+                if (purchaseOrder.getPoCode() == null || purchaseOrder.getPoCode().isEmpty()) {
+                    purchaseOrder.setPoCode(generateNextPOCode());
+                }
                 ps.setString(1, purchaseOrder.getPoCode());
                 ps.setInt(2, purchaseOrder.getPurchaseRequestId());
                 ps.setInt(3, purchaseOrder.getCreatedBy());

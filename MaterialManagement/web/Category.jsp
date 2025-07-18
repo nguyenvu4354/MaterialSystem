@@ -125,7 +125,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col" style="width: 150px">Code</th>
                                 <th scope="col" style="width: 300px">Name</th>
-                                <th scope="col" style="width: 150px">Parent ID</th>
+<!--                                <th scope="col" style="width: 150px">Parent ID</th>-->
                                 <th scope="col" style="width: 300px">Created Date</th>
                                 <th scope="col" style="width: 150px">Status</th>
                                 <th scope="col" style="width: 500px">Description</th>
@@ -144,7 +144,7 @@
                                             <td>${cat.category_id}</td>
                                             <td>${cat.code}</td>
                                             <td>${cat.category_name}</td>
-                                            <td>${cat.parent_id != null ? cat.parent_id : 'None'}</td>
+<!--                                            <td>${cat.parent_id != null ? cat.parent_id : 'None'}</td>-->
                                             <td><fmt:formatDate value="${cat.created_at}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                             <td>${cat.status}</td>
                                             <td>${cat.description}</td>

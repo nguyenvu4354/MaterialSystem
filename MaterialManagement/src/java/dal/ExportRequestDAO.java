@@ -51,7 +51,7 @@ public class ExportRequestDAO extends DBContext {
             sql.append("AND er.recipient_user_id = ? ");
         }
 
-        sql.append("ORDER BY er.request_date DESC ");
+        sql.append("ORDER BY er.export_request_id ASC ");
 
         if (page > 0 && itemsPerPage > 0) {
             sql.append("LIMIT ? OFFSET ?");
@@ -179,18 +179,18 @@ public class ExportRequestDAO extends DBContext {
         String sql = "UPDATE Export_Requests SET "
                 + "status = ?, "
                 + "approved_by = ?, "
-                + "approved_at = CURRENT_TIMESTAMP, "
+                + (("approved".equals(request.getStatus()) || "rejected".equals(request.getStatus())) ? "approved_at = CURRENT_TIMESTAMP, " : "")
                 + "approval_reason = ?, "
                 + "rejection_reason = ? "
                 + "WHERE export_request_id = ? AND disable = 0";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, request.getStatus());
-            ps.setInt(2, request.getApprovedBy());
-            ps.setString(3, request.getApprovalReason());
-            ps.setString(4, request.getRejectionReason());
-            ps.setInt(5, request.getExportRequestId());
-            
+            int idx = 1;
+            ps.setString(idx++, request.getStatus());
+            ps.setInt(idx++, request.getApprovedBy());
+            ps.setString(idx++, request.getApprovalReason());
+            ps.setString(idx++, request.getRejectionReason());
+            ps.setInt(idx++, request.getExportRequestId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating export request: " + e.getMessage(), e);

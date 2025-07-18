@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,11 +149,11 @@
                 <p><strong>Delivery Date:</strong> ${exportRequest.deliveryDate}</p>
                 <p>Request Reason:</p>
                 <p>${exportRequest.reason != null ? exportRequest.reason : "N/A"}</p>
-                <c:if test="${not empty exportRequest.approvalReason}">
+                <c:if test="${exportRequest.status == 'approved' && not empty exportRequest.approvalReason}">
                     <p><strong>Approval Reason:</strong> ${exportRequest.approvalReason}</p>
-                    <p><strong>Approved At:</strong> ${exportRequest.approvedAt}</p>
+                    <p><strong>Approved At:</strong> <fmt:formatDate value="${exportRequest.approvedAt}" pattern="yyyy-MM-dd HH:mm:ss" timeZone="Asia/Ho_Chi_Minh"/></p>
                 </c:if>
-                <c:if test="${not empty exportRequest.rejectionReason}">
+                <c:if test="${exportRequest.status == 'rejected' && not empty exportRequest.rejectionReason}">
                     <p><strong>Rejection Reason:</strong> ${exportRequest.rejectionReason}</p>
                 </c:if>
             </div>
