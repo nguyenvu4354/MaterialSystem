@@ -546,7 +546,7 @@
             </div>
         </div>
         <jsp:include page="Header.jsp" />
-        <section class="module-links py-4">
+<!--        <section class="module-links py-4">
             <div class="container">
                 <div class="row g-4 justify-content-center text-center">
                     <div class="col-6 col-md-3">
@@ -575,7 +575,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section>-->
 
         <div class="container-fluid my-5">
             <div class="row">

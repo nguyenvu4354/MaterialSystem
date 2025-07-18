@@ -45,7 +45,7 @@
         color: #4a4a4a;
     }
 
-    .back-btn {
+    .back-btn, .category-btn {
         border-radius: 30px;
         padding: 10px 30px;
         font-weight: 500;
@@ -53,9 +53,10 @@
         color: #f4a261;
         border: 2px solid #f4a261;
         transition: all 0.2s ease;
+        margin-right: 10px;
     }
 
-    .back-btn:hover {
+    .back-btn:hover, .category-btn:hover {
         background-color: #f4a261;
         color: #fff;
     }
@@ -121,8 +122,6 @@
                                 </c:choose>
                             </p>
 
-                         
-
                             <p><strong>📂 Category:</strong> 
                                 <c:choose>
                                     <c:when test="${not empty product.category}">
@@ -151,7 +150,9 @@
     </c:if>
 
     <div class="text-center mt-4">
-        <a href="view" class="btn btn-outline-secondary back-btn me-2">⬅ Back to Material List</a>
+        <c:if test="${not empty product.category}">
+            <a href="filter?categoryId=${product.category.category_id}" class="btn btn-outline-secondary category-btn">📂 Category: ${product.category.category_name}</a>
+        </c:if>
         <a href="home" class="btn btn-outline-secondary back-btn">🏠 Back to Home</a>
     </div>
 </div>

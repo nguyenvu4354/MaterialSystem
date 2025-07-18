@@ -126,7 +126,7 @@
 
                             <div class="mt-5 d-grid gap-2">
                                 <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                                <a href="HomePage.jsp" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
+                                <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
                             </div>
                         </form>
                     </div>
