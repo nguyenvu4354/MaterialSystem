@@ -55,7 +55,7 @@ public class InventoryDAO extends DBContext {
         }
     }
 
-    public void updateInventoryForImport(List<ImportDetail> details, int updatedBy) throws SQLException {
+    public void updateInventoryForImport(List<ImportDetail> details, int updatedBy, String location) throws SQLException {
         Objects.requireNonNull(details, "Import details list cannot be null");
         if (details.isEmpty()) {
             throw new SQLException("Import details list cannot be empty.");
@@ -65,8 +65,8 @@ public class InventoryDAO extends DBContext {
         }
 
         String checkStockSql = "SELECT stock FROM Inventory WHERE material_id = ?";
-        String updateStockSql = "UPDATE Inventory SET stock = stock + ?, updated_by = ?, last_updated = CURRENT_TIMESTAMP WHERE material_id = ?";
-        String insertStockSql = "INSERT INTO Inventory (material_id, stock, updated_by, last_updated, location) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'Default Warehouse')";
+        String updateStockSql = "UPDATE Inventory SET stock = stock + ?, updated_by = ?, last_updated = CURRENT_TIMESTAMP, location = ? WHERE material_id = ?";
+        String insertStockSql = "INSERT INTO Inventory (material_id, stock, updated_by, last_updated, location) VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)";
 
         try (PreparedStatement checkStmt = connection.prepareStatement(checkStockSql);
              PreparedStatement updateStmt = connection.prepareStatement(updateStockSql);
@@ -77,7 +77,8 @@ public class InventoryDAO extends DBContext {
                     if (rs.next()) {
                         updateStmt.setInt(1, detail.getQuantity());
                         updateStmt.setInt(2, updatedBy);
-                        updateStmt.setInt(3, detail.getMaterialId());
+                        updateStmt.setString(3, location);
+                        updateStmt.setInt(4, detail.getMaterialId());
                         if (updateStmt.executeUpdate() == 0) {
                             throw new SQLException("Failed to update inventory for material ID: " + detail.getMaterialId());
                         }
@@ -85,6 +86,7 @@ public class InventoryDAO extends DBContext {
                         insertStmt.setInt(1, detail.getMaterialId());
                         insertStmt.setInt(2, detail.getQuantity());
                         insertStmt.setInt(3, updatedBy);
+                        insertStmt.setString(4, location);
                         if (insertStmt.executeUpdate() == 0) {
                             throw new SQLException("Failed to create new inventory for material ID: " + detail.getMaterialId());
                         }
@@ -109,7 +111,7 @@ public class InventoryDAO extends DBContext {
 
     public List<Inventory> getAllInventory() throws SQLException {
         List<Inventory> inventoryList = new ArrayList<>();
-        String sql = "SELECT i.*, m.material_name, m.material_code, c.category_name, u.unit_name " +
+        String sql = "SELECT i.*, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name " +
                     "FROM Inventory i " +
                     "JOIN Materials m ON i.material_id = m.material_id " +
                     "LEFT JOIN Categories c ON m.category_id = c.category_id " +
@@ -130,6 +132,7 @@ public class InventoryDAO extends DBContext {
                 inventory.setUpdatedBy(rs.getInt("updated_by"));
                 inventory.setMaterialName(rs.getString("material_name"));
                 inventory.setMaterialCode(rs.getString("material_code"));
+                inventory.setMaterialsUrl(rs.getString("materials_url"));
                 inventory.setCategoryName(rs.getString("category_name"));
                 inventory.setUnitName(rs.getString("unit_name"));
                 
@@ -163,7 +166,7 @@ public class InventoryDAO extends DBContext {
         List<Inventory> inventoryList = new ArrayList<>();
         
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT i.*, m.material_name, m.material_code, c.category_name, u.unit_name ");
+        sql.append("SELECT i.*, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name ");
         sql.append("FROM Inventory i ");
         sql.append("JOIN Materials m ON i.material_id = m.material_id ");
         sql.append("LEFT JOIN Categories c ON m.category_id = c.category_id ");
@@ -227,6 +230,7 @@ public class InventoryDAO extends DBContext {
                     inventory.setUpdatedBy(rs.getInt("updated_by"));
                     inventory.setMaterialName(rs.getString("material_name"));
                     inventory.setMaterialCode(rs.getString("material_code"));
+                    inventory.setMaterialsUrl(rs.getString("materials_url"));
                     inventory.setCategoryName(rs.getString("category_name"));
                     inventory.setUnitName(rs.getString("unit_name"));
                     
