@@ -201,10 +201,10 @@ public class ImportDAO extends DBContext {
         }
     }
 
-    public void updateInventoryByImportId(int importId, int updatedBy) throws SQLException {
+    public void updateInventoryByImportId(int importId, int updatedBy, String location) throws SQLException {
         InventoryDAO inventoryDAO = new InventoryDAO();
         List<ImportDetail> details = getImportDetailsByImportId(importId);
-        inventoryDAO.updateInventoryForImport(details, updatedBy);
+        inventoryDAO.updateInventoryForImport(details, updatedBy, location);
     }
 
     public List<ImportDetail> getImportDetailsByImportId(int importId) throws SQLException {

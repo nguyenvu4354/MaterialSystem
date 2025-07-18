@@ -305,7 +305,7 @@
                   <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
                     <i class="fas fa-search me-2"></i> Search
                   </button>
-                  <a href="StaticInventory" class="btn btn-secondary" style="width: 120px; height: 50px">Clear</a>
+                  <a href="StaticInventory" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 120px; height: 50px">Clear</a>
                 </form>
               </div>
             </div>
@@ -313,15 +313,14 @@
               <table class="table table-bordered table-hover align-middle text-center">
                 <thead class="table-light">
                   <tr>
-                    <th>#</th>
-                    <th>Code</th>
-                    <th>Name</th>
-                    <th>Unit</th>
-                    <th>Category</th>
-                    <th>Stock</th>
-                    <th>Location</th>
-                    <th>Last Updated</th>
-                    <th>Updated By</th>
+                    <th style="width: 40px;">#</th>
+                    <th style="width: 90px;">Code</th>
+                    <th style="width: 90px;">Image</th>
+                    <th style="width: 180px;">Name</th>
+                    <th style="width: 80px;">Unit</th>
+                    <th style="width: 120px;">Category</th>
+                    <th style="width: 90px;">Stock</th>
+                    <th style="width: 120px;">Location</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -329,6 +328,16 @@
                     <tr>
                       <td><strong>${loop.index + 1}</strong></td>
                       <td><span class="material-code">${inv.materialCode}</span></td>
+                      <td>
+                        <c:choose>
+                          <c:when test="${not empty inv.materialsUrl}">
+                            <img src="${inv.materialsUrl}" alt="Material Image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
+                          </c:when>
+                          <c:otherwise>
+                            <img src="images/material/default.jpg" alt="Material Image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
+                          </c:otherwise>
+                        </c:choose>
+                      </td>
                       <td><div class="material-name">${inv.materialName}</div></td>
                       <td><div class="material-name">${inv.unitName}</div></td>
                       <td><div class="material-name">${inv.categoryName}</div></td>
@@ -341,18 +350,11 @@
                         </c:choose>
                       </td>
                       <td><div class="material-name">${inv.location}</div></td>
-                      <td><small class="text-muted">${inv.lastUpdated}</small></td>
-                      <td>
-                        <c:choose>
-                          <c:when test="${not empty userMap[inv.updatedBy]}"><span style="color: black; font-weight: 500">${userMap[inv.updatedBy].fullName}</span></c:when>
-                          <c:otherwise><span class="text-muted">-</span></c:otherwise>
-                        </c:choose>
-                      </td>
                     </tr>
                   </c:forEach>
                   <c:if test="${empty inventoryList}">
                     <tr>
-                      <td colspan="9" class="text-center text-muted">No inventory data available</td>
+                      <td colspan="8" class="text-center text-muted">No inventory data available</td>
                     </tr>
                   </c:if>
                 </tbody>

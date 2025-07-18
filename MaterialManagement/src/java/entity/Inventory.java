@@ -20,6 +20,7 @@ public class Inventory {
     private String materialCode;
     private String categoryName;
     private String unitName;
+    private String materialsUrl;
 
     public Inventory() {}
 
@@ -119,5 +120,12 @@ public class Inventory {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public String getMaterialsUrl() {
+        return materialsUrl;
+    }
+    public void setMaterialsUrl(String materialsUrl) {
+        this.materialsUrl = materialsUrl;
     }
 } 

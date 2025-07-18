@@ -237,7 +237,7 @@ public class ImportMaterialServlet extends HttpServlet {
 
         importDAO.updateImport(imports);
         importDAO.confirmImport(tempImportId);
-        importDAO.updateInventoryByImportId(tempImportId, user.getUserId());
+        importDAO.updateInventoryByImportId(tempImportId, user.getUserId(), destination);
         session.setAttribute("tempImportId", 0);
         request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + ". Total value: $" + String.format("%.2f", totalImportValue));
         loadDataAndForward(request, response);
