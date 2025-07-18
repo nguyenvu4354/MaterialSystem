@@ -43,13 +43,13 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="categoryName">Category Name <span class="text-danger">*</span></label>
+                                <label for="categoryName">Category Name <span class="text-danger"></span></label>
                                 <input type="text" id="categoryName" name="categoryName" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="code">Code <span class="text-danger">*</span></label>
+                                <label for="code">Code <span class="text-danger"></span></label>
                                 <input type="text" id="code" name="code" class="form-control" value="${categoryCode}" readonly required>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="status">Status <span class="text-danger">*</span></label>
+                                <label for="status">Status <span class="text-danger"></span></label>
                                 <select id="status" name="status" class="form-control" required>
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
@@ -83,7 +83,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="priority">Priority <span class="text-danger">*</span></label>
+                                <label for="priority">Priority <span class="text-danger"></span></label>
                                 <select id="priority" name="priority" class="form-control" required>
                                     <option value="high">High</option>
                                     <option value="medium">Medium</option>
@@ -95,7 +95,7 @@
 
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description" class="form-control"></textarea>
+                        <textarea id="description" name="description" class="form-control" required></textarea>
                     </div>
 
                     <div class="mt-3">
