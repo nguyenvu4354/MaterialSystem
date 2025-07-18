@@ -101,16 +101,17 @@ public class EditDepartmentServlet extends HttpServlet {
         String location = request.getParameter("location");
         String description = request.getParameter("description");
         String code = request.getParameter("code");
+        String status = request.getParameter("status");
 
         // Validate department ID
         Map<String, String> errors = new HashMap<>();
         if (idStr == null || idStr.trim().isEmpty()) {
-            errors.put("id", "Department code cannot be blank.");
+            errors.put("id", "Department ID cannot be blank.");
         } else {
             try {
                 Integer.parseInt(idStr);
             } catch (NumberFormatException e) {
-                errors.put("id", "Invalid department code.");
+                errors.put("id", "Invalid department ID.");
             }
         }
 
@@ -120,6 +121,11 @@ public class EditDepartmentServlet extends HttpServlet {
         }
         if (code == null || code.trim().isEmpty()) {
             errors.put("code", "Department code cannot be blank.");
+        }
+        if (status == null || status.trim().isEmpty()) {
+            errors.put("status", "Status cannot be blank.");
+        } else if (!status.equals("active") && !status.equals("inactive")) {
+            errors.put("status", "Invalid status value.");
         }
 
         int id = 0;
@@ -138,6 +144,7 @@ public class EditDepartmentServlet extends HttpServlet {
             request.setAttribute("location", location);
             request.setAttribute("description", description);
             request.setAttribute("code", code);
+            request.setAttribute("status", status);
             request.setAttribute("department", dept);
             request.getRequestDispatcher("EditDepartment.jsp").forward(request, response);
             return;
@@ -152,7 +159,7 @@ public class EditDepartmentServlet extends HttpServlet {
         dept.setEmail(email);
         dept.setLocation(location);
         dept.setDescription(description);
-        dept.setStatus(Department.Status.active);
+        dept.setStatus(Department.Status.valueOf(status));
         dept.setUpdatedAt(LocalDateTime.now());
 
         try {
@@ -167,6 +174,7 @@ public class EditDepartmentServlet extends HttpServlet {
             request.setAttribute("location", location);
             request.setAttribute("description", description);
             request.setAttribute("code", code);
+            request.setAttribute("status", status);
             request.setAttribute("department", dept);
             request.getRequestDispatcher("EditDepartment.jsp").forward(request, response);
         }
