@@ -331,7 +331,7 @@
                       <td>
                         <c:choose>
                           <c:when test="${not empty inv.materialsUrl}">
-                            <img src="${inv.materialsUrl}" alt="Material Image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
+                            <img src="images/material/${inv.materialsUrl}" alt="Material Image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
                           </c:when>
                           <c:otherwise>
                             <img src="images/material/default.jpg" alt="Material Image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;" />
