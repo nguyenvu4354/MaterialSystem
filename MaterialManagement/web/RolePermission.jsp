@@ -26,7 +26,7 @@
             font-family: 'Roboto', sans-serif;
         }
         .custom-search {
-            max-width: 250px; /* Thanh tìm kiếm nhỏ gọn */
+            max-width: 250px;
         }
         .custom-search .form-control {
             font-size: 0.9rem;
@@ -73,15 +73,52 @@
         #sidebarMenu .nav-link.active i {
             color: #ffffff;
         }
+        .back-button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .back-button-container .btn-back {
+            background-color: #Dead6F;
+            border-color: #Dead6F;
+            color: #ffffff;
+        }
+        .back-button-container .btn-back:hover {
+            background-color: #c7a65f;
+            border-color: #c7a65f;
+        }
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+            position: relative;
+            cursor: pointer;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #Dead6F;
+            border-color: #Dead6F;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '\2713';
+            color: #ffffff;
+            font-size: 14px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
 <body>
     <%@ include file="Header.jsp" %>
 
-    <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0" id="sidebarMenu">
                 <div class="position-sticky pt-4">
                     <ul class="nav flex-column menu-list list-unstyled">
@@ -150,8 +187,10 @@
                 </div>
             </div>
 
-            <!-- Page Content -->
-            <div class="col-md-9 col-lg-10 px-md-4 content">
+            <div class="col-md-9 col-lg-10 px-md-4 content position-relative">
+                <div class="back-button-container">
+                    <a href="UserList" class="btn btn-back btn-lg rounded-1">Back to User List</a>
+                </div>
                 <h2 class="text-primary fw-bold display-6 border-bottom pb-2">🔐 Role Permission Management</h2>
 
                 <c:if test="${not empty errorMessage}">
@@ -169,7 +208,6 @@
                     <div class="table-responsive">
                         <c:choose>
                             <c:when test="${selectedModule == ''}">
-                                <!-- Hiển thị tất cả permissions, nhóm theo module -->
                                 <div id="module_all" class="tabcontent">
                                     <c:forEach var="module" items="${modules}">
                                         <c:if test="${not empty permissionsByModule[module.moduleId]}">
@@ -238,7 +276,6 @@
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <!-- Hiển thị permissions theo module được chọn -->
                                 <c:forEach var="module" items="${modules}">
                                     <div id="module_${module.moduleId}" class="tabcontent">
                                         <c:choose>
@@ -313,20 +350,20 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-1">Save Changes</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer py-4 bg-light mt-auto">
         <div class="container text-center">
             <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     <script>
