@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @WebServlet(urlPatterns = {"/depairmentlist"})
@@ -63,28 +64,24 @@ public class DepartmentServlet extends HttpServlet {
         String searchKeyword = request.getParameter("search");
         String sortByName = request.getParameter("sortByName");
         String statusFilter = request.getParameter("statusFilter");
-        String locationFilter = request.getParameter("locationFilter");
 
         try {
-            // Fetch locations and statuses for dropdowns
-            List<String> locations = departmentDAO.getAllLocations();
-            List<String> statuses = departmentDAO.getAllStatuses();
+            // Define statuses for dropdown
+            List<String> statuses = Arrays.asList("Active", "Inactive", "Deleted");
 
             // Fetch departments with pagination, search, sort, and filter
             List<Department> departments = departmentDAO.getDepartmentsWithPagination(
-                    offset, pageSize, searchKeyword, sortByName, statusFilter, locationFilter
+                    offset, pageSize, searchKeyword, sortByName, statusFilter
             );
-            int totalRecords = departmentDAO.getTotalDepartmentCount(searchKeyword, statusFilter, locationFilter);
+            int totalRecords = departmentDAO.getTotalDepartmentCount(searchKeyword, statusFilter);
             int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
             // Set attributes for JSP
             request.setAttribute("departments", departments);
-            request.setAttribute("locations", locations);
             request.setAttribute("statuses", statuses);
             request.setAttribute("searchKeyword", searchKeyword);
             request.setAttribute("sortByName", sortByName);
             request.setAttribute("statusFilter", statusFilter);
-            request.setAttribute("locationFilter", locationFilter);
             request.setAttribute("currentPage", page);
             request.setAttribute("pageSize", pageSize);
             request.setAttribute("totalPages", totalPages);

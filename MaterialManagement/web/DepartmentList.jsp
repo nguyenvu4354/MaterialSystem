@@ -99,15 +99,9 @@
                                 </select>
                                 <select name="statusFilter" class="form-select">
                                     <option value="" ${statusFilter == null || statusFilter == '' ? 'selected' : ''}>All Statuses</option>
-                                    <c:forEach var="status" items="${statuses}">
-                                        <option value="${status}" ${statusFilter == status ? 'selected' : ''}>${status}</option>
-                                    </c:forEach>
-                                </select>
-                                <select name="locationFilter" class="form-select">
-                                    <option value="" ${locationFilter == null || locationFilter == '' ? 'selected' : ''}>All Locations</option>
-                                    <c:forEach var="location" items="${locations}">
-                                        <option value="${location}" ${locationFilter == location ? 'selected' : ''}>${location}</option>
-                                    </c:forEach>
+                                    <option value="Active" ${statusFilter == 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Inactive" ${statusFilter == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    <option value="Deleted" ${statusFilter == 'Deleted' ? 'selected' : ''}>Deleted</option>
                                 </select>
                                 <button class="btn" type="submit" style="background-color: #e2b77a; color: #fff; height: 60px; min-width: 150px; font-size: 1.1rem; font-weight: 500; border-radius: 6px;">
                                     <i class="fas fa-search me-2"></i> Search
@@ -181,17 +175,17 @@
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="depairmentlist?page=${currentPage - 1}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}&locationFilter=${locationFilter}" aria-label="Previous">
+                                        <a class="page-link" href="depairmentlist?page=${currentPage - 1}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}" aria-label="Previous">
                                             <span aria-hidden="true">«</span>
                                         </a>
                                     </li>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="depairmentlist?page=${i}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}&locationFilter=${locationFilter}">${i}</a>
+                                            <a class="page-link" href="depairmentlist?page=${i}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="depairmentlist?page=${currentPage + 1}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}&locationFilter=${locationFilter}" aria-label="Next">
+                                        <a class="page-link" href="depairmentlist?page=${currentPage + 1}&pageSize=${pageSize}&search=${searchKeyword}&sortByName=${sortByName}&statusFilter=${statusFilter}" aria-label="Next">
                                             <span aria-hidden="true">»</span>
                                         </a>
                                     </li>

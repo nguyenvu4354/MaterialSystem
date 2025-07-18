@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -38,7 +39,7 @@ public class DepartmentDAO extends DBContext {
         return departmentList;
     }
 
-    public List<Department> getDepartmentsWithPagination(int offset, int pageSize, String searchKeyword, String sortByName, String statusFilter, String locationFilter) throws SQLException {
+    public List<Department> getDepartmentsWithPagination(int offset, int pageSize, String searchKeyword, String sortByName, String statusFilter) throws SQLException {
         List<Department> departmentList = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM Departments");
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
@@ -48,9 +49,6 @@ public class DepartmentDAO extends DBContext {
         }
         if (statusFilter != null && !statusFilter.trim().isEmpty()) {
             sql.append(" AND status = ?");
-        }
-        if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-            sql.append(" AND location = ?");
         }
         List<String> orderByClauses = new ArrayList<>();
         if (sortByName != null && (sortByName.equals("asc") || sortByName.equals("desc"))) {
@@ -70,9 +68,6 @@ public class DepartmentDAO extends DBContext {
             }
             if (statusFilter != null && !statusFilter.trim().isEmpty()) {
                 ps.setString(paramIndex++, statusFilter.trim());
-            }
-            if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-                ps.setString(paramIndex++, locationFilter.trim());
             }
             ps.setInt(paramIndex++, pageSize);
             ps.setInt(paramIndex, offset);
@@ -99,7 +94,7 @@ public class DepartmentDAO extends DBContext {
         return departmentList;
     }
 
-    public int getTotalDepartmentCount(String searchKeyword, String statusFilter, String locationFilter) throws SQLException {
+    public int getTotalDepartmentCount(String searchKeyword, String statusFilter) throws SQLException {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Departments");
         if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
             sql.append(" WHERE UPPER(department_code) LIKE ?");
@@ -109,9 +104,6 @@ public class DepartmentDAO extends DBContext {
         if (statusFilter != null && !statusFilter.trim().isEmpty()) {
             sql.append(" AND status = ?");
         }
-        if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-            sql.append(" AND location = ?");
-        }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
@@ -120,9 +112,6 @@ public class DepartmentDAO extends DBContext {
             }
             if (statusFilter != null && !statusFilter.trim().isEmpty()) {
                 ps.setString(paramIndex++, statusFilter.trim());
-            }
-            if (locationFilter != null && !locationFilter.trim().isEmpty()) {
-                ps.setString(paramIndex++, locationFilter.trim());
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -136,32 +125,8 @@ public class DepartmentDAO extends DBContext {
         return 0;
     }
 
-    public List<String> getAllLocations() throws SQLException {
-        List<String> locations = new ArrayList<>();
-        String sql = "SELECT DISTINCT location FROM Departments WHERE location IS NOT NULL ORDER BY location";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                locations.add(rs.getString("location"));
-            }
-        } catch (SQLException e) {
-            throw e;
-        }
-        return locations;
-    }
-
-    public List<String> getAllStatuses() throws SQLException {
-        List<String> statuses = new ArrayList<>();
-        String sql = "SELECT DISTINCT status FROM Departments WHERE status IS NOT NULL ORDER BY status";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                statuses.add(rs.getString("status"));
-            }
-        } catch (SQLException e) {
-            throw e;
-        }
-        return statuses;
+    public List<String> getAllStatuses() {
+        return Arrays.asList("Active", "Inactive", "Deleted");
     }
 
     public List<Department> getDepartments() throws SQLException {

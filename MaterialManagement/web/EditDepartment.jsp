@@ -113,6 +113,13 @@
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="4">${department.description}</textarea>
                             </div>
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="active" ${department.status == 'active' ? 'selected' : ''}>Active</option>
+                                    <option value="inactive" ${department.status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </div>
                             <div class="d-flex gap-2 justify-content-md-end">
                                 <button type="submit" class="btn btn-brown flex-fill px-4">Update Department</button>
                                 <a href="depairmentlist" class="btn btn-secondary flex-fill px-4">Cancel</a>
