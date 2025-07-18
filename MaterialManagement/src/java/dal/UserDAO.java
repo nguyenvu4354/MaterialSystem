@@ -1,6 +1,7 @@
 package dal;
 
 import entity.DBContext;
+import entity.Department;
 import entity.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -253,8 +254,6 @@ public class UserDAO extends DBContext {
         }
     }
 
-    
-
     public boolean deleteUserById(int id) {
         String sql = "UPDATE Users SET status = 'deleted', updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -289,7 +288,6 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    // Check if email exists (do not exclude userId)
     public boolean isEmailExists(String email) {
         String sql = "SELECT COUNT(*) FROM Users WHERE email = ? AND status != 'deleted' AND verification_status = 'verified'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -305,7 +303,6 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    // Reset password by email
     public boolean updatePasswordByEmail(String email, String md5Password) {
         String sql = "UPDATE Users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ? AND status != 'deleted' AND verification_status = 'verified'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -578,54 +575,30 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    public static void main(String[] args) {
-        UserDAO userDAO = new UserDAO();
-        User user = new User();
+        public List<Department> getActiveDepartments() {
+        List<Department> departmentList = new ArrayList<>();
+        String sql = "SELECT * FROM Departments WHERE status = 'active' ORDER BY department_id";
 
-        // Thiết lập thông tin người dùng
-        user.setUsername("Employee1");
-        user.setPassword(userDAO.md5("123")); // Mã hóa mật khẩu bằng MD5
-        user.setFullName("Phạm Thị Kiều Trinh");
-        user.setEmail("testuser@example.com"); // Thay bằng email thật để kiểm tra
-        user.setPhoneNumber("0123456789");
-        user.setAddress("123 Test Street");
-        user.setUserPicture("test.jpg");
-        user.setRoleId(4); // Giả sử role_id = 4 là Employee
-        user.setDepartmentId(1); // Giả sử department_id = 1 tồn tại
-        user.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        user.setGender(User.Gender.male);
-        user.setDescription("Test user for DAO");
-        user.setStatus(User.Status.inactive); // Trạng thái ban đầu là pending
-        user.setVerificationToken(UUID.randomUUID().toString()); // Sử dụng UUID đúng
-        user.setVerificationStatus("pending"); // Trạng thái xác thực
-        user.setVerificationExpiry(LocalDateTime.now().plusHours(24)); // Hết hạn sau 24 giờ
-
-        // Tạo người dùng trong database
-        boolean created = userDAO.createUser(user);
-        if (created) {
-            System.out.println("✅ Tạo user thành công: " + user.getUsername());
-
-            // Giả lập gửi email xác thực
-            try {
-                String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + user.getVerificationToken();
-                String subject = "Xác thực tài khoản của bạn";
-                String content = "<html><body>"
-                        + "Xin chào " + user.getFullName() + ",<br><br>"
-                        + "Tài khoản của bạn đã được tạo. Vui lòng xác thực email bằng cách nhấp vào liên kết sau:<br><br>"
-                        + "<a href=\"" + verificationLink + "\">Xác thực tài khoản</a><br><br>"
-                        + "Liên kết này sẽ hết hạn sau 24 giờ.<br><br>"
-                        + "Trân trọng,<br>"
-                        + "Đội ngũ hỗ trợ."
-                        + "</body></html>";
-
-                EmailUtils.sendEmail(user.getEmail(), subject, content);
-                System.out.println("✅ Đã gửi email xác thực tới: " + user.getEmail());
-            } catch (Exception e) {
-                System.err.println("❌ Lỗi khi gửi email xác thực: " + e.getMessage());
-                e.printStackTrace();
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Department dept = new Department();
+                dept.setDepartmentId(rs.getInt("department_id"));
+                dept.setDepartmentName(rs.getString("department_name"));
+                dept.setDepartmentCode(rs.getString("department_code"));
+                dept.setPhoneNumber(rs.getString("phone_number"));
+                dept.setEmail(rs.getString("email"));
+                dept.setLocation(rs.getString("location"));
+                dept.setDescription(rs.getString("description"));
+                dept.setStatus(rs.getString("status") != null ? Department.Status.valueOf(rs.getString("status")) : null);
+                dept.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
+                dept.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
+                departmentList.add(dept);
             }
-        } else {
-            System.err.println("❌ Tạo user thất bại");
+            System.out.println("✅ Lấy danh sách phòng ban active thành công, số lượng: " + departmentList.size());
+        } catch (Exception e) {
+            System.out.println("❌ Lỗi getActiveDepartments: " + e.getMessage());
+            e.printStackTrace();
         }
+        return departmentList;
     }
 }

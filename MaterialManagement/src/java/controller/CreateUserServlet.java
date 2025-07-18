@@ -1,6 +1,5 @@
 package controller;
 
-import dal.DepartmentDAO;
 import dal.UserDAO;
 import entity.Department;
 import entity.User;
@@ -33,7 +32,6 @@ import java.util.Random;
 public class CreateUserServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
-    private DepartmentDAO departmentDAO = new DepartmentDAO();
     private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
     @Override
@@ -51,7 +49,7 @@ public class CreateUserServlet extends HttpServlet {
             return;
         }
 
-        List<Department> departments = departmentDAO.getAllDepartments();
+        List<Department> departments = userDAO.getActiveDepartments();
         request.setAttribute("departments", departments);
 
         request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
@@ -95,7 +93,7 @@ public class CreateUserServlet extends HttpServlet {
                 roleId = Integer.parseInt(roleIdStr);
             } catch (NumberFormatException e) {
                 request.setAttribute("error", "Invalid role ID.");
-                List<Department> departments = departmentDAO.getAllDepartments();
+                List<Department> departments = userDAO.getActiveDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 return;
@@ -156,9 +154,11 @@ public class CreateUserServlet extends HttpServlet {
             errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, description, dateOfBirthStr, gender, departmentIdStr, userPicture));
 
             if (departmentId != null) {
-                Department department = departmentDAO.getDepartmentById(departmentId);
-                if (department == null) {
-                    errors.put("departmentId", "Selected department does not exist.");
+                final Integer finalDepartmentId = departmentId;
+                List<Department> departments = userDAO.getActiveDepartments();
+                boolean departmentExists = departments.stream().anyMatch(dept -> dept.getDepartmentId() == finalDepartmentId);
+                if (!departmentExists) {
+                    errors.put("departmentId", "Selected department does not exist or is not active.");
                 }
             }
 
@@ -191,7 +191,7 @@ public class CreateUserServlet extends HttpServlet {
                 request.setAttribute("enteredRoleId", roleIdStr);
                 request.setAttribute("enteredDepartmentId", departmentIdStr);
                 request.setAttribute("enteredDepartmentName", departmentName);
-                List<Department> departments = departmentDAO.getAllDepartments();
+                List<Department> departments = userDAO.getActiveDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 return;
@@ -221,13 +221,13 @@ public class CreateUserServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/UserList");
                 } catch (Exception e) {
                     request.setAttribute("error", "Account created, but email failed: " + e.getMessage());
-                    List<Department> departments = departmentDAO.getAllDepartments();
+                    List<Department> departments = userDAO.getActiveDepartments();
                     request.setAttribute("departments", departments);
                     request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
                 }
             } else {
                 request.setAttribute("error", "Failed to create account. Please try again.");
-                List<Department> departments = departmentDAO.getAllDepartments();
+                List<Department> departments = userDAO.getActiveDepartments();
                 request.setAttribute("departments", departments);
                 request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
             }
@@ -235,7 +235,7 @@ public class CreateUserServlet extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", "System error: " + e.getMessage());
             e.printStackTrace();
-            List<Department> departments = departmentDAO.getAllDepartments();
+            List<Department> departments = userDAO.getActiveDepartments();
             request.setAttribute("departments", departments);
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
         }
