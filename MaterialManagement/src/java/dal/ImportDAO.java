@@ -12,7 +12,7 @@ import java.util.List;
 public class ImportDAO extends DBContext {
 
     public int createImport(Import importData) throws SQLException {
-        String sql = "INSERT INTO Imports (import_code, import_date, imported_by, supplier_id, destination, batch_number, actual_arrival, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Imports (import_code, import_date, imported_by, supplier_id, destination, actual_arrival, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, importData.getImportCode());
             stmt.setObject(2, importData.getImportDate());
@@ -23,13 +23,12 @@ public class ImportDAO extends DBContext {
                 stmt.setNull(4, Types.INTEGER);
             }
             stmt.setString(5, importData.getDestination());
-            stmt.setString(6, importData.getBatchNumber());
             if (importData.getActualArrival() != null) {
-                stmt.setTimestamp(7, Timestamp.valueOf(importData.getActualArrival()));
+                stmt.setTimestamp(6, Timestamp.valueOf(importData.getActualArrival()));
             } else {
-                stmt.setNull(7, Types.TIMESTAMP);
+                stmt.setNull(6, Types.TIMESTAMP);
             }
-            stmt.setString(8, importData.getNote());
+            stmt.setString(7, importData.getNote());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -174,7 +173,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void updateImport(Import importData) throws SQLException {
-        String sql = "UPDATE Imports SET import_code = ?, import_date = ?, imported_by = ?, supplier_id = ?, destination = ?, batch_number = ?, actual_arrival = ?, note = ? WHERE import_id = ?";
+        String sql = "UPDATE Imports SET import_code = ?, import_date = ?, imported_by = ?, supplier_id = ?, destination = ?, actual_arrival = ?, note = ? WHERE import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, importData.getImportCode());
             stmt.setObject(2, importData.getImportDate());
@@ -185,14 +184,13 @@ public class ImportDAO extends DBContext {
                 stmt.setNull(4, Types.INTEGER);
             }
             stmt.setString(5, importData.getDestination());
-            stmt.setString(6, importData.getBatchNumber());
             if (importData.getActualArrival() != null) {
-                stmt.setTimestamp(7, Timestamp.valueOf(importData.getActualArrival()));
+                stmt.setTimestamp(6, Timestamp.valueOf(importData.getActualArrival()));
             } else {
-                stmt.setNull(7, Types.TIMESTAMP);
+                stmt.setNull(6, Types.TIMESTAMP);
             }
-            stmt.setString(8, importData.getNote());
-            stmt.setInt(9, importData.getImportId());
+            stmt.setString(7, importData.getNote());
+            stmt.setInt(8, importData.getImportId());
             
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -254,7 +252,6 @@ public class ImportDAO extends DBContext {
                     importData.setImportedBy(rs.getInt("imported_by"));
                     importData.setSupplierId(rs.getInt("supplier_id"));
                     importData.setDestination(rs.getString("destination"));
-                    importData.setBatchNumber(rs.getString("batch_number"));
                     if (rs.getTimestamp("actual_arrival") != null) {
                         importData.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
                     }
@@ -299,7 +296,6 @@ public class ImportDAO extends DBContext {
                     importData.setImportedBy(rs.getInt("imported_by"));
                     importData.setSupplierId(rs.getInt("supplier_id"));
                     importData.setDestination(rs.getString("destination"));
-                    importData.setBatchNumber(rs.getString("batch_number"));
                     if (rs.getTimestamp("actual_arrival") != null) {
                         importData.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
                     }

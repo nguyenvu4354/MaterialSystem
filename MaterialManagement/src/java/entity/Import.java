@@ -17,7 +17,6 @@ public class Import {
     private int importedBy;
     private Integer supplierId;
     private String destination;
-    private String batchNumber;
     private LocalDateTime actualArrival;
     private String note;
     private LocalDateTime createdAt;
@@ -70,14 +69,6 @@ public class Import {
 
     public void setDestination(String destination) {
         this.destination = destination;
-    }
-
-    public String getBatchNumber() {
-        return batchNumber;
-    }
-
-    public void setBatchNumber(String batchNumber) {
-        this.batchNumber = batchNumber;
     }
 
     public LocalDateTime getActualArrival() {
