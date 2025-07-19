@@ -362,10 +362,10 @@
                         </c:if>
                         <form id="confirmImportForm" action="ImportMaterial" method="post" onsubmit="return validateConfirmForm()">
                             <input type="hidden" name="action" value="import">
-                            <div class="row g-3">
+                            <div class="row g-4"> <!-- Increased gap for better spacing -->
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Supplier</label>
-                                    <input type="text" id="supplierName" name="supplierName" class="form-control" list="supplierList" required placeholder="Type or select supplier">
+                                    <input type="text" id="supplierName" name="supplierName" class="form-control" list="supplierList" required placeholder="Type Or Select Supplier">
                                     <input type="hidden" name="supplierId" id="supplierId">
                                     <datalist id="supplierList">
                                         <c:forEach var="supplier" items="${suppliers}">
@@ -379,7 +379,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Destination</label>
-                                    <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>"  value="${param.destination}">
+                                    <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>" value="${param.destination}">
                                     <div class="invalid-feedback" id="destinationError">
                                         <c:choose>
                                             <c:when test="${not empty formErrors['destination']}">
@@ -392,27 +392,13 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-muted">Batch Number</label>
-                                    <input type="text" name="batchNumber" class="form-control<c:if test='${not empty formErrors["batchNumber"]}'> is-invalid</c:if>" required value="${param.batchNumber}">
-                                    <div class="invalid-feedback" id="batchNumberError">
-                                        <c:choose>
-                                            <c:when test="${not empty formErrors['batchNumber']}">
-                                                ${formErrors['batchNumber']}
-                                            </c:when>
-                                            <c:otherwise>
-                                                Please enter a batch number (max 50 characters).
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
                                     <label class="form-label text-muted">Actual Arrival</label>
                                     <input type="datetime-local" name="actualArrival" class="form-control" required value="${param.actualArrival}">
                                     <c:if test="${not empty formErrors['actualArrival']}">
                                         <div class="text-danger small mt-1">${formErrors['actualArrival']}</div>
                                     </c:if>
                                 </div>
-                                <div class="col-12">
+                                <div class="col-md-6">
                                     <label class="form-label text-muted">Notes</label>
                                     <input type="text" name="note" class="form-control" placeholder="Enter Note" value="${param.note}">
                                     <c:if test="${not empty formErrors['note']}">
@@ -521,7 +507,6 @@
             const supplierIdInput = form.querySelector('input[name="supplierId"]');
             const destination = form.querySelector('input[name="destination"]');
             const destinationOther = form.querySelector('input[name="destinationOther"]');
-            const batchNumber = form.querySelector('input[name="batchNumber"]');
             const actualArrival = form.querySelector('input[name="actualArrival"]');
 
             if (!supplierNameInput.value.trim()) {
@@ -537,21 +522,15 @@
                 supplierIdInput.classList.remove('is-invalid');
             }
 
-            if (destination.value === 'other') {
+            if (destination && destination.value === 'other') {
                 if (!destinationOther.value.trim()) {
                     destinationOther.classList.add('is-invalid');
                     isValid = false; 
                 } else {
                     destinationOther.classList.remove('is-invalid');
                 }
-            } else { 
+            } else if (destination) { 
                 destination.classList.remove('is-invalid'); 
-            }
-            if (!batchNumber.value.trim()) {
-                batchNumber.classList.add('is-invalid');
-                isValid = false; 
-            } else { 
-                batchNumber.classList.remove('is-invalid'); 
             }
             if (!actualArrival.value) { 
                 actualArrival.classList.add('is-invalid');
@@ -563,6 +542,7 @@
         }
     </script>
     <script>
+        // Supplier and material autocomplete logic (consolidated, no duplicates)
         $(function() {
             var materials = [
                 <c:forEach var="material" items="${materials}" varStatus="loop">
@@ -606,10 +586,6 @@
                 },
                 minLength: 1
             });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
             var supplierNameInput = document.getElementById('supplierName');
             var supplierIdInput = document.getElementById('supplierId');
             var supplierList = document.getElementById('supplierList');

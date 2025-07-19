@@ -207,11 +207,10 @@ public class ImportMaterialServlet extends HttpServlet {
 
         String supplierIdStr = request.getParameter("supplierId");
         String destination = request.getParameter("destination");
-        String batchNumber = request.getParameter("batchNumber");
         String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
         Map<String, String> formErrors = utils.ImportValidator.validateImportFormData(
-            supplierIdStr, destination, batchNumber, actualArrivalStr, note, supplierDAO
+            supplierIdStr, destination, actualArrivalStr, note, supplierDAO
         );
         if (!formErrors.isEmpty()) {
             request.setAttribute("formErrors", formErrors);
@@ -229,7 +228,6 @@ public class ImportMaterialServlet extends HttpServlet {
         imports.setImportedBy(user.getUserId());
         imports.setSupplierId(supplierId);
         imports.setDestination(destination);
-        imports.setBatchNumber(batchNumber);
         imports.setActualArrival(actualArrival);
         imports.setNote(note);
 

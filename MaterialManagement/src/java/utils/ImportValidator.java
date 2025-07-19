@@ -24,13 +24,6 @@ public class ImportValidator {
             errors.put("destination", "Destination cannot exceed 100 characters.");
         }
 
-        // Validate batchNumber
-        if (imp.getBatchNumber() == null || imp.getBatchNumber().trim().isEmpty()) {
-            errors.put("batchNumber", "Batch Number cannot be empty.");
-        } else if (imp.getBatchNumber().trim().length() > 50) {
-            errors.put("batchNumber", "Batch Number cannot exceed 50 characters.");
-        }
-
         // Validate actualArrival
         if (imp.getActualArrival() == null) {
             errors.put("actualArrival", "Actual Arrival is required.");
@@ -67,50 +60,41 @@ public class ImportValidator {
     }
 
     // Validate import form data 
-    public static Map<String, String> validateImportFormData(String supplierIdStr, String destination, String batchNumber, String actualArrivalStr, String note, SupplierDAO supplierDAO) {
+    public static Map<String, String> validateImportFormData(String supplierIdStr, String destination, String actualArrivalStr, String note, dal.SupplierDAO supplierDAO) {
         Map<String, String> errors = new HashMap<>();
-
         // Validate supplierId
-        Integer supplierId = null;
-        try {
-            supplierId = (supplierIdStr != null && !supplierIdStr.isEmpty()) ? Integer.parseInt(supplierIdStr) : null;
-        } catch (NumberFormatException e) {
-            errors.put("supplierId", "Invalid supplier ID format.");
+        if (supplierIdStr == null || supplierIdStr.isEmpty()) {
+            errors.put("supplierId", "Supplier is required.");
+        } else {
+            try {
+                int supplierId = Integer.parseInt(supplierIdStr);
+                if (supplierDAO.getSupplierById(supplierId) == null) {
+                    errors.put("supplierId", "Supplier does not exist.");
+                }
+            } catch (NumberFormatException e) {
+                errors.put("supplierId", "Invalid supplier ID.");
+            }
         }
-        if (supplierId == null || supplierDAO.getSupplierByID(supplierId) == null) {
-            errors.put("supplierId", "Supplier is required and must exist.");
-        }
-
-        // Validate destination 
+        // Validate destination
         if (destination == null || destination.trim().isEmpty()) {
-            errors.put("destination", "Destination cannot be empty.");
-        } else if (destination.trim().length() > 100) {
-            errors.put("destination", "Destination cannot exceed 100 characters.");
+            errors.put("destination", "Destination is required.");
+        } else if (destination.length() > 100) {
+            errors.put("destination", "Destination must not exceed 100 characters.");
         }
-
-        // Validate batchNumber
-        if (batchNumber == null || batchNumber.trim().isEmpty()) {
-            errors.put("batchNumber", "Batch Number cannot be empty.");
-        } else if (batchNumber.trim().length() > 50) {
-            errors.put("batchNumber", "Batch Number cannot exceed 50 characters.");
-        }
-
         // Validate actualArrival
         if (actualArrivalStr == null || actualArrivalStr.isEmpty()) {
-            errors.put("actualArrival", "Actual Arrival is required.");
+            errors.put("actualArrival", "Actual arrival date/time is required.");
         } else {
             try {
                 java.time.LocalDateTime.parse(actualArrivalStr);
             } catch (Exception e) {
-                errors.put("actualArrival", "Invalid actual arrival date format.");
+                errors.put("actualArrival", "Invalid date/time format.");
             }
         }
-
-        // Validate note (optional)
-        if (note != null && note.trim().length() > 200) {
-            errors.put("note", "Note cannot exceed 200 characters.");
+        // Validate note
+        if (note != null && note.length() > 255) {
+            errors.put("note", "Note must not exceed 255 characters.");
         }
-
         return errors;
     }
 
