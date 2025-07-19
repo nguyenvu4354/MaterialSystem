@@ -68,7 +68,7 @@ public class ImportValidator {
         } else {
             try {
                 int supplierId = Integer.parseInt(supplierIdStr);
-                if (supplierDAO.getSupplierById(supplierId) == null) {
+                if (supplierDAO.getSupplierByID(supplierId) == null) {
                     errors.put("supplierId", "Supplier does not exist.");
                 }
             } catch (NumberFormatException e) {
