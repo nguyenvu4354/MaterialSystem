@@ -100,19 +100,16 @@
                         </c:if>
 
                         <c:if test="${hasViewApplicationsPermission}">
-                            <!-- Navigation buttons -->
                             <jsp:include page="Navigation.jsp" />
 
                             <h2 class="display-4 fw-normal text-center mb-4">My <span class="text-primary">Requests</span></h2>
 
-                            <!-- Display success or error message -->
                             <c:if test="${not empty message}">
                                 <div class="alert ${message.startsWith('Error') ? 'alert-danger' : 'alert-success'}">
                                     ${message}
                                 </div>
                             </c:if>
 
-                            <!-- Filter Form -->
                             <h3 class="fw-normal mb-3">Filter Requests</h3>
                             <form action="${pageContext.request.contextPath}/ViewRequests" method="get" class="mb-4">
                                 <div class="row g-3">
@@ -131,6 +128,10 @@
                                         <input type="text" name="requestCode" id="requestCode" value="${requestCode}" class="form-control">
                                     </div>
                                     <div class="col-md-3">
+                                        <label for="searchTerm" class="form-label text-muted">Material Name or Code</label>
+                                        <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Enter material name or code">
+                                    </div>
+                                    <div class="col-md-3">
                                         <label for="startDate" class="form-label text-muted">Start Date</label>
                                         <input type="date" name="startDate" id="startDate" value="${startDate}" class="form-control">
                                     </div>
@@ -144,7 +145,6 @@
                                 </div>
                             </form>
 
-                            <!-- Tabs -->
                             <ul class="nav nav-tabs mb-4">
                                 <li class="nav-item">
                                     <a class="nav-link active" id="export-tab" data-bs-toggle="tab" href="#Export">Export Requests</a>
@@ -157,9 +157,7 @@
                                 </li>
                             </ul>
 
-                            <!-- Tab Content -->
                             <div class="tab-content">
-                                <!-- Export Requests -->
                                 <div class="tab-pane fade show active" id="Export">
                                     <h3 class="fw-normal mb-3">Export Requests</h3>
                                     <div class="table-responsive">
@@ -205,21 +203,20 @@
                                     <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                             </li>
                                             <c:forEach begin="1" end="${exportTotalPages}" var="i">
                                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${i}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                                 </li>
                                             </c:forEach>
                                             <li class="page-item ${currentPage == exportTotalPages ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=export&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                             </li>
                                         </ul>
                                     </nav>
                                 </div>
 
-                                <!-- Purchase Requests -->
                                 <div class="tab-pane fade" id="Purchase">
                                     <h3 class="fw-normal mb-3">Purchase Requests</h3>
                                     <div class="table-responsive">
@@ -263,21 +260,20 @@
                                     <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                             </li>
                                             <c:forEach begin="1" end="${purchaseTotalPages}" var="i">
                                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${i}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                                 </li>
                                             </c:forEach>
                                             <li class="page-item ${currentPage == purchaseTotalPages ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                             </li>
                                         </ul>
                                     </nav>
                                 </div>
 
-                                <!-- Repair Requests -->
                                 <div class="tab-pane fade" id="Repair">
                                     <h3 class="fw-normal mb-3">Repair Requests</h3>
                                     <div class="table-responsive">
@@ -321,15 +317,15 @@
                                     <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage - 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                             </li>
                                             <c:forEach begin="1" end="${repairTotalPages}" var="i">
                                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${i}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${i}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                                 </li>
                                             </c:forEach>
                                             <li class="page-item ${currentPage == repairTotalPages ? 'disabled' : ''}">
-                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage + 1}&status=${status}&requestCode=${requestCode}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                             </li>
                                         </ul>
                                     </nav>
