@@ -33,6 +33,7 @@ public class CreateUserServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
     private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -72,7 +73,6 @@ public class CreateUserServlet extends HttpServlet {
 
         try {
             String username = request.getParameter("username");
-            String password = request.getParameter("password");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phoneNumber = request.getParameter("phoneNumber");
@@ -85,6 +85,7 @@ public class CreateUserServlet extends HttpServlet {
 
             int roleId = 0;
             Integer departmentId = null;
+            String randomPassword = generateRandomPassword(12);
 
             String modifiedUsername = username + generateRandomLetters(5);
 
@@ -107,7 +108,7 @@ public class CreateUserServlet extends HttpServlet {
 
             User newUser = new User();
             newUser.setUsername(modifiedUsername);
-            newUser.setPassword(hashPasswordWithMD5(password));
+            newUser.setPassword(hashPasswordWithMD5(randomPassword));
             newUser.setEmail(email);
             newUser.setPhoneNumber(phoneNumber);
             newUser.setRoleId(roleId);
@@ -209,7 +210,7 @@ public class CreateUserServlet extends HttpServlet {
                             "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
                             "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>" +
                             "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>" +
-                            "<p><strong>Password:</strong> " + password + "</p>" +
+                            "<p><strong>Password:</strong> " + randomPassword + "</p>" +
                             "<p>This link will expire in 24 hours.</p>" +
                             "<p>Best regards,<br>The Support Team</p>" +
                             "</body></html>";
@@ -258,6 +259,15 @@ public class CreateUserServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             sb.append(LETTERS.charAt(random.nextInt(LETTERS.length())));
+        }
+        return sb.toString();
+    }
+
+    private String generateRandomPassword(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
         }
         return sb.toString();
     }

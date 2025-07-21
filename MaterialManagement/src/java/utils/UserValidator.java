@@ -72,9 +72,7 @@ public class UserValidator {
             errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
         }
 
-        if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
-            errors.put("dateOfBirth", "Date of birth is required.");
-        } else {
+        if (dateOfBirth != null && !dateOfBirth.trim().isEmpty()) {
             try {
                 LocalDate dob = LocalDate.parse(dateOfBirth);
                 if (dob.isAfter(LocalDate.now())) {
@@ -85,18 +83,10 @@ public class UserValidator {
             }
         }
 
-        if (gender == null || gender.trim().isEmpty()) {
-            errors.put("gender", "Gender is required.");
-        } else if (!"male".equalsIgnoreCase(gender) && !"female".equalsIgnoreCase(gender) && !"other".equalsIgnoreCase(gender)) {
-            errors.put("gender", "Invalid gender.");
-        }
-
-        if (departmentId != null && departmentId.trim().isEmpty()) {
-            errors.put("departmentId", "Department is required.");
-        }
-
-        if (userPicture != null && userPicture.trim().isEmpty()) {
-            errors.put("userPicture", "User picture is required.");
+        if (gender != null && !gender.trim().isEmpty()) {
+            if (!"male".equalsIgnoreCase(gender) && !"female".equalsIgnoreCase(gender) && !"other".equalsIgnoreCase(gender)) {
+                errors.put("gender", "Invalid gender.");
+            }
         }
 
         if (description != null && description.length() > DESCRIPTION_MAX_LENGTH) {
@@ -140,9 +130,7 @@ public class UserValidator {
             errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
         }
 
-        if (dateOfBirth == null || dateOfBirth.trim().isEmpty()) {
-            errors.put("dateOfBirth", "Date of birth is required.");
-        } else {
+        if (dateOfBirth != null && !dateOfBirth.trim().isEmpty()) {
             try {
                 LocalDate dob = LocalDate.parse(dateOfBirth);
                 if (dob.isAfter(LocalDate.now())) {
@@ -153,10 +141,10 @@ public class UserValidator {
             }
         }
 
-        if (gender == null || gender.trim().isEmpty()) {
-            errors.put("gender", "Gender is required.");
-        } else if (!"male".equalsIgnoreCase(gender) && !"female".equalsIgnoreCase(gender) && !"other".equalsIgnoreCase(gender)) {
-            errors.put("gender", "Invalid gender.");
+        if (gender != null && !gender.trim().isEmpty()) {
+            if (!"male".equalsIgnoreCase(gender) && !"female".equalsIgnoreCase(gender) && !"other".equalsIgnoreCase(gender)) {
+                errors.put("gender", "Invalid gender.");
+            }
         }
 
         if (description != null && description.length() > DESCRIPTION_MAX_LENGTH) {
