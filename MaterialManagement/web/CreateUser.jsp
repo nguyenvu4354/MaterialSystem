@@ -110,15 +110,6 @@
                                                 <% } %>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="password" class="form-label text-muted">Password</label>
-                                                <input type="password" class="form-control <% if(errors != null && errors.containsKey("password")) { %>is-invalid<% } %>" 
-                                                       name="password" id="password"
-                                                       placeholder="Enter Password" maxlength="255" required>
-                                                <% if (errors != null && errors.containsKey("password")) { %>
-                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("password"))}</div>
-                                                <% } %>
-                                            </div>
-                                            <div class="mb-3">
                                                 <label for="fullName" class="form-label text-muted">Full Name</label>
                                                 <input type="text" class="form-control <% if(errors != null && errors.containsKey("fullName")) { %>is-invalid<% } %>" 
                                                        name="fullName" id="fullName"
@@ -163,7 +154,7 @@
                                             <div class="mb-3">
                                                 <label for="userPicture" class="form-label text-muted">User Picture</label>
                                                 <input class="form-control <% if(errors != null && errors.containsKey("userPicture")) { %>is-invalid<% } %>" 
-                                                       type="file" name="userPicture" id="userPicture" accept="image/*" required>
+                                                       type="file" name="userPicture" id="userPicture" accept="image/*">
                                                 <img id="previewImage" src="#" alt="Image Preview" class="img-thumbnail mt-3" style="display:none; max-height: 150px;">
                                                 <% if (errors != null && errors.containsKey("userPicture")) { %>
                                                     <div class="invalid-feedback">${fn:escapeXml(errors.get("userPicture"))}</div>
@@ -173,7 +164,7 @@
                                                 <label for="dateOfBirth" class="form-label text-muted">Date of Birth</label>
                                                 <input type="date" class="form-control <% if(errors != null && errors.containsKey("dateOfBirth")) { %>is-invalid<% } %>" 
                                                        name="dateOfBirth" id="dateOfBirth"
-                                                       value="${fn:escapeXml(dateOfBirthStr != null ? dateOfBirthStr : '')}" required>
+                                                       value="${fn:escapeXml(dateOfBirthStr != null ? dateOfBirthStr : '')}">
                                                 <% if (errors != null && errors.containsKey("dateOfBirth")) { %>
                                                     <div class="invalid-feedback">${fn:escapeXml(errors.get("dateOfBirth"))}</div>
                                                 <% } %>
@@ -181,7 +172,7 @@
                                             <div class="mb-3">
                                                 <label for="gender" class="form-label text-muted">Gender</label>
                                                 <select class="form-select <% if(errors != null && errors.containsKey("gender")) { %>is-invalid<% } %>" 
-                                                        name="gender" id="gender" required>
+                                                        name="gender" id="gender">
                                                     <option value="" <%= enteredGender == null || enteredGender.isEmpty() ? "selected" : "" %>>Select Gender</option>
                                                     <option value="male" <%= "male".equalsIgnoreCase(enteredGender) ? "selected" : "" %>>Male</option>
                                                     <option value="female" <%= "female".equalsIgnoreCase(enteredGender) ? "selected" : "" %>>Female</option>
@@ -209,7 +200,7 @@
                                                 <input type="text" id="departmentName" name="departmentName" 
                                                        class="form-control <% if(errors != null && errors.containsKey("departmentId")) { %>is-invalid<% } %>"
                                                        placeholder="Type department name" 
-                                                       value="${fn:escapeXml(enteredDepartmentName != null ? enteredDepartmentName : '')}" required>
+                                                       value="${fn:escapeXml(enteredDepartmentName != null ? enteredDepartmentName : '')}">
                                                 <input type="hidden" name="departmentId" id="departmentId" 
                                                        value="${fn:escapeXml(enteredDepartmentId != null ? enteredDepartmentId : '')}">
                                                 <% if (errors != null && errors.containsKey("departmentId")) { %>
@@ -326,15 +317,6 @@
                     document.getElementById('username').classList.remove('is-invalid');
                 }
 
-                const password = document.getElementById('password').value;
-                if (!password) {
-                    errors.push('Password is required.');
-                    document.getElementById('password').classList.add('is-invalid');
-                    document.getElementById('password').nextElementSibling.textContent = 'Password is required.';
-                } else {
-                    document.getElementById('password').classList.remove('is-invalid');
-                }
-
                 const fullName = document.getElementById('fullName').value;
                 if (!fullName) {
                     errors.push('Full name is required.');
@@ -379,33 +361,6 @@
                     document.getElementById('address').classList.remove('is-invalid');
                 }
 
-                const userPicture = document.getElementById('userPicture').files;
-                if (!userPicture || userPicture.length === 0) {
-                    errors.push('User picture is required.');
-                    document.getElementById('userPicture').classList.add('is-invalid');
-                    document.getElementById('userPicture').nextElementSibling.nextElementSibling.textContent = 'User picture is required.';
-                } else {
-                    document.getElementById('userPicture').classList.remove('is-invalid');
-                }
-
-                const dateOfBirth = document.getElementById('dateOfBirth').value;
-                if (!dateOfBirth) {
-                    errors.push('Date of birth is required.');
-                    document.getElementById('dateOfBirth').classList.add('is-invalid');
-                    document.getElementById('dateOfBirth').nextElementSibling.textContent = 'Date of birth is required.';
-                } else {
-                    document.getElementById('dateOfBirth').classList.remove('is-invalid');
-                }
-
-                const gender = document.getElementById('gender').value;
-                if (!gender) {
-                    errors.push('Gender is required.');
-                    document.getElementById('gender').classList.add('is-invalid');
-                    document.getElementById('gender').nextElementSibling.textContent = 'Gender is required.';
-                } else {
-                    document.getElementById('gender').classList.remove('is-invalid');
-                }
-
                 const roleId = document.getElementById('roleId').value;
                 if (!roleId) {
                     errors.push('Role is required.');
@@ -413,15 +368,6 @@
                     document.getElementById('roleId').nextElementSibling.textContent = 'Role is required.';
                 } else {
                     document.getElementById('roleId').classList.remove('is-invalid');
-                }
-
-                const departmentName = document.getElementById('departmentName').value;
-                if (!departmentName) {
-                    errors.push('Department is required.');
-                    document.getElementById('departmentName').classList.add('is-invalid');
-                    document.getElementById('departmentName').nextElementSibling.nextElementSibling.textContent = 'Department is required.';
-                } else {
-                    document.getElementById('departmentName').classList.remove('is-invalid');
                 }
 
                 if (errors.length > 0) {
