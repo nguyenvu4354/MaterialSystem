@@ -663,6 +663,22 @@ public class MaterialDAO extends DBContext {
         return max;
     }
 
+    public List<Material> getAllMaterials() {
+        List<Material> list = new ArrayList<>();
+        String sql = "SELECT * FROM Materials";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Material m = new Material();
+                m.setMaterialId(rs.getInt("material_id"));
+                m.setMaterialName(rs.getString("material_name"));
+                // ... set các trường khác nếu cần
+                list.add(m);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
     public static void main(String[] args) {
         MaterialDAO md = new MaterialDAO();
 

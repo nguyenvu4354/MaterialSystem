@@ -3,6 +3,7 @@ package entity;
 import java.time.LocalDateTime;
 
 public class Export {
+
     private int exportId;
     private String exportCode;
     private LocalDateTime exportDate;
@@ -12,6 +13,12 @@ public class Export {
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Thêm các trường phục vụ hiển thị lịch sử xuất kho
+    private String exportedByName;
+    private String recipientName;
+    private int totalQuantity;
+    private double totalValue;
 
     // Getters and setters
     public int getExportId() {
@@ -84,5 +91,37 @@ public class Export {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getExportedByName() {
+        return exportedByName;
+    }
+
+    public void setExportedByName(String exportedByName) {
+        this.exportedByName = exportedByName;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public int getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public double getTotalValue() {
+        return totalValue;
+    }
+
+    public void setTotalValue(double totalValue) {
+        this.totalValue = totalValue;
     }
 }

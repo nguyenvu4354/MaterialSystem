@@ -5,11 +5,13 @@
 package entity;
 
 import java.time.LocalDateTime;
+
 /**
  *
  * @author Admin
  */
 public class ImportDetail {
+
     private int importDetailId;
     private int importId;
     private int materialId;
@@ -18,6 +20,8 @@ public class ImportDetail {
     private String materialCondition;
     private String status;
     private LocalDateTime createdAt;
+    private String materialName;
+    private String unitName;
 
     public int getImportDetailId() {
         return importDetailId;
@@ -83,7 +87,20 @@ public class ImportDetail {
         this.createdAt = createdAt;
     }
 
+    public String getMaterialName() {
+        return materialName;
+    }
 
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
 
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
 
 }

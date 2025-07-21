@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  * @author Admin
  */
 public class Import {
+
     private int importId;
     private String importCode;
     private LocalDateTime importDate;
@@ -22,7 +23,11 @@ public class Import {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    
+    private String importedByName;
+    private String supplierName;
+    private int totalQuantity;
+    private double totalValue;
+
     public int getImportId() {
         return importId;
     }
@@ -103,6 +108,36 @@ public class Import {
         this.updatedAt = updatedAt;
     }
 
+    public String getImportedByName() {
+        return importedByName;
+    }
 
+    public void setImportedByName(String importedByName) {
+        this.importedByName = importedByName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public int getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public double getTotalValue() {
+        return totalValue;
+    }
+
+    public void setTotalValue(double totalValue) {
+        this.totalValue = totalValue;
+    }
 
 }
