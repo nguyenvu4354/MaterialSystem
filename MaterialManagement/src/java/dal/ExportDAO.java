@@ -240,7 +240,7 @@ public class ExportDAO extends DBContext {
 
     public List<ExportDetail> getExportDetailsByExportId(int exportId) throws SQLException {
         List<ExportDetail> details = new ArrayList<>();
-        String sql = "SELECT d.*, m.material_name, u.unit_name "
+        String sql = "SELECT d.*, m.material_name, m.materials_url, u.unit_name "
                 + "FROM Export_Details d "
                 + "JOIN Materials m ON d.material_id = m.material_id "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
@@ -258,6 +258,7 @@ public class ExportDAO extends DBContext {
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
                     detail.setMaterialName(rs.getString("material_name"));
+                    detail.setMaterialsUrl(rs.getString("materials_url")); // Thêm materials_url
                     detail.setUnitName(rs.getString("unit_name"));
                     details.add(detail);
                 }
@@ -526,7 +527,11 @@ public class ExportDAO extends DBContext {
     }
 
     public Export getExportById(int exportId) {
-        String sql = "SELECT * FROM Exports WHERE export_id = ?";
+        String sql = "SELECT e.*, u1.full_name AS exportedByName, u2.full_name AS recipientName "
+                + "FROM Exports e "
+                + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
+                + "WHERE e.export_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, exportId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -539,10 +544,11 @@ public class ExportDAO extends DBContext {
                     }
                     exportData.setExportedBy(rs.getInt("exported_by"));
                     exportData.setRecipientUserId(rs.getInt("recipient_user_id"));
-                    exportData.setBatchNumber(rs.getString("batch_number"));
                     exportData.setNote(rs.getString("note"));
                     exportData.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     exportData.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    exportData.setExportedByName(rs.getString("exportedByName"));
+                    exportData.setRecipientName(rs.getString("recipientName"));
                     return exportData;
                 }
             }
@@ -551,4 +557,5 @@ public class ExportDAO extends DBContext {
         }
         return null;
     }
+
 }

@@ -11,31 +11,84 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <style>
             body {
-                background-color: #f8f9fa;
-                padding: 20px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                background-color: #faf4ee;
             }
-            .table-responsive {
+            .container-main {
+                max-width: 1200px;
+                margin: 30px auto;
+                background: #fff;
+                padding: 32px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+            h2 {
+                font-size: 1.75rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+                color: #DEAD6F;
+            }
+            .filter-bar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
                 margin: 20px 0;
+                align-items: center;
             }
-            .search-box {
-                margin-bottom: 20px;
+            .filter-bar .form-control,
+            .filter-bar .btn {
+                height: 48px;
+                min-width: 120px;
+            }
+            .btn-filter:hover {
+                background-color: #cfa856;
+                color: #fff;
+            }
+            .custom-table thead th {
+                background-color: #f9f5f0;
+                color: #5c4434;
+                font-weight: 600;
+            }
+            .custom-table tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+            .custom-table th,
+            .custom-table td {
+                vertical-align: middle;
+                min-height: 48px;
+            }
+            .btn-detail {
+                background-color: #fff7e6;
+                color: #b8860b;
+                border: 1px solid #ffe58f;
+                border-radius: 6px;
+                padding: 6px auto;
+                font-weight: 300;
+                width: 100px;
             }
             .pagination {
-                justify-content: center;
                 margin-top: 20px;
-            }
-            .btn-action {
-                width: 50px;
-                height: 32px;
-                padding: 0;
-                display: flex;
-                align-items: center;
                 justify-content: center;
-                margin: 0 2px;
             }
-            .content {
-                padding-left: 20px;
-                font-family: 'Roboto', sans-serif;
+            .pagination .page-link {
+                color: #DEAD6F;
+                border: 1px solid #DEAD6F;
+                margin: 0 4px;
+                border-radius: 6px;
+            }
+            .pagination .page-link:hover {
+                background-color: #DEAD6F;
+                color: #fff;
+            }
+            .pagination .page-item.active .page-link {
+                background-color: #DEAD6F;
+                border-color: #DEAD6F;
+                color: #fff;
+            }
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                border-color: #dee2e6;
+                background-color: #f8f9fa;
             }
         </style>
     </head>
@@ -99,7 +152,9 @@
                                                     <td>${exp.totalQuantity}</td>
                                                     <td>${exp.totalValue}</td>
                                                     <td>
-                                                        <a href="ExportDetail?exportId=${exp.exportId}" class="btn btn-info btn-action btn-sm">View</a>
+                                                        <a href="ExportDetail?exportId=${exp.exportId}" class="btn btn-detail">
+                                                            <i class="fas fa-eye"></i> Detail
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
@@ -153,5 +208,5 @@
             });
         </script>
     </body>
-    
+
 </html>
