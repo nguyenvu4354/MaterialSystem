@@ -65,13 +65,11 @@ public class ProfileServlet extends HttpServlet {
             String address = request.getParameter("address");
             String dateOfBirthStr = request.getParameter("dateOfBirth");
             String gender = request.getParameter("gender");
-            String description = request.getParameter("description");
 
             user.setFullName(fullName);
             user.setEmail(email);
             user.setPhoneNumber(phoneNumber);
             user.setAddress(address);
-            user.setDescription(description);
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
                 try {
@@ -121,7 +119,7 @@ public class ProfileServlet extends HttpServlet {
                     user.setUserPicture(fileName);
                 }
             }
-            errors.putAll(UserValidator.validateForProfile(user, fullName, address, description, dateOfBirthStr, gender));
+            errors.putAll(UserValidator.validateForProfile(user, fullName, address, null, dateOfBirthStr, gender));
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
                 request.setAttribute("user", user);

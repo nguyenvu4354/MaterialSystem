@@ -97,10 +97,6 @@
                                 <div class="col-sm-8">${user.status}</div>
                             </div>
                             <div class="row detail-row">
-                                <div class="col-sm-4 fw-bold">Description:</div>
-                                <div class="col-sm-8">${user.description != null ? user.description : '-'}</div>
-                            </div>
-                            <div class="row detail-row">
                                 <div class="col-sm-4 fw-bold">Created At:</div>
                                 <div class="col-sm-8">${user.createdAt != null ? user.createdAt : '-'}</div>
                             </div>

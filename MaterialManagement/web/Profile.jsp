@@ -168,13 +168,6 @@
                                         <input type="text" class="form-control" id="department"
                                                value="<%= user.getDepartmentName() != null ? user.getDepartmentName() : "-" %>" disabled>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="description" class="form-label text-muted">Description</label>
-                                        <textarea class="form-control <%= errors != null && errors.containsKey("description") ? "is-invalid" : "" %>" id="description" name="description" rows="3"><%= user.getDescription() != null ? user.getDescription() : "" %></textarea>
-                                        <% if (errors != null && errors.containsKey("description")) { %>
-                                        <div class="invalid-feedback"><%= errors.get("description") %></div>
-                                        <% } %>
-                                    </div>
                                     <div class="d-grid">
                                         <button type="submit" class="btn btn-primary btn-lg rounded-1">Update Profile</button>
                                     </div>
@@ -195,7 +188,6 @@
         <script src="js/script.js"></script>
         <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
         <script>
-                                               // Preview image
                                                function previewImage(event) {
                                                    const input = event.target;
                                                    const preview = document.getElementById('previewImage');
@@ -224,7 +216,6 @@
                                                    }
                                                }
 
-                                               // Real-time validation for full name
                                                document.getElementById('fullName').addEventListener('input', function () {
                                                    const fullName = this.value;
                                                    const feedback = this.nextElementSibling;
@@ -260,7 +251,6 @@
                                                    }
                                                });
 
-                                               // Real-time validation for phone number
                                                document.getElementById('phoneNumber').addEventListener('input', function () {
                                                    const phone = this.value;
                                                    const phoneRegex = /^\+?[0-9]{1,15}$/;
@@ -280,7 +270,6 @@
                                                    }
                                                });
 
-                                               // Real-time validation for address
                                                document.getElementById('address').addEventListener('input', function () {
                                                    const address = this.value;
                                                    const feedback = this.nextElementSibling;
@@ -293,7 +282,6 @@
                                                    }
                                                });
 
-                                               // Real-time validation for date of birth
                                                document.getElementById('dateOfBirth').addEventListener('input', function () {
                                                    const date = this.value;
                                                    const feedback = this.nextElementSibling;
@@ -313,20 +301,6 @@
                                                    }
                                                });
 
-                                               // Real-time validation for description
-                                               document.getElementById('description').addEventListener('input', function () {
-                                                   const description = this.value;
-                                                   const feedback = this.nextElementSibling;
-                                                   if (description.length > 1000) {
-                                                       this.classList.add('is-invalid');
-                                                       feedback.textContent = 'Description must not exceed 1000 characters.';
-                                                   } else {
-                                                       this.classList.remove('is-invalid');
-                                                       feedback.textContent = '';
-                                                   }
-                                               });
-
-                                               // Form submission validation
                                                document.getElementById('profileForm').addEventListener('submit', function (event) {
                                                    let valid = true;
                                                    const fullName = document.getElementById('fullName').value;
