@@ -48,6 +48,25 @@
             border-color: #0d6efd;
             color: #fff;
         }
+        /* Autocomplete UI giống material */
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            z-index: 1000;
+        }
+        .ui-menu-item {
+            padding: 8px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .ui-menu-item:hover {
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
 <body>
@@ -81,11 +100,11 @@
                     <div class="col-md-8">
                         <form method="get" action="${pageContext.request.contextPath}/Category" class="d-flex gap-2 align-items-center">
                             <input type="hidden" name="service" value="listCategory"/>
-                            <input type="text" name="code" class="form-control" 
-                                   placeholder="Search by Code" 
-                                   value="${code != null ? code : ''}" 
+                            <input type="text" name="name" class="form-control" 
+                                   placeholder="Search by Name" 
+                                   value="${name != null ? name : ''}" 
                                    style="width: 200px; height: 50px; border: 2px solid gray"/>
-                            <!-- Đã loại bỏ trường search by name (categoryName) -->
+                            
                             <select name="priority" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                 <option value="">All Priorities</option>
                                 <option value="high" ${priority == 'high' ? 'selected' : ''}>High</option>
@@ -109,7 +128,7 @@
                             <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px !important; height: 50px; background-color: #DEAD6F; color: white;">
                                 <i class="fas fa-search me-2"></i> Search
                             </button>
-                                <a href="Supplier?action=list" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
+                                <a href="Category?action=listCategory" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
                         </form>
                     </div>
                 </div>
@@ -125,7 +144,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col" style="width: 150px">Code</th>
                                 <th scope="col" style="width: 300px">Name</th>
-<!--                                <th scope="col" style="width: 150px">Parent ID</th>-->
+                                <th scope="col" style="width: 150px">Parent ID</th>
                                 <th scope="col" style="width: 300px">Created Date</th>
                                 <th scope="col" style="width: 150px">Status</th>
                                 <th scope="col" style="width: 500px">Description</th>
@@ -144,7 +163,7 @@
                                             <td>${cat.category_id}</td>
                                             <td>${cat.code}</td>
                                             <td>${cat.category_name}</td>
-<!--                                            <td>${cat.parent_id != null ? cat.parent_id : 'None'}</td>-->
+                                            <td>${categoryDAO.getParentCategoryName(cat.parent_id)}</td>
                                             <td><fmt:formatDate value="${cat.created_at}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                             <td>${cat.status}</td>
                                             <td>${cat.description}</td>
@@ -206,5 +225,35 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        // Chuyển categories sang mảng JS cho autocomplete
+        var categoriesData = [
+            <c:forEach var="cat" items="${categories}" varStatus="loop">
+                {
+                    label: "${cat.category_name}",
+                    value: "${cat.category_name}",
+                    id: "${cat.category_id}"
+                }<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
+        ];
+        $(function() {
+            var $input = $("input[name='name']");
+            $input.autocomplete({
+                source: function(request, response) {
+                    var term = request.term.toLowerCase();
+                    var matches = categoriesData.filter(function(cat) {
+                        return cat.label.toLowerCase().includes(term);
+                    });
+                    response(matches);
+                },
+                minLength: 0 // Cho phép hiển thị khi chưa nhập gì
+            }).on('focus', function() {
+                // Khi focus vào input, hiển thị luôn danh sách
+                $(this).autocomplete('search', '');
+            });
+        });
+    </script>
 </body>
 </html>

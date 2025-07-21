@@ -158,15 +158,15 @@ public class CategoryDAO extends DBContext {
     }
 
     /**
-     * Tìm kiếm danh mục theo nhiều điều kiện kết hợp: code, priority, status, sort
+     * Tìm kiếm danh mục theo nhiều điều kiện kết hợp: name (LIKE), priority, status, sort
      */
-    public List<Category> searchCategories(String code, String priority, String status, String sortBy, String sortOrder) {
+    public List<Category> searchCategories(String name, String priority, String status, String sortBy, String sortOrder) {
         List<Category> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT * FROM Categories WHERE disable = 0");
         List<Object> params = new ArrayList<>();
-        if (code != null && !code.trim().isEmpty()) {
-            sql.append(" AND code LIKE ?");
-            params.add("%" + code.trim() + "%");
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append(" AND category_name LIKE ?");
+            params.add("%" + name.trim() + "%");
         }
         if (priority != null && !priority.trim().isEmpty()) {
             sql.append(" AND priority = ?");
@@ -226,6 +226,53 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         }
         return max;
+    }
+
+    /**
+     * Lấy tên của parent category dựa trên parent_id
+     */
+    public String getParentCategoryName(Integer parentId) {
+        if (parentId == null) {
+            return "None";
+        }
+        String sql = "SELECT category_name FROM Categories WHERE category_id = ? AND disable = 0";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("category_name");
+            }
+        } catch (Exception e) {
+            lastError = "Error getParentCategoryName: " + e.getMessage();
+            System.out.println("❌ " + lastError);
+            e.printStackTrace();
+        }
+        return "Unknown";
+    }
+
+    /**
+     * Kiểm tra xem category name đã tồn tại chưa (không phân biệt hoa thường)
+     */
+    public boolean isCategoryNameExists(String categoryName, Integer excludeCategoryId) {
+        String sql = "SELECT COUNT(*) FROM Categories WHERE LOWER(category_name) = LOWER(?) AND disable = 0";
+        if (excludeCategoryId != null) {
+            sql += " AND category_id != ?";
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, categoryName.trim());
+            if (excludeCategoryId != null) {
+                ps.setInt(2, excludeCategoryId);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            lastError = "Error isCategoryNameExists: " + e.getMessage();
+            System.out.println("❌ " + lastError);
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static void main(String[] args) {

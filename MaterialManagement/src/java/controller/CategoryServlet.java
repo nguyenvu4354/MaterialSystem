@@ -83,8 +83,18 @@ public class CategoryServlet extends HttpServlet {
                             String createdAtRaw = request.getParameter("createdAt");
                             String parentIDRaw = request.getParameter("parentID");
 
-                            if (categoryName == null || categoryName.trim().isEmpty() || code == null || code.trim().isEmpty()) {
-                                request.setAttribute("error", "Category name and code cannot be empty.");
+                            if (code == null || code.trim().isEmpty()) {
+                                request.setAttribute("error", "Category code cannot be empty.");
+                                request.setAttribute("c", categoryDAO.getCategoryById(categoryId));
+                                request.setAttribute("categories", categoryDAO.getAllCategories());
+                                request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+                                request.getRequestDispatcher("/UpdateCategory.jsp").forward(request, response);
+                                return;
+                            }
+
+                            // Kiểm tra category name đã tồn tại chưa (loại trừ category hiện tại)
+                            if (categoryDAO.isCategoryNameExists(categoryName.trim(), categoryId)) {
+                                request.setAttribute("error", "Category name '" + categoryName + "' already exists. Please choose a different name.");
                                 request.setAttribute("c", categoryDAO.getCategoryById(categoryId));
                                 request.setAttribute("categories", categoryDAO.getAllCategories());
                                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
@@ -229,6 +239,22 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
+                            // Kiểm tra category name đã tồn tại chưa
+                            if (categoryDAO.isCategoryNameExists(categoryName.trim(), null)) {
+                                request.setAttribute("error", "Category name '" + categoryName + "' already exists. Please choose a different name.");
+                                request.setAttribute("categories", categoryDAO.getAllCategories());
+                                request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+                                // Giữ lại thông tin đã nhập
+                                request.setAttribute("enteredCategoryCode", code);
+                                request.setAttribute("enteredCategoryName", categoryName);
+                                request.setAttribute("enteredDescription", description);
+                                request.setAttribute("enteredStatus", status);
+                                request.setAttribute("enteredPriority", priority);
+                                request.setAttribute("enteredParentID", parentIDRaw);
+                                request.getRequestDispatcher("/InsertCategory.jsp").forward(request, response);
+                                return;
+                            }
+
                             // Thay thế searchCategoriesByCode bằng searchCategories
                             List<Category> existingCategories = categoryDAO.searchCategories(code.trim(), null, null, null, null);
                             if (!existingCategories.isEmpty()) {
@@ -281,7 +307,7 @@ public class CategoryServlet extends HttpServlet {
                         request.getRequestDispatcher("/Category.jsp").forward(request, response);
                         return;
                     }
-                    String code = request.getParameter("code");
+                    String name = request.getParameter("name");
                     String priority = request.getParameter("priority");
                     String status = request.getParameter("status");
                     String sortBy = request.getParameter("sortBy");
@@ -310,7 +336,7 @@ public class CategoryServlet extends HttpServlet {
                     }
 
                     // Lấy toàn bộ danh sách đã lọc
-                    List<Category> filteredList = categoryDAO.searchCategories(code, priority, status, sortCol, sortOrder);
+                    List<Category> filteredList = categoryDAO.searchCategories(name, priority, status, sortCol, sortOrder);
                     int totalCategories = filteredList.size();
                     int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
                     if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
@@ -321,11 +347,13 @@ public class CategoryServlet extends HttpServlet {
                     request.setAttribute("data", paginatedList);
                     request.setAttribute("currentPage", currentPage);
                     request.setAttribute("totalPages", totalPages);
-                    request.setAttribute("code", code);
+                    request.setAttribute("name", name);
                     request.setAttribute("priority", priority);
                     request.setAttribute("status", status);
                     request.setAttribute("sortBy", sortBy);
                     request.setAttribute("rolePermissionDAO", rolePermissionDAO);
+                    request.setAttribute("categoryDAO", categoryDAO);
+                    request.setAttribute("categories", categoryDAO.getAllCategories());
                     request.getRequestDispatcher("/Category.jsp").forward(request, response);
                     break;
                 }

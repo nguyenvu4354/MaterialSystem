@@ -44,13 +44,15 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="categoryName">Category Name <span class="text-danger"></span></label>
-                                    <input type="text" id="categoryName" name="categoryName" class="form-control" required>
+                                    <input type="text" id="categoryName" name="categoryName" class="form-control" 
+                                           value="${enteredCategoryName != null ? enteredCategoryName : ''}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="code">Code <span class="text-danger"></span></label>
-                                    <input type="text" id="code" name="code" class="form-control" value="${categoryCode}" readonly required>
+                                    <input type="text" id="code" name="code" class="form-control" 
+                                           value="${enteredCategoryCode != null ? enteredCategoryCode : categoryCode}" readonly required>
                                 </div>
                             </div>
                         </div>
@@ -61,8 +63,8 @@
                                 <div class="form-group">
                                     <label for="status">Status <span class="text-danger"></span></label>
                                     <select id="status" name="status" class="form-control" required>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="active" ${enteredStatus == 'active' ? 'selected' : ''}>Active</option>
+                                        <option value="inactive" ${enteredStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
                                     </select>
                                 </div>
                             </div>
@@ -71,9 +73,9 @@
                                 <div class="form-group">
                                     <label for="priority">Priority <span class="text-danger"></span></label>
                                     <select id="priority" name="priority" class="form-control" required>
-                                        <option value="high">High</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="low">Low</option>
+                                        <option value="high" ${enteredPriority == 'high' ? 'selected' : ''}>High</option>
+                                        <option value="medium" ${enteredPriority == 'medium' ? 'selected' : ''}>Medium</option>
+                                        <option value="low" ${enteredPriority == 'low' ? 'selected' : ''}>Low</option>
                                     </select>
                                 </div>
                             </div>
@@ -86,7 +88,7 @@
                                     <select id="parentID" name="parentID" class="form-control">
                                         <option value="">None</option>
                                         <c:forEach var="category" items="${categories}">
-                                            <option value="${category.category_id}">
+                                            <option value="${category.category_id}" ${enteredParentID == category.category_id.toString() ? 'selected' : ''}>
                                                 ${category.category_id} - ${category.category_name}
                                             </option>
                                         </c:forEach>
@@ -101,7 +103,7 @@
 
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea id="description" name="description" class="form-control" required></textarea>
+                            <textarea id="description" name="description" class="form-control" required>${enteredDescription != null ? enteredDescription : ''}</textarea>
                         </div>
 
                         <div class="mt-3">

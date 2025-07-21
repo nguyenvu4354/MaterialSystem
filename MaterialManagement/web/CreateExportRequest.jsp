@@ -19,6 +19,7 @@
         .export-form .form-control, .export-form .form-select {
             height: 48px;
             font-size: 1rem;
+            font-family: 'Roboto', Arial, sans-serif;
         }
         .export-form .form-label {
             font-size: 0.9rem;
@@ -32,6 +33,15 @@
             margin-bottom: 1rem;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 1rem;
+        }
+        #reason, textarea {
+            font-family: 'Roboto', Arial, sans-serif;
+            height: 40px;
+            padding: 6px 12px;
+            resize: vertical;
+             align-items: center;
+            justify-content: center;
+            padding-top: 32px; 
         }
         /* Giao diện autocomplete giống ExportMaterial.jsp */
         .ui-autocomplete {
@@ -90,7 +100,7 @@
                             </div>
                             <div class="col-12">
                                 <label for="reason" class="form-label text-muted">Reason</label>
-                                <textarea class="form-control" id="reason" name="reason" required rows="3"></textarea>
+                                <textarea class="form-control" id="reason" name="reason" required rows="1" style="height: 40px; padding: 6px 12px; resize: vertical;"></textarea>
                             </div>
                             <div class="col-md-6">
                                 <label for="recipientId" class="form-label text-muted">Recipient</label>
@@ -186,7 +196,6 @@ function updateMaterialRowAutocomplete(row) {
                 material.name.toLowerCase().includes(term) || 
                 material.code.toLowerCase().includes(term)
             );
-            console.log("Autocomplete term:", term, "matches:", matches);
             response(matches);
         },
         select: function(event, ui) {
@@ -238,7 +247,9 @@ function updateMaterialRowAutocomplete(row) {
                 }
             }
         },
-        minLength: 1
+        minLength: 0
+    }).on('focus', function() {
+        $(this).autocomplete('search', '');
     });
 }
 

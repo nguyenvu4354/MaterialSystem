@@ -54,7 +54,8 @@
                                     <div class="form-group">
                                         <label for="categoryName">Category Name</label>
                                         <input type="text" id="categoryName" name="categoryName" class="form-control" 
-                                               value="${c.category_name}" required>
+                                               value="${c.category_name}" readonly style="background-color: #f8f9fa;">
+                                        <small class="text-muted">Category name cannot be changed</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

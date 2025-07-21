@@ -247,14 +247,7 @@
                 <form id="statusForm" method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="requestId" value="${exportRequest.exportRequestId}">
-                        <div class="mb-3">
-                            <label for="statusSelect" class="form-label">New Status</label>
-                            <select class="form-select" name="status" id="statusSelect" required onchange="onStatusChange()">
-                                <option value="">Select Status</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
+                        <!-- Chỉ hiện 1 ô nhập lý do, không còn select status -->
                         <div class="mb-3" id="approvalReasonDiv" style="display: none;">
                             <label for="approvalReason" class="form-label">Approval Reason</label>
                             <textarea class="form-control" name="approvalReason" id="approvalReason" rows="3" placeholder="Enter approval reason..."></textarea>
@@ -275,38 +268,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function updateStatus(status) {
-            document.getElementById('statusSelect').value = status;
-            onStatusChange();
             if (status === 'approved') {
+                document.getElementById('approvalReasonDiv').style.display = 'block';
+                document.getElementById('rejectionReasonDiv').style.display = 'none';
                 document.getElementById('statusForm').action = '${pageContext.request.contextPath}/ApproveExportRequest';
+                document.getElementById('approvalReason').setAttribute('required', 'required');
+                document.getElementById('rejectionReason').removeAttribute('required');
             } else if (status === 'rejected') {
+                document.getElementById('approvalReasonDiv').style.display = 'none';
+                document.getElementById('rejectionReasonDiv').style.display = 'block';
                 document.getElementById('statusForm').action = '${pageContext.request.contextPath}/RejectExportRequest';
-            } else {
-                document.getElementById('statusForm').action = '';
+                document.getElementById('rejectionReason').setAttribute('required', 'required');
+                document.getElementById('approvalReason').removeAttribute('required');
             }
             new bootstrap.Modal(document.getElementById('statusModal')).show();
-        }
-        function onStatusChange() {
-            const status = document.getElementById('statusSelect').value;
-            const approvalReasonDiv = document.getElementById('approvalReasonDiv');
-            const rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
-            const rejectionReason = document.getElementById('rejectionReason');
-            if (status === 'approved') {
-                approvalReasonDiv.style.display = 'block';
-                rejectionReasonDiv.style.display = 'none';
-                rejectionReason.removeAttribute('required');
-                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/ApproveExportRequest';
-            } else if (status === 'rejected') {
-                approvalReasonDiv.style.display = 'none';
-                rejectionReasonDiv.style.display = 'block';
-                rejectionReason.setAttribute('required', 'required');
-                document.getElementById('statusForm').action = '${pageContext.request.contextPath}/RejectExportRequest';
-            } else {
-                approvalReasonDiv.style.display = 'none';
-                rejectionReasonDiv.style.display = 'none';
-                rejectionReason.removeAttribute('required');
-                document.getElementById('statusForm').action = '';
-            }
         }
     </script>
 </body>

@@ -163,8 +163,7 @@ public class CreateExportRequestServlet extends HttpServlet {
                     System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
                     e.printStackTrace();
                 }
-                request.setAttribute("success", "Export request created successfully!");
-                doGet(request, response);
+                response.sendRedirect(request.getContextPath() + "/ExportRequestList");
                 return;
             } else {
                 request.setAttribute("error", "Failed to create export request.");
