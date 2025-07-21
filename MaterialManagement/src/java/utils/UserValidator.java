@@ -16,9 +16,8 @@ public class UserValidator {
     private static final int EMAIL_MAX_LENGTH = 100;
     private static final int PHONE_MAX_LENGTH = 15;
     private static final int ADDRESS_MAX_LENGTH = 25;
-    private static final int DESCRIPTION_MAX_LENGTH = 25;
 
-    public static Map<String, String> validateForCreateUser(User user, UserDAO userDAO, String fullName, String address, String description,
+    public static Map<String, String> validateForCreateUser(User user, UserDAO userDAO, String fullName, String address,
                                                            String dateOfBirth, String gender, String departmentId, String userPicture) {
         Map<String, String> errors = new HashMap<>();
 
@@ -66,10 +65,10 @@ public class UserValidator {
             errors.put("fullName", "Full name must not contain numbers.");
         }
 
-        if (address == null || address.trim().isEmpty()) {
-            errors.put("address", "Address is required.");
-        } else if (address.length() > ADDRESS_MAX_LENGTH) {
-            errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
+        if (address != null && !address.trim().isEmpty()) {
+            if (address.length() > ADDRESS_MAX_LENGTH) {
+                errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
+            }
         }
 
         if (dateOfBirth != null && !dateOfBirth.trim().isEmpty()) {
@@ -89,14 +88,10 @@ public class UserValidator {
             }
         }
 
-        if (description != null && description.length() > DESCRIPTION_MAX_LENGTH) {
-            errors.put("description", "Description must not exceed " + DESCRIPTION_MAX_LENGTH + " characters.");
-        }
-
         return errors;
     }
 
-    public static Map<String, String> validateForProfile(User user, String fullName, String address, String description,
+    public static Map<String, String> validateForProfile(User user, String fullName, String address,
                                                         String dateOfBirth, String gender) {
         Map<String, String> errors = new HashMap<>();
 
@@ -124,10 +119,10 @@ public class UserValidator {
             errors.put("fullName", "Full name must not contain numbers.");
         }
 
-        if (address == null || address.trim().isEmpty()) {
-            errors.put("address", "Address is required.");
-        } else if (address.length() > ADDRESS_MAX_LENGTH) {
-            errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
+        if (address != null && !address.trim().isEmpty()) {
+            if (address.length() > ADDRESS_MAX_LENGTH) {
+                errors.put("address", "Address must not exceed " + ADDRESS_MAX_LENGTH + " characters.");
+            }
         }
 
         if (dateOfBirth != null && !dateOfBirth.trim().isEmpty()) {
@@ -145,10 +140,6 @@ public class UserValidator {
             if (!"male".equalsIgnoreCase(gender) && !"female".equalsIgnoreCase(gender) && !"other".equalsIgnoreCase(gender)) {
                 errors.put("gender", "Invalid gender.");
             }
-        }
-
-        if (description != null && description.length() > DESCRIPTION_MAX_LENGTH) {
-            errors.put("description", "Description must not exceed " + DESCRIPTION_MAX_LENGTH + " characters.");
         }
 
         return errors;

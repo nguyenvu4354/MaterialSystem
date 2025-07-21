@@ -66,33 +66,34 @@ public class ProfileServlet extends HttpServlet {
             String dateOfBirthStr = request.getParameter("dateOfBirth");
             String gender = request.getParameter("gender");
 
-            user.setFullName(fullName);
-            user.setEmail(email);
-            user.setPhoneNumber(phoneNumber);
-            user.setAddress(address);
+            User updatedUser = new User(user);
+            updatedUser.setFullName(fullName);
+            updatedUser.setEmail(email);
+            updatedUser.setPhoneNumber(phoneNumber);
+            updatedUser.setAddress(address);
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
                 try {
-                    user.setDateOfBirth(LocalDate.parse(dateOfBirthStr, DateTimeFormatter.ISO_LOCAL_DATE));
+                    updatedUser.setDateOfBirth(LocalDate.parse(dateOfBirthStr, DateTimeFormatter.ISO_LOCAL_DATE));
                 } catch (Exception e) {
-                    user.setDateOfBirth(null);
+                    updatedUser.setDateOfBirth(null);
                 }
             } else {
-                user.setDateOfBirth(null);
+                updatedUser.setDateOfBirth(null);
             }
 
             if (gender != null && !gender.isEmpty()) {
                 try {
-                    user.setGender(User.Gender.valueOf(gender.toLowerCase()));
+                    updatedUser.setGender(User.Gender.valueOf(gender.toLowerCase()));
                 } catch (IllegalArgumentException e) {
-                    user.setGender(null);
+                    updatedUser.setGender(null);
                 }
             } else {
-                user.setGender(null);
+                updatedUser.setGender(null);
             }
 
             Map<String, String> errors = new HashMap<>();
-            if (userDAO.isEmailExist(email, user.getUserId())) {
+            if (!user.getEmail().equals(email) && userDAO.isEmailExist(email, user.getUserId())) {
                 errors.put("email", "This email is already in use.");
             }
 
@@ -116,10 +117,12 @@ public class ProfileServlet extends HttpServlet {
 
                     Path savePath = uploadDir.resolve(fileName);
                     filePart.write(savePath.toString());
-                    user.setUserPicture(fileName);
+                    updatedUser.setUserPicture(fileName);
                 }
             }
-            errors.putAll(UserValidator.validateForProfile(user, fullName, address, null, dateOfBirthStr, gender));
+            
+            errors.putAll(UserValidator.validateForProfile(updatedUser, fullName, address, dateOfBirthStr, gender));
+            
             if (!errors.isEmpty()) {
                 request.setAttribute("errors", errors);
                 request.setAttribute("user", user);
@@ -127,10 +130,9 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
-            boolean updated = userDAO.updateUser(user);
+            boolean updated = userDAO.updateUser(updatedUser);
             if (updated) {
-                user = userDAO.getUserById(user.getUserId()); 
-                session.setAttribute("user", user);
+                session.setAttribute("user", updatedUser);
                 session.setAttribute("message", "Profile updated successfully!");
                 response.sendRedirect("profile");
             } else {
