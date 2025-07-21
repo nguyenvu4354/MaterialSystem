@@ -23,18 +23,41 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String verificationToken;
-    private String verificationStatus; 
+    private String verificationStatus;
     private LocalDateTime verificationExpiry;
-    
+
+    public User() {
+    }
+
+    public User(User other) {
+        this.userId = other.userId;
+        this.username = other.username;
+        this.password = other.password;
+        this.fullName = other.fullName;
+        this.email = other.email;
+        this.phoneNumber = other.phoneNumber;
+        this.address = other.address;
+        this.userPicture = other.userPicture;
+        this.roleId = other.roleId;
+        this.roleName = other.roleName;
+        this.departmentId = other.departmentId;
+        this.departmentName = other.departmentName;
+        this.dateOfBirth = other.dateOfBirth;
+        this.gender = other.gender;
+        this.status = other.status;
+        this.createdAt = other.createdAt;
+        this.updatedAt = other.updatedAt;
+        this.verificationToken = other.verificationToken;
+        this.verificationStatus = other.verificationStatus;
+        this.verificationExpiry = other.verificationExpiry;
+    }
+
     public enum Gender {
         male, female, other
     }
 
     public enum Status {
-        active, inactive, deleted, pending 
-    }
-
-    public User() {
+        active, inactive, deleted, pending
     }
 
     public int getUserId() {

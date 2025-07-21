@@ -151,8 +151,8 @@ public class CreateUserServlet extends HttpServlet {
                 }
             }
 
-            errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, null, dateOfBirthStr, gender, departmentIdStr, userPicture));
-
+            errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, dateOfBirthStr, gender, departmentIdStr, userPicture));
+            
             if (departmentId != null) {
                 final Integer finalDepartmentId = departmentId;
                 List<Department> departments = userDAO.getActiveDepartments();
