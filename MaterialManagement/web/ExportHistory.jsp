@@ -90,6 +90,11 @@
                 border-color: #dee2e6;
                 background-color: #f8f9fa;
             }
+            .pagination-ellipsis {
+                color: #6c757d;
+                padding: 0 10px;
+                line-height: 38px;
+            }
         </style>
     </head>
     <body>
@@ -111,13 +116,13 @@
                             <datalist id="materialNameList">
                                 <c:forEach var="mat" items="${materialList}">
                                     <option value="${mat.materialName}">
-                                    </c:forEach>
+                                </c:forEach>
                             </datalist>
                             <input type="text" name="recipientName" id="recipientNameInput" class="form-control" placeholder="Search By Recipient" list="recipientNameList" value="${recipientName}" style="width: 200px; height: 50px; border: 2px solid gray" />
                             <datalist id="recipientNameList">
                                 <c:forEach var="user" items="${userList}">
                                     <option value="${user.fullName}">
-                                    </c:forEach>
+                                </c:forEach>
                             </datalist>
                             <button type="submit" class="btn d-flex align-items-center justify-content-center" style="background-color: #e2b176; color: #fff; width: 150px; height: 50px; border-radius: 8px; font-weight: 500;">
                                 <i class="fas fa-search me-2"></i> Search
@@ -166,19 +171,34 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Pagination -->
-                        <c:if test="${totalPages > 1}">
+                        <!-- Enhanced Pagination -->
+                        <c:if test="${totalPages > 0}">
                             <nav>
                                 <ul class="pagination">
-                                    <c:if test="${currentPage > 1}">
-                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Previous</a></li>
-                                        </c:if>
-                                        <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${i == currentPage ? 'active' : ''}"><a class="page-link" href="ExportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${i}</a></li>
-                                        </c:forEach>
-                                        <c:if test="${currentPage < totalPages}">
-                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Next</a></li>
-                                        </c:if>
+                                    <!-- Previous Button -->
+                                    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="ExportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Previous</a>
+                                    </li>
+                                    <!-- Page Numbers -->
+                                    <c:set var="startPage" value="${currentPage - 2 > 1 ? currentPage - 2 : 1}"/>
+                                    <c:set var="endPage" value="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}"/>
+                                    <c:if test="${startPage > 1}">
+                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">1</a></li>
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                    </c:if>
+                                    <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link" href="ExportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <c:if test="${endPage < totalPages}">
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${totalPages}</a></li>
+                                    </c:if>
+                                    <!-- Next Button -->
+                                    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="ExportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Next</a>
+                                    </li>
                                 </ul>
                             </nav>
                         </c:if>
@@ -208,5 +228,4 @@
             });
         </script>
     </body>
-
 </html>

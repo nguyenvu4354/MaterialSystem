@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="css/vendor.css">
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" type="text/css" href="style,z.css">
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
@@ -90,6 +90,11 @@
                 border-color: #dee2e6;
                 background-color: #f8f9fa;
             }
+            .pagination-ellipsis {
+                color: #6c757d;
+                padding: 0 10px;
+                line-height: 38px;
+            }
         </style>
     </head>
     <body>
@@ -111,13 +116,13 @@
                             <datalist id="materialNameList">
                                 <c:forEach var="mat" items="${materialList}">
                                     <option value="${mat.materialName}">
-                                    </c:forEach>
+                                </c:forEach>
                             </datalist>
                             <input type="text" name="supplierName" id="supplierNameInput" class="form-control" placeholder="Search By Supplier" list="supplierNameList" value="${supplierName}" style="width: 200px; height: 50px; border: 2px solid gray" />
                             <datalist id="supplierNameList">
                                 <c:forEach var="sup" items="${supplierList}">
                                     <option value="${sup.supplierName}">
-                                    </c:forEach>
+                                </c:forEach>
                             </datalist>
                             <button type="submit" class="btn d-flex align-items-center justify-content-center" style="background-color: #e2b176; color: #fff; width: 150px; height: 50px; border-radius: 8px; font-weight: 500;">
                                 <i class="fas fa-search me-2"></i> Search
@@ -166,19 +171,34 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Pagination -->
-                        <c:if test="${totalPages > 1}">
+                        <!-- Enhanced Pagination -->
+                        <c:if test="${totalPages > 0}">
                             <nav>
                                 <ul class="pagination">
-                                    <c:if test="${currentPage > 1}">
-                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&supplierId=${supplierId}">Previous</a></li>
-                                        </c:if>
-                                        <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${i == currentPage ? 'active' : ''}"><a class="page-link" href="ImportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&supplierId=${supplierId}">${i}</a></li>
-                                        </c:forEach>
-                                        <c:if test="${currentPage < totalPages}">
-                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&supplierId=${supplierId}">Next</a></li>
-                                        </c:if>
+                                    <!-- Previous Button -->
+                                    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="ImportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">Previous</a>
+                                    </li>
+                                    <!-- Page Numbers -->
+                                    <c:set var="startPage" value="${currentPage - 2 > 1 ? currentPage - 2 : 1}"/>
+                                    <c:set var="endPage" value="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}"/>
+                                    <c:if test="${startPage > 1}">
+                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">1</a></li>
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                    </c:if>
+                                    <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link" href="ImportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <c:if test="${endPage < totalPages}">
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">${totalPages}</a></li>
+                                    </c:if>
+                                    <!-- Next Button -->
+                                    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="ImportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">Next</a>
+                                    </li>
                                 </ul>
                             </nav>
                         </c:if>
