@@ -207,7 +207,7 @@ public class ImportDAO extends DBContext {
 
     public List<ImportDetail> getImportDetailsByImportId(int importId) throws SQLException {
         List<ImportDetail> details = new ArrayList<>();
-        String sql = "SELECT d.*, m.material_name, u.unit_name "
+        String sql = "SELECT d.*, m.material_name, m.materials_url, u.unit_name "
                 + "FROM Import_Details d "
                 + "JOIN Materials m ON d.material_id = m.material_id "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
@@ -226,6 +226,7 @@ public class ImportDAO extends DBContext {
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
                     detail.setMaterialName(rs.getString("material_name"));
+                    detail.setMaterialsUrl(rs.getString("materials_url"));
                     detail.setUnitName(rs.getString("unit_name"));
                     details.add(detail);
                 }
@@ -246,7 +247,11 @@ public class ImportDAO extends DBContext {
     }
 
     public Import getImportById(int importId) {
-        String sql = "SELECT * FROM Imports WHERE import_id = ?";
+        String sql = "SELECT i.*, u.full_name AS importedByName, s.supplier_name AS supplierName "
+                + "FROM Imports i "
+                + "LEFT JOIN Users u ON i.imported_by = u.user_id "
+                + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
+                + "WHERE i.import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -266,6 +271,8 @@ public class ImportDAO extends DBContext {
                     importData.setNote(rs.getString("note"));
                     importData.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     importData.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    importData.setImportedByName(rs.getString("importedByName"));
+                    importData.setSupplierName(rs.getString("supplierName"));
                     return importData;
                 }
             }
@@ -329,7 +336,6 @@ public class ImportDAO extends DBContext {
         return 0;
     }
 
-    // Lấy danh sách lịch sử nhập kho có filter, phân trang
     public List<Import> getImportHistory(String fromDate, String toDate, String importCode, String supplierId, int page, int pageSize) {
         List<Import> list = new ArrayList<>();
         String sql = "SELECT i.*, u.full_name as importedByName, s.supplier_name, "
@@ -380,7 +386,6 @@ public class ImportDAO extends DBContext {
                 imp.setNote(rs.getString("note"));
                 imp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 imp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                // custom fields
                 imp.setImportedByName(rs.getString("importedByName"));
                 imp.setSupplierName(rs.getString("supplier_name"));
                 imp.setTotalQuantity(rs.getInt("totalQuantity"));
@@ -393,7 +398,6 @@ public class ImportDAO extends DBContext {
         return list;
     }
 
-    // Đếm tổng số phiếu nhập (phục vụ phân trang)
     public int countImportHistory(String fromDate, String toDate, String importCode, String supplierId) {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM Imports WHERE 1=1 ";
@@ -428,7 +432,6 @@ public class ImportDAO extends DBContext {
         return count;
     }
 
-    // Lấy danh sách lịch sử nhập kho nâng cao (filter theo tên vật tư, nhà cung cấp)
     public List<Import> getImportHistoryAdvanced(String fromDate, String toDate, String importCode, String materialName, String supplierName, int page, int pageSize) {
         List<Import> list = new ArrayList<>();
         String sql = "SELECT DISTINCT i.*, u.full_name as importedByName, s.supplier_name, "

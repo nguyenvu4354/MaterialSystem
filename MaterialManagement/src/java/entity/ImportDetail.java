@@ -22,6 +22,7 @@ public class ImportDetail {
     private LocalDateTime createdAt;
     private String materialName;
     private String unitName;
+    private String materialsUrl;
 
     public int getImportDetailId() {
         return importDetailId;
@@ -30,6 +31,15 @@ public class ImportDetail {
     public void setImportDetailId(int importDetailId) {
         this.importDetailId = importDetailId;
     }
+
+    public String getMaterialsUrl() {
+        return materialsUrl;
+    }
+
+    public void setMaterialsUrl(String materialsUrl) {
+        this.materialsUrl = materialsUrl;
+    }
+
 
     public int getImportId() {
         return importId;

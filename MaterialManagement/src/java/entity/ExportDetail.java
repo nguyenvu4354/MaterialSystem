@@ -13,11 +13,21 @@ public class ExportDetail {
     private LocalDateTime updatedAt;
     private String materialName;
     private String unitName;
+    private String materialsUrl;
 
     public int getExportDetailId() {
         return exportDetailId;
     }
 
+    public String getMaterialsUrl() {
+        return materialsUrl;
+    }
+
+    public void setMaterialsUrl(String materialsUrl) {
+        this.materialsUrl = materialsUrl;
+    }
+
+    
     public void setExportDetailId(int exportDetailId) {
         this.exportDetailId = exportDetailId;
     }
