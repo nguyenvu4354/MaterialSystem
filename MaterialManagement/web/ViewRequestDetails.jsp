@@ -190,7 +190,6 @@
                                     <th>Material Code</th>
                                     <th>Quantity</th>
                                     <th>Unit</th>
-                                    <th>Export Condition</th>
                                     <th>Image</th>
                                 </tr>
                             </thead>
@@ -201,7 +200,6 @@
                                         <td>${detail.materialCode}</td>
                                         <td>${detail.quantity}</td>
                                         <td>${detail.materialUnit}</td>
-                                        <td>${detail.exportCondition}</td>
                                         <td>
                                             <c:forEach var="material" items="${materials}">
                                                 <c:if test="${material.materialId == detail.materialId}">
@@ -305,7 +303,6 @@
                     </c:when>
                 </c:choose>
 
-                <!-- Phân trang -->
                 <c:if test="${totalPages > 1}">
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">

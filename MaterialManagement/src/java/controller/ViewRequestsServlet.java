@@ -46,6 +46,8 @@ public class ViewRequestsServlet extends HttpServlet {
             int pageSize = 10;
             String status = request.getParameter("status");
             String requestCode = request.getParameter("requestCode");
+            String materialName = request.getParameter("materialName");
+            String materialCode = request.getParameter("materialCode");
             LocalDate startDate = null;
             LocalDate endDate = null;
 
@@ -57,13 +59,13 @@ public class ViewRequestsServlet extends HttpServlet {
                 endDate = LocalDate.parse(request.getParameter("endDate"), formatter);
             }
 
-            List<ExportRequest> exportRequests = requestDAO.getExportRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate);
-            List<PurchaseRequest> purchaseRequests = requestDAO.getPurchaseRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate);
-            List<RepairRequest> repairRequests = requestDAO.getRepairRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate);
+            List<ExportRequest> exportRequests = requestDAO.getExportRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate, materialName, materialCode);
+            List<PurchaseRequest> purchaseRequests = requestDAO.getPurchaseRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate, materialName, materialCode);
+            List<RepairRequest> repairRequests = requestDAO.getRepairRequestsByUser(userId, page, pageSize, status, requestCode, startDate, endDate, materialName, materialCode);
 
-            int exportCount = requestDAO.getExportRequestCountByUser(userId, status, requestCode, startDate, endDate);
-            int purchaseCount = requestDAO.getPurchaseRequestCountByUser(userId, status, requestCode, startDate, endDate);
-            int repairCount = requestDAO.getRepairRequestCountByUser(userId, status, requestCode, startDate, endDate);
+            int exportCount = requestDAO.getExportRequestCountByUser(userId, status, requestCode, startDate, endDate, materialName, materialCode);
+            int purchaseCount = requestDAO.getPurchaseRequestCountByUser(userId, status, requestCode, startDate, endDate, materialName, materialCode);
+            int repairCount = requestDAO.getRepairRequestCountByUser(userId, status, requestCode, startDate, endDate, materialName, materialCode);
 
             String message = request.getParameter("message");
             if (message != null) {
@@ -79,6 +81,8 @@ public class ViewRequestsServlet extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("status", status);
             request.setAttribute("requestCode", requestCode);
+            request.setAttribute("materialName", materialName);
+            request.setAttribute("materialCode", materialCode);
             request.setAttribute("startDate", request.getParameter("startDate"));
             request.setAttribute("endDate", request.getParameter("endDate"));
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
