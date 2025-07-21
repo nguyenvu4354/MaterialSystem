@@ -58,13 +58,13 @@
                             <datalist id="materialNameList">
                                 <c:forEach var="mat" items="${materialList}">
                                     <option value="${mat.materialName}">
-                                </c:forEach>
+                                    </c:forEach>
                             </datalist>
                             <input type="text" name="recipientName" id="recipientNameInput" class="form-control" placeholder="Search By Recipient" list="recipientNameList" value="${recipientName}" style="width: 200px; height: 50px; border: 2px solid gray" />
                             <datalist id="recipientNameList">
                                 <c:forEach var="user" items="${userList}">
                                     <option value="${user.fullName}">
-                                </c:forEach>
+                                    </c:forEach>
                             </datalist>
                             <button type="submit" class="btn d-flex align-items-center justify-content-center" style="background-color: #e2b176; color: #fff; width: 150px; height: 50px; border-radius: 8px; font-weight: 500;">
                                 <i class="fas fa-search me-2"></i> Search
@@ -87,27 +87,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <c:choose>
-                                    <c:when test="${not empty exportList}">
-                                        <c:forEach var="exp" items="${exportList}" varStatus="loop">
-                                            <tr>
-                                                <td>${(currentPage-1)*10 + loop.index + 1}</td>
-                                                <td>${exp.exportCode}</td>
-                                                <td>${exp.exportDate}</td>
-                                                <td>${exp.exportedByName}</td>
-                                                <td>${exp.recipientName}</td>
-                                                <td>${exp.totalQuantity}</td>
-                                                <td>${exp.totalValue}</td>
-                                                <td>
-                                                    <a href="ExportDetail?exportId=${exp.exportId}" class="btn btn-info btn-action btn-sm">View</a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr><td colspan="8" class="text-center text-muted">No export records found.</td></tr>
-                                    </c:otherwise>
-                                </c:choose>
+                                    <c:choose>
+                                        <c:when test="${not empty exportList}">
+                                            <c:forEach var="exp" items="${exportList}" varStatus="loop">
+                                                <tr>
+                                                    <td>${(currentPage-1)*10 + loop.index + 1}</td>
+                                                    <td>${exp.exportCode}</td>
+                                                    <td>${exp.exportDate}</td>
+                                                    <td>${exp.exportedByName}</td>
+                                                    <td>${exp.recipientName}</td>
+                                                    <td>${exp.totalQuantity}</td>
+                                                    <td>${exp.totalValue}</td>
+                                                    <td>
+                                                        <a href="ExportDetail?exportId=${exp.exportId}" class="btn btn-info btn-action btn-sm">View</a>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr><td colspan="8" class="text-center text-muted">No export records found.</td></tr>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </tbody>
                             </table>
                         </div>
@@ -117,13 +117,13 @@
                                 <ul class="pagination">
                                     <c:if test="${currentPage > 1}">
                                         <li class="page-item"><a class="page-link" href="ExportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Previous</a></li>
-                                    </c:if>
-                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        </c:if>
+                                        <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${i == currentPage ? 'active' : ''}"><a class="page-link" href="ExportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${i}</a></li>
-                                    </c:forEach>
-                                    <c:if test="${currentPage < totalPages}">
+                                        </c:forEach>
+                                        <c:if test="${currentPage < totalPages}">
                                         <li class="page-item"><a class="page-link" href="ExportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Next</a></li>
-                                    </c:if>
+                                        </c:if>
                                 </ul>
                             </nav>
                         </c:if>
@@ -138,19 +138,20 @@
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script>
             var materialNames = [
-                    <c:forEach var="mat" items="${materialList}" varStatus="loop">
-        "${mat.materialName}"<c:if test="${!loop.last}">,</c:if>
-        </c:forEach>
+            <c:forEach var="mat" items="${materialList}" varStatus="loop">
+            "${mat.materialName}"<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
             ];
             var recipientNames = [
-                    <c:forEach var="user" items="${userList}" varStatus="loop">
-        "${user.fullName}"<c:i                f test="${!loop.last}            ">,</c:            if>
-                </c:for                Each>
+            <c:forEach var="user" items="${userList}" varStatus="loop">
+            "${user.fullName}"<c:if test="${!loop.last}">,</c:if>
+            </c:forEach>
             ];
-            $(function() {
-            $("#materialNameInput").autocomplete({ source:                 materialNames, minLength: 1 });
-            $("#recipientNameInput").autocomplete({ source: r            ecipient                                        Names, min                                            Length: 1 });
+            $(function () {
+                $("#materialNameInput").autocomplete({source: materialNames, minLength: 1});
+                $("#recipientNameInput").autocomplete({source: recipientNames, minLength: 1});
             });
-</script>
+        </script>
     </body>
+    
 </html>
