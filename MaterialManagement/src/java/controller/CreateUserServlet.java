@@ -79,7 +79,6 @@ public class CreateUserServlet extends HttpServlet {
             String address = request.getParameter("address");
             String dateOfBirthStr = request.getParameter("dateOfBirth");
             String gender = request.getParameter("gender");
-            String description = request.getParameter("description");
             String roleIdStr = request.getParameter("roleId");
             String departmentIdStr = request.getParameter("departmentId");
             String departmentName = request.getParameter("departmentName");
@@ -151,7 +150,7 @@ public class CreateUserServlet extends HttpServlet {
                 }
             }
 
-            errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, description, dateOfBirthStr, gender, departmentIdStr, userPicture));
+            errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, null, dateOfBirthStr, gender, departmentIdStr, userPicture));
 
             if (departmentId != null) {
                 final Integer finalDepartmentId = departmentId;
@@ -199,7 +198,6 @@ public class CreateUserServlet extends HttpServlet {
 
             newUser.setFullName(fullName);
             newUser.setAddress(address);
-            newUser.setDescription(description);
 
             boolean created = userDAO.createUser(newUser);
             if (created) {

@@ -19,12 +19,11 @@ public class User {
     private String departmentName;
     private LocalDate dateOfBirth;
     private Gender gender;
-    private String description;
     private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String verificationToken;
-    private String verificationStatus; // Could also use an enum
+    private String verificationStatus; 
     private LocalDateTime verificationExpiry;
     
     public enum Gender {
@@ -32,7 +31,7 @@ public class User {
     }
 
     public enum Status {
-        active, inactive, deleted, pending // Thêm pending để hỗ trợ xác thực email
+        active, inactive, deleted, pending 
     }
 
     public User() {
@@ -148,14 +147,6 @@ public class User {
 
     public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Status getStatus() {

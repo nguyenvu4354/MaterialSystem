@@ -58,7 +58,6 @@ public class UserDAO extends DBContext {
                 user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
-                user.setDescription(rs.getString("description"));
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
@@ -101,7 +100,6 @@ public class UserDAO extends DBContext {
                 user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
-                user.setDescription(rs.getString("description"));
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
@@ -139,7 +137,6 @@ public class UserDAO extends DBContext {
                 user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
-                user.setDescription(rs.getString("description"));
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
@@ -156,7 +153,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET password = ?, full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, description = ?, status = ?, department_id = ? WHERE user_id = ?";
+        String sql = "UPDATE Users SET password = ?, full_name = ?, email = ?, phone_number = ?, address = ?, user_picture = ?, date_of_birth = ?, gender = ?, status = ?, department_id = ? WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             System.out.println("🔄 Cập nhật user với user_id = " + user.getUserId());
             System.out.println("full_name = " + user.getFullName());
@@ -166,7 +163,6 @@ public class UserDAO extends DBContext {
             System.out.println("user_picture = " + user.getUserPicture());
             System.out.println("date_of_birth = " + (user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "null"));
             System.out.println("gender = " + (user.getGender() != null ? user.getGender().toString() : "null"));
-            System.out.println("description = " + user.getDescription());
             System.out.println("status = " + (user.getStatus() != null ? user.getStatus().toString() : "null"));
             System.out.println("department_id = " + user.getDepartmentId());
 
@@ -178,10 +174,9 @@ public class UserDAO extends DBContext {
             ps.setString(6, user.getUserPicture());
             ps.setObject(7, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
             ps.setString(8, user.getGender() != null ? user.getGender().toString() : null);
-            ps.setString(9, user.getDescription());
-            ps.setString(10, user.getStatus() != null ? user.getStatus().toString() : null);
-            ps.setObject(11, user.getDepartmentId());
-            ps.setInt(12, user.getUserId());
+            ps.setString(9, user.getStatus() != null ? user.getStatus().toString() : null);
+            ps.setObject(10, user.getDepartmentId());
+            ps.setInt(11, user.getUserId());
 
             int rowsAffected = ps.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected + " for user_id: " + user.getUserId());
@@ -200,8 +195,8 @@ public class UserDAO extends DBContext {
     }
 
     public boolean createUser(User user) {
-        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, description, status, verification_token, verification_status, verification_expiry) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (username, password, full_name, email, phone_number, address, user_picture, role_id, department_id, date_of_birth, gender, status, verification_token, verification_status, verification_expiry) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
@@ -214,11 +209,10 @@ public class UserDAO extends DBContext {
             ps.setObject(9, user.getDepartmentId());
             ps.setObject(10, user.getDateOfBirth() != null ? java.sql.Date.valueOf(user.getDateOfBirth()) : null);
             ps.setString(11, user.getGender() != null ? user.getGender().name() : null);
-            ps.setString(12, user.getDescription());
-            ps.setString(13, user.getStatus() != null ? user.getStatus().name() : "pending");
-            ps.setString(14, user.getVerificationToken());
-            ps.setString(15, user.getVerificationStatus() != null ? user.getVerificationStatus() : "pending");
-            ps.setObject(16, user.getVerificationExpiry() != null ? java.sql.Timestamp.valueOf(user.getVerificationExpiry()) : null);
+            ps.setString(12, user.getStatus() != null ? user.getStatus().name() : "pending");
+            ps.setString(13, user.getVerificationToken());
+            ps.setString(14, user.getVerificationStatus() != null ? user.getVerificationStatus() : "pending");
+            ps.setObject(15, user.getVerificationExpiry() != null ? java.sql.Timestamp.valueOf(user.getVerificationExpiry()) : null);
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
@@ -467,7 +461,6 @@ public class UserDAO extends DBContext {
                 user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
-                user.setDescription(rs.getString("description"));
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
@@ -549,7 +542,6 @@ public class UserDAO extends DBContext {
                 user.setDepartmentName(rs.getString("department_name"));
                 user.setDateOfBirth(rs.getDate("date_of_birth") != null ? rs.getDate("date_of_birth").toLocalDate() : null);
                 user.setGender(rs.getString("gender") != null ? User.Gender.valueOf(rs.getString("gender")) : null);
-                user.setDescription(rs.getString("description"));
                 user.setStatus(rs.getString("status") != null ? User.Status.valueOf(rs.getString("status")) : null);
                 user.setCreatedAt(rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null);
                 user.setUpdatedAt(rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
@@ -575,7 +567,7 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-        public List<Department> getActiveDepartments() {
+    public List<Department> getActiveDepartments() {
         List<Department> departmentList = new ArrayList<>();
         String sql = "SELECT * FROM Departments WHERE status = 'active' ORDER BY department_id";
 

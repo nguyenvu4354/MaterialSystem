@@ -216,15 +216,6 @@
                                                     <div class="invalid-feedback">${fn:escapeXml(errors.get("departmentId"))}</div>
                                                 <% } %>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="description" class="form-label text-muted">Description</label>
-                                                <textarea class="form-control <% if(errors != null && errors.containsKey("description")) { %>is-invalid<% } %>" 
-                                                          name="description" id="description" rows="3"
-                                                          placeholder="Enter Description">${fn:escapeXml(enteredUser != null && enteredUser.getDescription() != null ? enteredUser.getDescription() : "")}</textarea>
-                                                <% if (errors != null && errors.containsKey("description")) { %>
-                                                    <div class="invalid-feedback">${fn:escapeXml(errors.get("description"))}</div>
-                                                <% } %>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -431,15 +422,6 @@
                     document.getElementById('departmentName').nextElementSibling.nextElementSibling.textContent = 'Department is required.';
                 } else {
                     document.getElementById('departmentName').classList.remove('is-invalid');
-                }
-
-                const description = document.getElementById('description').value;
-                if (description.length > 25) {
-                    errors.push('Description must not exceed 25 characters.');
-                    document.getElementById('description').classList.add('is-invalid');
-                    document.getElementById('description').nextElementSibling.textContent = 'Description must not exceed 25 characters.';
-                } else {
-                    document.getElementById('description').classList.remove('is-invalid');
                 }
 
                 if (errors.length > 0) {
