@@ -191,7 +191,7 @@ public class ImportDAO extends DBContext {
             }
             stmt.setString(7, importData.getNote());
             stmt.setInt(8, importData.getImportId());
-            
+
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("No import updated for import ID: " + importData.getImportId());
@@ -207,7 +207,11 @@ public class ImportDAO extends DBContext {
 
     public List<ImportDetail> getImportDetailsByImportId(int importId) throws SQLException {
         List<ImportDetail> details = new ArrayList<>();
-        String sql = "SELECT * FROM Import_Details WHERE import_id = ?";
+        String sql = "SELECT d.*, m.material_name, u.unit_name "
+                + "FROM Import_Details d "
+                + "JOIN Materials m ON d.material_id = m.material_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "WHERE d.import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -221,6 +225,8 @@ public class ImportDAO extends DBContext {
                     detail.setStatus(rs.getString("status"));
                     java.sql.Timestamp ts = rs.getTimestamp("created_at");
                     detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
+                    detail.setMaterialName(rs.getString("material_name"));
+                    detail.setUnitName(rs.getString("unit_name"));
                     details.add(detail);
                 }
             }
@@ -239,7 +245,7 @@ public class ImportDAO extends DBContext {
         }
     }
 
-    public Import getImportById(int importId) throws SQLException {
+    public Import getImportById(int importId) {
         String sql = "SELECT * FROM Imports WHERE import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
@@ -248,7 +254,9 @@ public class ImportDAO extends DBContext {
                     Import importData = new Import();
                     importData.setImportId(rs.getInt("import_id"));
                     importData.setImportCode(rs.getString("import_code"));
-                    importData.setImportDate(rs.getTimestamp("import_date").toLocalDateTime());
+                    if (rs.getTimestamp("import_date") != null) {
+                        importData.setImportDate(rs.getTimestamp("import_date").toLocalDateTime());
+                    }
                     importData.setImportedBy(rs.getInt("imported_by"));
                     importData.setSupplierId(rs.getInt("supplier_id"));
                     importData.setDestination(rs.getString("destination"));
@@ -261,6 +269,8 @@ public class ImportDAO extends DBContext {
                     return importData;
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -317,5 +327,214 @@ public class ImportDAO extends DBContext {
             }
         }
         return 0;
+    }
+
+    // Lấy danh sách lịch sử nhập kho có filter, phân trang
+    public List<Import> getImportHistory(String fromDate, String toDate, String importCode, String supplierId, int page, int pageSize) {
+        List<Import> list = new ArrayList<>();
+        String sql = "SELECT i.*, u.full_name as importedByName, s.supplier_name, "
+                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id) as totalQuantity, "
+                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id) as totalValue "
+                + "FROM Imports i "
+                + "LEFT JOIN Users u ON i.imported_by = u.user_id "
+                + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
+                + "WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND i.import_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND i.import_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (importCode != null && !importCode.isEmpty()) {
+            sql += "AND i.import_code LIKE ? ";
+            params.add("%" + importCode + "%");
+        }
+        if (supplierId != null && !supplierId.isEmpty()) {
+            sql += "AND i.supplier_id = ? ";
+            params.add(Integer.parseInt(supplierId));
+        }
+        sql += "ORDER BY i.import_date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Import imp = new Import();
+                imp.setImportId(rs.getInt("import_id"));
+                imp.setImportCode(rs.getString("import_code"));
+                if (rs.getTimestamp("import_date") != null) {
+                    imp.setImportDate(rs.getTimestamp("import_date").toLocalDateTime());
+                }
+                imp.setImportedBy(rs.getInt("imported_by"));
+                imp.setSupplierId(rs.getInt("supplier_id"));
+                imp.setDestination(rs.getString("destination"));
+                if (rs.getTimestamp("actual_arrival") != null) {
+                    imp.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
+                }
+                imp.setNote(rs.getString("note"));
+                imp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                imp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                // custom fields
+                imp.setImportedByName(rs.getString("importedByName"));
+                imp.setSupplierName(rs.getString("supplier_name"));
+                imp.setTotalQuantity(rs.getInt("totalQuantity"));
+                imp.setTotalValue(rs.getDouble("totalValue"));
+                list.add(imp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Đếm tổng số phiếu nhập (phục vụ phân trang)
+    public int countImportHistory(String fromDate, String toDate, String importCode, String supplierId) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Imports WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND import_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND import_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (importCode != null && !importCode.isEmpty()) {
+            sql += "AND import_code LIKE ? ";
+            params.add("%" + importCode + "%");
+        }
+        if (supplierId != null && !supplierId.isEmpty()) {
+            sql += "AND supplier_id = ? ";
+            params.add(Integer.parseInt(supplierId));
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    // Lấy danh sách lịch sử nhập kho nâng cao (filter theo tên vật tư, nhà cung cấp)
+    public List<Import> getImportHistoryAdvanced(String fromDate, String toDate, String importCode, String materialName, String supplierName, int page, int pageSize) {
+        List<Import> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT i.*, u.full_name as importedByName, s.supplier_name, "
+                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id) as totalQuantity, "
+                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id) as totalValue "
+                + "FROM Imports i "
+                + "LEFT JOIN Users u ON i.imported_by = u.user_id "
+                + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
+                + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
+                + "LEFT JOIN Materials m ON idt.material_id = m.material_id "
+                + "WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND i.import_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND i.import_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (importCode != null && !importCode.isEmpty()) {
+            sql += "AND i.import_code LIKE ? ";
+            params.add("%" + importCode + "%");
+        }
+        if (materialName != null && !materialName.isEmpty()) {
+            sql += "AND m.material_name LIKE ? ";
+            params.add("%" + materialName + "%");
+        }
+        if (supplierName != null && !supplierName.isEmpty()) {
+            sql += "AND s.supplier_name LIKE ? ";
+            params.add("%" + supplierName + "%");
+        }
+        sql += "ORDER BY i.import_date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Import imp = new Import();
+                imp.setImportId(rs.getInt("import_id"));
+                imp.setImportCode(rs.getString("import_code"));
+                if (rs.getTimestamp("import_date") != null) {
+                    imp.setImportDate(rs.getTimestamp("import_date").toLocalDateTime());
+                }
+                imp.setImportedBy(rs.getInt("imported_by"));
+                imp.setSupplierId(rs.getInt("supplier_id"));
+                imp.setDestination(rs.getString("destination"));
+                if (rs.getTimestamp("actual_arrival") != null) {
+                    imp.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
+                }
+                imp.setNote(rs.getString("note"));
+                imp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                imp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                imp.setImportedByName(rs.getString("importedByName"));
+                imp.setSupplierName(rs.getString("supplier_name"));
+                imp.setTotalQuantity(rs.getInt("totalQuantity"));
+                imp.setTotalValue(rs.getDouble("totalValue"));
+                list.add(imp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countImportHistoryAdvanced(String fromDate, String toDate, String importCode, String materialName, String supplierName) {
+        int count = 0;
+        String sql = "SELECT COUNT(DISTINCT i.import_id) FROM Imports i "
+                + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
+                + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
+                + "LEFT JOIN Materials m ON idt.material_id = m.material_id WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND i.import_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND i.import_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (importCode != null && !importCode.isEmpty()) {
+            sql += "AND i.import_code LIKE ? ";
+            params.add("%" + importCode + "%");
+        }
+        if (materialName != null && !materialName.isEmpty()) {
+            sql += "AND m.material_name LIKE ? ";
+            params.add("%" + materialName + "%");
+        }
+        if (supplierName != null && !supplierName.isEmpty()) {
+            sql += "AND s.supplier_name LIKE ? ";
+            params.add("%" + supplierName + "%");
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }

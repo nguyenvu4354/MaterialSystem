@@ -240,7 +240,11 @@ public class ExportDAO extends DBContext {
 
     public List<ExportDetail> getExportDetailsByExportId(int exportId) throws SQLException {
         List<ExportDetail> details = new ArrayList<>();
-        String sql = "SELECT * FROM Export_Details WHERE export_id = ?";
+        String sql = "SELECT d.*, m.material_name, u.unit_name "
+                + "FROM Export_Details d "
+                + "JOIN Materials m ON d.material_id = m.material_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
+                + "WHERE d.export_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, exportId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -253,6 +257,8 @@ public class ExportDAO extends DBContext {
                     detail.setStatus(rs.getString("status"));
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    detail.setMaterialName(rs.getString("material_name"));
+                    detail.setUnitName(rs.getString("unit_name"));
                     details.add(detail);
                 }
             }
@@ -313,5 +319,236 @@ public class ExportDAO extends DBContext {
             }
         }
         return users;
+    }
+
+    // Lấy danh sách lịch sử xuất kho có filter, phân trang
+    public List<Export> getExportHistory(String fromDate, String toDate, String exportCode, String recipientId, int page, int pageSize) {
+        List<Export> list = new ArrayList<>();
+        String sql = "SELECT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
+                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
+                + "0 as totalValue "
+                + // Nếu có giá trị xuất thì thay bằng SUM(quantity * price)
+                "FROM Exports e "
+                + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
+                + "WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND e.export_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND e.export_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (exportCode != null && !exportCode.isEmpty()) {
+            sql += "AND e.export_code LIKE ? ";
+            params.add("%" + exportCode + "%");
+        }
+        if (recipientId != null && !recipientId.isEmpty()) {
+            sql += "AND e.recipient_user_id = ? ";
+            params.add(Integer.parseInt(recipientId));
+        }
+        sql += "ORDER BY e.export_date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Export exp = new Export();
+                exp.setExportId(rs.getInt("export_id"));
+                exp.setExportCode(rs.getString("export_code"));
+                if (rs.getTimestamp("export_date") != null) {
+                    exp.setExportDate(rs.getTimestamp("export_date").toLocalDateTime());
+                }
+                exp.setExportedBy(rs.getInt("exported_by"));
+                exp.setRecipientUserId(rs.getInt("recipient_user_id"));
+                exp.setBatchNumber(rs.getString("batch_number"));
+                exp.setNote(rs.getString("note"));
+                exp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                exp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                // custom fields
+                exp.setExportedByName(rs.getString("exportedByName"));
+                exp.setRecipientName(rs.getString("recipientName"));
+                exp.setTotalQuantity(rs.getInt("totalQuantity"));
+                exp.setTotalValue(rs.getDouble("totalValue"));
+                list.add(exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Đếm tổng số phiếu xuất (phục vụ phân trang)
+    public int countExportHistory(String fromDate, String toDate, String exportCode, String recipientId) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Exports WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND export_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND export_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (exportCode != null && !exportCode.isEmpty()) {
+            sql += "AND export_code LIKE ? ";
+            params.add("%" + exportCode + "%");
+        }
+        if (recipientId != null && !recipientId.isEmpty()) {
+            sql += "AND recipient_user_id = ? ";
+            params.add(Integer.parseInt(recipientId));
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    // Lấy danh sách lịch sử xuất kho nâng cao (filter theo tên vật tư, người nhận)
+    public List<Export> getExportHistoryAdvanced(String fromDate, String toDate, String exportCode, String materialName, String recipientName, int page, int pageSize) {
+        List<Export> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
+                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
+                + "0 as totalValue "
+                + "FROM Exports e "
+                + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
+                + "LEFT JOIN Export_Details edt ON e.export_id = edt.export_id "
+                + "LEFT JOIN Materials m ON edt.material_id = m.material_id "
+                + "WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND e.export_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND e.export_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (exportCode != null && !exportCode.isEmpty()) {
+            sql += "AND e.export_code LIKE ? ";
+            params.add("%" + exportCode + "%");
+        }
+        if (materialName != null && !materialName.isEmpty()) {
+            sql += "AND m.material_name LIKE ? ";
+            params.add("%" + materialName + "%");
+        }
+        if (recipientName != null && !recipientName.isEmpty()) {
+            sql += "AND u2.full_name LIKE ? ";
+            params.add("%" + recipientName + "%");
+        }
+        sql += "ORDER BY e.export_date DESC LIMIT ? OFFSET ?";
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Export exp = new Export();
+                exp.setExportId(rs.getInt("export_id"));
+                exp.setExportCode(rs.getString("export_code"));
+                if (rs.getTimestamp("export_date") != null) {
+                    exp.setExportDate(rs.getTimestamp("export_date").toLocalDateTime());
+                }
+                exp.setExportedBy(rs.getInt("exported_by"));
+                exp.setRecipientUserId(rs.getInt("recipient_user_id"));
+                exp.setBatchNumber(rs.getString("batch_number"));
+                exp.setNote(rs.getString("note"));
+                exp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                exp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                exp.setExportedByName(rs.getString("exportedByName"));
+                exp.setRecipientName(rs.getString("recipientName"));
+                exp.setTotalQuantity(rs.getInt("totalQuantity"));
+                exp.setTotalValue(rs.getDouble("totalValue"));
+                list.add(exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countExportHistoryAdvanced(String fromDate, String toDate, String exportCode, String materialName, String recipientName) {
+        int count = 0;
+        String sql = "SELECT COUNT(DISTINCT e.export_id) FROM Exports e "
+                + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
+                + "LEFT JOIN Export_Details edt ON e.export_id = edt.export_id "
+                + "LEFT JOIN Materials m ON edt.material_id = m.material_id WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql += "AND e.export_date >= ? ";
+            params.add(fromDate + " 00:00:00");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql += "AND e.export_date <= ? ";
+            params.add(toDate + " 23:59:59");
+        }
+        if (exportCode != null && !exportCode.isEmpty()) {
+            sql += "AND e.export_code LIKE ? ";
+            params.add("%" + exportCode + "%");
+        }
+        if (materialName != null && !materialName.isEmpty()) {
+            sql += "AND m.material_name LIKE ? ";
+            params.add("%" + materialName + "%");
+        }
+        if (recipientName != null && !recipientName.isEmpty()) {
+            sql += "AND u2.full_name LIKE ? ";
+            params.add("%" + recipientName + "%");
+        }
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public Export getExportById(int exportId) {
+        String sql = "SELECT * FROM Exports WHERE export_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, exportId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Export exportData = new Export();
+                    exportData.setExportId(rs.getInt("export_id"));
+                    exportData.setExportCode(rs.getString("export_code"));
+                    if (rs.getTimestamp("export_date") != null) {
+                        exportData.setExportDate(rs.getTimestamp("export_date").toLocalDateTime());
+                    }
+                    exportData.setExportedBy(rs.getInt("exported_by"));
+                    exportData.setRecipientUserId(rs.getInt("recipient_user_id"));
+                    exportData.setBatchNumber(rs.getString("batch_number"));
+                    exportData.setNote(rs.getString("note"));
+                    exportData.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    exportData.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    return exportData;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

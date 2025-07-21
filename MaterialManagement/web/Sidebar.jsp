@@ -41,7 +41,29 @@
                             Inventory Report
                         </a>
                     </li>
-                </c:if>                      
+                </c:if>
+                <c:if test="${sessionScope.user.roleId == 1}">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-uppercase secondary-font d-flex align-items-center collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#historyMenu" aria-expanded="false" aria-controls="historyMenu">
+                            <i class="fas fa-history fs-4 me-3"></i>
+                            History
+                        </a>
+                        <div class="collapse" id="historyMenu">
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center ms-4" href="ImportHistory">
+                                        <i class="fas fa-arrow-down me-2"></i> Import History
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center ms-4" href="ExportHistory">
+                                        <i class="fas fa-arrow-up me-2"></i> Export History
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </c:if>
                 <c:if test="${sessionScope.userPermissions.contains('VIEW_LIST_USER')}">
                     <li class="nav-item mb-2">
                         <a class="nav-link text-uppercase secondary-font d-flex align-items-center" href="${pageContext.request.contextPath}/UserList">
@@ -142,10 +164,18 @@
         const currentPage = window.location.pathname.split('/').pop();
 
         const navLinks = document.querySelectorAll('#sidebarMenu .nav-link');
+        const historyDropdown = document.querySelector('#sidebarMenu [data-bs-target="#historyMenu"]');
+        const historyPages = ["ImportHistory", "ExportHistory"];
+
+        let isHistoryPage = historyPages.includes(currentPage);
 
         navLinks.forEach(link => {
-            const href = link.getAttribute('href').split('/').pop();
-            if (href === currentPage) {
+            const href = link.getAttribute('href') ? link.getAttribute('href').split('/').pop() : null;
+            // Nếu là trang history thì chỉ bôi nâu mục History dropdown
+            if (isHistoryPage && link === historyDropdown) {
+                link.classList.add('active');
+                link.setAttribute('aria-current', 'page');
+            } else if (!isHistoryPage && href === currentPage) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
             } else {
@@ -160,9 +190,14 @@
                     l.classList.remove('active');
                     l.removeAttribute('aria-current');
                 });
-
-                this.classList.add('active');
-                this.setAttribute('aria-current', 'page');
+                // Nếu click vào mục con của History thì bôi nâu mục History dropdown
+                if (historyPages.includes(this.getAttribute('href') ? this.getAttribute('href').split('/').pop() : '')) {
+                    historyDropdown.classList.add('active');
+                    historyDropdown.setAttribute('aria-current', 'page');
+                } else {
+                    this.classList.add('active');
+                    this.setAttribute('aria-current', 'page');
+                }
             });
         });
     });
