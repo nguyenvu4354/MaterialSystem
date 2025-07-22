@@ -25,6 +25,7 @@ import utils.ImportValidator;
 
 @WebServlet(name = "ImportMaterialServlet", urlPatterns = {"/ImportMaterial"})
 public class ImportMaterialServlet extends HttpServlet {
+
     private ImportDAO importDAO;
     private SupplierDAO supplierDAO;
     private MaterialDAO materialDAO;
@@ -210,7 +211,7 @@ public class ImportMaterialServlet extends HttpServlet {
         String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
         Map<String, String> formErrors = utils.ImportValidator.validateImportFormData(
-            supplierIdStr, destination, actualArrivalStr, note, supplierDAO
+                supplierIdStr, destination, actualArrivalStr, note, supplierDAO
         );
         if (!formErrors.isEmpty()) {
             request.setAttribute("formErrors", formErrors);
@@ -223,7 +224,8 @@ public class ImportMaterialServlet extends HttpServlet {
 
         Import imports = new Import();
         imports.setImportId(tempImportId);
-        imports.setImportCode("IMP-" + UUID.randomUUID().toString().substring(0, 8));
+        String nextImportCode = importDAO.generateNextImportCode();
+        imports.setImportCode(nextImportCode);
         imports.setImportDate(java.time.LocalDateTime.now());
         imports.setImportedBy(user.getUserId());
         imports.setSupplierId(supplierId);
@@ -237,7 +239,7 @@ public class ImportMaterialServlet extends HttpServlet {
         importDAO.confirmImport(tempImportId);
         importDAO.updateInventoryByImportId(tempImportId, user.getUserId(), destination);
         session.setAttribute("tempImportId", 0);
-        request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + ". Total value: $" + String.format("%.2f", totalImportValue));
+        request.setAttribute("success", "Import completed successfully with code: " + nextImportCode + ". Total value: $" + String.format("%.2f", totalImportValue));
         loadDataAndForward(request, response);
     }
 
@@ -267,7 +269,7 @@ public class ImportMaterialServlet extends HttpServlet {
             for (Material m : allMaterials) {
                 materialMap.put(m.getMaterialId(), m);
             }
-            
+
             Map<Integer, Integer> stockMap = new HashMap<>();
             for (ImportDetail detail : importDetails) {
                 stockMap.put(detail.getMaterialId(), inventoryDAO.getStockByMaterialId(detail.getMaterialId()));

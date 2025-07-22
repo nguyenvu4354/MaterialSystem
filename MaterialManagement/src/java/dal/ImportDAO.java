@@ -53,7 +53,7 @@ public class ImportDAO extends DBContext {
                     throw new SQLException("Quantity must be greater than 0 for material ID: " + detail.getMaterialId());
                 }
 
-                ImportDetail existingDetail = getImportDetailByMaterial(detail.getImportId(), detail.getMaterialId());
+                ImportDetail existingDetail = getImportDetailByMaterialAndPrice(detail.getImportId(), detail.getMaterialId(), detail.getUnitPrice());
                 if (existingDetail != null) {
                     int newQuantity = existingDetail.getQuantity() + detail.getQuantity();
                     updateImportDetailQuantity(existingDetail.getImportDetailId(), newQuantity);
@@ -114,7 +114,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void confirmImport(int importId) throws SQLException {
-        String sql = "UPDATE Import_Details SET status = 'imported' WHERE import_id = ? AND status = 'draft'";
+        String sql = "UPDATE Import_Details SET status = 'imported', created_at = CURRENT_TIMESTAMP WHERE import_id = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, importId);
             int affectedRows = stmt.executeUpdate();
@@ -453,5 +453,41 @@ public class ImportDAO extends DBContext {
             e.printStackTrace();
         }
         return count;
+    }
+
+    public String generateNextImportCode() throws SQLException {
+        String sql = "SELECT MAX(import_id) FROM Imports";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            int nextId = 1;
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1;
+            }
+            return String.format("IMP-%05d", nextId);
+        }
+    }
+
+    public ImportDetail getImportDetailByMaterialAndPrice(int importId, int materialId, double unitPrice) throws SQLException {
+        String sql = "SELECT * FROM Import_Details WHERE import_id = ? AND material_id = ? AND unit_price = ? AND status = 'draft'";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, importId);
+            stmt.setInt(2, materialId);
+            stmt.setDouble(3, unitPrice);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ImportDetail detail = new ImportDetail();
+                    detail.setImportDetailId(rs.getInt("import_detail_id"));
+                    detail.setImportId(rs.getInt("import_id"));
+                    detail.setMaterialId(rs.getInt("material_id"));
+                    detail.setQuantity(rs.getInt("quantity"));
+                    detail.setUnitPrice(rs.getDouble("unit_price"));
+                    detail.setStatus(rs.getString("status"));
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    detail.setCreatedAt(ts != null ? ts.toLocalDateTime() : null);
+                    return detail;
+                }
+            }
+        }
+        return null;
     }
 }
