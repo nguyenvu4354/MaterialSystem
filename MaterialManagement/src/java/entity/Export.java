@@ -9,18 +9,15 @@ public class Export {
     private LocalDateTime exportDate;
     private int exportedBy;
     private int recipientUserId;
-    private String batchNumber;
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Thêm các trường phục vụ hiển thị lịch sử xuất kho
     private String exportedByName;
     private String recipientName;
     private int totalQuantity;
     private double totalValue;
 
-    // Getters and setters
     public int getExportId() {
         return exportId;
     }
@@ -59,14 +56,6 @@ public class Export {
 
     public void setRecipientUserId(int recipientUserId) {
         this.recipientUserId = recipientUserId;
-    }
-
-    public String getBatchNumber() {
-        return batchNumber;
-    }
-
-    public void setBatchNumber(String batchNumber) {
-        this.batchNumber = batchNumber;
     }
 
     public String getNote() {

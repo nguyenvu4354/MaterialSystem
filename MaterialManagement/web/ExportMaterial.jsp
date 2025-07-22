@@ -278,11 +278,6 @@
                                         </datalist>
                                         <div class="invalid-feedback">Please select a valid recipient.</div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="batchNumber" class="form-label text-muted">Batch Number</label>
-                                        <input type="text" name="batchNumber" id="batchNumber" maxlength="50" class="form-control" placeholder="Enter batch number">
-                                        <div class="invalid-feedback">Please enter a valid batch number.</div>
-                                    </div>
                                     <div class="col-12">
                                         <label for="note" class="form-label text-muted">Note</label>
                                         <input type="text" name="note" id="note" maxlength="100" class="form-control" placeholder="Enter note">
@@ -434,7 +429,6 @@
                     let isValid = true;
                     const recipientId = form.querySelector('#recipientUserId');
                     const recipientName = form.querySelector('#recipientName');
-                    const batchNumber = form.querySelector('#batchNumber');
                     const note = form.querySelector('#note');
 
                     if (!recipientId.value) {
@@ -442,15 +436,6 @@
                         isValid = false;
                     } else {
                         recipientName.classList.remove('is-invalid');
-                    }
-
-                    if (batchNumber.value.length > 50) {
-                        batchNumber.classList.add('is-invalid');
-                        batchNumber.nextElementSibling.textContent = 'Batch number must not exceed 50 characters.';
-                        isValid = false;
-                    } else {
-                        batchNumber.classList.remove('is-invalid');
-                        batchNumber.nextElementSibling.textContent = 'Please enter a valid batch number.';
                     }
 
                     if (note.value.length > 100) {
