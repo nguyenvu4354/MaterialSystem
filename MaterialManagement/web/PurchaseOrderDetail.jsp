@@ -258,15 +258,7 @@
                 <div class="modal-body">
                     <input type="hidden" name="action" value="updateStatus">
                     <input type="hidden" name="poId" id="poId">
-                    <div class="mb-3">
-                        <label for="status" class="form-label">New Status</label>
-                        <select class="form-select" name="status" id="status" required onchange="onStatusChange()">
-                            <option value="">Select Status</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                           
-                        </select>
-                    </div>
+                    <input type="hidden" name="status" id="statusHidden">
                     <div class="mb-3" id="approvalReasonDiv" style="display: none;">
                         <label for="approvalReason" class="form-label">Approval Reason</label>
                         <textarea class="form-control" name="approvalReason" id="approvalReason" rows="3" placeholder="Enter approval reason..."></textarea>
@@ -289,28 +281,27 @@
 <script>
     function updateStatus(poId, status) {
         document.getElementById('poId').value = poId;
-        document.getElementById('status').value = status;
-        onStatusChange();
-        new bootstrap.Modal(document.getElementById('statusModal')).show();
-    }
-    function onStatusChange() {
-        const status = document.getElementById('status').value;
-        const approvalReasonDiv = document.getElementById('approvalReasonDiv');
-        const rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
-        const rejectionReason = document.getElementById('rejectionReason');
-        if (status === 'approved') {
-            approvalReasonDiv.style.display = 'block';
-            rejectionReasonDiv.style.display = 'none';
-            rejectionReason.removeAttribute('required');
-        } else if (status === 'rejected') {
-            approvalReasonDiv.style.display = 'none';
-            rejectionReasonDiv.style.display = 'block';
-            rejectionReason.setAttribute('required', 'required');
-        } else {
-            approvalReasonDiv.style.display = 'none';
-            rejectionReasonDiv.style.display = 'none';
-            rejectionReason.removeAttribute('required');
+        let statusInput = document.getElementById('statusHidden');
+        if (!statusInput) {
+            statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.id = 'statusHidden';
+            document.getElementById('statusForm').appendChild(statusInput);
         }
+        statusInput.value = status;
+        if (status === 'approved') {
+            document.getElementById('approvalReasonDiv').style.display = 'block';
+            document.getElementById('rejectionReasonDiv').style.display = 'none';
+            document.getElementById('approvalReason').setAttribute('required', 'required');
+            document.getElementById('rejectionReason').removeAttribute('required');
+        } else if (status === 'rejected') {
+            document.getElementById('approvalReasonDiv').style.display = 'none';
+            document.getElementById('rejectionReasonDiv').style.display = 'block';
+            document.getElementById('rejectionReason').setAttribute('required', 'required');
+            document.getElementById('approvalReason').removeAttribute('required');
+        }
+        new bootstrap.Modal(document.getElementById('statusModal')).show();
     }
 </script>
 </body>

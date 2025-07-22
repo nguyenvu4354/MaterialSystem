@@ -176,8 +176,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                     System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
                     e.printStackTrace();
                 }
-                request.setAttribute("success", "Purchase order created successfully!");
-                doGet(request, response);
+                response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");
                 return;
             } else {
                 request.setAttribute("error", "Failed to create purchase order.");
@@ -257,9 +256,8 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
 
     private String generatePOCode() {
         String prefix = "PO";
-        String year = String.valueOf(LocalDate.now().getYear());
         String sql = "SELECT po_code FROM Purchase_Orders WHERE po_code LIKE ? ORDER BY po_code DESC LIMIT 1";
-        String likePattern = prefix + "-" + year + "-%";
+        String likePattern = prefix + "%";
         try (java.sql.Connection conn = new entity.DBContext().getConnection();
              java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, likePattern);
@@ -267,18 +265,16 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 int nextSeq = 1;
                 if (rs.next()) {
                     String lastCode = rs.getString("po_code");
-                    String[] parts = lastCode.split("-");
-                    if (parts.length == 3) {
-                        try {
-                            nextSeq = Integer.parseInt(parts[2]) + 1;
-                        } catch (NumberFormatException ignore) {}
-                    }
+                    String numberPart = lastCode.replace(prefix, "");
+                    try {
+                        nextSeq = Integer.parseInt(numberPart) + 1;
+                    } catch (NumberFormatException ignore) {}
                 }
-                return prefix + "-" + year + "-" + String.format("%03d", nextSeq);
+                return prefix + String.format("%03d", nextSeq);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return prefix + "-" + year + "-001";
+            return prefix + "001";
         }
     }
 } 
