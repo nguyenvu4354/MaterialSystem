@@ -25,7 +25,6 @@ import utils.ImportValidator;
 
 @WebServlet(name = "ImportMaterialServlet", urlPatterns = {"/ImportMaterial"})
 public class ImportMaterialServlet extends HttpServlet {
-
     private ImportDAO importDAO;
     private SupplierDAO supplierDAO;
     private MaterialDAO materialDAO;
@@ -96,6 +95,9 @@ public class ImportMaterialServlet extends HttpServlet {
                     break;
                 case "update":
                     handleUpdateQuantity(request, response, session);
+                    break;
+                case "updatePrice":
+                    handleUpdatePrice(request, response, session);
                     break;
                 default:
                     request.setAttribute("error", "Invalid action.");
@@ -190,6 +192,33 @@ public class ImportMaterialServlet extends HttpServlet {
         loadDataAndForward(request, response);
     }
 
+    private void handleUpdatePrice(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws ServletException, IOException, SQLException {
+        int materialId = Integer.parseInt(request.getParameter("materialId"));
+        double newUnitPrice = Double.parseDouble(request.getParameter("newUnitPrice"));
+        Integer tempImportId = (Integer) session.getAttribute("tempImportId");
+
+        if (newUnitPrice <= 0) {
+            request.setAttribute("error", "Unit price must be greater than 0.");
+            loadDataAndForward(request, response);
+            return;
+        }
+
+        if (tempImportId != null && tempImportId != 0) {
+         
+            ImportDetail detail = importDAO.getImportDetailByMaterial(tempImportId, materialId);
+            if (detail != null) {
+                importDAO.updateImportDetailPrice(detail.getImportDetailId(), newUnitPrice);
+                request.setAttribute("success", "Unit price updated successfully for material ID: " + materialId);
+            } else {
+                request.setAttribute("error", "Material not found in import list.");
+            }
+        } else {
+            request.setAttribute("error", "No import list found to update.");
+        }
+        loadDataAndForward(request, response);
+    }
+
     private void handleImport(HttpServletRequest request, HttpServletResponse response, HttpSession session, User user)
             throws ServletException, IOException, SQLException {
         Integer tempImportId = (Integer) session.getAttribute("tempImportId");
@@ -211,7 +240,7 @@ public class ImportMaterialServlet extends HttpServlet {
         String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
         Map<String, String> formErrors = utils.ImportValidator.validateImportFormData(
-                supplierIdStr, destination, actualArrivalStr, note, supplierDAO
+            supplierIdStr, destination, actualArrivalStr, note, supplierDAO
         );
         if (!formErrors.isEmpty()) {
             request.setAttribute("formErrors", formErrors);
@@ -249,29 +278,41 @@ public class ImportMaterialServlet extends HttpServlet {
         try {
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, Integer.MAX_VALUE, "code_asc");
-            // Remove department loading for destination
-            // List<entity.Department> departments = departmentDAO.getDepartments();
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("materials", allMaterials);
-            // request.setAttribute("departments", departments);
-
             Integer tempImportId = (Integer) session.getAttribute("tempImportId");
             if (tempImportId == null) {
                 tempImportId = 0;
                 session.setAttribute("tempImportId", 0);
             }
 
-            List<ImportDetail> importDetails = (tempImportId != 0)
+            List<ImportDetail> allDetails = (tempImportId != 0)
                     ? importDAO.getDraftImportDetails(tempImportId)
                     : new ArrayList<>();
-            request.setAttribute("importDetails", importDetails);
+            int pageSize = 3;
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null) {
+                try { currentPage = Integer.parseInt(pageParam); } catch (Exception e) {}
+            }
+            int totalItems = allDetails.size();
+            int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+            int fromIndex = (currentPage - 1) * pageSize;
+            int toIndex = Math.min(fromIndex + pageSize, totalItems);
+            List<ImportDetail> pagedDetails = (fromIndex < toIndex) ? allDetails.subList(fromIndex, toIndex) : new ArrayList<>();
+            request.setAttribute("importDetails", pagedDetails);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("pageSize", pageSize);
+            request.setAttribute("totalItems", totalItems);
+
             Map<Integer, Material> materialMap = new HashMap<>();
             for (Material m : allMaterials) {
                 materialMap.put(m.getMaterialId(), m);
             }
-
+            
             Map<Integer, Integer> stockMap = new HashMap<>();
-            for (ImportDetail detail : importDetails) {
+            for (ImportDetail detail : allDetails) {
                 stockMap.put(detail.getMaterialId(), inventoryDAO.getStockByMaterialId(detail.getMaterialId()));
             }
 
