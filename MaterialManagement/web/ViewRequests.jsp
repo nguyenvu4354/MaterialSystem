@@ -162,7 +162,6 @@
                                                 <tr>
                                                     <th>Request code</th>
                                                     <th>Request date</th>
-                                                    <th>Recipient</th>
                                                     <th>Status</th>
                                                     <th>Details</th>
                                                     <th>Action</th>
@@ -173,7 +172,6 @@
                                                     <tr>
                                                         <td>${request.requestCode}</td>
                                                         <td><fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
-                                                        <td>${request.recipientName}</td>
                                                         <td>${request.status}</td>
                                                         <td>
                                                             <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=export&id=${request.exportRequestId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
@@ -349,4 +347,4 @@
             });
         </script>
     </body>
-</html> 
+</html>
