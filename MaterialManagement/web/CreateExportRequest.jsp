@@ -131,9 +131,9 @@
                                     <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required data-touched="false">
                                     <div class="invalid-feedback" style="display:none;">Not enough stock!</div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2" style="display:none;">
                                     <label class="form-label text-muted">Condition</label>
-                                    <select class="form-select" name="conditions[]" required>
+                                    <select class="form-select" name="conditions[]" >
                                         <option value="new">New</option>
                                         <option value="used">Used</option>
                                         <option value="refurbished">Refurbished</option>
