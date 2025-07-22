@@ -12,7 +12,7 @@
     }
     User user = (User) session.getAttribute("user");
     boolean canApprove = user != null && (user.getRoleId() == 1 || user.getRoleId() == 2 || rolePermissionDAO.hasPermission(user.getRoleId(), "APPROVE_REPAIR_REQUEST"));
-    boolean canReject = user != null && (user.getRoleId() == 1 || user.getRoleId() == 2 || rolePermissionDAO.hasPermission(user.getRoleId(), "REJECT_REPAIR_REQUEST"));
+    boolean canReject = user != null && (user.getRoleId() == 1 || user.getRoleId() == 106 || rolePermissionDAO.hasPermission(user.getRoleId(), "REJECT_REPAIR_REQUEST"));
     request.setAttribute("canApprove", canApprove);
     request.setAttribute("canReject", canReject);
 %>
@@ -99,10 +99,39 @@
             min-height: 48px;
         }
         .status-approved {
-            background-color: #198754; 
+            background-color: #198754;
         }
         .status-rejected {
-            background-color: #dc3545; 
+            background-color: #dc3545;
+        }
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .pagination .page-link {
+            color: #DEAD6F;
+            border: 1px solid #DEAD6F;
+            margin: 0 4px;
+            border-radius: 6px;
+        }
+        .pagination .page-link:hover {
+            background-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            border-color: #dee2e6;
+            background-color: #f8f9fa;
+        }
+        .pagination-ellipsis {
+            color: #6c757d;
+            padding: 0 10px;
+            line-height: 38px;
         }
     </style>
 </head>
@@ -200,6 +229,37 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination -->
+                        <c:if test="${totalPages > 1}">
+                            <nav>
+                                <ul class="pagination">
+                                    <!-- Previous Button -->
+                                    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="repairrequestdetailbyID?page=${currentPage-1}&requestId=${requestId}">Previous</a>
+                                    </li>
+                                    <!-- Page Numbers -->
+                                    <c:set var="startPage" value="${currentPage - 2 > 1 ? currentPage - 2 : 1}"/>
+                                    <c:set var="endPage" value="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}"/>
+                                    <c:if test="${startPage > 1}">
+                                        <li class="page-item"><a class="page-link" href="repairrequestdetailbyID?page=1&requestId=${requestId}">1</a></li>
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                    </c:if>
+                                    <c:forEach begin="${startPage}" end="${endPage}" var="i">
+                                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                            <a class="page-link" href="repairrequestdetailbyID?page=${i}&requestId=${requestId}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <c:if test="${endPage < totalPages}">
+                                        <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
+                                        <li class="page-item"><a class="page-link" href="repairrequestdetailbyID?page=${totalPages}&requestId=${requestId}">${totalPages}</a></li>
+                                    </c:if>
+                                    <!-- Next Button -->
+                                    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="repairrequestdetailbyID?page=${currentPage+1}&requestId=${requestId}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </c:if>
                     </c:otherwise>
                 </c:choose>
             </div>

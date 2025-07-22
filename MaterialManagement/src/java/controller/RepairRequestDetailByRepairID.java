@@ -25,6 +25,8 @@ import java.util.List;
 @WebServlet(name = "RepairRequestDetailByRepairID", urlPatterns = {"/repairrequestdetailbyID"})
 public class RepairRequestDetailByRepairID extends HttpServlet {
 
+    private static final int PAGE_SIZE = 5; // Number of records per page
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -38,7 +40,6 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -51,7 +52,6 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -63,33 +63,67 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-      try {
-        int requestId = Integer.parseInt(request.getParameter("requestId"));
-        RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
-        List<RepairRequestDetail> details = dao.getRepairRequestDetailsByRequestId(requestId);
+        try {
+            int requestId = Integer.parseInt(request.getParameter("requestId"));
 
-        // Lấy thông tin RepairRequest từ RepairRequestDAO
-        RepairRequestDAO repairRequestDAO = new RepairRequestDAO();
-        RepairRequest repairRequest = repairRequestDAO.getRepairRequestById(requestId);
+            // Get current page from request, default to 1 if not provided
+            int currentPage = 1;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                try {
+                    currentPage = Integer.parseInt(pageParam);
+                    if (currentPage < 1) {
+                        currentPage = 1;
+                    }
+                } catch (NumberFormatException e) {
+                    currentPage = 1;
+                }
+            }
 
-        // Lấy thông tin người dùng từ session
-        HttpSession session = request.getSession();
-        entity.User user = (entity.User) session.getAttribute("user");
+            RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
+            // Get all details to calculate total records
+            List<RepairRequestDetail> allDetails = dao.getRepairRequestDetailsByRequestId(requestId);
 
-        int roleId = user != null ? user.getRoleId() : 0;
+            // Calculate pagination parameters
+            int totalRecords = allDetails.size();
+            int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
+            if (totalPages < 1) {
+                totalPages = 1;
+            }
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
 
-        // Đặt các thuộc tính vào request
-        request.setAttribute("details", details);
-        request.setAttribute("requestId", requestId);
-        request.setAttribute("roleId", roleId);
-        request.setAttribute("status", repairRequest != null ? repairRequest.getStatus() : "N/A");
+            // Get paginated details
+            int start = (currentPage - 1) * PAGE_SIZE;
+            int end = Math.min(start + PAGE_SIZE, totalRecords);
+            List<RepairRequestDetail> details = allDetails.subList(start, end);
 
-        request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("error", "Failed to load repair request details.");
-        request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
-    }
+            // Get RepairRequest information
+            RepairRequestDAO repairRequestDAO = new RepairRequestDAO();
+            RepairRequest repairRequest = repairRequestDAO.getRepairRequestById(requestId);
+
+            // Get user information from session
+            HttpSession session = request.getSession();
+            entity.User user = (entity.User) session.getAttribute("user");
+
+            int roleId = user != null ? user.getRoleId() : 0;
+
+            // Set attributes for JSP
+            request.setAttribute("details", details);
+            request.setAttribute("requestId", requestId);
+            request.setAttribute("roleId", roleId);
+            request.setAttribute("status", repairRequest != null ? repairRequest.getStatus() : "N/A");
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecords", totalRecords);
+
+            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Failed to load repair request details.");
+            request.getRequestDispatcher("RepairRequestDetailByID.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -113,7 +147,6 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Handles repair request details with pagination";
+    }
 }

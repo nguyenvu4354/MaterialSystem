@@ -36,7 +36,8 @@
                 align-items: center;
             }
             .filter-bar .form-control,
-            .filter-bar .btn {
+            .filter-bar .btn,
+            .filter-bar .form-select {
                 height: 48px;
                 min-width: 120px;
             }
@@ -111,19 +112,22 @@
                         <form action="ImportHistory" method="get" class="d-flex gap-2 align-items-center search-box">
                             <input type="date" name="fromDate" class="form-control" value="${fromDate}" placeholder="From Date" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="date" name="toDate" class="form-control" value="${toDate}" placeholder="To Date" style="width: 180px; height: 50px; border: 2px solid gray" />
-                            <input type="text" name="importCode" class="form-control" placeholder="Search By Code" value="${importCode}" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="text" name="materialName" id="materialNameInput" class="form-control" placeholder="Search By Material" list="materialNameList" value="${materialName}" style="width: 200px; height: 50px; border: 2px solid gray" />
                             <datalist id="materialNameList">
                                 <c:forEach var="mat" items="${materialList}">
                                     <option value="${mat.materialName}">
                                 </c:forEach>
                             </datalist>
-                            <input type="text" name="supplierName" id="supplierNameInput" class="form-control" placeholder="Search By Supplier" list="supplierNameList" value="${supplierName}" style="width: 200px; height: 50px; border: 2px solid gray" />
-                            <datalist id="supplierNameList">
-                                <c:forEach var="sup" items="${supplierList}">
-                                    <option value="${sup.supplierName}">
-                                </c:forEach>
-                            </datalist>
+                            <select name="sortSupplier" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
+                                <option value="" ${empty sortSupplier ? 'selected' : ''}>Sort By Supplier</option>
+                                <option value="A-Z" ${sortSupplier == 'A-Z' ? 'selected' : ''}>Supplier (A-Z)</option>
+                                <option value="Z-A" ${sortSupplier == 'Z-A' ? 'selected' : ''}>Supplier (Z-A)</option>
+                            </select>
+                            <select name="sortImportedBy" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
+                                <option value="" ${empty sortImportedBy ? 'selected' : ''}>Sort By Imported By</option>
+                                <option value="A-Z" ${sortImportedBy == 'A-Z' ? 'selected' : ''}>Imported By (A-Z)</option>
+                                <option value="Z-A" ${sortImportedBy == 'Z-A' ? 'selected' : ''}>Imported By (Z-A)</option>
+                            </select>
                             <button type="submit" class="btn d-flex align-items-center justify-content-center" style="background-color: #e2b176; color: #fff; width: 150px; height: 50px; border-radius: 8px; font-weight: 500;">
                                 <i class="fas fa-search me-2"></i> Search
                             </button>
@@ -177,27 +181,27 @@
                                 <ul class="pagination">
                                     <!-- Previous Button -->
                                     <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="ImportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">Previous</a>
+                                        <a class="page-link" href="ImportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortSupplier=${sortSupplier}&sortImportedBy=${sortImportedBy}">Previous</a>
                                     </li>
                                     <!-- Page Numbers -->
                                     <c:set var="startPage" value="${currentPage - 2 > 1 ? currentPage - 2 : 1}"/>
-                                    <c:set var="endPage" value="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}"/>
+                                    <c:set var="endPage" value="${currentPage + 2 < totalNames ? currentPage + 2 : totalPages}"/>
                                     <c:if test="${startPage > 1}">
-                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortSupplier=${sortSupplier}&sortImportedBy=${sortImportedBy}">1</a></li>
                                         <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
                                     </c:if>
                                     <c:forEach begin="${startPage}" end="${endPage}" var="i">
                                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                            <a class="page-link" href="ImportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">${i}</a>
+                                            <a class="page-link" href="ImportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortSupplier=${sortSupplier}&sortImportedBy=${sortImportedBy}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <c:if test="${endPage < totalPages}">
                                         <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
-                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">${totalPages}</a></li>
+                                        <li class="page-item"><a class="page-link" href="ImportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortSupplier=${sortSupplier}&sortImportedBy=${sortImportedBy}">${totalPages}</a></li>
                                     </c:if>
                                     <!-- Next Button -->
                                     <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="ImportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&importCode=${importCode}&materialName=${materialName}&supplierName=${supplierName}">Next</a>
+                                        <a class="page-link" href="ImportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortSupplier=${sortSupplier}&sortImportedBy=${sortImportedBy}">Next</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -217,14 +221,8 @@
             "${mat.materialName}"<c:if test="${!loop.last}">,</c:if>
             </c:forEach>
             ];
-            var supplierNames = [
-            <c:forEach var="sup" items="${supplierList}" varStatus="loop">
-            "${sup.supplierName}"<c:if test="${!loop.last}">,</c:if>
-            </c:forEach>
-            ];
             $(function () {
                 $("#materialNameInput").autocomplete({source: materialNames, minLength: 1});
-                $("#supplierNameInput").autocomplete({source: supplierNames, minLength: 1});
             });
         </script>
     </body>

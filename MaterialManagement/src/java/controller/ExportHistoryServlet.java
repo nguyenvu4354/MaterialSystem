@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller;
 
 import dal.ExportDAO;
@@ -39,7 +34,6 @@ public class ExportHistoryServlet extends HttpServlet {
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -52,7 +46,6 @@ public class ExportHistoryServlet extends HttpServlet {
         }
     } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /** 
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
@@ -63,12 +56,12 @@ public class ExportHistoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        // 1. Lấy filter
+        // 1. Lấy filter và sort parameters
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-        String exportCode = request.getParameter("exportCode");
         String materialName = request.getParameter("materialName");
-        String recipientName = request.getParameter("recipientName");
+        String sortByRecipient = request.getParameter("sortByRecipient");
+        String sortByExportedBy = request.getParameter("sortByExportedBy");
         int page = 1;
         try {
             page = Integer.parseInt(request.getParameter("page"));
@@ -81,11 +74,11 @@ public class ExportHistoryServlet extends HttpServlet {
         UserDAO userDAO = new UserDAO();
 
         // 3. Lấy danh sách phiếu xuất, filter nâng cao, phân trang
-        List<Export> exportList = exportDAO.getExportHistoryAdvanced(fromDate, toDate, exportCode, materialName, recipientName, page, PAGE_SIZE);
-        int totalRecords = exportDAO.countExportHistoryAdvanced(fromDate, toDate, exportCode, materialName, recipientName);
+        List<Export> exportList = exportDAO.getExportHistoryAdvanced(fromDate, toDate, materialName, sortByRecipient, sortByExportedBy, page, PAGE_SIZE);
+        int totalRecords = exportDAO.countExportHistoryAdvanced(fromDate, toDate, materialName);
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
 
-        // 4. Lấy danh sách vật tư, người nhận cho autocomplete
+        // 4. Lấy danh sách vật tư cho autocomplete
         List<Material> materialList = materialDAO.getAllMaterials();
         List<User> userList = userDAO.getAllUsers();
 
@@ -93,9 +86,9 @@ public class ExportHistoryServlet extends HttpServlet {
         request.setAttribute("exportList", exportList);
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
-        request.setAttribute("exportCode", exportCode);
         request.setAttribute("materialName", materialName);
-        request.setAttribute("recipientName", recipientName);
+        request.setAttribute("sortByRecipient", sortByRecipient);
+        request.setAttribute("sortByExportedBy", sortByExportedBy);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("materialList", materialList);
@@ -125,6 +118,5 @@ public class ExportHistoryServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }
