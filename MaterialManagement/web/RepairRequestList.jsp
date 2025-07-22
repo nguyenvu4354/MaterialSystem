@@ -207,7 +207,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <c:if test="${totalPages > 1}">
+                        <c:if test="${totalPages > 0}">
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">

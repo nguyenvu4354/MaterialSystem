@@ -36,6 +36,7 @@
                 align-items: center;
             }
             .filter-bar .form-control,
+            .filter-bar .form-select,
             .filter-bar .btn {
                 height: 48px;
                 min-width: 120px;
@@ -111,19 +112,23 @@
                         <form action="ExportHistory" method="get" class="d-flex gap-2 align-items-center search-box">
                             <input type="date" name="fromDate" class="form-control" value="${fromDate}" placeholder="From Date" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="date" name="toDate" class="form-control" value="${toDate}" placeholder="To Date" style="width: 180px; height: 50px; border: 2px solid gray" />
-                            <input type="text" name="exportCode" class="form-control" placeholder="Search By Code" value="${exportCode}" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="text" name="materialName" id="materialNameInput" class="form-control" placeholder="Search By Material" list="materialNameList" value="${materialName}" style="width: 200px; height: 50px; border: 2px solid gray" />
                             <datalist id="materialNameList">
                                 <c:forEach var="mat" items="${materialList}">
                                     <option value="${mat.materialName}">
                                 </c:forEach>
                             </datalist>
-                            <input type="text" name="recipientName" id="recipientNameInput" class="form-control" placeholder="Search By Recipient" list="recipientNameList" value="${recipientName}" style="width: 200px; height: 50px; border: 2px solid gray" />
-                            <datalist id="recipientNameList">
-                                <c:forEach var="user" items="${userList}">
-                                    <option value="${user.fullName}">
-                                </c:forEach>
-                            </datalist>
+                            <select name="sortByRecipient" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
+                                <option value="" ${empty sortByRecipient ? 'selected' : ''}>Sort By Recipient</option>
+                                <option value="A-Z" ${sortByRecipient == 'A-Z' ? 'selected' : ''}>Recipient A-Z</option>
+                               的分0.5px; color: #3B3B3B; } /* Dark Gray */
+                                <option value="Z-A" ${sortByRecipient == 'Z-A' ? 'selected' : ''}>Recipient Z-A</option>
+                            </select>
+                            <select name="sortByExportedBy" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
+                                <option value="" ${empty sortByExportedBy ? 'selected' : ''}>Sort By Exported By</option>
+                                <option value="A-Z" ${sortByExportedBy == 'A-Z' ? 'selected' : ''}>Exported By A-Z</option>
+                                <option value="Z-A" ${sortByExportedBy == 'Z-A' ? 'selected' : ''}>Exported By Z-A</option>
+                            </select>
                             <button type="submit" class="btn d-flex align-items-center justify-content-center" style="background-color: #e2b176; color: #fff; width: 150px; height: 50px; border-radius: 8px; font-weight: 500;">
                                 <i class="fas fa-search me-2"></i> Search
                             </button>
@@ -177,27 +182,27 @@
                                 <ul class="pagination">
                                     <!-- Previous Button -->
                                     <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="ExportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Previous</a>
+                                        <a class="page-link" href="ExportHistory?page=${currentPage-1}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortByRecipient=${sortByRecipient}&sortByExportedBy=${sortByExportedBy}">Previous</a>
                                     </li>
                                     <!-- Page Numbers -->
                                     <c:set var="startPage" value="${currentPage - 2 > 1 ? currentPage - 2 : 1}"/>
                                     <c:set var="endPage" value="${currentPage + 2 < totalPages ? currentPage + 2 : totalPages}"/>
                                     <c:if test="${startPage > 1}">
-                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=1&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortByRecipient=${sortByRecipient}&sortByExportedBy=${sortByExportedBy}">1</a></li>
                                         <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
                                     </c:if>
                                     <c:forEach begin="${startPage}" end="${endPage}" var="i">
                                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                            <a class="page-link" href="ExportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${i}</a>
+                                            <a class="page-link" href="ExportHistory?page=${i}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortByRecipient=${sortByRecipient}&sortByExportedBy=${sortByExportedBy}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <c:if test="${endPage < totalPages}">
                                         <li class="page-item disabled"><span class="pagination-ellipsis">...</span></li>
-                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">${totalPages}</a></li>
+                                        <li class="page-item"><a class="page-link" href="ExportHistory?page=${totalPages}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortByRecipient=${sortByRecipient}&sortByExportedBy=${sortByExportedBy}">${totalPages}</a></li>
                                     </c:if>
                                     <!-- Next Button -->
                                     <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="ExportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&exportCode=${exportCode}&materialName=${materialName}&recipientName=${recipientName}">Next</a>
+                                        <a class="page-link" href="ExportHistory?page=${currentPage+1}&fromDate=${fromDate}&toDate=${toDate}&materialName=${materialName}&sortByRecipient=${sortByRecipient}&sortByExportedBy=${sortByExportedBy}">Next</a>
                                     </li>
                                 </ul>
                             </nav>
@@ -217,14 +222,8 @@
             "${mat.materialName}"<c:if test="${!loop.last}">,</c:if>
             </c:forEach>
             ];
-            var recipientNames = [
-            <c:forEach var="user" items="${userList}" varStatus="loop">
-            "${user.fullName}"<c:if test="${!loop.last}">,</c:if>
-            </c:forEach>
-            ];
             $(function () {
-                $("#materialNameInput").autocomplete({source: materialNames, minLength: 1});
-                $("#recipientNameInput").autocomplete({source: recipientNames, minLength: 1});
+                $("#materialNameInput").autocomplete({source: materialNames, minLengthソーシャルメディアのシェアードリンクはこちらminLength: 1});
             });
         </script>
     </body>

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.ImportDAO;
@@ -41,7 +37,6 @@ public class ImportHistoryServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -54,7 +49,6 @@ public class ImportHistoryServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -69,9 +63,9 @@ public class ImportHistoryServlet extends HttpServlet {
         // 1. Lấy filter
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-        String importCode = request.getParameter("importCode");
         String materialName = request.getParameter("materialName");
-        String supplierName = request.getParameter("supplierName");
+        String sortSupplier = request.getParameter("sortSupplier");
+        String sortImportedBy = request.getParameter("sortImportedBy");
         int page = 1;
         int pageSize = 10; // Default page size
         try {
@@ -97,8 +91,8 @@ public class ImportHistoryServlet extends HttpServlet {
         SupplierDAO supplierDAO = new SupplierDAO();
 
         // 3. Lấy danh sách phiếu nhập, filter nâng cao, phân trang
-        List<Import> importList = importDAO.getImportHistoryAdvanced(fromDate, toDate, importCode, materialName, supplierName, page, pageSize);
-        int totalRecords = importDAO.countImportHistoryAdvanced(fromDate, toDate, importCode, materialName, supplierName);
+        List<Import> importList = importDAO.getImportHistoryAdvanced(fromDate, toDate, materialName, sortSupplier, sortImportedBy, page, pageSize);
+        int totalRecords = importDAO.countImportHistoryAdvanced(fromDate, toDate, materialName, sortSupplier);
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
         // 4. Lấy danh sách vật tư, nhà cung cấp cho autocomplete
@@ -109,12 +103,12 @@ public class ImportHistoryServlet extends HttpServlet {
         request.setAttribute("importList", importList);
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
-        request.setAttribute("importCode", importCode);
         request.setAttribute("materialName", materialName);
-        request.setAttribute("supplierName", supplierName);
+        request.setAttribute("sortSupplier", sortSupplier);
+        request.setAttribute("sortImportedBy", sortImportedBy);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        request.setAttribute("pageSize", pageSize); // Add pageSize to request
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("materialList", materialList);
         request.setAttribute("supplierList", supplierList);
 
@@ -144,6 +138,5 @@ public class ImportHistoryServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

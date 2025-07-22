@@ -420,7 +420,7 @@ public class ExportDAO extends DBContext {
     }
 
     // Lấy danh sách lịch sử xuất kho nâng cao (filter theo tên vật tư, người nhận)
-    public List<Export> getExportHistoryAdvanced(String fromDate, String toDate, String exportCode, String materialName, String recipientName, int page, int pageSize) {
+    public List<Export> getExportHistoryAdvanced(String fromDate, String toDate, String materialName, String sortByRecipient, String sortByExportedBy, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT DISTINCT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
                 + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
@@ -440,19 +440,28 @@ public class ExportDAO extends DBContext {
             sql += "AND e.export_date <= ? ";
             params.add(toDate + " 23:59:59");
         }
-        if (exportCode != null && !exportCode.isEmpty()) {
-            sql += "AND e.export_code LIKE ? ";
-            params.add("%" + exportCode + "%");
-        }
         if (materialName != null && !materialName.isEmpty()) {
             sql += "AND m.material_name LIKE ? ";
             params.add("%" + materialName + "%");
         }
-        if (recipientName != null && !recipientName.isEmpty()) {
-            sql += "AND u2.full_name LIKE ? ";
-            params.add("%" + recipientName + "%");
+        // Xử lý sắp xếp
+        String orderByClause = "ORDER BY ";
+        boolean hasOrderBy = false;
+        if (sortByRecipient != null && !sortByRecipient.isEmpty()) {
+            orderByClause += "u2.full_name " + (sortByRecipient.equals("A-Z") ? "ASC" : "DESC");
+            hasOrderBy = true;
         }
-        sql += "ORDER BY e.export_date DESC LIMIT ? OFFSET ?";
+        if (sortByExportedBy != null && !sortByExportedBy.isEmpty()) {
+            if (hasOrderBy) {
+                orderByClause += ", ";
+            }
+            orderByClause += "u1.full_name " + (sortByExportedBy.equals("A-Z") ? "ASC" : "DESC");
+            hasOrderBy = true;
+        }
+        if (!hasOrderBy) {
+            orderByClause += "e.export_date DESC";
+        }
+        sql += orderByClause + " LIMIT ? OFFSET ?";
         params.add(pageSize);
         params.add((page - 1) * pageSize);
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -485,7 +494,7 @@ public class ExportDAO extends DBContext {
         return list;
     }
 
-    public int countExportHistoryAdvanced(String fromDate, String toDate, String exportCode, String materialName, String recipientName) {
+    public int countExportHistoryAdvanced(String fromDate, String toDate, String materialName) {
         int count = 0;
         String sql = "SELECT COUNT(DISTINCT e.export_id) FROM Exports e "
                 + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
@@ -500,17 +509,9 @@ public class ExportDAO extends DBContext {
             sql += "AND e.export_date <= ? ";
             params.add(toDate + " 23:59:59");
         }
-        if (exportCode != null && !exportCode.isEmpty()) {
-            sql += "AND e.export_code LIKE ? ";
-            params.add("%" + exportCode + "%");
-        }
         if (materialName != null && !materialName.isEmpty()) {
             sql += "AND m.material_name LIKE ? ";
             params.add("%" + materialName + "%");
-        }
-        if (recipientName != null && !recipientName.isEmpty()) {
-            sql += "AND u2.full_name LIKE ? ";
-            params.add("%" + recipientName + "%");
         }
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
