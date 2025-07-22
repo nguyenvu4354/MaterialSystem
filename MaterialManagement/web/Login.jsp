@@ -25,7 +25,7 @@
     <div class="container">
       <div class="row my-5 py-5">
         <div class="offset-md-3 col-md-6 my-5">
-          <h2 class="display-3 fw-normal text-center">Login to <span class="text-primary">Waggy</span></h2>
+          <h2 class="display-3 fw-normal text-center">Login to <span class="text-primary">Material Management</span></h2>
           <form action="LoginServlet" method="post">
             <div class="mb-3">
               <input type="text" class="form-control form-control-lg" name="username" id="username"

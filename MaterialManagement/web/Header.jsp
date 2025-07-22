@@ -113,24 +113,19 @@ if (user != null) {
                           </select>
                     </c:if>
 
-                    <!-- Stock Dropdown -->
+                    <!-- Stock & History Dropdown -->
                     <c:if test="${sessionScope.userPermissions.contains('EXPORT_MATERIAL') || sessionScope.userPermissions.contains('IMPORT_MATERIAL')}">
                         <select class="filter-categories border-0 mb-0 me-5" onchange="location.href = this.value;">
                             <option selected disabled>Stock</option>
+                            <!-- Export / Import Stock -->
                             <c:if test="${sessionScope.userPermissions.contains('EXPORT_MATERIAL')}">
                                 <option value="ExportMaterial">Export Stock</option>
+                                <option value="ExportHistory">Export History</option>
                             </c:if>
                             <c:if test="${sessionScope.userPermissions.contains('IMPORT_MATERIAL')}">
                                 <option value="ImportMaterial">Import Stock</option>
+                                <option value="ImportHistory">Import History</option>
                             </c:if>
-                        </select>
-                    </c:if>
-                    <!-- History Dropdown (admin only) -->
-                    <c:if test="${not empty sessionScope.user && sessionScope.user.roleId == 1}">
-                        <select class="filter-categories border-0 mb-0 me-5" onchange="location.href = this.value;">
-                            <option selected disabled>History</option>
-                            <option value="ImportHistory">Import History</option>
-                            <option value="ExportHistory">Export History</option>
                         </select>
                     </c:if>
 
