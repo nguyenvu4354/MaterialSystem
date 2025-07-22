@@ -113,6 +113,18 @@ public class ImportDAO extends DBContext {
         }
     }
 
+    public void updateImportDetailPrice(int importDetailId, double newUnitPrice) throws SQLException {
+        String sql = "UPDATE Import_Details SET unit_price = ? WHERE import_detail_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDouble(1, newUnitPrice);
+            stmt.setInt(2, importDetailId);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating import detail price failed for import detail ID: " + importDetailId);
+            }
+        }
+    }
+
     public void confirmImport(int importId) throws SQLException {
         String sql = "UPDATE Import_Details SET status = 'imported', created_at = CURRENT_TIMESTAMP WHERE import_id = ? AND status = 'draft'";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
