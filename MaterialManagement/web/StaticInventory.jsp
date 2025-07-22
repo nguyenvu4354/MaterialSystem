@@ -320,7 +320,6 @@
                     <th style="width: 80px;">Unit</th>
                     <th style="width: 120px;">Category</th>
                     <th style="width: 90px;">Stock</th>
-                    <th style="width: 120px;">Location</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -349,12 +348,11 @@
                           <c:otherwise><span class="badge stock-zero">${inv.stock}</span></c:otherwise>
                         </c:choose>
                       </td>
-                      <td><div class="material-name">${inv.location}</div></td>
                     </tr>
                   </c:forEach>
                   <c:if test="${empty inventoryList}">
                     <tr>
-                      <td colspan="8" class="text-center text-muted">No inventory data available</td>
+                      <td colspan="7" class="text-center text-muted">No inventory data available</td>
                     </tr>
                   </c:if>
                 </tbody>
