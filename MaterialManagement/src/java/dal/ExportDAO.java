@@ -28,17 +28,16 @@ public class ExportDAO extends DBContext {
     }
 
     public int createExport(Export export) throws SQLException {
-        String sql = "INSERT INTO Exports (export_code, export_date, exported_by, recipient_user_id, batch_number, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Exports (export_code, export_date, exported_by, recipient_user_id, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             int exportId = getNextExportNumber();
             stmt.setString(1, generateExportCode(exportId));
             stmt.setObject(2, export.getExportDate());
             stmt.setInt(3, export.getExportedBy());
             stmt.setInt(4, export.getRecipientUserId());
-            stmt.setString(5, export.getBatchNumber());
-            stmt.setString(6, export.getNote());
-            stmt.setObject(7, export.getCreatedAt());
-            stmt.setObject(8, export.getUpdatedAt());
+            stmt.setString(5, export.getNote());
+            stmt.setObject(6, export.getCreatedAt());
+            stmt.setObject(7, export.getUpdatedAt());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -215,15 +214,14 @@ public class ExportDAO extends DBContext {
     }
 
     public void updateExport(Export export) throws SQLException {
-        String sql = "UPDATE Exports SET export_date = ?, exported_by = ?, recipient_user_id = ?, batch_number = ?, note = ?, updated_at = ? WHERE export_id = ?";
+        String sql = "UPDATE Exports SET export_date = ?, exported_by = ?, recipient_user_id = ?, note = ?, updated_at = ? WHERE export_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setObject(1, export.getExportDate());
             stmt.setInt(2, export.getExportedBy());
             stmt.setInt(3, export.getRecipientUserId());
-            stmt.setString(4, export.getBatchNumber());
-            stmt.setString(5, export.getNote());
-            stmt.setObject(6, export.getUpdatedAt());
-            stmt.setInt(7, export.getExportId());
+            stmt.setString(4, export.getNote());
+            stmt.setObject(5, export.getUpdatedAt());
+            stmt.setInt(6, export.getExportId());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -258,7 +256,7 @@ public class ExportDAO extends DBContext {
                     detail.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     detail.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
                     detail.setMaterialName(rs.getString("material_name"));
-                    detail.setMaterialsUrl(rs.getString("materials_url")); // Thêm materials_url
+                    detail.setMaterialsUrl(rs.getString("materials_url"));
                     detail.setUnitName(rs.getString("unit_name"));
                     details.add(detail);
                 }
@@ -322,14 +320,12 @@ public class ExportDAO extends DBContext {
         return users;
     }
 
-    // Lấy danh sách lịch sử xuất kho có filter, phân trang
     public List<Export> getExportHistory(String fromDate, String toDate, String exportCode, String recipientId, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
                 + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
                 + "0 as totalValue "
-                + // Nếu có giá trị xuất thì thay bằng SUM(quantity * price)
-                "FROM Exports e "
+                + "FROM Exports e "
                 + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
                 + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
                 + "WHERE 1=1 ";
@@ -367,11 +363,9 @@ public class ExportDAO extends DBContext {
                 }
                 exp.setExportedBy(rs.getInt("exported_by"));
                 exp.setRecipientUserId(rs.getInt("recipient_user_id"));
-                exp.setBatchNumber(rs.getString("batch_number"));
                 exp.setNote(rs.getString("note"));
                 exp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 exp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-                // custom fields
                 exp.setExportedByName(rs.getString("exportedByName"));
                 exp.setRecipientName(rs.getString("recipientName"));
                 exp.setTotalQuantity(rs.getInt("totalQuantity"));
@@ -384,7 +378,6 @@ public class ExportDAO extends DBContext {
         return list;
     }
 
-    // Đếm tổng số phiếu xuất (phục vụ phân trang)
     public int countExportHistory(String fromDate, String toDate, String exportCode, String recipientId) {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM Exports WHERE 1=1 ";
@@ -419,7 +412,6 @@ public class ExportDAO extends DBContext {
         return count;
     }
 
-    // Lấy danh sách lịch sử xuất kho nâng cao (filter theo tên vật tư, người nhận)
     public List<Export> getExportHistoryAdvanced(String fromDate, String toDate, String materialName, String sortByRecipient, String sortByExportedBy, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT DISTINCT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
@@ -444,7 +436,6 @@ public class ExportDAO extends DBContext {
             sql += "AND m.material_name LIKE ? ";
             params.add("%" + materialName + "%");
         }
-        // Xử lý sắp xếp
         String orderByClause = "ORDER BY ";
         boolean hasOrderBy = false;
         if (sortByRecipient != null && !sortByRecipient.isEmpty()) {
@@ -478,7 +469,6 @@ public class ExportDAO extends DBContext {
                 }
                 exp.setExportedBy(rs.getInt("exported_by"));
                 exp.setRecipientUserId(rs.getInt("recipient_user_id"));
-                exp.setBatchNumber(rs.getString("batch_number"));
                 exp.setNote(rs.getString("note"));
                 exp.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 exp.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
@@ -558,5 +548,4 @@ public class ExportDAO extends DBContext {
         }
         return null;
     }
-
 }

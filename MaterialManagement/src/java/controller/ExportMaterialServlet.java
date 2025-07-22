@@ -291,7 +291,7 @@ public class ExportMaterialServlet extends HttpServlet {
         int recipientUserId;
         try {
             recipientUserId = Integer.parseInt(request.getParameter("recipientUserId"));
-            List<Integer> roleIds = List.of(3, 4); // Only allow roleId 3 or 4
+            List<Integer> roleIds = List.of(3, 4);
             List<User> validRecipients = exportDAO.getUsersByRoleIds(roleIds);
             boolean validRecipient = validRecipients.stream()
                     .anyMatch(u -> u.getUserId() == recipientUserId);
@@ -306,14 +306,7 @@ public class ExportMaterialServlet extends HttpServlet {
             return;
         }
 
-        String batchNumber = request.getParameter("batchNumber");
         String note = request.getParameter("note");
-
-        if (batchNumber != null && batchNumber.length() > 50) {
-            request.setAttribute("error", "Batch number must not exceed 50 characters.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
 
         if (note != null && note.length() > 100) {
             request.setAttribute("error", "Note must not exceed 100 characters.");
@@ -327,7 +320,6 @@ public class ExportMaterialServlet extends HttpServlet {
             export.setExportDate(LocalDateTime.now());
             export.setExportedBy(user.getUserId());
             export.setRecipientUserId(recipientUserId);
-            export.setBatchNumber(batchNumber);
             export.setNote(note);
             export.setUpdatedAt(LocalDateTime.now());
 
@@ -351,7 +343,7 @@ public class ExportMaterialServlet extends HttpServlet {
         try {
             List<Department> departments = departmentDAO.getDepartments();
             List<Material> materials = departmentDAO.getMaterials();
-            List<Integer> roleIds = List.of(3, 4); 
+            List<Integer> roleIds = List.of(3, 4);
             List<User> users = exportDAO.getUsersByRoleIds(roleIds);
             Integer tempExportId = (Integer) request.getSession().getAttribute("tempExportId");
             List<ExportDetail> fullExportDetails = (tempExportId != null) 
