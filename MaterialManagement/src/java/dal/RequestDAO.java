@@ -17,7 +17,7 @@ import java.util.List;
 
 public class RequestDAO extends DBContext {
 
-    public List<ExportRequest> getExportRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<ExportRequest> getExportRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<ExportRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name "
@@ -35,11 +35,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND er.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND er.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -221,7 +216,7 @@ public class RequestDAO extends DBContext {
         return details;
     }
 
-    public int getExportRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getExportRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_request_id) FROM Export_Requests er "
                 + "LEFT JOIN Export_Request_Details erd ON er.export_request_id = erd.export_request_id "
@@ -234,11 +229,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND er.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND er.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -275,7 +265,7 @@ public class RequestDAO extends DBContext {
         return 0;
     }
 
-    public List<PurchaseRequest> getPurchaseRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<PurchaseRequest> getPurchaseRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<PurchaseRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT pr.*, u.full_name AS user_name, u2.full_name AS approver_name "
@@ -292,11 +282,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND pr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND pr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -387,7 +372,7 @@ public class RequestDAO extends DBContext {
         return null;
     }
 
-    public int getPurchaseRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getPurchaseRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT pr.purchase_request_id) FROM Purchase_Requests pr "
                 + "LEFT JOIN Purchase_Request_Details prd ON pr.purchase_request_id = prd.purchase_request_id "
@@ -400,11 +385,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND pr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND pr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -441,7 +421,7 @@ public class RequestDAO extends DBContext {
         return 0;
     }
 
-    public List<RepairRequest> getRepairRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<RepairRequest> getRepairRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<RepairRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT rr.*, u.full_name AS user_name, u2.full_name AS approver_name "
@@ -458,11 +438,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND rr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND rr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -559,7 +534,7 @@ public class RequestDAO extends DBContext {
         return null;
     }
 
-    public int getRepairRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getRepairRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT rr.repair_request_id) FROM Repair_Requests rr "
                 + "LEFT JOIN Repair_Request_Details rrd ON rr.repair_request_id = rrd.repair_request_id "
@@ -572,11 +547,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND rr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND rr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
