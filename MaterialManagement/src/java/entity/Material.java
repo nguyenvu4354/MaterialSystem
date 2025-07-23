@@ -18,7 +18,6 @@ public class Material {
     private String materialName;
     private String materialsUrl;
     private String materialStatus;
-    private double price;
 
     private Category category;
     private Unit unit;
@@ -32,14 +31,13 @@ public class Material {
     }
 
     public Material(int materialId, String materialCode, String materialName, String materialsUrl, String materialStatus,
-             double price, Category category, Unit unit,
+             Category category, Unit unit,
             Timestamp createdAt, Timestamp updatedAt, boolean disable) {
         this.materialId = materialId;
         this.materialCode = materialCode;
         this.materialName = materialName;
         this.materialsUrl = materialsUrl;
         this.materialStatus = materialStatus;
-        this.price = price;
         this.category = category;
         this.unit = unit;
         this.createdAt = createdAt;
@@ -105,14 +103,6 @@ public class Material {
     }
 
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
     public Category getCategory() {
         return category;
     }
@@ -147,7 +137,7 @@ public class Material {
 
     @Override
     public String toString() {
-        return "Material{" + "materialId=" + materialId + ", materialCode=" + materialCode + ", materialName=" + materialName + ", materialsUrl=" + materialsUrl + ", materialStatus=" + materialStatus + ", price=" + price + ", category=" + category + ", unit=" + unit + ", quantity=" + quantity + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", disable=" + disable + '}';
+        return "Material{" + "materialId=" + materialId + ", materialCode=" + materialCode + ", materialName=" + materialName + ", materialsUrl=" + materialsUrl + ", materialStatus=" + materialStatus + ", category=" + category + ", unit=" + unit + ", quantity=" + quantity + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", disable=" + disable + '}';
     }
 
     

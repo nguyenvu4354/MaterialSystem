@@ -30,10 +30,10 @@ public class MaterialValidator {
             errors.put("materialStatus", "Material status cannot be empty.");
         }
 
-        // Validate price
-        if (material.getPrice() <= 0) {
-            errors.put("price", "Price must be greater than 0.");
-        }
+//        // Validate price
+//        if (material.getPrice() <= 0) {
+//            errors.put("price", "Price must be greater than 0.");
+//        }
 
         // Validate conditionPercentage
 //        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
@@ -78,15 +78,7 @@ public class MaterialValidator {
             errors.put("materialStatus", "Material status cannot be empty.");
         }
 
-        // Validate price
-        if (material.getPrice() <= 0) {
-            errors.put("price", "Price must be greater than 0.");
-        }
-
-        // Validate conditionPercentage
-//        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
-//            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
-//        }
+       
 
         // Validate category
         if (material.getCategory() == null || material.getCategory().getCategory_id() == 0) {

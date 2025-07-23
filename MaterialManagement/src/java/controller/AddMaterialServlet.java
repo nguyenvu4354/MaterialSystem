@@ -120,7 +120,6 @@ public class AddMaterialServlet extends HttpServlet {
                 m.setMaterialCode(materialCode);
                 m.setMaterialName(materialName);
                 m.setMaterialStatus(materialStatus);
-                m.setPrice(0);
                 m.setCategory(new Category());
                 m.setUnit(new Unit());
 
@@ -178,7 +177,6 @@ public class AddMaterialServlet extends HttpServlet {
             m.setMaterialName(materialName);
             m.setMaterialsUrl(relativeFilePath);
             m.setMaterialStatus(materialStatus);
-            m.setPrice(price);
 
             Category category = new Category();
             category.setCategory_id(categoryId);

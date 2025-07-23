@@ -416,6 +416,9 @@ public class UserDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
+        // Thêm điều kiện lọc user chỉ thuộc phòng ban active hoặc không có phòng ban
+        sql.append("AND (d.status = 'active' OR u.department_id IS NULL) ");
+
         if (username != null && !username.trim().isEmpty()) {
             sql.append("AND u.username LIKE ? ");
             params.add("%" + username.trim() + "%");

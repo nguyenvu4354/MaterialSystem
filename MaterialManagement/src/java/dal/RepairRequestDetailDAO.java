@@ -15,7 +15,7 @@ public class RepairRequestDetailDAO extends DBContext {
 
     public List<RepairRequestDetail> getRepairRequestDetailsByRequestId(int repairRequestId) throws SQLException {
         List<RepairRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT rrd.*, m.material_code, m.material_name, m.materials_url, m.material_status, m.price, " +
+        String sql = "SELECT rrd.*, m.material_code, m.material_name, m.materials_url, m.material_status, " +
                      "c.category_name, u.unit_name, s.supplier_name " +
                      "FROM Repair_Request_Details rrd " +
                      "JOIN Materials m ON rrd.material_id = m.material_id " +
@@ -46,7 +46,7 @@ public class RepairRequestDetailDAO extends DBContext {
                     material.setMaterialName(rs.getString("material_name"));
                     material.setMaterialsUrl(rs.getString("materials_url"));
                     material.setMaterialStatus(rs.getString("material_status"));
-                    material.setPrice(rs.getDouble("price"));
+                    // Bỏ setPrice và mọi dòng liên quan đến condition
 
                     // Tạo đối tượng Category
                     Category category = new Category();
