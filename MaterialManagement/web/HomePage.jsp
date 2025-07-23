@@ -546,36 +546,6 @@
             </div>
         </div>
         <jsp:include page="Header.jsp" />
-<!--        <section class="module-links py-4">
-            <div class="container">
-                <div class="row g-4 justify-content-center text-center">
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
-                            <i class="fas fa-boxes-stacked fa-2x mb-2 text-primary"></i>
-                            <div class="fw-semibold text-dark">Inventory Management</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
-                            <i class="fas fa-share-alt fa-2x mb-2 text-info"></i>
-                            <div class="fw-semibold text-dark">Allocation Tracking</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
-                            <i class="fas fa-tools fa-2x mb-2 text-warning"></i>
-                            <div class="fw-semibold text-dark">Maintenance Logs</div>
-                        </a>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a href="#" class="card-link-box d-block text-decoration-none shadow-sm p-4 rounded-3">
-                            <i class="fas fa-chart-line fa-2x mb-2 text-success"></i>
-                            <div class="fw-semibold text-dark">Reporting Tools</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>-->
 
         <div class="container-fluid my-5">
             <div class="row">
@@ -599,31 +569,8 @@
                         <section id="clothing" class="my-5 overflow-hidden">
                             <div class="container pb-5">
                                 <div class="section-header d-md-flex justify-content-between align-items-center mb-4">
-                                    <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material Inventory</h2>
-                                    <!-- Form tìm kiếm theo giá -->
-                                    <form action="searchPrice" method="get" style="display: flex; margin-right: 200px">
-                                        <div class="input-group" style="max-width: 300px;">
-                                            <span class="input-group-text bg-white border-0" style="border-radius: 24px 0 0 24px;">
-                                                <i class="fas fa-dollar-sign"></i>
-                                            </span>
-                                            <input type="number" name="minPrice" class="form-control" placeholder="Min Price" 
-                                                   value="${minPrice}" min="0" step="0.01" style="border-radius: 0;">
-                                            <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" 
-                                                   value="${maxPrice}" min="0" step="0.01" style="border-radius: 0 24px 24px 0;">
-                                        </div>
-                                        <!--                            <select name="sort" class="form-select" style="max-width: 200px; height: 44px;">
-                                                                        <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code ↑</option>
-                                                                        <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code ↓</option>
-                                                                        <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name ↑</option>
-                                                                        <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name ↓</option>
-                                                                        <option value="price_asc" ${sortOption == 'price_asc' ? 'selected' : ''}>Price ↑</option>
-                                                                        <option value="price_desc" ${sortOption == 'price_desc' ? 'selected' : ''}>Price ↓</option>
-                                                                        <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition ↑</option>
-                                                                        <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition ↓</option>
-                                                                    </select>-->
-                                        <button type="submit" class="btn btn-main" style="height: 44px;">Search</button>
-                                        <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-main" style="height: 44px;">Clear</a>
-                                    </form>
+                                    <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material List</h2>
+                                 
                                 </div>
 
                                 <div class="card-container">
@@ -632,7 +579,6 @@
                                             <img src="images/material/${product.materialsUrl}" alt="${product.materialName}" width="200">
                                             <div class="card-content">
                                                 <h5>${product.materialName}</h5>
-                                                <p style="color: #DEAD6F; font-weight: bold;">$${product.price}</p>
                                                 <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
                                                     <i class="fas fa-eye me-1"></i> View Detail
                                                 </a>

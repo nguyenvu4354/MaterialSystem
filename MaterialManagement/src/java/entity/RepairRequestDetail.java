@@ -18,6 +18,8 @@ public class RepairRequestDetail {
     private int quantity;
     private String damageDescription;
     private Double repairCost;
+    private int supplierId;
+    private String supplierName;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -49,6 +51,23 @@ public class RepairRequestDetail {
         this.material = material;
     }
 
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    
     public void setDetailId(int detailId) {
         this.detailId = detailId;
     }

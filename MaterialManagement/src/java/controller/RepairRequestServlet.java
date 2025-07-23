@@ -4,10 +4,12 @@ import dal.MaterialDAO;
 import dal.RepairRequestDAO;
 import dal.UserDAO;
 import dal.RolePermissionDAO;
+import dal.SupplierDAO;
 import entity.Material;
 import entity.RepairRequest;
 import entity.RepairRequestDetail;
 import entity.User;
+import entity.Supplier;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -52,8 +54,13 @@ public class RepairRequestServlet extends HttpServlet {
         MaterialDAO materialDAO = new MaterialDAO();
         List<Material> materialList = materialDAO.getAllProducts();
 
-        // Truyền danh sách vật tư sang JSP
+        // Lấy danh sách nhà cung cấp từ database
+        SupplierDAO supplierDAO = new SupplierDAO();
+        List<Supplier> supplierList = supplierDAO.getAllSuppliers();
+
+        // Truyền danh sách vật tư và nhà cung cấp sang JSP
         request.setAttribute("materialList", materialList);
+        request.setAttribute("supplierList", supplierList);
 
         // Forward đến trang tạo yêu cầu sửa chữa
         request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
@@ -84,20 +91,33 @@ public class RepairRequestServlet extends HttpServlet {
             String requestCode = generateRequestCode();
 
             // Lấy thông tin từ form
-            String repairPhone = request.getParameter("repairPersonPhoneNumber");
-            String repairEmail = request.getParameter("repairPersonEmail");
-            String repairLocation = request.getParameter("repairLocation");
+            String supplierIdStr = request.getParameter("supplierId");
             String reason = request.getParameter("reason");
             Date estimatedReturnDate = Date.valueOf(request.getParameter("estimatedReturnDate"));
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+
+            // Kiểm tra supplierId
+            if (supplierIdStr == null || supplierIdStr.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "Vui lòng chọn một nhà cung cấp.");
+                request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                return;
+            }
+            int supplierId;
+            try {
+                supplierId = Integer.parseInt(supplierIdStr);
+            } catch (NumberFormatException e) {
+                request.setAttribute("errorMessage", "ID nhà cung cấp không hợp lệ.");
+                request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
+                return;
+            }
 
             // Tạo yêu cầu sửa chữa
             RepairRequest requestObj = new RepairRequest();
             requestObj.setRequestCode(requestCode);
             requestObj.setUserId(userId);
-            requestObj.setRepairPersonPhoneNumber(repairPhone);
-            requestObj.setRepairPersonEmail(repairEmail);
-            requestObj.setRepairLocation(repairLocation);
+            requestObj.setRepairPersonPhoneNumber(null); // Đặt null vì không sử dụng
+            requestObj.setRepairPersonEmail(null); // Đặt null vì không sử dụng
+            requestObj.setRepairLocation(null); // Đặt null vì không sử dụng
             requestObj.setReason(reason);
             requestObj.setEstimatedReturnDate(estimatedReturnDate);
             requestObj.setRequestDate(now);
@@ -110,7 +130,6 @@ public class RepairRequestServlet extends HttpServlet {
             String[] materialNames = request.getParameterValues("materialName");
             String[] quantities = request.getParameterValues("quantity");
             String[] descriptions = request.getParameterValues("damageDescription");
-            String[] repairCosts = request.getParameterValues("repairCost");
 
             // Kiểm tra dữ liệu đầu vào
             if (materialNames == null || quantities == null || descriptions == null) {
@@ -156,23 +175,7 @@ public class RepairRequestServlet extends HttpServlet {
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 detail.setDamageDescription(description);
-
-                Double repairCost = null;
-                if (repairCosts[i] != null && !repairCosts[i].trim().isEmpty()) {
-                    try {
-                        repairCost = Double.parseDouble(repairCosts[i]);
-                        if (repairCost < 0) {
-                            request.setAttribute("errorMessage", "Chi phí sửa chữa không được âm.");
-                            request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
-                            return;
-                        }
-                    } catch (NumberFormatException e) {
-                        request.setAttribute("errorMessage", "Chi phí sửa chữa không hợp lệ cho vật tư: " + materialName);
-                        request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
-                        return;
-                    }
-                }
-                detail.setRepairCost(repairCost);
+                detail.setSupplierId(supplierId); // Gán supplierId vào chi tiết
                 detail.setCreatedAt(now);
                 detail.setUpdatedAt(now);
 
@@ -186,6 +189,8 @@ public class RepairRequestServlet extends HttpServlet {
             // Nếu thành công thì gửi email cho giám đốc
             if (success) {
                 UserDAO userDAO = new UserDAO();
+                SupplierDAO supplierDAO = new SupplierDAO();
+                Supplier supplier = supplierDAO.getSupplierByID(supplierId);
                 List<User> allUsers = userDAO.getAllUsers();
                 List<User> managers = new ArrayList<>();
                 for (User u : allUsers) {
@@ -203,7 +208,7 @@ public class RepairRequestServlet extends HttpServlet {
                     content.append("Mã yêu cầu: ").append(requestCode).append("\n");
                     content.append("Người tạo: ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")\n");
                     content.append("Lý do: ").append(reason).append("\n");
-                    content.append("Địa điểm sửa chữa: ").append(repairLocation).append("\n");
+                    content.append("Nhà cung cấp: ").append(supplier != null ? supplier.getSupplierName() : "N/A").append("\n");
                     content.append("Ngày dự kiến hoàn trả: ").append(estimatedReturnDate).append("\n");
                     content.append("Thời gian gửi yêu cầu: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)).append("\n\n");
                     content.append("Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý yêu cầu.");
@@ -221,7 +226,6 @@ public class RepairRequestServlet extends HttpServlet {
                         }
                     }
 
-                    System.out.println("[DEBUG] [MAIL] Email user hiện tại: " + user.getEmail());
                     if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
                         try {
                             System.out.println("[DEBUG] [MAIL] Sending email to user: " + user.getEmail());
