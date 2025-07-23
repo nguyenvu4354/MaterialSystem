@@ -62,14 +62,6 @@ public class MaterialDAO extends DBContext {
                     sortBy = "m.material_code";
                     sortOrder = "DESC";
                     break;
-                case "condition_asc":
-                    sortBy = "m.condition_percentage";
-                    sortOrder = "ASC";
-                    break;
-                case "condition_desc":
-                    sortBy = "m.condition_percentage";
-                    sortOrder = "DESC";
-                    break;
             }
             sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
 
@@ -91,7 +83,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setPrice(rs.getDouble("price"));
                 m.setQuantity(rs.getInt("quantity"));
 
                 m.setCreatedAt(rs.getTimestamp("created_at"));
@@ -167,7 +158,7 @@ public class MaterialDAO extends DBContext {
         Material m = new Material();
         try {
             String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, "
-                    + "m.material_status, m.condition_percentage, m.price, "
+                    + "m.material_status, "
                     + "c.category_id, c.category_name, c.description AS category_description, "
                     + "u.unit_id, u.unit_name, u.symbol, u.description AS unit_description, "
                     + "m.created_at, m.updated_at, m.disable, "
@@ -187,7 +178,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setPrice(rs.getDouble("price"));
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
                 m.setDisable(rs.getBoolean("disable"));
@@ -214,7 +204,7 @@ public class MaterialDAO extends DBContext {
 
     public void updateMaterial(Material m) {
         String sql = "UPDATE Materials SET material_code = ?, material_name = ?, materials_url = ?, "
-                + "material_status = ?, condition_percentage = ?, price = ?, category_id = ?, "
+                + "material_status = ?, category_id = ?, "
                 + "unit_id = ?, updated_at = CURRENT_TIMESTAMP, disable = ? WHERE material_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -222,11 +212,11 @@ public class MaterialDAO extends DBContext {
             st.setString(2, m.getMaterialName());
             st.setString(3, m.getMaterialsUrl());
             st.setString(4, m.getMaterialStatus());
-            st.setDouble(6, m.getPrice());
-            st.setInt(7, m.getCategory().getCategory_id());
-            st.setInt(8, m.getUnit().getId());
-            st.setBoolean(9, m.isDisable());
-            st.setInt(10, m.getMaterialId());
+            // Bỏ setDouble cho price, cập nhật lại chỉ số các tham số phía sau
+            st.setInt(5, m.getCategory().getCategory_id());
+            st.setInt(6, m.getUnit().getId());
+            st.setBoolean(7, m.isDisable());
+            st.setInt(8, m.getMaterialId());
             st.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e);
@@ -237,17 +227,16 @@ public class MaterialDAO extends DBContext {
         try {
             String sql = "INSERT INTO materials ("
                     + "material_code, material_name, materials_url, material_status, "
-                    + "condition_percentage, price, category_id, unit_id, disable"
-                    + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    + "category_id, unit_id, disable"
+                    + ") VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, m.getMaterialCode());
             ps.setString(2, m.getMaterialName());
             ps.setString(3, m.getMaterialsUrl());
             ps.setString(4, m.getMaterialStatus());
-            ps.setDouble(6, m.getPrice());
-            ps.setInt(7, m.getCategory().getCategory_id());
-            ps.setInt(8, m.getUnit().getId());
-            ps.setBoolean(9, m.isDisable());
+            ps.setInt(5, m.getCategory().getCategory_id());
+            ps.setInt(6, m.getUnit().getId());
+            ps.setBoolean(7, m.isDisable());
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -290,7 +279,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -337,7 +325,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -394,7 +381,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -445,7 +431,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -496,7 +481,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -545,7 +529,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getDouble("price"),
                         category,
                         unit,
                         rs.getTimestamp("created_at"),
@@ -740,14 +723,6 @@ public class MaterialDAO extends DBContext {
                     sortBy = "m.material_code";
                     sortOrder = "DESC";
                     break;
-                case "condition_asc":
-                    sortBy = "m.condition_percentage";
-                    sortOrder = "ASC";
-                    break;
-                case "condition_desc":
-                    sortBy = "m.condition_percentage";
-                    sortOrder = "DESC";
-                    break;
                 case "price_asc":
                     sortBy = "m.price";
                     sortOrder = "ASC";
@@ -779,7 +754,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setPrice(rs.getDouble("price"));
                 m.setQuantity(rs.getInt("quantity"));
 
                 m.setCreatedAt(rs.getTimestamp("created_at"));

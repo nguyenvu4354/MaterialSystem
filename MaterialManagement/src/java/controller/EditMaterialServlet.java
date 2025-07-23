@@ -126,7 +126,6 @@ public class EditMaterialServlet extends HttpServlet {
                 m.setMaterialCode(materialCode);
                 m.setMaterialName(materialName);
                 m.setMaterialStatus(materialStatus);
-                m.setPrice(0);
                 m.setCategory(new Category());
                 m.setUnit(new Unit());
 
@@ -186,7 +185,6 @@ public class EditMaterialServlet extends HttpServlet {
             material.setMaterialCode(materialCode);
             material.setMaterialName(materialName);
             material.setMaterialStatus(materialStatus);
-            material.setPrice(Double.parseDouble(priceStr));
 
             Category category = new Category();
             category.setCategory_id(Integer.parseInt(categoryId));
