@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 
 public class MaterialDAO extends DBContext {
 
-    // Phuong thuc tao ket noi toi database MySQL
-    // search theo name hoặc code và status
     public List<Material> searchMaterials(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
         List<Material> list = new ArrayList<>();
         try {
@@ -44,7 +42,7 @@ public class MaterialDAO extends DBContext {
                 sql.append("AND m.material_status = ? ");
                 params.add(status);
             }
-            String sortBy = "m.material_code"; // default
+            String sortBy = "m.material_code"; 
             String sortOrder = "ASC";
 
             switch (sortOption) {
@@ -93,7 +91,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setConditionPercentage(rs.getInt("condition_percentage"));
                 m.setPrice(rs.getDouble("price"));
                 m.setQuantity(rs.getInt("quantity"));
 
@@ -190,7 +187,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setConditionPercentage(rs.getInt("condition_percentage"));
                 m.setPrice(rs.getDouble("price"));
                 m.setCreatedAt(rs.getTimestamp("created_at"));
                 m.setUpdatedAt(rs.getTimestamp("updated_at"));
@@ -226,7 +222,6 @@ public class MaterialDAO extends DBContext {
             st.setString(2, m.getMaterialName());
             st.setString(3, m.getMaterialsUrl());
             st.setString(4, m.getMaterialStatus());
-            st.setInt(5, m.getConditionPercentage());
             st.setDouble(6, m.getPrice());
             st.setInt(7, m.getCategory().getCategory_id());
             st.setInt(8, m.getUnit().getId());
@@ -249,7 +244,6 @@ public class MaterialDAO extends DBContext {
             ps.setString(2, m.getMaterialName());
             ps.setString(3, m.getMaterialsUrl());
             ps.setString(4, m.getMaterialStatus());
-            ps.setInt(5, m.getConditionPercentage());
             ps.setDouble(6, m.getPrice());
             ps.setInt(7, m.getCategory().getCategory_id());
             ps.setInt(8, m.getUnit().getId());
@@ -296,7 +290,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -344,7 +337,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -358,6 +350,13 @@ public class MaterialDAO extends DBContext {
             e.printStackTrace();
         }
         return list;
+    }
+    public static void main(String[] args) {
+        MaterialDAO dao = new MaterialDAO();
+        List <Material> list = dao.getAllProducts();
+        for (Material material : list) {
+            System.out.println(material.toString());
+        }
     }
 
     // Phương thức tìm kiếm sản phẩm theo tên (có thể chứa một phần tên)
@@ -395,7 +394,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -447,7 +445,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -499,7 +496,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -549,7 +545,6 @@ public class MaterialDAO extends DBContext {
                         rs.getString("material_name"),
                         rs.getString("materials_url"),
                         rs.getString("material_status"),
-                        rs.getInt("condition_percentage"),
                         rs.getDouble("price"),
                         category,
                         unit,
@@ -679,27 +674,27 @@ public class MaterialDAO extends DBContext {
         return list;
     }
 
-    public static void main(String[] args) {
-        MaterialDAO md = new MaterialDAO();
-
-        // Lấy thông tin vật tư trước khi update
-        Material m = md.getInformation(4);
-        System.out.println("Trước khi update:");
-        System.out.println("Tên: " + m.getMaterialName());
-        System.out.println("Updated_at: " + m.getUpdatedAt());
-
-        // Thay đổi tên vật tư (hoặc trường bất kỳ)
-        m.setMaterialName(m.getMaterialName() + " (test update)");
-
-        // Gọi hàm update
-        md.updateMaterial(m);
-
-        // Lấy lại thông tin vật tư sau khi update
-        Material m2 = md.getInformation(5);
-        System.out.println("Sau khi update:");
-        System.out.println("Tên: " + m2.getMaterialName());
-        System.out.println("Updated_at: " + m2.getUpdatedAt());
-    }
+//    public static void main(String[] args) {
+//        MaterialDAO md = new MaterialDAO();
+//
+//        // Lấy thông tin vật tư trước khi update
+//        Material m = md.getInformation(4);
+//        System.out.println("Trước khi update:");
+//        System.out.println("Tên: " + m.getMaterialName());
+//        System.out.println("Updated_at: " + m.getUpdatedAt());
+//
+//        // Thay đổi tên vật tư (hoặc trường bất kỳ)
+//        m.setMaterialName(m.getMaterialName() + " (test update)");
+//
+//        // Gọi hàm update
+//        md.updateMaterial(m);
+//
+//        // Lấy lại thông tin vật tư sau khi update
+//        Material m2 = md.getInformation(5);
+//        System.out.println("Sau khi update:");
+//        System.out.println("Tên: " + m2.getMaterialName());
+//        System.out.println("Updated_at: " + m2.getUpdatedAt());
+//    }
 
     public List<Material> searchMaterialsByPrice(Double minPrice, Double maxPrice, int pageIndex, int pageSize, String sortOption) {
         List<Material> list = new ArrayList<>();
@@ -784,7 +779,6 @@ public class MaterialDAO extends DBContext {
                 m.setMaterialName(rs.getString("material_name"));
                 m.setMaterialsUrl(rs.getString("materials_url"));
                 m.setMaterialStatus(rs.getString("material_status"));
-                m.setConditionPercentage(rs.getInt("condition_percentage"));
                 m.setPrice(rs.getDouble("price"));
                 m.setQuantity(rs.getInt("quantity"));
 

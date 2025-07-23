@@ -127,7 +127,6 @@ public class EditMaterialServlet extends HttpServlet {
                 m.setMaterialName(materialName);
                 m.setMaterialStatus(materialStatus);
                 m.setPrice(0);
-                m.setConditionPercentage(0);
                 m.setCategory(new Category());
                 m.setUnit(new Unit());
 
@@ -188,7 +187,6 @@ public class EditMaterialServlet extends HttpServlet {
             material.setMaterialName(materialName);
             material.setMaterialStatus(materialStatus);
             material.setPrice(Double.parseDouble(priceStr));
-            material.setConditionPercentage(Integer.parseInt(conditionPercentage));
 
             Category category = new Category();
             category.setCategory_id(Integer.parseInt(categoryId));

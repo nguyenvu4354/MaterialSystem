@@ -36,9 +36,9 @@ public class MaterialValidator {
         }
 
         // Validate conditionPercentage
-        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
-            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
-        }
+//        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
+//            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
+//        }
 
         // Validate category
         if (material.getCategory() == null || material.getCategory().getCategory_id() == 0) {
@@ -84,9 +84,9 @@ public class MaterialValidator {
         }
 
         // Validate conditionPercentage
-        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
-            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
-        }
+//        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
+//            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
+//        }
 
         // Validate category
         if (material.getCategory() == null || material.getCategory().getCategory_id() == 0) {

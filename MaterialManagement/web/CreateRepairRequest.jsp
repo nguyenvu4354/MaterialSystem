@@ -87,9 +87,7 @@
                                         <input type="text" class="form-control" name="damageDescription" required>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label text-muted">Repair Cost (€)</label>
                                         <div class="repair-cost-container">
-                                            <input type="number" class="form-control" name="repairCost" step="0.01" min="0" value="0">
                                             <button type="button" class="btn btn-sm btn-outline-danger remove-material">X</button>
                                         </div>
                                     </div>
@@ -103,24 +101,24 @@
                             <h3 class="fw-normal mt-5 mb-3">Repairer and Schedule Information</h3>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label text-muted">Repairer's Phone Number</label>
-                                    <input type="tel" class="form-control" name="repairPersonPhoneNumber" required pattern="[0-9]{10,15}" title="Phone number must be 10-15 digits">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted">Repairer's Email</label>
-                                    <input type="email" class="form-control" name="repairPersonEmail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted">Repair Location</label>
-                                    <input type="text" class="form-control" name="repairLocation" required>
+                                    <label class="form-label text-muted">Supplier</label>
+                                    <select class="form-select" name="supplierId" required>
+                                        <option value="" disabled selected>Select a supplier</option>
+                                        <c:forEach var="supplier" items="${supplierList}">
+                                            <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a supplier.</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted">Estimated Return Date</label>
                                     <input type="date" class="form-control" name="estimatedReturnDate" id="returnDate" required>
+                                    <div class="invalid-feedback">Estimated return date cannot be left blank.</div>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label text-muted">Reason for Repair</label>
                                     <textarea name="reason" rows="3" class="form-control" required></textarea>
+                                    <div class="invalid-feedback">Reason for repair cannot be left blank.</div>
                                 </div>
                             </div>
 
@@ -168,10 +166,10 @@
                 const newRow = firstRow.cloneNode(true);
 
                 newRow.querySelectorAll('input').forEach(input => {
-                    input.value = (input.name === 'repairCost') ? '0' : (input.name === 'quantity' ? '1' : '');
+                    input.value = (input.name === 'quantity' ? '1' : '');
                 });
 
-                // Cập nhật nút X trong hàng mới
+                // Update remove button in new row
                 const repairCostContainer = newRow.querySelector('.repair-cost-container');
                 const removeButton = repairCostContainer.querySelector('.remove-material');
                 repairCostContainer.appendChild(removeButton);
@@ -195,37 +193,81 @@
 
             // Form validation
             document.getElementById('repairForm').addEventListener('submit', function (e) {
+                let isValid = true;
+
+                // Reset validation styles
+                document.querySelectorAll('.form-control, .form-select').forEach(input => {
+                    input.classList.remove('is-invalid');
+                });
+                document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+                    feedback.style.display = 'none';
+                });
+
+                // Validate return date
                 const returnDate = document.getElementById('returnDate').value;
-                const today = new Date().toISOString().split('T')[0];
-
-                if (returnDate !== today) {
-                    e.preventDefault();
-                    alert('Estimated return date must be today only.');
-                    return;
+                if (!returnDate) {
+                    document.getElementById('returnDate').classList.add('is-invalid');
+                    document.getElementById('returnDate').nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else if (returnDate !== today) {
+                    document.getElementById('returnDate').classList.add('is-invalid');
+                    document.getElementById('returnDate').nextElementSibling.textContent = 'Estimated return date must be today only.';
+                    document.getElementById('returnDate').nextElementSibling.style.display = 'block';
+                    isValid = false;
                 }
 
-                const phoneNumber = document.querySelector('input[name="repairPersonPhoneNumber"]').value;
-                if (!/^[0-9]{10,15}$/.test(phoneNumber)) {
-                    e.preventDefault();
-                    alert('Phone number must be 10-15 digits.');
-                    return;
+                // Validate supplier
+                const supplierId = document.querySelector('select[name="supplierId"]').value;
+                if (!supplierId) {
+                    document.querySelector('select[name="supplierId"]').classList.add('is-invalid');
+                    document.querySelector('select[name="supplierId"]').nextElementSibling.style.display = 'block';
+                    isValid = false;
                 }
 
-                const email = document.querySelector('input[name="repairPersonEmail"]').value;
-                const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-                if (!emailPattern.test(email)) {
-                    e.preventDefault();
-                    alert('Please enter a valid email address.');
-                    return;
+                // Validate reason
+                const reason = document.querySelector('textarea[name="reason"]').value.trim();
+                if (!reason) {
+                    document.querySelector('textarea[name="reason"]').classList.add('is-invalid');
+                    document.querySelector('textarea[name="reason"]').nextElementSibling.style.display = 'block';
+                    isValid = false;
                 }
 
+                // Validate material inputs
                 const materialInputs = document.querySelectorAll('.material-autocomplete');
                 for (let input of materialInputs) {
-                    if (!availableMaterials.includes(input.value)) {
-                        e.preventDefault();
-                        alert('Please select valid material names from the suggestions.');
-                        return;
+                    if (!input.value.trim()) {
+                        input.classList.add('is-invalid');
+                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Material name cannot be left blank.</div>');
+                        isValid = false;
+                    } else if (!availableMaterials.includes(input.value)) {
+                        input.classList.add('is-invalid');
+                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Please select a valid material name from the suggestions.</div>');
+                        isValid = false;
                     }
+                }
+
+                // Validate quantity inputs
+                const quantityInputs = document.querySelectorAll('input[name="quantity"]');
+                for (let input of quantityInputs) {
+                    if (!input.value || input.value < 1) {
+                        input.classList.add('is-invalid');
+                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Quantity must be at least 1.</div>');
+                        isValid = false;
+                    }
+                }
+
+                // Validate damage description inputs
+                const damageInputs = document.querySelectorAll('input[name="damageDescription"]');
+                for (let input of damageInputs) {
+                    if (!input.value.trim()) {
+                        input.classList.add('is-invalid');
+                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Damage description cannot be left blank.</div>');
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
                 }
             });
         </script>

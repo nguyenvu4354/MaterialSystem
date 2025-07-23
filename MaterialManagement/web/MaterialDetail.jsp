@@ -101,15 +101,12 @@
                         <div class="col-md-7 product-info">
                             <h3 class="fw-bold mb-3 text-primary">${product.materialName}</h3>
                             <p><strong>🆔 Code:</strong> ${product.materialCode}</p>
-                            <p><strong>💲 Price:</strong> 
-                                $<fmt:formatNumber value="${product.price != null ? product.price : 0}" type="number" />
-                            </p>
+                            
                             <p><strong>🏷️ Status:</strong> 
                                 <span class="status-${product.materialStatus == 'new' ? 'new' : product.materialStatus == 'used' ? 'used' : 'damaged'}">
                                     ${product.materialStatus}
                                 </span>
                             </p>
-                            <p class="condition-text"><strong>🔢 Condition:</strong> ${product.conditionPercentage}%</p>
 
                             <p><strong>📏 Unit:</strong> 
                                 <c:choose>

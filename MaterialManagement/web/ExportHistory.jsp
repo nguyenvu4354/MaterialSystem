@@ -145,7 +145,6 @@
                                         <th>Exported By</th>
                                         <th>Recipient</th>
                                         <th>Total Quantity</th>
-                                        <th>Total Value</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -160,7 +159,6 @@
                                                     <td>${exp.exportedByName}</td>
                                                     <td>${exp.recipientName}</td>
                                                     <td>${exp.totalQuantity}</td>
-                                                    <td>${exp.totalValue}</td>
                                                     <td>
                                                         <a href="ExportDetail?exportId=${exp.exportId}" class="btn btn-detail">
                                                             <i class="fas fa-eye"></i> Detail

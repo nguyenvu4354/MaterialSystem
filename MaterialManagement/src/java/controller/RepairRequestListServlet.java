@@ -45,7 +45,7 @@ public class RepairRequestListServlet extends HttpServlet {
         // Filter parameters
         String searchKeyword = request.getParameter("search");
         String selectedStatus = request.getParameter("status");
-        String sortByName = request.getParameter("sortByName"); // New sort parameter
+        String sortByName = request.getParameter("sortByName");
         String requestDateFrom = request.getParameter("requestDateFrom");
         String requestDateTo = request.getParameter("requestDateTo");
         if (selectedStatus == null || selectedStatus.isEmpty()) {
@@ -66,7 +66,7 @@ public class RepairRequestListServlet extends HttpServlet {
             request.setAttribute("repairRequests", repairRequests);
             request.setAttribute("searchKeyword", searchKeyword);
             request.setAttribute("selectedStatus", selectedStatus);
-            request.setAttribute("sortByName", sortByName); // Pass sortByName to JSP
+            request.setAttribute("sortByName", sortByName);
             request.setAttribute("requestDateFrom", requestDateFrom);
             request.setAttribute("requestDateTo", requestDateTo);
             request.setAttribute("currentPage", page);

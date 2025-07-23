@@ -18,7 +18,6 @@ public class Material {
     private String materialName;
     private String materialsUrl;
     private String materialStatus;
-    private int conditionPercentage;
     private double price;
 
     private Category category;
@@ -33,14 +32,13 @@ public class Material {
     }
 
     public Material(int materialId, String materialCode, String materialName, String materialsUrl, String materialStatus,
-            int conditionPercentage, double price, Category category, Unit unit,
+             double price, Category category, Unit unit,
             Timestamp createdAt, Timestamp updatedAt, boolean disable) {
         this.materialId = materialId;
         this.materialCode = materialCode;
         this.materialName = materialName;
         this.materialsUrl = materialsUrl;
         this.materialStatus = materialStatus;
-        this.conditionPercentage = conditionPercentage;
         this.price = price;
         this.category = category;
         this.unit = unit;
@@ -106,13 +104,6 @@ public class Material {
         this.materialStatus = materialStatus;
     }
 
-    public int getConditionPercentage() {
-        return conditionPercentage;
-    }
-
-    public void setConditionPercentage(int conditionPercentage) {
-        this.conditionPercentage = conditionPercentage;
-    }
 
     public double getPrice() {
         return price;
@@ -154,4 +145,10 @@ public class Material {
         this.disable = disable;
     }
 
+    @Override
+    public String toString() {
+        return "Material{" + "materialId=" + materialId + ", materialCode=" + materialCode + ", materialName=" + materialName + ", materialsUrl=" + materialsUrl + ", materialStatus=" + materialStatus + ", price=" + price + ", category=" + category + ", unit=" + unit + ", quantity=" + quantity + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", disable=" + disable + '}';
+    }
+
+    
 }

@@ -136,7 +136,7 @@
                             </a>
                         </div>
                         <form method="get" action="repairrequestlist" class="filter-bar align-items-center" style="gap: 8px; flex-wrap: nowrap;">
-                            <input type="text" name="search" class="form-control" placeholder="Search Request Code"
+                            <input type="text" name="search" class="form-control" placeholder="Search Reason"
                                    value="${searchKeyword != null ? searchKeyword : ''}" style="width: 230px;">
                             <select name="status" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
                                 <option value="all" ${selectedStatus == null || selectedStatus == 'all' ? 'selected' : ''}>All Status</option>
@@ -150,7 +150,6 @@
                                 <option value="desc" ${sortByName == 'desc' ? 'selected' : ''}>Name (Z-A)</option>
                             </select>
                             <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">
-
                             <input type="date" name="requestDateFrom" class="form-control" placeholder="From Date"
                                    value="${requestDateFrom != null ? requestDateFrom : ''}" style="width: 230px;">
                             <input type="date" name="requestDateTo" class="form-control" placeholder="To Date"
