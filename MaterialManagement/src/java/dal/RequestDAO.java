@@ -17,13 +17,12 @@ import java.util.List;
 
 public class RequestDAO extends DBContext {
 
-    public List<ExportRequest> getExportRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<ExportRequest> getExportRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<ExportRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT DISTINCT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name "
+                "SELECT DISTINCT er.*, u1.full_name AS user_name, u3.full_name AS approver_name "
                 + "FROM Export_Requests er "
                 + "JOIN Users u1 ON er.user_id = u1.user_id "
-                + "JOIN Users u2 ON er.recipient_user_id = u2.user_id "
                 + "LEFT JOIN Users u3 ON er.approved_by = u3.user_id "
                 + "LEFT JOIN Export_Request_Details erd ON er.export_request_id = erd.export_request_id "
                 + "LEFT JOIN Materials m ON erd.material_id = m.material_id "
@@ -35,11 +34,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND er.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND er.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -77,8 +71,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setUserName(rs.getString("user_name"));
-                request.setRecipientId(rs.getInt("recipient_user_id"));
-                request.setRecipientName(rs.getString("recipient_name"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setStatus(rs.getString("status"));
                 request.setDeliveryDate(rs.getDate("delivery_date"));
@@ -98,10 +90,9 @@ public class RequestDAO extends DBContext {
     }
 
     public ExportRequest getExportRequestById(int exportRequestId) {
-        String sql = "SELECT er.*, u1.full_name AS user_name, u2.full_name AS recipient_name, u3.full_name AS approver_name "
+        String sql = "SELECT er.*, u1.full_name AS user_name, u3.full_name AS approver_name "
                 + "FROM Export_Requests er "
                 + "JOIN Users u1 ON er.user_id = u1.user_id "
-                + "JOIN Users u2 ON er.recipient_user_id = u2.user_id "
                 + "LEFT JOIN Users u3 ON er.approved_by = u3.user_id "
                 + "WHERE er.export_request_id = ? AND er.disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -113,8 +104,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setUserName(rs.getString("user_name"));
-                request.setRecipientId(rs.getInt("recipient_user_id"));
-                request.setRecipientName(rs.getString("recipient_name"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setStatus(rs.getString("status"));
                 request.setDeliveryDate(rs.getDate("delivery_date"));
@@ -221,7 +210,7 @@ public class RequestDAO extends DBContext {
         return details;
     }
 
-    public int getExportRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getExportRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT er.export_request_id) FROM Export_Requests er "
                 + "LEFT JOIN Export_Request_Details erd ON er.export_request_id = erd.export_request_id "
@@ -234,11 +223,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND er.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND er.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -275,7 +259,7 @@ public class RequestDAO extends DBContext {
         return 0;
     }
 
-    public List<PurchaseRequest> getPurchaseRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<PurchaseRequest> getPurchaseRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<PurchaseRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT pr.*, u.full_name AS user_name, u2.full_name AS approver_name "
@@ -292,11 +276,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND pr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND pr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -335,7 +314,6 @@ public class RequestDAO extends DBContext {
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setStatus(rs.getString("status"));
-                request.setEstimatedPrice(rs.getDouble("estimated_price"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 request.setApprovalReason(rs.getString("approval_reason"));
@@ -369,7 +347,6 @@ public class RequestDAO extends DBContext {
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
                 request.setStatus(rs.getString("status"));
-                request.setEstimatedPrice(rs.getDouble("estimated_price"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 request.setApprovalReason(rs.getString("approval_reason"));
@@ -387,7 +364,7 @@ public class RequestDAO extends DBContext {
         return null;
     }
 
-    public int getPurchaseRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getPurchaseRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT pr.purchase_request_id) FROM Purchase_Requests pr "
                 + "LEFT JOIN Purchase_Request_Details prd ON pr.purchase_request_id = prd.purchase_request_id "
@@ -400,11 +377,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND pr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND pr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -441,7 +413,7 @@ public class RequestDAO extends DBContext {
         return 0;
     }
 
-    public List<RepairRequest> getRepairRequestsByUser(int userId, int page, int pageSize, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public List<RepairRequest> getRepairRequestsByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<RepairRequest> requests = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT rr.*, u.full_name AS user_name, u2.full_name AS approver_name "
@@ -458,11 +430,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND rr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND rr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
@@ -500,9 +467,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
-                request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                request.setRepairPersonEmail(rs.getString("repair_person_email"));
-                request.setRepairLocation(rs.getString("repair_location"));
                 request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
@@ -537,9 +501,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
-                request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                request.setRepairPersonEmail(rs.getString("repair_person_email"));
-                request.setRepairLocation(rs.getString("repair_location"));
                 request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
@@ -559,7 +520,7 @@ public class RequestDAO extends DBContext {
         return null;
     }
 
-    public int getRepairRequestCountByUser(int userId, String status, String requestCode, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+    public int getRepairRequestCountByUser(int userId, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT rr.repair_request_id) FROM Repair_Requests rr "
                 + "LEFT JOIN Repair_Request_Details rrd ON rr.repair_request_id = rrd.repair_request_id "
@@ -572,11 +533,6 @@ public class RequestDAO extends DBContext {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND rr.status = ? ");
             params.add(status.trim());
-        }
-
-        if (requestCode != null && !requestCode.trim().isEmpty()) {
-            sql.append("AND rr.request_code LIKE ? ");
-            params.add("%" + requestCode.trim() + "%");
         }
 
         if (startDate != null) {
