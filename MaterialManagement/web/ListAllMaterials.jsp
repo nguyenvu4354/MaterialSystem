@@ -143,9 +143,12 @@
                                 ${material.materialStatus}
                             </span>
                         </p>
-                        <p class="card-text mb-1 condition-text">Condition: ${material.conditionPercentage}%</p>
+                        <p class="card-text mb-1 condition-text">
+  Status: <span class="badge ${material.materialStatus == 'new' ? 'bg-success' : (material.materialStatus == 'used' ? 'bg-warning' : 'bg-danger')}">
+    ${material.materialStatus == 'new' ? 'New' : (material.materialStatus == 'used' ? 'Used' : 'Damaged')}
+  </span>
+</p>
                         <p class="card-text mb-1">Unit ID: ${material.unit != null ? material.unit.id : 'N/A'}</p>
-                        <p class="price">Price: $<fmt:formatNumber value="${material.price != null ? material.price : 0}" type="number" /></p>
                         <p class="supplier-label">
                             <c:choose>
                                 <c:when test="${not empty material.supplier}">

@@ -243,8 +243,7 @@
                         <th>Material Code</th>
                         <th>Material Name</th>
                         <th>Status</th>
-                        <th>Condition (%)</th>
-                        <th>Price</th>
+                        <th>Status</th>
                         <th>Category</th>
                         <th>Unit</th>
                         <th>Created At</th>
@@ -261,9 +260,12 @@
                             </td>
                             <td>${product.materialCode}</td>
                             <td>${product.materialName}</td>
-                            <td>${product.materialStatus}</td>
+                            <td>
+                                <span class="badge ${product.materialStatus == 'new' ? 'bg-success' : (product.materialStatus == 'used' ? 'bg-warning' : 'bg-danger')}">
+                                    ${product.materialStatus == 'new' ? 'New' : (product.materialStatus == 'used' ? 'Used' : 'Damaged')}
+                                </span>
+                            </td>
                             <td>${product.conditionPercentage}</td>
-                            <td class="text-danger fw-bold">$${product.price != null ? product.price : 0}</td>
                             <td>${product.category != null ? product.category.category_name : 'N/A'}</td>
                             <td>${product.unit != null ? product.unit.unitName : 'N/A'}</td>
                             <td>${product.createdAt}</td>

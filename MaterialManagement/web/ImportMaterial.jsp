@@ -279,7 +279,7 @@
                                                 <th style="width: 10%">Quantity</th>
                                                 <th style="width: 12%">Price</th>
                                                 <th style="width: 12%">Value</th>
-                                                <th style="width: 10%">Condition</th>
+                                                <th style="width: 10%">Status</th>
                                                 <th style="width: 8%">Stock</th>
                                                 <th style="width: 5%">Action</th>
                                             </tr>
@@ -322,11 +322,17 @@
                                                     <td><strong>$<fmt:formatNumber value="${detail.unitPrice}" type="number" minFractionDigits="2"/></strong></td>
                                                     <td><strong>$<fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" minFractionDigits="2"/></strong></td>
                                                     <td>
-                                                        <div class="condition-bar" style="height: 5px; background-color: #e9ecef; border-radius: 3px; margin-top: 5px;">
-                                                            <div class="condition-fill ${materialMap[detail.materialId].conditionPercentage >= 70 ? 'condition-good' : materialMap[detail.materialId].conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" 
-                                                                 style="width: ${materialMap[detail.materialId].conditionPercentage}%; height: 100%; border-radius: 3px;"></div>
-                                                        </div>
-                                                        <small class="text-muted">${materialMap[detail.materialId].conditionPercentage}%</small>
+                                                        <c:choose>
+                                                            <c:when test="${materialMap[detail.materialId].materialStatus == 'new'}">
+                                                                <span class="badge bg-success">New</span>
+                                                            </c:when>
+                                                            <c:when test="${materialMap[detail.materialId].materialStatus == 'used'}">
+                                                                <span class="badge bg-warning text-dark">Used</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-danger">Damaged</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </td>
                                                     <td>
                                                         <c:choose>

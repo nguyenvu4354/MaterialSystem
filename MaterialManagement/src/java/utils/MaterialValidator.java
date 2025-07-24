@@ -5,6 +5,7 @@ import entity.Material;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class MaterialValidator {
 
@@ -33,11 +34,6 @@ public class MaterialValidator {
 //        // Validate price
 //        if (material.getPrice() <= 0) {
 //            errors.put("price", "Price must be greater than 0.");
-//        }
-
-        // Validate conditionPercentage
-//        if (material.getConditionPercentage() < 0 || material.getConditionPercentage() > 100) {
-//            errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
 //        }
 
         // Validate category
@@ -78,7 +74,12 @@ public class MaterialValidator {
             errors.put("materialStatus", "Material status cannot be empty.");
         }
 
-       
+        // Thêm validate cho status
+        if (material.getMaterialStatus() == null || material.getMaterialStatus().trim().isEmpty()) {
+            errors.put("status", "Material status cannot be empty.");
+        } else if (!List.of("new", "used", "damaged").contains(material.getMaterialStatus())) {
+            errors.put("status", "Invalid material status.");
+        }
 
         // Validate category
         if (material.getCategory() == null || material.getCategory().getCategory_id() == 0) {
@@ -94,8 +95,7 @@ public class MaterialValidator {
     }
 
     public static Map<String, String> validateMaterialFormData(String materialCode, String materialName, 
-                                                             String materialStatus, String priceStr, 
-                                                             String conditionPercentageStr, String categoryIdStr, 
+                                                             String materialStatus, String categoryIdStr, 
                                                              String unitIdStr) {
         Map<String, String> errors = new HashMap<>();
 
@@ -114,34 +114,8 @@ public class MaterialValidator {
         // Validate materialStatus
         if (materialStatus == null || materialStatus.trim().isEmpty()) {
             errors.put("materialStatus", "Material status cannot be empty.");
-        }
-
-        // Validate price
-        if (priceStr == null || priceStr.trim().isEmpty()) {
-            errors.put("price", "Price cannot be empty.");
-        } else {
-            try {
-                java.math.BigDecimal price = new java.math.BigDecimal(priceStr);
-                if (price.compareTo(java.math.BigDecimal.ZERO) <= 0) {
-                    errors.put("price", "Price must be greater than 0.");
-                }
-            } catch (NumberFormatException e) {
-                errors.put("price", "Invalid price format.");
-            }
-        }
-
-        // Validate conditionPercentage
-        if (conditionPercentageStr == null || conditionPercentageStr.trim().isEmpty()) {
-            errors.put("conditionPercentage", "Condition percentage cannot be empty.");
-        } else {
-            try {
-                int conditionPercentage = Integer.parseInt(conditionPercentageStr);
-                if (conditionPercentage < 0 || conditionPercentage > 100) {
-                    errors.put("conditionPercentage", "Condition percentage must be between 0 and 100.");
-                }
-            } catch (NumberFormatException e) {
-                errors.put("conditionPercentage", "Invalid condition percentage format.");
-            }
+        } else if (!List.of("new", "used", "damaged").contains(materialStatus)) {
+            errors.put("materialStatus", "Invalid material status.");
         }
 
         // Validate categoryId
@@ -172,7 +146,6 @@ public class MaterialValidator {
             }
         }
 
-        // Chỉ return errors 1 lần cuối, không return sớm!
         return errors;
     }
 } 

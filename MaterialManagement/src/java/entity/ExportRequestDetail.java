@@ -10,7 +10,7 @@ public class ExportRequestDetail {
     private String materialName;
     private String materialUnit;
     private int quantity;
-    private String exportCondition;
+    private String status;
     private String materialImageUrl;
     private Date createdAt;
     private Date updatedAt;
@@ -75,12 +75,12 @@ public class ExportRequestDetail {
         this.quantity = quantity;
     }
 
-    public String getExportCondition() {
-        return exportCondition;
+    public String getStatus() {
+        return status;
     }
 
-    public void setExportCondition(String exportCondition) {
-        this.exportCondition = exportCondition;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getMaterialImageUrl() {

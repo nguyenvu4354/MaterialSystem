@@ -99,7 +99,6 @@ public class EditMaterialServlet extends HttpServlet {
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
-            String conditionPercentage = request.getParameter("conditionPercentage");
             String priceStr = request.getParameter("price");
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
@@ -110,7 +109,6 @@ public class EditMaterialServlet extends HttpServlet {
             System.out.println("materialCode: " + materialCode);
             System.out.println("materialName: " + materialName);
             System.out.println("materialStatus: " + materialStatus);
-            System.out.println("conditionPercentage: " + conditionPercentage);
             System.out.println("price: " + priceStr);
             System.out.println("categoryId: " + categoryId);
             System.out.println("unitId: " + unitId);
@@ -118,7 +116,7 @@ public class EditMaterialServlet extends HttpServlet {
 
             // Validate form data
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
-                    materialCode, materialName, materialStatus, priceStr, conditionPercentage, categoryId, unitId);
+                    materialCode, materialName, materialStatus, categoryId, unitId);
 
             if (!errors.isEmpty()) {
                 Material m = new Material();

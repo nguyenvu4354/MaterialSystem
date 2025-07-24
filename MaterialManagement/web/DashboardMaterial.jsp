@@ -140,8 +140,6 @@
                                     <option value="name_desc" ${sortOption == 'name_desc' ? 'selected' : ''}>Name (Z-A)</option>
                                     <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
                                     <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
-                                    <option value="condition_asc" ${sortOption == 'condition_asc' ? 'selected' : ''}>Condition (Low-High)</option>
-                                    <option value="condition_desc" ${sortOption == 'condition_desc' ? 'selected' : ''}>Condition (High-Low)</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
                                     <i class="fas fa-search me-2"></i> Search
@@ -160,8 +158,6 @@
                                     <th scope="col" style="width: 120px">Code</th>
                                     <th scope="col" style="width: 200px">Name</th>
                                     <th scope="col" style="width: 100px">Status</th>
-                                    <th scope="col" style="width: 120px">Price</th>
-                                    <th scope="col" style="width: 150px">Condition</th>
                                     <th scope="col" style="width: 150px">Category</th>
                                     <th scope="col" style="width: 150px">Created At</th>
                                     <th scope="col" style="width: 150px">Updated At</th>
@@ -185,62 +181,62 @@
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td>${material.materialCode}</td>
-                                                <td>${material.materialName}</td>
+                                                <td>${material.materialCode != null ? material.materialCode : 'N/A'}</td>
+                                                <td>${material.materialName != null ? material.materialName : 'N/A'}</td>
                                                 <td>
-                                                    <span class="status-badge ${material.materialStatus == 'NEW' ? 'status-new' : material.materialStatus == 'USED' ? 'status-used' : 'status-damaged'}">
-                                                        ${material.materialStatus}
-                                                    </span>
-                                                </td>
-                                                <td><fmt:formatNumber value="${material.price}" type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="3"/></td>
-                                                <td>
-                                                    <div class="condition-bar">
-                                                        <div class="condition-fill ${material.conditionPercentage >= 70 ? 'condition-good' : material.conditionPercentage >= 40 ? 'condition-warning' : 'condition-bad'}" 
-                                                             style="width: ${material.conditionPercentage}%;"></div>
-                                                    </div>
-                                                    <small class="text-muted">${material.conditionPercentage}%</small>
-                                                </td>
-                                                <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
-                                                <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                                <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                                <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                                    <td>
-                                                        <div class="d-flex justify-content-center">
-                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
-                                                                <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
-                                                                   class="btn btn-info btn-action" 
-                                                                   title="View Details">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </a>
-                                                            </c:if>
-                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
-                                                                <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
-                                                                   class="btn btn-warning btn-action" 
-                                                                   title="Edit Material">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                            </c:if>
-                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
-                                                                    <input type="hidden" name="materialId" value="${material.materialId}" />
-                                                                    <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </c:if>
-                                                        </div>
-                                                    </td>
-                                                </c:if>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr><td colspan="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL') ? 10 : 9}" class="text-center text-muted">No materials found.</td></tr>
-                                    </c:otherwise>
-                                </c:choose>
-                            </tbody>
-                        </table>
-                    </div>
+                                  <c:choose>
+                                <c:when test="${material.materialStatus == 'new'}">
+                                  <span class="badge bg-success">New</span>
+                                </c:when>
+                                <c:when test="${material.materialStatus == 'used'}">
+                                  <span class="badge bg-warning text-dark">Used</span>
+                                </c:when>
+                                <c:otherwise>
+                                  <span class="badge bg-danger">Damaged</span>
+                                </c:otherwise>
+                              </c:choose>
+                            </td>
+                            <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
+                            <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                            <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
+                                            <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
+                                               class="btn btn-info btn-action" 
+                                               title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </c:if>
+                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
+                                            <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
+                                               class="btn btn-warning btn-action" 
+                                               title="Edit Material">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </c:if>
+                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                            <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
+                                                <input type="hidden" name="materialId" value="${material.materialId}" />
+                                                <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </c:if>
+                                    </div>
+                                </td>
+                            </c:if>
+                        </tr>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <tr><td colspan="8">No materials found.</td></tr>
+                </c:otherwise>
+            </c:choose>
+        </tbody>
+    </table>
+</div>
 
                     <!-- Pagination -->
                     <c:if test="${totalPages > 1}">
@@ -273,11 +269,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     <script>
         // Chuyển categories sang mảng JSON cho JS
-        var categories = [
-            <c:forEach var="cat" items="${categories}" varStatus="loop">
-                {id: ${cat.category_id}, name: "${cat.category_name}"}<c:if test="${!loop.last}">,</c:if>
-            </c:forEach>
-        ];
+        var categories = [];
+        <c:forEach var="cat" items="${categories}">
+            categories.push({id: ${cat.category_id}, name: "${cat.category_name}"});
+        </c:forEach>
 
         // Autocomplete cho category
         const input = document.getElementById('categoryInput');

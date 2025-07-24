@@ -17,7 +17,6 @@ public class ImportDetail {
     private int materialId;
     private int quantity;
     private double unitPrice;
-    private String materialCondition;
     private String status;
     private LocalDateTime createdAt;
     private String materialName;
@@ -71,14 +70,6 @@ public class ImportDetail {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
-    }
-
-    public String getMaterialCondition() {
-        return materialCondition;
-    }
-
-    public void setMaterialCondition(String materialCondition) {
-        this.materialCondition = materialCondition;
     }
 
     public String getStatus() {

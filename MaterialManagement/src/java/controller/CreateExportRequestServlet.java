@@ -122,9 +122,9 @@ public class CreateExportRequestServlet extends HttpServlet {
             exportRequest.setStatus("pending");
             String[] materialIds = request.getParameterValues("materials[]");
             String[] quantities = request.getParameterValues("quantities[]");
-            String[] conditions = request.getParameterValues("conditions[]");
-            if (materialIds == null || quantities == null || conditions == null ||
-                materialIds.length == 0 || quantities.length == 0 || conditions.length == 0) {
+            String[] statuses = request.getParameterValues("statuses[]");
+            if (materialIds == null || quantities == null || statuses == null ||
+                materialIds.length == 0 || quantities.length == 0 || statuses.length == 0) {
                 throw new Exception("At least one material is required.");
             }
             java.util.Map<Integer, Integer> materialQuantityMap = new java.util.HashMap<>();
@@ -132,18 +132,18 @@ public class CreateExportRequestServlet extends HttpServlet {
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
-                String condition = conditions[i];
+                String status = statuses[i];
                 if (quantity <= 0) {
                     throw new Exception("Quantity must be positive.");
                 }
-                if (!List.of("new", "used", "refurbished").contains(condition)) {
-                    throw new Exception("Invalid export condition.");
+                if (!List.of("new", "used", "damaged").contains(status)) {
+                    throw new Exception("Invalid material status.");
                 }
                 materialQuantityMap.put(materialId, materialQuantityMap.getOrDefault(materialId, 0) + quantity);
                 ExportRequestDetail detail = new ExportRequestDetail();
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
-                detail.setExportCondition(condition);
+                detail.setStatus(status);
                 details.add(detail);
             }
             for (Integer materialId : materialQuantityMap.keySet()) {
@@ -211,7 +211,7 @@ public class CreateExportRequestServlet extends HttpServlet {
                 content.append("<tr>");
                 content.append("<td>").append(materialName).append("</td>");
                 content.append("<td>").append(detail.getQuantity()).append("</td>");
-                content.append("<td>").append(detail.getExportCondition()).append("</td>");
+                content.append("<td>").append(detail.getStatus()).append("</td>");
                 content.append("</tr>");
             }
             content.append("</table>");
