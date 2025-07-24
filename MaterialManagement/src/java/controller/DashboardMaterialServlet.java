@@ -78,6 +78,10 @@ public class DashboardMaterialServlet extends HttpServlet {
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
 
+            // Thêm đoạn này để lấy tất cả vật tư cho autocomplete
+            List<Material> allMaterials = materialDAO.getAllProducts();
+            request.setAttribute("materials", allMaterials);
+
             String categoryIdParam = request.getParameter("categoryId");
             Integer categoryId = null;
             if (categoryIdParam != null && !categoryIdParam.isEmpty()) {

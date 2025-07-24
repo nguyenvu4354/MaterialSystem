@@ -54,18 +54,6 @@
             border-radius: 15px; 
             font-size: 0.85em; 
         }
-        .status-new { 
-            background-color: #d1e7dd; 
-            color: #0f5132; 
-        }
-        .status-used { 
-            background-color: #fff3cd; 
-            color: #664d03; 
-        }
-        .status-damaged { 
-            background-color: #f8d7da; 
-            color: #842029; 
-        }
         .condition-bar { 
             height: 5px; 
             background-color: #e9ecef; 
@@ -117,23 +105,19 @@
 
                     <!-- Search and Filter Section -->
                     <div class="row search-box">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
-                                <input type="text" name="keyword" class="form-control" 
-                                       placeholder="Search by Name" 
-                                       value="${keyword != null ? keyword : ''}" 
-                                       style="width: 200px; height: 50px; border: 2px solid gray"/>
+                                <div style="position: relative; display: inline-block;">
+                                    <input type="text" id="materialInput" name="materialName" class="form-control" placeholder="Material..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialName != null ? param.materialName : ''}" />
+                                    <input type="hidden" id="materialId" name="materialId" value="${param.materialId != null ? param.materialId : ''}" />
+                                    <div id="materialSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 350px; max-height: 250px; overflow-y: auto;"></div>
+                                </div>
                                 <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                     <option value="">All Status</option>
                                     <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
                                     <option value="USED" ${status == 'USED' ? 'selected' : ''}>Used</option>
                                     <option value="DAMAGED" ${status == 'DAMAGED' ? 'selected' : ''}>Damaged</option>
                                 </select>
-                                <div style="position: relative; display: inline-block;">
-                                    <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" style="width: 180px; height: 50px; border: 2px solid gray" value="${param.categoryName != null ? param.categoryName : ''}" />
-                                    <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : ''}" />
-                                    <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 180px;"></div>
-                                </div>
                                 <select name="sortOption" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                     <option value="">Sort By</option>
                                     <option value="name_asc" ${sortOption == 'name_asc' ? 'selected' : ''}>Name (A-Z)</option>
@@ -144,7 +128,7 @@
                                 <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px;">
                                     <i class="fas fa-search me-2"></i> Search
                                 </button>
-                                <a href="dashboardmaterial" class="btn btn-secondary" style="width: 150px; height: 50px">Clear</a>
+                                <a href="dashboardmaterial" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 150px; height: 50px">Clear</a>
                             </form>
                         </div>
                     </div>
@@ -186,13 +170,13 @@
                                                 <td>
                                   <c:choose>
                                 <c:when test="${material.materialStatus == 'new'}">
-                                  <span class="badge bg-success">New</span>
+                                  New
                                 </c:when>
                                 <c:when test="${material.materialStatus == 'used'}">
-                                  <span class="badge bg-warning text-dark">Used</span>
+                                  Used
                                 </c:when>
                                 <c:otherwise>
-                                  <span class="badge bg-danger">Damaged</span>
+                                  Damaged
                                 </c:otherwise>
                               </c:choose>
                             </td>
@@ -268,51 +252,66 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     <script>
-        // Chuyển categories sang mảng JSON cho JS
-        var categories = [];
-        <c:forEach var="cat" items="${categories}">
-            categories.push({id: ${cat.category_id}, name: "${cat.category_name}"});
+        var materials = [];
+        <c:forEach var="mat" items="${materials}">
+            materials.push({id: ${mat.materialId}, name: "${mat.materialName}", code: "${mat.materialCode}"});
         </c:forEach>
 
-        // Autocomplete cho category
-        const input = document.getElementById('categoryInput');
-        const suggestions = document.getElementById('categorySuggestions');
-        const hiddenId = document.getElementById('categoryId');
+        const matInput = document.getElementById('materialInput');
+        const matSuggestions = document.getElementById('materialSuggestions');
+        const matHiddenId = document.getElementById('materialId');
 
-        input.addEventListener('input', function() {
+        matInput.addEventListener('focus', function() {
+            if (matInput.value.trim() === '') {
+                showSuggestions(materials);
+            }
+        });
+        matInput.addEventListener('click', function() {
+            if (matInput.value.trim() === '') {
+                showSuggestions(materials);
+            }
+        });
+
+        // Khi nhập ký tự thì lọc lại
+        matInput.addEventListener('input', function() {
             const value = this.value.trim().toLowerCase();
-            suggestions.innerHTML = '';
-            hiddenId.value = '';
+            matSuggestions.innerHTML = '';
+            matHiddenId.value = '';
             if (value.length === 0) {
-                suggestions.style.display = 'none';
+                showSuggestions(materials);
                 return;
             }
-            const matches = categories.filter(cat => cat.name.toLowerCase().includes(value));
-            if (matches.length === 0) {
-                suggestions.style.display = 'none';
+            const matches = materials.filter(mat => mat.name.toLowerCase().includes(value) || mat.code.toLowerCase().includes(value));
+            showSuggestions(matches);
+        });
+
+        function showSuggestions(list) {
+            matSuggestions.innerHTML = '';
+            if (list.length === 0) {
+                matSuggestions.style.display = 'none';
                 return;
             }
-            matches.forEach(cat => {
+            list.forEach(mat => {
                 const item = document.createElement('button');
                 item.type = 'button';
                 item.className = 'list-group-item list-group-item-action';
-                item.textContent = cat.name;
+                item.innerHTML = `<b>${mat.name}</b> <span style='color:gray'>(Code: ${mat.code})</span>`;
                 item.onclick = function() {
-                    input.value = cat.name;
-                    hiddenId.value = cat.id;
-                    suggestions.innerHTML = '';
-                    suggestions.style.display = 'none';
+                    matInput.value = mat.name;
+                    matHiddenId.value = mat.id;
+                    matSuggestions.innerHTML = '';
+                    matSuggestions.style.display = 'none';
                 };
-                suggestions.appendChild(item);
+                matSuggestions.appendChild(item);
             });
-            suggestions.style.display = 'block';
-        });
+            matSuggestions.style.display = 'block';
+        }
 
         // Ẩn gợi ý khi click ra ngoài
         document.addEventListener('click', function(e) {
-            if (!input.contains(e.target) && !suggestions.contains(e.target)) {
-                suggestions.innerHTML = '';
-                suggestions.style.display = 'none';
+            if (!matInput.contains(e.target) && !matSuggestions.contains(e.target)) {
+                matSuggestions.innerHTML = '';
+                matSuggestions.style.display = 'none';
             }
         });
     </script>

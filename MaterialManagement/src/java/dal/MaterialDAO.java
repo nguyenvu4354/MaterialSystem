@@ -295,7 +295,7 @@ public class MaterialDAO extends DBContext {
     // Phương thức lấy danh sách tất cả sản phẩm
     public List<Material> getAllProducts() {
         List<Material> list = new ArrayList<>();
-        String sql = "SELECT m.*, u.unit_name, c.category_name "
+        String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, m.material_status, m.created_at, m.updated_at, m.disable, u.unit_id, u.unit_name, c.category_id, c.category_name "
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id";
@@ -692,17 +692,7 @@ public class MaterialDAO extends DBContext {
 
             List<Object> params = new ArrayList<>();
 
-            // Thêm điều kiện lọc theo giá
-            if (minPrice != null) {
-                sql.append("AND m.price >= ? ");
-                params.add(minPrice);
-            }
-            if (maxPrice != null) {
-                sql.append("AND m.price <= ? ");
-                params.add(maxPrice);
-            }
-
-            // Xử lý sắp xếp
+            // Xử lý sắp xếp (bỏ price)
             String sortBy = "m.material_code"; // default
             String sortOrder = "ASC";
 
@@ -721,14 +711,6 @@ public class MaterialDAO extends DBContext {
                     break;
                 case "code_desc":
                     sortBy = "m.material_code";
-                    sortOrder = "DESC";
-                    break;
-                case "price_asc":
-                    sortBy = "m.price";
-                    sortOrder = "ASC";
-                    break;
-                case "price_desc":
-                    sortBy = "m.price";
                     sortOrder = "DESC";
                     break;
             }
