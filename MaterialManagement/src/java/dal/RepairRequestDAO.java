@@ -13,9 +13,8 @@ import java.util.List;
 public class RepairRequestDAO extends DBContext {
 
     public boolean createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
-        String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, repair_person_phone_number, repair_person_email, "
-                + "repair_location, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String detailSql = "INSERT INTO Repair_Request_Details "
                 + "(repair_request_id, material_id, quantity, damage_description, repair_cost, supplier_id, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -29,16 +28,13 @@ public class RepairRequestDAO extends DBContext {
             // Insert into Repair_Requests
             psRequest.setString(1, request.getRequestCode());
             psRequest.setInt(2, request.getUserId());
-            psRequest.setString(3, request.getRepairPersonPhoneNumber());
-            psRequest.setString(4, request.getRepairPersonEmail());
-            psRequest.setString(5, request.getRepairLocation());
-            psRequest.setDate(6, request.getEstimatedReturnDate());
-            psRequest.setString(7, request.getReason());
-            psRequest.setString(8, request.getStatus());
-            psRequest.setTimestamp(9, request.getRequestDate());
-            psRequest.setTimestamp(10, request.getCreatedAt());
-            psRequest.setTimestamp(11, request.getUpdatedAt());
-            psRequest.setBoolean(12, request.isDisable());
+            psRequest.setDate(3, request.getEstimatedReturnDate());
+            psRequest.setString(4, request.getReason());
+            psRequest.setString(5, request.getStatus());
+            psRequest.setTimestamp(6, request.getRequestDate());
+            psRequest.setTimestamp(7, request.getCreatedAt());
+            psRequest.setTimestamp(8, request.getUpdatedAt());
+            psRequest.setBoolean(9, request.isDisable());
             psRequest.executeUpdate();
 
             // Get generated repair request ID
@@ -127,9 +123,6 @@ public class RepairRequestDAO extends DBContext {
                     request.setUserId(rs.getInt("user_id"));
                     request.setFullName(rs.getString("full_name"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
-                    request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                    request.setRepairPersonEmail(rs.getString("repair_person_email"));
-                    request.setRepairLocation(rs.getString("repair_location"));
                     request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     request.setStatus(rs.getString("status"));
                     request.setReason(rs.getString("reason"));
@@ -251,9 +244,6 @@ public class RepairRequestDAO extends DBContext {
                     req.setUserId(rs.getInt("user_id"));
                     req.setFullName(rs.getString("full_name"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
-                    req.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                    req.setRepairPersonEmail(rs.getString("repair_person_email"));
-                    req.setRepairLocation(rs.getString("repair_location"));
                     req.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     req.setReason(rs.getString("reason"));
                     req.setStatus(rs.getString("status"));
@@ -279,9 +269,6 @@ public class RepairRequestDAO extends DBContext {
                     req.setUserId(rs.getInt("user_id"));
                     req.setFullName(rs.getString("full_name"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
-                    req.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                    req.setRepairPersonEmail(rs.getString("repair_person_email"));
-                    req.setRepairLocation(rs.getString("repair_location"));
                     req.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     req.setReason(rs.getString("reason"));
                     req.setStatus(rs.getString("status"));
@@ -306,9 +293,6 @@ public class RepairRequestDAO extends DBContext {
                     request.setUserId(rs.getInt("user_id"));
                     request.setFullName(rs.getString("full_name"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
-                    request.setRepairPersonPhoneNumber(rs.getString("repair_person_phone_number"));
-                    request.setRepairPersonEmail(rs.getString("repair_person_email"));
-                    request.setRepairLocation(rs.getString("repair_location"));
                     request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     request.setStatus(rs.getString("status"));
                     request.setReason(rs.getString("reason"));
