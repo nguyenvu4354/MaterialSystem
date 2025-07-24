@@ -15,7 +15,7 @@ public class ExportRequestDetailDAO extends DBContext {
         connection = getConnection();
         List<ExportRequestDetail> details = new ArrayList<>();
         String sql = "SELECT erd.detail_id, erd.export_request_id, erd.material_id, "
-                + "erd.quantity, erd.export_condition, erd.created_at, erd.updated_at, "
+                + "erd.quantity, erd.status, erd.created_at, erd.updated_at, "
                 + "m.material_code, m.material_name, m.materials_url, u.unit_name as material_unit "
                 + "FROM Export_Request_Details erd "
                 + "JOIN Materials m ON erd.material_id = m.material_id "
@@ -34,7 +34,7 @@ public class ExportRequestDetailDAO extends DBContext {
                     detail.setMaterialName(rs.getString("material_name"));
                     detail.setMaterialUnit(rs.getString("material_unit"));
                     detail.setQuantity(rs.getInt("quantity"));
-                    detail.setExportCondition(rs.getString("export_condition"));
+                    detail.setStatus(rs.getString("status"));
                     String rawUrl = rs.getString("materials_url");
                     String imgUrl = rawUrl;
                     if (imgUrl != null && !imgUrl.isEmpty() && !imgUrl.startsWith("/") && !imgUrl.startsWith("http") && !imgUrl.startsWith("images/material/")) {

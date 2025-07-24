@@ -97,7 +97,6 @@ public class AddMaterialServlet extends HttpServlet {
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
             String priceStr = request.getParameter("price");
-            String conditionPercentageStr = request.getParameter("conditionPercentage");
             String categoryIdStr = request.getParameter("categoryId");
             String unitIdStr = request.getParameter("unitId");
             String urlInput = request.getParameter("materialsUrl");
@@ -107,13 +106,12 @@ public class AddMaterialServlet extends HttpServlet {
             System.out.println("materialName: " + materialName);
             System.out.println("materialStatus: " + materialStatus);
             System.out.println("price: " + priceStr);
-            System.out.println("conditionPercentage: " + conditionPercentageStr);
             System.out.println("categoryId: " + categoryIdStr);
             System.out.println("unitId: " + unitIdStr);
             System.out.println("materialsUrl: " + urlInput);
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
-                materialCode, materialName, materialStatus, priceStr, conditionPercentageStr, categoryIdStr, unitIdStr);
+                materialCode, materialName, materialStatus, categoryIdStr, unitIdStr);
 
             if (!errors.isEmpty()) {
                 Material m = new Material();
@@ -169,7 +167,6 @@ public class AddMaterialServlet extends HttpServlet {
 
             int categoryId = Integer.parseInt(categoryIdStr);
             int unitId = Integer.parseInt(unitIdStr);
-            int conditionPercentage = Integer.parseInt(conditionPercentageStr);
             double price = Double.parseDouble(priceStr);
 
             Material m = new Material();

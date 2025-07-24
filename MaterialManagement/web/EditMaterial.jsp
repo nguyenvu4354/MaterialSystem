@@ -77,7 +77,6 @@
 
                     <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
                        String nameError = (errors != null) ? errors.get("materialName") : null;
-                       String priceError = (errors != null) ? errors.get("price") : null;
                     %>
 
                     <% if (errors != null && !errors.isEmpty()) { %>
@@ -159,18 +158,6 @@
                             </div>
                         </div>
 
-                        <!-- Chất lượng và giá -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="conditionPercentage" class="form-label">Condition (%)</label>
-                                <input class="form-control" id="conditionPercentage" name="conditionPercentage" value="${param.conditionPercentage != null ? param.conditionPercentage : m.conditionPercentage}">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="price" class="form-label">Price (VNĐ)</label>
-                                <input id="price" name="price" class="form-control" value="${param.price != null ? param.price : m.price}">
-                            </div>
-                        </div>
-
                         <!-- Danh mục và đơn vị -->
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -196,9 +183,9 @@
                             <div class="col-md-6">
                                 <label for="materialStatus" class="form-label">Status</label>
                                 <select class="form-select" id="materialStatus" name="materialStatus">
-                                    <option value="NEW" <c:if test="${param.materialStatus != null ? param.materialStatus == 'NEW' : m.materialStatus == 'NEW'}">selected</c:if>>New</option>
-                                    <option value="USED" <c:if test="${param.materialStatus != null ? param.materialStatus == 'USED' : m.materialStatus == 'USED'}">selected</c:if>>Used</option>
-                                    <option value="DAMAGED" <c:if test="${param.materialStatus != null ? param.materialStatus == 'DAMAGED' : m.materialStatus == 'DAMAGED'}">selected</c:if>>Damaged</option>
+                                    <option value="new" <c:if test="${param.materialStatus != null ? param.materialStatus == 'new' : m.materialStatus == 'new'}">selected</c:if>>New</option>
+                                    <option value="used" <c:if test="${param.materialStatus != null ? param.materialStatus == 'used' : m.materialStatus == 'used'}">selected</c:if>>Used</option>
+                                    <option value="damaged" <c:if test="${param.materialStatus != null ? param.materialStatus == 'damaged' : m.materialStatus == 'damaged'}">selected</c:if>>Damaged</option>
                                 </select>
                             </div>
                         </div>

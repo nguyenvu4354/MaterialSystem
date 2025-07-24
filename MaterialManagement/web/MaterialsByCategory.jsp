@@ -119,8 +119,7 @@
                                 <th style="width: 180px;">Material Name</th>
                                 <th style="width: 100px;">Code</th>
                                 <th style="width: 90px;">Status</th>
-                                <th style="width: 80px;">Condition (%)</th>
-                                <th style="width: 80px;">Price ($)</th>
+                                <th style="width: 80px;">Status</th>
                                 <th style="width: 70px;">Unit</th>
                                 <th style="width: 120px;">Category</th>
                                 <th style="width: 120px;">Created At</th>
@@ -138,13 +137,14 @@
                                     <td>${material.materialName}</td>
                                     <td class="text-center">${material.materialCode}</td>
                                     <td class="text-center">
-                                        <span class="status-${material.materialStatus == 'new' ? 'new' : material.materialStatus == 'used' ? 'used' : 'damaged'}">
-                                            ${material.materialStatus}
+                                        <span class="badge ${material.materialStatus == 'new' ? 'bg-success' : (material.materialStatus == 'used' ? 'bg-warning' : 'bg-danger')}">
+                                            ${material.materialStatus == 'new' ? 'Mới' : (material.materialStatus == 'used' ? 'Đã sử dụng' : 'Hỏng')}
                                         </span>
                                     </td>
-                                    <td class="text-end">${material.conditionPercentage} %</td>
                                     <td class="text-end">
-                                        $<fmt:formatNumber value="${material.price != null ? material.price : 0}" type="number" pattern="#,##0.00" />
+                                        <span class="badge ${material.materialStatus == 'new' ? 'bg-success' : (material.materialStatus == 'used' ? 'bg-warning' : 'bg-danger')}">
+                                            ${material.materialStatus == 'new' ? 'New' : (material.materialStatus == 'used' ? 'Used' : 'Damaged')}
+                                        </span>
                                     </td>
                                     <td class="text-center">${material.unit != null ? material.unit.unitName : 'N/A'}</td>
                                     <td class="text-center">${material.category != null ? material.category.category_name : 'N/A'}</td>

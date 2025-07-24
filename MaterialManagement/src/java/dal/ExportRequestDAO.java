@@ -245,14 +245,14 @@ public class ExportRequestDAO extends DBContext {
                     }
                 }
             }
-            String detailSql = "INSERT INTO Export_Request_Details (export_request_id, material_id, quantity, export_condition) "
+            String detailSql = "INSERT INTO Export_Request_Details (export_request_id, material_id, quantity, status) "
                              + "VALUES (?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(detailSql)) {
                 for (ExportRequestDetail detail : details) {
                     ps.setInt(1, request.getExportRequestId());
                     ps.setInt(2, detail.getMaterialId());
                     ps.setInt(3, detail.getQuantity());
-                    ps.setString(4, detail.getExportCondition());
+                    ps.setString(4, detail.getStatus());
                     ps.addBatch();
                 }
                 ps.executeBatch();

@@ -134,26 +134,14 @@
                         </div>
                     </div>
 
-                    <!-- Price and Condition -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="price" class="form-label required-field">Price ($)</label>
-                            <input type="number" class="form-control" id="price" name="price" value="${param.price != null ? param.price : (price != null ? price : '')}">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="conditionPercentage" class="form-label required-field">Condition (%)</label>
-                            <input type="number" class="form-control" id="conditionPercentage" name="conditionPercentage" value="${param.conditionPercentage != null ? param.conditionPercentage : (conditionPercentage != null ? conditionPercentage : '100')}">
-                        </div>
-                    </div>
-
                     <!-- Material Status -->
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="materialStatus" class="form-label required-field">Status</label>
+                            <label for="materialStatus" class="form-label">Status</label>
                             <select class="form-select" id="materialStatus" name="materialStatus">
-                                <option value="NEW" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'NEW'}">selected</c:if>>New</option>
-                                <option value="USED" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'USED'}">selected</c:if>>Used</option>
-                                <option value="DAMAGED" <c:if test="${(param.materialStatus != null ? param.materialStatus : materialStatus) == 'DAMAGED'}">selected</c:if>>Damaged</option>
+                                <option value="new" <c:if test="${param.materialStatus == 'new'}">selected</c:if>>New</option>
+                                <option value="used" <c:if test="${param.materialStatus == 'used'}">selected</c:if>>Used</option>
+                                <option value="damaged" <c:if test="${param.materialStatus == 'damaged'}">selected</c:if>>Damaged</option>
                             </select>
                         </div>
                     </div>

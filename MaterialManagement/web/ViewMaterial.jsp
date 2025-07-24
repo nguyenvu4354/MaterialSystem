@@ -151,25 +151,9 @@
                         <div class="detail-row">
                             <div class="detail-label">Status</div>
                             <div>
-                                <span class="status-badge status-${empty m.materialStatus ? 'unknown' : m.materialStatus.toLowerCase()}">
-                                    ${empty m.materialStatus ? 'Không có thông tin' : m.materialStatus}
+                                <span class="badge ${m.materialStatus == 'new' ? 'bg-success' : (m.materialStatus == 'used' ? 'bg-warning' : 'bg-danger')}">
+                                  ${m.materialStatus == 'new' ? 'New' : (m.materialStatus == 'used' ? 'Used' : 'Damaged')}
                                 </span>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Condition</div>
-                            <div>
-                                ${m.conditionPercentage != null ? m.conditionPercentage : 'Không có thông tin'}%
-
-                                <div class="progress condition-bar">
-                                    <div class="progress-bar ${m.conditionPercentage >= 70 ? 'bg-success' : m.conditionPercentage >= 40 ? 'bg-warning' : 'bg-danger'}" role="progressbar" style="width: ${m.conditionPercentage != null ? m.conditionPercentage : 0}%" aria-valuenow="${m.conditionPercentage != null ? m.conditionPercentage : 0}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-label">Price</div>
-                            <div class="h4">
-                                <fmt:formatNumber value="${m.price}" type="currency" currencySymbol="VNĐ"/>
                             </div>
                         </div>
                         <div class="row mb-2">
