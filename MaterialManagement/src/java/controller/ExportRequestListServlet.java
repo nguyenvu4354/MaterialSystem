@@ -95,12 +95,7 @@ public class ExportRequestListServlet extends HttpServlet {
         }
         int totalItems = exportRequestDAO.getTotalCount(status, search);
         int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
-        List<Integer> recipientIds = exportRequestDAO.getAllRecipientUserIds();
         List<User> recipients = new java.util.ArrayList<>();
-        for (Integer rid : recipientIds) {
-            User recipient = userDAO.getUserById(rid);
-            if (recipient != null) recipients.add(recipient);
-        }
         request.setAttribute("recipients", recipients);
         request.setAttribute("exportRequests", exportRequests);
         request.setAttribute("currentPage", page);

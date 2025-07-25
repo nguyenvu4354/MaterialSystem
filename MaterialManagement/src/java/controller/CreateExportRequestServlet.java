@@ -92,7 +92,6 @@ public class CreateExportRequestServlet extends HttpServlet {
             String requestCode = request.getParameter("requestCode");
             String deliveryDateStr = request.getParameter("deliveryDate");
             String reason = request.getParameter("reason");
-            String recipientIdStr = request.getParameter("recipientId");
             if (requestCode == null || requestCode.trim().isEmpty() ||
                 deliveryDateStr == null || deliveryDateStr.trim().isEmpty() ||
                 reason == null || reason.trim().isEmpty()) {
@@ -105,26 +104,16 @@ public class CreateExportRequestServlet extends HttpServlet {
             if (deliveryLocalDate.isBefore(today)) {
                 throw new Exception("Delivery date cannot be in the past. Please select today or a future date.");
             }
-            int recipientId = 0;
-            if (recipientIdStr != null && !recipientIdStr.trim().isEmpty()) {
-                recipientId = Integer.parseInt(recipientIdStr);
-                User recipient = userDAO.getUserById(recipientId);
-                if (recipient == null || recipient.getRoleId() != 3) {
-                    throw new Exception("Recipient must be a valid staff member.");
-                }
-            }
             ExportRequest exportRequest = new ExportRequest();
             exportRequest.setRequestCode(requestCode);
             exportRequest.setDeliveryDate(deliveryDate);
             exportRequest.setReason(reason);
             exportRequest.setUserId(user.getUserId());
-            exportRequest.setRecipientId(recipientId);
             exportRequest.setStatus("pending");
             String[] materialIds = request.getParameterValues("materials[]");
             String[] quantities = request.getParameterValues("quantities[]");
-            String[] statuses = request.getParameterValues("statuses[]");
-            if (materialIds == null || quantities == null || statuses == null ||
-                materialIds.length == 0 || quantities.length == 0 || statuses.length == 0) {
+            if (materialIds == null || quantities == null ||
+                materialIds.length == 0 || quantities.length == 0) {
                 throw new Exception("At least one material is required.");
             }
             java.util.Map<Integer, Integer> materialQuantityMap = new java.util.HashMap<>();
@@ -132,18 +121,13 @@ public class CreateExportRequestServlet extends HttpServlet {
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
-                String status = statuses[i];
                 if (quantity <= 0) {
                     throw new Exception("Quantity must be positive.");
-                }
-                if (!List.of("new", "used", "damaged").contains(status)) {
-                    throw new Exception("Invalid material status.");
                 }
                 materialQuantityMap.put(materialId, materialQuantityMap.getOrDefault(materialId, 0) + quantity);
                 ExportRequestDetail detail = new ExportRequestDetail();
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
-                detail.setStatus(status);
                 details.add(detail);
             }
             for (Integer materialId : materialQuantityMap.keySet()) {

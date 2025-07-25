@@ -39,7 +39,13 @@
     </style>
 </head>
 <body>
-<jsp:include page="Header.jsp"/>
+<jsp:include page="Header.jsp" />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 bg-light p-0">
+            <jsp:include page="SidebarEmployee.jsp" />
+        </div>
+        <div class="col-md-9 col-lg-10">
 
 <section id="create-purchase-order" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
     <div class="container">
@@ -187,5 +193,9 @@
     });
     
 </script>
+</div>
+</div>
+</div>
+<jsp:include page="Footer.jsp" />
 </body>
 </html> 
