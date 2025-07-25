@@ -539,6 +539,48 @@
                 color: #fff !important;
                 box-shadow: 0 4px 18px rgba(222,173,111,0.18);
             }
+            .dashboard-card {
+                min-height: 170px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                background: #fffbe9;
+                border: 2px solid #DEAD6F;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.08);
+                margin-bottom: 16px;
+                transition: box-shadow 0.2s, transform 0.2s;
+            }
+            .dashboard-card:hover {
+                box-shadow: 0 6px 24px rgba(222,173,111,0.18);
+                transform: scale(1.03);
+            }
+            .dashboard-card .card-title {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 8px;
+            }
+            .dashboard-card .card-text {
+                font-size: 2rem;
+                font-weight: 700;
+            }
+            .dashboard-row-scroll {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 24px;
+                padding-bottom: 8px;
+                margin-left: -8px;
+                margin-right: -8px;
+            }
+            .dashboard-row-scroll .dashboard-card {
+                min-width: 240px;
+                max-width: 260px;
+                flex: 0 0 auto;
+            }
         </style>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -557,118 +599,92 @@
 
         <!-- DASHBOARD OVERVIEW (clickable cards) -->
         <div class="container my-4">
-            <div class="row g-4">
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3 || sessionScope.user.roleId == 4}">
-                    <div class="col-md-3">
-                        <a href="dashboardmaterial" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-boxes fa-2x mb-2" style="color:#DEAD6F;"></i>
-                                    <h5 class="card-title" style="color:#cfa856;">Total Materials</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#DEAD6F;">${materialCount}</p>
-                                </div>
-                            </div>
-                        </a>
+            <div class="dashboard-row-scroll mb-4">
+                <!-- Nhóm 1: Quản lý vật tư/kho (mọi role đều thấy) -->
+                <a href="dashboardmaterial" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-boxes fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title" style="color:#cfa856;">Total Materials</h5>
+                        <p class="card-text" style="color:#DEAD6F;">${materialCount}</p>
                     </div>
-                </c:if>
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
-                    <div class="col-md-3">
-                        <a href="ExportRequestList" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-file-signature fa-2x mb-2" style="color:#cfa856;"></i>
-                                    <h5 class="card-title" style="color:#cfa856;">Pending Export Requests</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#cfa856;">${pendingExportRequestCount}</p>
-                                </div>
-                            </div>
-                        </a>
+                </a>
+                <a href="StaticInventory" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-warehouse fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title" style="color:#cfa856;">Total Inventory</h5>
+                        <p class="card-text" style="color:#DEAD6F;">${totalStock}</p>
                     </div>
-                </c:if>
+                </a>
+                <a href="StaticInventory?stockFilter=low" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color:#e67e22;"></i>
+                        <h5 class="card-title" style="color:#e67e22;">Low Stock Materials</h5>
+                        <p class="card-text" style="color:#e67e22;">${lowStockCount}</p>
+                    </div>
+                </a>
+                <a href="StaticInventory?stockFilter=zero" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-times-circle fa-2x mb-2" style="color:#e74c3c;"></i>
+                        <h5 class="card-title" style="color:#e74c3c;">Out of Stock</h5>
+                        <p class="card-text" style="color:#e74c3c;">${outOfStockCount}</p>
+                    </div>
+                </a>
+
+                <!-- Nhóm 2: Quản lý yêu cầu (Admin, Warehouse, Director) -->
                 <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                    <div class="col-md-3">
-                        <a href="StaticInventory" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-warehouse fa-2x mb-2" style="color:#DEAD6F;"></i>
-                                    <h5 class="card-title" style="color:#cfa856;">Total Inventory</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#DEAD6F;">${totalStock}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="ExportRequestList" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-file-signature fa-2x mb-2" style="color:#cfa856;"></i>
+                            <h5 class="card-title" style="color:#cfa856;">Pending Export Requests</h5>
+                            <p class="card-text" style="color:#cfa856;">${pendingExportRequestCount}</p>
+                        </div>
+                    </a>
+                    <a href="ListPurchaseRequests" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-shopping-cart fa-2x mb-2" style="color:#198754;"></i>
+                            <h5 class="card-title" style="color:#198754;">Pending Purchase Requests</h5>
+                            <p class="card-text" style="color:#198754;">${pendingPurchaseRequestCount}</p>
+                        </div>
+                    </a>
+                    <a href="repairrequestlist" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-tools fa-2x mb-2" style="color:#0dcaf0;"></i>
+                            <h5 class="card-title" style="color:#0dcaf0;">Pending Repair Requests</h5>
+                            <p class="card-text" style="color:#0dcaf0;">${pendingRepairRequestCount}</p>
+                        </div>
+                    </a>
                 </c:if>
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                    <div class="col-md-3">
-                        <a href="StaticInventory?stockFilter=low" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color:#e67e22;"></i>
-                                    <h5 class="card-title" style="color:#e67e22;">Low Stock Materials</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#e67e22;">${lowStockCount}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </c:if>
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                    <div class="col-md-3">
-                        <a href="StaticInventory?stockFilter=zero" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-times-circle fa-2x mb-2" style="color:#e74c3c;"></i>
-                                    <h5 class="card-title" style="color:#e74c3c;">Out of Stock</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#e74c3c;">
-                                        ${outOfStockCount}
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </c:if>
-                <!-- Pending Purchase Requests -->
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                    <div class="col-md-3">
-                        <a href="ListPurchaseRequests" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-shopping-cart fa-2x mb-2" style="color:#198754;"></i>
-                                    <h5 class="card-title" style="color:#198754;">Pending Purchase Requests</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#198754;">${pendingPurchaseRequestCount}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </c:if>
-                <!-- Pending Repair Requests -->
-                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
-                    <div class="col-md-3">
-                        <a href="repairrequestlist" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-tools fa-2x mb-2" style="color:#0dcaf0;"></i>
-                                    <h5 class="card-title" style="color:#0dcaf0;">Pending Repair Requests</h5>
-                                    <p class="card-text fs-4 fw-bold" style="color:#0dcaf0;">${pendingRepairRequestCount}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </c:if>
-                <!-- My Requests (for employee) -->
+
+                <!-- Nhóm 2: My Requests (Employee) -->
                 <c:if test="${sessionScope.user.roleId == 4}">
-                    <div class="col-md-3">
-                        <a href="ListPurchaseRequests" style="text-decoration:none;">
-                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
-                                <div class="card-body">
-                                    <i class="fas fa-user-check fa-2x mb-2" style="color:#cfa856;"></i>
-                                    <h5 class="card-title" style="color:#cfa856;">My Requests</h5>
-                                    <p class="card-text fs-5 fw-bold" style="color:#cfa856;">
-                                        Purchase: ${myPurchaseRequestCount}<br/>
-                                        Repair: ${myRepairRequestCount}
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="ListPurchaseRequests" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-user-check fa-2x mb-2" style="color:#cfa856;"></i>
+                            <h5 class="card-title" style="color:#cfa856;">My Requests</h5>
+                            <p class="card-text fs-5 fw-bold" style="color:#cfa856;">
+                                Purchase: ${myPurchaseRequestCount}<br/>
+                                Repair: ${myRepairRequestCount}
+                            </p>
+                        </div>
+                    </a>
+                </c:if>
+
+                <!-- Nhóm 3: Quản trị hệ thống (Admin) -->
+                <c:if test="${sessionScope.user.roleId == 1}">
+                    <a href="UserList" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-users fa-2x mb-2" style="color:#6c757d;"></i>
+                            <h5 class="card-title" style="color:#6c757d;">Total Users</h5>
+                            <p class="card-text" style="color:#6c757d;">${totalUserCount}</p>
+                        </div>
+                    </a>
+                    <a href="RolePermission" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-key fa-2x mb-2" style="color:#ffc107;"></i>
+                            <h5 class="card-title" style="color:#ffc107;">Total Permissions</h5>
+                            <p class="card-text" style="color:#ffc107;">${totalPermissionCount}</p>
+                        </div>
+                    </a>
                 </c:if>
             </div>
         </div>
