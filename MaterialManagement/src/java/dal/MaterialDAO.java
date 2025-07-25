@@ -34,8 +34,7 @@ public class MaterialDAO extends DBContext {
             List<Object> params = new ArrayList<>();
 
             if (keyword != null && !keyword.isEmpty()) {
-                sql.append("AND (m.material_name LIKE ? OR m.material_code LIKE ?) ");
-                params.add("%" + keyword + "%");
+                sql.append("AND m.material_name LIKE ? ");
                 params.add("%" + keyword + "%");
             }
 
@@ -354,7 +353,7 @@ public class MaterialDAO extends DBContext {
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "WHERE m.material_name LIKE ?";
+                + "WHERE m.material_name LIKE ? AND m.disable = 0";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + keyword + "%");
@@ -403,7 +402,7 @@ public class MaterialDAO extends DBContext {
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "WHERE m.material_code LIKE ?";
+                + "WHERE m.material_code LIKE ? AND m.disable = 0";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, "%" + materialCode + "%");
@@ -453,7 +452,7 @@ public class MaterialDAO extends DBContext {
                 + "FROM Materials m "
                 + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "LEFT JOIN Categories c ON m.category_id = c.category_id "
-                + "WHERE m.category_id = ?";
+                + "WHERE m.category_id = ? AND m.disable = 0";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, categoryId);
@@ -644,7 +643,7 @@ public class MaterialDAO extends DBContext {
 
     public List<Material> getAllMaterials() {
         List<Material> list = new ArrayList<>();
-        String sql = "SELECT * FROM Materials";
+        String sql = "SELECT * FROM Materials WHERE disable = 0";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -760,4 +759,50 @@ public class MaterialDAO extends DBContext {
         return list;
     }
 
+    // Kiểm tra tên vật tư và trạng thái đã tồn tại chưa
+    public boolean isMaterialNameAndStatusExists(String materialName, String materialStatus) {
+        String sql = "SELECT 1 FROM materials WHERE material_name = ? AND material_status = ? LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, materialName);
+            ps.setString(2, materialStatus);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Lấy vật tư theo tên và trạng thái
+    public Material getInformationByNameAndStatus(String name, String status) {
+        String sql = "SELECT * FROM materials WHERE material_name = ? AND material_status = ? LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, status);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Material m = new Material();
+                m.setMaterialId(rs.getInt("material_id"));
+                m.setMaterialCode(rs.getString("material_code"));
+                m.setMaterialName(rs.getString("material_name"));
+                m.setMaterialsUrl(rs.getString("materials_url"));
+                m.setMaterialStatus(rs.getString("material_status"));
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setUpdatedAt(rs.getTimestamp("updated_at"));
+                m.setDisable(rs.getBoolean("disable"));
+                // Set category
+                Category c = new Category();
+                c.setCategory_id(rs.getInt("category_id"));
+                m.setCategory(c);
+                // Set unit
+                Unit u = new Unit();
+                u.setId(rs.getInt("unit_id"));
+                m.setUnit(u);
+                return m;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

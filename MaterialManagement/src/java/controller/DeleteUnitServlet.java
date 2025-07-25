@@ -26,7 +26,7 @@ public class DeleteUnitServlet extends HttpServlet {
         }
         dal.UnitDAO unitDAO = new dal.UnitDAO();
         int id = Integer.parseInt(request.getParameter("id"));
-        unitDAO.deleteUnit(id);
+        unitDAO.deleteUnitAndMaterials(id);
         response.sendRedirect("UnitList");
     }
 }

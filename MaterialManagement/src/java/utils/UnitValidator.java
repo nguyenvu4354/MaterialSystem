@@ -17,6 +17,13 @@ public class UnitValidator {
             errors.put("unitName", "Unit name cannot contain special characters.");
         }
 
+        // Khi kiểm tra trùng tên, chỉ trả về thông báo lỗi 'Unit name already exists.'
+        if (unit.getUnitName() != null && !unit.getUnitName().trim().isEmpty()) {
+            if (unitDAO.isUnitNameExists(unit.getUnitName())) {
+                errors.put("unitName", "Unit name already exists.");
+            }
+        }
+
         // Validate symbol
         if (unit.getSymbol() == null || unit.getSymbol().trim().isEmpty()) {
             errors.put("symbol", "Unit symbol cannot be empty.");
@@ -47,6 +54,18 @@ public class UnitValidator {
             errors.put("unitName", "Unit name cannot be empty.");
         } else if (!unit.getUnitName().matches("^[a-zA-Z0-9\\sÀ-ỹà-ỹ.,-]+$")) {
             errors.put("unitName", "Unit name cannot contain special characters.");
+        }
+
+        // Kiểm tra trùng tên đơn vị khi cập nhật (không tính chính nó)
+        if (unit.getUnitName() != null && !unit.getUnitName().trim().isEmpty()) {
+            if (unitDAO.isUnitNameExists(unit.getUnitName())) {
+                Unit existing = unitDAO.getAllUnits().stream()
+                    .filter(u -> u.getUnitName().equalsIgnoreCase(unit.getUnitName()))
+                    .findFirst().orElse(null);
+                if (existing != null && existing.getId() != unit.getId()) {
+                    errors.put("unitName", "Unit name already exists.");
+                }
+            }
         }
 
         // Validate symbol

@@ -16,11 +16,6 @@ public class PurchaseRequestValidator {
             errors.put("reason", "Reason for request cannot be empty.");
         }
 
-        // Validate estimatedPrice
-        if (purchaseRequest.getEstimatedPrice() < 0) {
-            errors.put("estimatedPrice", "Estimated price must be greater than or equal to 0.");
-        }
-
         // Validate userId
         if (purchaseRequest.getUserId() <= 0) {
             errors.put("userId", "Invalid user ID.");
@@ -34,28 +29,13 @@ public class PurchaseRequestValidator {
         return errors;
     }
 
-    public static Map<String, String> validatePurchaseRequestFormData(String reason, String estimatedPriceStr) {
+    // validatePurchaseRequestFormData chỉ nhận reason, không còn estimatedPriceStr
+    public static Map<String, String> validatePurchaseRequestFormData(String reason) {
         Map<String, String> errors = new HashMap<>();
-
         // Validate reason
         if (reason == null || reason.trim().isEmpty()) {
             errors.put("reason", "Reason for request cannot be empty.");
         }
-
-        // Validate estimatedPrice
-        if (estimatedPriceStr == null || estimatedPriceStr.trim().isEmpty()) {
-            errors.put("estimatedPrice", "Estimated price cannot be empty.");
-        } else {
-            try {
-                double estimatedPrice = Double.parseDouble(estimatedPriceStr);
-                if (estimatedPrice < 0) {
-                    errors.put("estimatedPrice", "Estimated price must be greater than or equal to 0.");
-                }
-            } catch (NumberFormatException e) {
-                errors.put("estimatedPrice", "Invalid estimated price.");
-            }
-        }
-
         return errors;
     }
 

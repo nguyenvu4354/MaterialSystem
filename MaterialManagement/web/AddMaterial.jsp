@@ -69,11 +69,11 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${materialCode}" readonly>
+                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${m != null ? m.materialCode : (param.materialCode != null ? param.materialCode : (materialCode != null ? materialCode : ''))}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="materialName" class="form-label required-field">Material Name</label>
-                            <input type="text" class="form-control" id="materialName" name="materialName" value="${param.materialName != null ? param.materialName : (materialName != null ? materialName : '')}">
+                            <input type="text" class="form-control" id="materialName" name="materialName" value="${m != null ? m.materialName : (param.materialName != null ? param.materialName : (materialName != null ? materialName : ''))}">
                         </div>
                     </div>
 
@@ -108,7 +108,7 @@
                             <!-- Image URL input tab -->
                             <div class="tab-pane fade" id="url-content" role="tabpanel">
                                 <label class="form-label">Or Use Image URL</label>
-                                <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter an image URL from the internet">
+                                <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter an image URL from the internet" value="${m != null ? m.materialsUrl : (param.materialsUrl != null ? param.materialsUrl : '')}">
                                 <div class="form-text">Enter an image URL from the internet</div>
                             </div>
                         </div>
@@ -119,16 +119,16 @@
                         <div class="col-md-6">
                             <label for="categoryInput" class="form-label required-field">Category</label>
                             <div style="position: relative; display: inline-block; width: 100%;">
-                                <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" value="${param.categoryName != null ? param.categoryName : ''}" />
-                                <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : ''}" />
+                                <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" value="${m != null && m.category != null ? m.category.category_name : (param.categoryName != null ? param.categoryName : '')}" />
+                                <input type="hidden" id="categoryId" name="categoryId" value="${m != null && m.category != null ? m.category.category_id : (param.categoryId != null ? param.categoryId : '')}" />
                                 <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label for="unitInput" class="form-label required-field">Unit</label>
                             <div style="position: relative; display: inline-block; width: 100%;">
-                                <input type="text" id="unitInput" name="unitName" class="form-control" placeholder="Unit..." autocomplete="off" value="${param.unitName != null ? param.unitName : ''}" />
-                                <input type="hidden" id="unitId" name="unitId" value="${param.unitId != null ? param.unitId : ''}" />
+                                <input type="text" id="unitInput" name="unitName" class="form-control" placeholder="Unit..." autocomplete="off" value="${m != null && m.unit != null ? m.unit.unitName : (param.unitName != null ? param.unitName : '')}" />
+                                <input type="hidden" id="unitId" name="unitId" value="${m != null && m.unit != null ? m.unit.id : (param.unitId != null ? param.unitId : '')}" />
                                 <div id="unitSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
                             </div>
                         </div>
@@ -139,9 +139,9 @@
                         <div class="col-md-6">
                             <label for="materialStatus" class="form-label">Status</label>
                             <select class="form-select" id="materialStatus" name="materialStatus">
-                                <option value="new" <c:if test="${param.materialStatus == 'new'}">selected</c:if>>New</option>
-                                <option value="used" <c:if test="${param.materialStatus == 'used'}">selected</c:if>>Used</option>
-                                <option value="damaged" <c:if test="${param.materialStatus == 'damaged'}">selected</c:if>>Damaged</option>
+                                <option value="new" <c:if test="${(m != null && m.materialStatus == 'new') || (param.materialStatus == 'new')}">selected</c:if>>New</option>
+                                <option value="used" <c:if test="${(m != null && m.materialStatus == 'used') || (param.materialStatus == 'used')}">selected</c:if>>Used</option>
+                                <option value="damaged" <c:if test="${(m != null && m.materialStatus == 'damaged') || (param.materialStatus == 'damaged')}">selected</c:if>>Damaged</option>
                             </select>
                         </div>
                     </div>

@@ -94,21 +94,36 @@ public class AddMaterialServlet extends HttpServlet {
             request.setCharacterEncoding("UTF-8");
 
             String materialCode = request.getParameter("materialCode");
+            materialCode = materialCode != null ? materialCode.trim() : "";
             String materialName = request.getParameter("materialName");
+            materialName = materialName != null ? materialName.trim() : "";
             String materialStatus = request.getParameter("materialStatus");
-            String priceStr = request.getParameter("price");
+            materialStatus = materialStatus != null ? materialStatus.trim() : "";
             String categoryIdStr = request.getParameter("categoryId");
+            categoryIdStr = categoryIdStr != null ? categoryIdStr.trim() : "";
             String unitIdStr = request.getParameter("unitId");
+            unitIdStr = unitIdStr != null ? unitIdStr.trim() : "";
             String urlInput = request.getParameter("materialsUrl");
+            urlInput = urlInput != null ? urlInput.trim() : "";
 
             System.out.println("🛠️ [AddMaterialServlet] Form Parameters:");
             System.out.println("materialCode: " + materialCode);
             System.out.println("materialName: " + materialName);
             System.out.println("materialStatus: " + materialStatus);
-            System.out.println("price: " + priceStr);
             System.out.println("categoryId: " + categoryIdStr);
             System.out.println("unitId: " + unitIdStr);
             System.out.println("materialsUrl: " + urlInput);
+            // Debug: In ra giá trị thực tế của categoryIdStr và unitIdStr
+            if (categoryIdStr == null || categoryIdStr.isEmpty()) {
+                System.out.println("[DEBUG] categoryIdStr is EMPTY or NULL");
+            } else {
+                System.out.println("[DEBUG] categoryIdStr value: " + categoryIdStr);
+            }
+            if (unitIdStr == null || unitIdStr.isEmpty()) {
+                System.out.println("[DEBUG] unitIdStr is EMPTY or NULL");
+            } else {
+                System.out.println("[DEBUG] unitIdStr value: " + unitIdStr);
+            }
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                 materialCode, materialName, materialStatus, categoryIdStr, unitIdStr);
@@ -165,9 +180,40 @@ public class AddMaterialServlet extends HttpServlet {
                 System.out.println("📎 [AddMaterialServlet] No image provided, using default.jpg");
             }
 
+            // Validate categoryIdStr và unitIdStr trước khi parseInt
+            if (categoryIdStr == null || categoryIdStr.isEmpty()) {
+                request.setAttribute("error", "Bạn phải chọn Category từ danh sách gợi ý.");
+                Material m = new Material();
+                m.setMaterialCode(materialCode);
+                m.setMaterialName(materialName);
+                m.setMaterialStatus(materialStatus);
+                m.setCategory(new Category());
+                m.setUnit(new Unit());
+                request.setAttribute("m", m);
+                request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                request.setAttribute("units", new UnitDAO().getAllUnits());
+                request.setAttribute("materialCode", materialCode);
+                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
+                return;
+            }
+            if (unitIdStr == null || unitIdStr.isEmpty()) {
+                request.setAttribute("error", "Bạn phải chọn Unit từ danh sách gợi ý.");
+                Material m = new Material();
+                m.setMaterialCode(materialCode);
+                m.setMaterialName(materialName);
+                m.setMaterialStatus(materialStatus);
+                m.setCategory(new Category());
+                m.setUnit(new Unit());
+                request.setAttribute("m", m);
+                request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                request.setAttribute("units", new UnitDAO().getAllUnits());
+                request.setAttribute("materialCode", materialCode);
+                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
+                return;
+            }
+
             int categoryId = Integer.parseInt(categoryIdStr);
             int unitId = Integer.parseInt(unitIdStr);
-            double price = Double.parseDouble(priceStr);
 
             Material m = new Material();
             m.setMaterialCode(materialCode);
@@ -194,6 +240,17 @@ public class AddMaterialServlet extends HttpServlet {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("error", "Mã vật tư đã tồn tại.");
+                request.setAttribute("m", m);
+                request.setAttribute("materialCode", materialCode);
+                request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
+                return;
+            }
+
+            // Check for duplicate (name, status)
+            if (md.isMaterialNameAndStatusExists(materialName, materialStatus)) {
+                request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                request.setAttribute("units", new UnitDAO().getAllUnits());
+                request.setAttribute("error", "Tên vật tư đã tồn tại với trạng thái này. Vui lòng chọn tên hoặc trạng thái khác.");
                 request.setAttribute("m", m);
                 request.setAttribute("materialCode", materialCode);
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);

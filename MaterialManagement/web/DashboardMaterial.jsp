@@ -74,6 +74,17 @@
         .condition-bad { 
             background-color: #dc3545; 
         }
+        #materialSuggestions .list-group-item {
+            color: #212529 !important;
+            background: #fff !important;
+            font-size: 16px !important;
+            padding: 8px 12px !important;
+            border-bottom: 1px solid #eee;
+        }
+        #materialSuggestions .list-group-item:hover {
+            background: #f1f1f1 !important;
+            color: #007bff !important;
+        }
     </style>
 </head>
 <body>
@@ -107,11 +118,7 @@
                     <div class="row search-box">
                         <div class="col-md-12">
                             <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
-                                <div style="position: relative; display: inline-block;">
-                                    <input type="text" id="materialInput" name="materialName" class="form-control" placeholder="Material..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialName != null ? param.materialName : ''}" />
-                                    <input type="hidden" id="materialId" name="materialId" value="${param.materialId != null ? param.materialId : ''}" />
-                                    <div id="materialSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 350px; max-height: 250px; overflow-y: auto;"></div>
-                                </div>
+                                <input type="text" id="materialInput" name="materialName" class="form-control" placeholder="Tên vật tư..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialName != null ? param.materialName : ''}" />
                                 <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                     <option value="">All Status</option>
                                     <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
@@ -227,15 +234,15 @@
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Previous</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="dashboardmaterial?page=${i}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">${i}</a>
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&keyword=${keyword}&status=${status}&sortOption=${sortOption}">Next</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -251,69 +258,5 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
-    <script>
-        var materials = [];
-        <c:forEach var="mat" items="${materials}">
-            materials.push({id: ${mat.materialId}, name: "${mat.materialName}", code: "${mat.materialCode}"});
-        </c:forEach>
-
-        const matInput = document.getElementById('materialInput');
-        const matSuggestions = document.getElementById('materialSuggestions');
-        const matHiddenId = document.getElementById('materialId');
-
-        matInput.addEventListener('focus', function() {
-            if (matInput.value.trim() === '') {
-                showSuggestions(materials);
-            }
-        });
-        matInput.addEventListener('click', function() {
-            if (matInput.value.trim() === '') {
-                showSuggestions(materials);
-            }
-        });
-
-        // Khi nhập ký tự thì lọc lại
-        matInput.addEventListener('input', function() {
-            const value = this.value.trim().toLowerCase();
-            matSuggestions.innerHTML = '';
-            matHiddenId.value = '';
-            if (value.length === 0) {
-                showSuggestions(materials);
-                return;
-            }
-            const matches = materials.filter(mat => mat.name.toLowerCase().includes(value) || mat.code.toLowerCase().includes(value));
-            showSuggestions(matches);
-        });
-
-        function showSuggestions(list) {
-            matSuggestions.innerHTML = '';
-            if (list.length === 0) {
-                matSuggestions.style.display = 'none';
-                return;
-            }
-            list.forEach(mat => {
-                const item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'list-group-item list-group-item-action';
-                item.innerHTML = `<b>${mat.name}</b> <span style='color:gray'>(Code: ${mat.code})</span>`;
-                item.onclick = function() {
-                    matInput.value = mat.name;
-                    matHiddenId.value = mat.id;
-                    matSuggestions.innerHTML = '';
-                    matSuggestions.style.display = 'none';
-                };
-                matSuggestions.appendChild(item);
-            });
-            matSuggestions.style.display = 'block';
-        }
-
-        // Ẩn gợi ý khi click ra ngoài
-        document.addEventListener('click', function(e) {
-            if (!matInput.contains(e.target) && !matSuggestions.contains(e.target)) {
-                matSuggestions.innerHTML = '';
-                matSuggestions.style.display = 'none';
-            }
-        });
-    </script>
 </body>
 </html>

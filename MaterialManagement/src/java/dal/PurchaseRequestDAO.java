@@ -125,7 +125,6 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUserId(rs.getInt("user_id"));
                 pr.setRequestDate(rs.getTimestamp("request_date"));
                 pr.setStatus(rs.getString("status"));
-                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
                 pr.setReason(rs.getString("reason"));
                 pr.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 pr.setApprovalReason(rs.getString("approval_reason"));
@@ -162,7 +161,6 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUserId(rs.getInt("user_id"));
                 pr.setRequestDate(rs.getTimestamp("request_date"));
                 pr.setStatus(rs.getString("status"));
-                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
                 pr.setReason(rs.getString("reason"));
 
                 int approvedBy = rs.getInt("approved_by");
@@ -230,7 +228,7 @@ public class PurchaseRequestDAO extends DBContext {
     }
 
     public boolean createPurchaseRequestWithDetails(PurchaseRequest request, List<PurchaseRequestDetail> details) {
-        String insertRequestSQL = "INSERT INTO material_management.purchase_requests (request_code, user_id, request_date, status, estimated_price, reason) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertRequestSQL = "INSERT INTO material_management.purchase_requests (request_code, user_id, request_date, status, reason) VALUES (?, ?, ?, ?, ?)";
         String insertDetailSQL = "INSERT INTO material_management.purchase_request_details (purchase_request_id, material_id, quantity, notes) VALUES (?, ?, ?, ?)";
 
         try {
@@ -241,8 +239,7 @@ public class PurchaseRequestDAO extends DBContext {
                 psRequest.setInt(2, request.getUserId());
                 psRequest.setTimestamp(3, request.getRequestDate());
                 psRequest.setString(4, request.getStatus());
-                psRequest.setDouble(5, request.getEstimatedPrice());
-                psRequest.setString(6, request.getReason());
+                psRequest.setString(5, request.getReason());
 
                 int affectedRows = psRequest.executeUpdate();
                 if (affectedRows == 0) {
@@ -320,7 +317,6 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUserId(rs.getInt("user_id"));
                 pr.setRequestDate(rs.getTimestamp("request_date"));
                 pr.setStatus(rs.getString("status"));
-                pr.setEstimatedPrice(rs.getDouble("estimated_price"));
                 pr.setReason(rs.getString("reason"));
 
                 int approvedBy = rs.getInt("approved_by");
