@@ -6,121 +6,138 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Add Department</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="css/vendor.css">
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
-            body {
-                background-color: #f8f9fa;
-                padding: 20px;
+            .card-header-brown {
+                background-color: #DEB887;
+                color: #fff;
+                font-size: 2rem;
+                font-weight: bold;
+                border-radius: 8px 8px 0 0;
+                padding: 18px 32px;
             }
-            .content {
+            .unit-card {
+                border-radius: 8px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+                background: #fff;
+                max-width: 900px;
+                margin: 40px auto;
+            }
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            .form-control.is-invalid {
+                border-color: #dc3545;
+            }
+            .error-alert {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 5px;
+            }
+            .error-list {
+                margin: 0;
                 padding-left: 20px;
-                font-family: 'Roboto', sans-serif;
             }
-            .form-container .form-control, .form-container .form-select {
-                height: 48px;
-                font-size: 1rem;
+            .error-list li {
+                margin-bottom: 5px;
             }
-            .form-container .form-label {
-                font-size: 0.9rem;
-                margin-bottom: 0.25rem;
+            .btn-brown {
+                background-color: #DEB887 !important;
+                color: #fff !important;
+                border: none;
             }
-            .form-container .btn {
-                font-size: 1rem;
-                padding: 0.75rem;
+            .btn-brown:hover, .btn-brown:focus {
+                background-color: #c49b63 !important;
+                color: #fff !important;
+            }
+            .permission-denied {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+                padding: 20px;
+                border-radius: 5px;
+                text-align: center;
+                margin: 40px auto;
+                max-width: 600px;
             }
         </style>
     </head>
-    <body>
-        <jsp:include page="Header.jsp" />
-
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Sidebar -->
-                <div class="col-md-3 col-lg-2 bg-light p-0">
-                    <jsp:include page="Sidebar.jsp" />
-                </div>
-                <!-- Page Content -->
-                <div class="col-md-9 col-lg-10 px-md-4 py-4">
-                    <section id="AddDepartment" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
-                        <div class="container">
-                            <div class="row my-5 py-5">
-                                <div class="col-10 bg-white p-4 mx-auto rounded shadow form-container">
-                                    <h2 class="display-4 fw-normal text-center mb-4">Add New <span class="text-primary">Department</span></h2>
-
-                                    <c:if test="${not empty error or not empty errors}">
-                                        <div class="alert alert-danger">
-                                            <c:if test="${not empty error}">
-                                                ${error}
+    <body class="bg-light">
+        <div class="container mt-5">
+            <!-- Kiểm tra quyền trước khi hiển thị form -->
+            <c:choose>
+                <c:when test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_DEPARTMENT')}">
+                    <div class="unit-card card shadow">
+                        <div class="card-header card-header-brown text-white">
+                            Add Department
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Error Alert Box -->
+                            <c:if test="${not empty error or not empty errors}">
+                                <div class="error-alert">
+                                    <h6 class="mb-2"><strong>Please fix the following errors:</strong></h6>
+                                    <ul class="error-list">
+                                        <c:if test="${not empty error}">
+                                            <li>${error}</li>
                                             </c:if>
                                             <c:forEach var="entry" items="${errors}">
-                                                <div>${entry.key}: ${entry.value}</div>
+                                            <li><strong>${entry.key}:</strong> ${entry.value}</li>
                                             </c:forEach>
-                                        </div>
-                                    </c:if>
-
-                                    <c:choose>
-                                        <c:when test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_DEPARTMENT')}">
-                                            <form action="${pageContext.request.contextPath}/adddepartment" method="post" id="departmentForm">
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label text-muted">Department Name</label>
-                                                        <input type="text" class="form-control" name="name" value="${param.name}" required>
-                                                        <div class="invalid-feedback" id="nameError"></div>
-                                                    </div>
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label text-muted">Phone number</label>
-                                                        <input type="text" class="form-control" name="phone" value="${param.phone}" required>
-                                                        <div class="invalid-feedback" id="phoneError"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label text-muted">Email</label>
-                                                        <input type="email" class="form-control" name="email" value="${param.email}" required>
-                                                        <div class="invalid-feedback" id="emailError"></div>
-                                                    </div>
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label text-muted">Location</label>
-                                                        <input type="text" class="form-control" name="location" value="${param.location}" required>
-                                                        <div class="invalid-feedback" id="locationError"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label text-muted">Description</label>
-                                                    <textarea class="form-control" name="description" rows="3">${param.description}</textarea>
-                                                </div>
-                                                <div class="d-grid gap-2">
-                                                    <button type="submit" class="btn btn-dark btn-lg rounded-1">Add Department</button>
-                                                    <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-secondary btn-lg rounded-1">Cancel</a>
-                                                </div>
-                                            </form>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <div class="alert alert-danger text-center">
-                                                <h4><i class="fas fa-exclamation-triangle"></i> Access Denied</h4>
-                                                <p>You do not have permission to add departments.</p>
-                                                <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-primary">Back to list</a>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    </ul>
                                 </div>
-                            </div>
+                            </c:if>
+                            <form action="${pageContext.request.contextPath}/adddepartment" method="post" id="departmentForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Department Name</label>
+                                        <input type="text" class="form-control" name="name" value="${param.name}" required>
+                                        <div class="error-message" id="nameError"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone number</label>
+                                        <input type="text" class="form-control" name="phone" value="${param.phone}" required>
+                                        <div class="error-message" id="phoneError"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" name="email" value="${param.email}" required>
+                                        <div class="error-message" id="emailError"></div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Location</label>
+                                        <input type="text" class="form-control" name="location" value="${param.location}" required>
+                                        <div class="error-message" id="locationError"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="description" rows="3">${param.description}</textarea>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-brown px-4">Add Department</button>
+                                    <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-secondary px-4">Cancel</a>
+                                </div>
+                            </form>
                         </div>
-                    </section>
-                </div>
-            </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="permission-denied">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Access Denied</h4>
+                        <p>You do not have permission to add departments.</p>
+                        <a href="${pageContext.request.contextPath}/depairmentlist" class="btn btn-primary">Back to list</a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
-
-        <footer class="footer py-4 bg-light mt-auto">
-            <div class="container text-center">
-                <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
-            </div>
-        </footer>
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             document.getElementById('departmentForm').addEventListener('submit', function (event) {
                 let isValid = true;
@@ -130,7 +147,7 @@
                 const location = document.querySelector('input[name="location"]').value.trim();
 
                 // Reset error messages
-                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+                document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
                 document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
 
                 // Validate name

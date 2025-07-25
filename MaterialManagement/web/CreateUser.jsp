@@ -228,7 +228,11 @@
         </div>
     </div>
 
-    <jsp:include page="Footer.jsp" />
+    <footer class="footer py-4 bg-light mt-auto">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Computer Accessories - All Rights Reserved.</span>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>

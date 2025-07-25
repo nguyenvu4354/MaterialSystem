@@ -34,6 +34,7 @@ if (user != null) {
     <div class="container py-5">
         <div class="row">
 
+            <!-- Quick Links -->
             <div class="col-md-3 order-md-1">
                 <h6 class="fw-bold mb-3">Quick Links</h6>
                 <ul class="list-unstyled text-muted small">
@@ -45,6 +46,7 @@ if (user != null) {
                 </ul>
             </div>
 
+            <!-- Help Center -->
             <div class="col-md-3 order-md-2">
                 <h6 class="fw-bold mb-3">Help Center</h6>
                 <ul class="list-unstyled text-muted small">
@@ -56,6 +58,7 @@ if (user != null) {
                 </ul>
             </div>
 
+            <!-- Contact -->
             <div class="col-md-3 order-md-3">
                 <h6 class="fw-bold mb-3">Contact</h6>
                 <ul class="list-unstyled text-muted small">
@@ -66,6 +69,7 @@ if (user != null) {
                 </ul>
             </div>
 
+            <!-- Logo & Social -->
             <div class="col-md-3 order-md-4 text-md-end text-center">
                 <img src="images/AdminLogo.png" alt="Logo" width="180px" class="mb-3">
                 <p class="text-muted small">Internal Materials Management System</p>
@@ -81,7 +85,4 @@ if (user != null) {
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-</body>
 </html>
