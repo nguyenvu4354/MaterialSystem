@@ -60,7 +60,20 @@ public class MaterialDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          String idParam = request.getParameter("id");
+        String idParam = request.getParameter("id");
+        // Lấy user từ session để truyền role cho JSP
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        entity.User user = null;
+        String roleName = null;
+        if (session != null) {
+            user = (entity.User) session.getAttribute("user");
+            if (user != null) {
+                roleName = user.getRoleName();
+                request.setAttribute("roleId", user.getRoleId());
+            }
+        }
+        request.setAttribute("user", user);
+        request.setAttribute("roleName", roleName);
         if (idParam != null) {
             try {
                 int id = Integer.parseInt(idParam);
@@ -79,7 +92,6 @@ public class MaterialDetailServlet extends HttpServlet {
         } else {
             response.sendRedirect("view"); // chuyển về danh sách nếu không có id
         }
-
     }
 
     /**
@@ -107,5 +119,3 @@ public class MaterialDetailServlet extends HttpServlet {
     }// </editor-fold>
 
 }
-
-
