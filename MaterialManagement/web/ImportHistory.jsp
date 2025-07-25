@@ -107,7 +107,7 @@
                 </div>
                 <div class="col-md-9 col-lg-10 content px-md-4">
                     <div class="bg-white rounded shadow-sm p-4 mt-4">
-                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2 mb-3">Import History</h2>
+                        <h2 class="fw-bold display-6 border-bottom pb-2 mb-3">Import History</h2>
                         <!-- Filter Form -->
                         <form action="ImportHistory" method="get" class="d-flex gap-2 align-items-center search-box">
                             <input type="date" name="fromDate" class="form-control" value="${fromDate}" placeholder="From Date" style="width: 180px; height: 50px; border: 2px solid gray" />

@@ -59,78 +59,89 @@
     <body>
         <jsp:include page="Header.jsp"/>
 
-        <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
-            <div class="container">
-                <div class="row my-5 py-5">
-                    <div class="col-12 bg-white p-4 rounded shadow repair-form">
-                        <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Repair Request</span></h2>
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 col-lg-2 bg-light p-0">
+                    <jsp:include page="SidebarEmployee.jsp" />
+                </div>
+                <!-- Page Content -->
+                <div class="col-md-9 col-lg-10">
+                    <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+                        <div class="container">
+                            <div class="row my-5 py-5">
+                                <div class="col-12 bg-white p-4 rounded shadow repair-form">
+                                    <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Repair Request</span></h2>
 
-                        <c:if test="${not empty errorMessage}">
-                            <div class="alert alert-danger">${errorMessage}</div>
-                        </c:if>
+                                    <c:if test="${not empty errorMessage}">
+                                        <div class="alert alert-danger">${errorMessage}</div>
+                                    </c:if>
 
-                        <form action="repairrequest" method="post" id="repairForm">
-                            <h3 class="fw-normal mt-4 mb-3">Materials for Repair</h3>
-                            <div id="materialList">
-                                <!-- Initial Material Row -->
-                                <div class="row material-row align-items-end gy-2">
-                                    <div class="col-md-3">
-                                        <label class="form-label text-muted">Material Name</label>
-                                        <input type="text" class="form-control material-autocomplete" name="materialName" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label text-muted">Quantity</label>
-                                        <input type="number" class="form-control" name="quantity" required min="1" value="1">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label text-muted">Description of Damage</label>
-                                        <input type="text" class="form-control" name="damageDescription" required>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="repair-cost-container">
-                                            <button type="button" class="btn btn-sm btn-outline-danger remove-material">X</button>
+                                    <form action="repairrequest" method="post" id="repairForm">
+                                        <h3 class="fw-normal mt-4 mb-3">Materials for Repair</h3>
+                                        <div id="materialList">
+                                            <!-- Initial Material Row -->
+                                            <div class="row material-row align-items-end gy-2">
+                                                <div class="col-md-3">
+                                                    <label class="form-label text-muted">Material Name</label>
+                                                    <input type="text" class="form-control material-autocomplete" name="materialName" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label text-muted">Quantity</label>
+                                                    <input type="number" class="form-control" name="quantity" required min="1" value="1">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label class="form-label text-muted">Description of Damage</label>
+                                                    <input type="text" class="form-control" name="damageDescription" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="repair-cost-container">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-material">X</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="mt-2 mb-4">
-                                <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
-                            </div>
+                                        <div class="mt-2 mb-4">
+                                            <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
+                                        </div>
 
-                            <h3 class="fw-normal mt-5 mb-3">Repairer and Schedule Information</h3>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted">Supplier</label>
-                                    <select class="form-select" name="supplierId" required>
-                                        <option value="" disabled selected>Select a supplier</option>
-                                        <c:forEach var="supplier" items="${supplierList}">
-                                            <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <div class="invalid-feedback">Please select a supplier.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-muted">Estimated Return Date</label>
-                                    <input type="date" class="form-control" name="estimatedReturnDate" id="returnDate" required>
-                                    <div class="invalid-feedback">Estimated return date cannot be left blank.</div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label text-muted">Reason for Repair</label>
-                                    <textarea name="reason" rows="3" class="form-control" required></textarea>
-                                    <div class="invalid-feedback">Reason for repair cannot be left blank.</div>
-                                </div>
-                            </div>
+                                        <h3 class="fw-normal mt-5 mb-3">Repairer and Schedule Information</h3>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Supplier</label>
+                                                <select class="form-select" name="supplierId" required>
+                                                    <option value="" disabled selected>Select a supplier</option>
+                                                    <c:forEach var="supplier" items="${supplierList}">
+                                                        <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                                    </c:forEach>
+                                                </select>
+                                                <div class="invalid-feedback">Please select a supplier.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Estimated Return Date</label>
+                                                <input type="date" class="form-control" name="estimatedReturnDate" id="returnDate" required>
+                                                <div class="invalid-feedback">Estimated return date cannot be left blank.</div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label text-muted">Reason for Repair</label>
+                                                <textarea name="reason" rows="3" class="form-control" required></textarea>
+                                                <div class="invalid-feedback">Reason for repair cannot be left blank.</div>
+                                            </div>
+                                        </div>
 
-                            <div class="mt-5 d-grid gap-2">
-                                <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                                <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
+                                        <div class="mt-5 d-grid gap-2">
+                                            <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                                            <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </section>
                 </div>
             </div>
-        </section>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
