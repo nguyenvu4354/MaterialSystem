@@ -74,6 +74,13 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        if (user == null) {
+            request.setAttribute("error", "You must login to access this page.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
         MaterialDAO dao = new MaterialDAO();
         int page = 1;
         int pageSize = 8;
@@ -99,8 +106,6 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("categories", categoryTree);
 
         // Dashboard tổng quan cho tất cả role
-        HttpSession session = request.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
         request.setAttribute("materialCount", materialCount);
 
         // Số yêu cầu xuất kho chờ duyệt

@@ -762,7 +762,7 @@
                                                     </c:if>
                                                     <c:if test="${product.quantity > 0 && product.quantity < 10}">
                                                         <span class="badge bg-warning text-dark" style="margin-left:6px;">
-                                                            <i class="fas fa-exclamation-triangle"></i> Low
+                                                            <i class="fas fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>
                                                 </div>
