@@ -12,6 +12,7 @@ import dal.RoleDAO;
 import dal.PurchaseRequestDAO;
 import dal.RepairRequestDAO;
 import dal.RequestDAO;
+import dal.UserDAO;
 import entity.Category;
 import entity.Material;
 import entity.User;
@@ -101,6 +102,21 @@ public class HomeServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
         request.setAttribute("materialCount", materialCount);
+
+        // Số yêu cầu xuất kho chờ duyệt
+        ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
+        int pendingExportRequestCount = exportRequestDAO.getTotalCount("pending", null);
+        request.setAttribute("pendingExportRequestCount", pendingExportRequestCount);
+
+        // Tổng số người dùng (chỉ cho admin)
+        UserDAO userDAO = new UserDAO();
+        int totalUserCount = userDAO.getUserCountByFilter(null, null, null, null);
+        request.setAttribute("totalUserCount", totalUserCount);
+
+        // Tổng số quyền (chỉ cho admin)
+        dal.PermissionDAO permissionDAO = new dal.PermissionDAO();
+        int totalPermissionCount = permissionDAO.getAllPermissions().size();
+        request.setAttribute("totalPermissionCount", totalPermissionCount);
 
         // Số yêu cầu mua vật tư chờ duyệt
         PurchaseRequestDAO purchaseRequestDAO = new PurchaseRequestDAO();
