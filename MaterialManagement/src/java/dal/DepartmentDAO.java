@@ -101,7 +101,7 @@ public class DepartmentDAO extends DBContext {
         } else {
             sql.append(" WHERE 1=1");
         }
-        if (statusFilter != null && !searchKeyword.trim().isEmpty()) {
+        if (statusFilter != null && !statusFilter.trim().isEmpty()) {
             sql.append(" AND status = ?");
         }
 
@@ -204,48 +204,14 @@ public class DepartmentDAO extends DBContext {
     }
 
     public void deleteDepartment(int id) {
-        String updateUsersSql = "UPDATE Users SET status = 'deleted', updated_at = CURRENT_TIMESTAMP WHERE department_id = ?";
-        String deleteDepartmentSql = "DELETE FROM Departments WHERE department_id = ?";
-        
-        try {
-            connection.setAutoCommit(false); // Start transaction
-            
-            // Update user status
-            try (PreparedStatement psUsers = connection.prepareStatement(updateUsersSql)) {
-                psUsers.setInt(1, id);
-                int usersAffected = psUsers.executeUpdate();
-                System.out.println("✅ Updated " + usersAffected + " users to 'deleted' status for department_id: " + id);
-            }
-            
-            // Delete department
-            try (PreparedStatement psDept = connection.prepareStatement(deleteDepartmentSql)) {
-                psDept.setInt(1, id);
-                int deptAffected = psDept.executeUpdate();
-                if (deptAffected == 0) {
-                    throw new SQLException("No department found with department_id: " + id);
-                }
-                System.out.println("✅ Deleted department with department_id: " + id);
-            }
-            
-            connection.commit(); // Commit transaction
-            System.out.println("✅ Department and associated users deleted successfully");
+        String sql = "UPDATE Departments SET status = 'deleted', updated_at = ? WHERE department_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setTimestamp(1, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(2, id);
+            ps.executeUpdate();
         } catch (SQLException e) {
-            try {
-                connection.rollback(); // Rollback on error
-                System.out.println("🔄 Transaction rolled back due to error: " + e.getMessage());
-            } catch (SQLException rollbackEx) {
-                System.out.println("❌ Error during rollback: " + rollbackEx.getMessage());
-                rollbackEx.printStackTrace();
-            }
-            System.out.println("❌ Error in deleteDepartment: " + e.getMessage());
-            throw new RuntimeException("Error deleting department and updating user statuses", e);
-        } finally {
-            try {
-                connection.setAutoCommit(true); // Restore default auto-commit mode
-            } catch (SQLException e) {
-                System.out.println("❌ Error restoring auto-commit: " + e.getMessage());
-                e.printStackTrace();
-            }
+            System.out.println("❌ Lỗi deleteDepartment: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
