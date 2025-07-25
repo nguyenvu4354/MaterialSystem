@@ -103,43 +103,43 @@
                 background: #cfa856;
                 transform: translateY(-2px) scale(1.04);
             }
+            /* Sidebar */
             .sidebar {
-                padding: 24px 18px;
-                border-radius: 18px;
                 background: #fff;
-                box-shadow: 0 4px 18px rgba(222,173,111,0.08);
-                margin-top: 0;
-                border: 1px solid #e0e0e0;
+                border: 1.5px solid #bdbdbd;
+                border-radius: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
             }
             .sidebar h3 {
-                color: #DEAD6F;
+                color: #cfa856;
                 font-weight: 800;
-                border-bottom: 2px solid #f9f5f0;
+                border-bottom: 2px solid #f5f5f5;
                 padding-bottom: 10px;
                 margin-bottom: 24px;
                 letter-spacing: 1px;
                 font-size: 20px;
             }
             .sidebar-item {
-                display: flex;
-                align-items: center;
-                padding: 13px 18px;
-                margin-bottom: 14px;
-                border-radius: 14px;
-                background: #f9f5f0;
-                box-shadow: 0 2px 8px rgba(222,173,111,0.06);
-                transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
-                text-decoration: none;
-                font-weight: 600;
-                color: #DEAD6F;
+                background: #fff;
+                color: #212529;
+                border-radius: 12px;
+                margin-bottom: 10px;
+                font-weight: 700;
+                transition: background 0.2s, color 0.2s;
+                padding: 12px 18px;
+                display: block;
+                border: 1px solid #f5f5f5;
                 font-size: 16px;
-                gap: 10px;
+            }
+            .sidebar-item.active {
+                background: #198754;
+                color: #fff !important;
+                border: 1.5px solid #198754;
             }
             .sidebar-item:hover {
-                background: #DEAD6F;
-                color: #fff;
-                box-shadow: 0 4px 16px rgba(222,173,111,0.13);
-                transform: translateX(6px) scale(1.04);
+                background: #ffc107;
+                color: #212529 !important;
+                border: 1.5px solid #ffc107;
             }
             .sidebar-item:hover .category-icon {
                 color: #fff;
@@ -165,22 +165,22 @@
                 gap: 28px;
                 justify-content: flex-start;
             }
+            /* Card */
             .product-card {
+                width: 270px;
+                min-height: 420px;
                 display: flex;
                 flex-direction: column;
-                width: 270px;
-                border-radius: 20px;
-                overflow: hidden;
+                justify-content: space-between;
                 background: #fff;
-                box-shadow: 0 4px 18px rgba(222,173,111,0.10);
-                transition: box-shadow 0.3s, transform 0.3s;
-                margin-bottom: 0;
-                border: 1px solid #e0e0e0;
-                position: relative;
+                border: 1.5px solid #bdbdbd;
+                border-radius: 18px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+                transition: box-shadow 0.2s, transform 0.2s;
             }
             .product-card:hover {
-                box-shadow: 0 10px 32px rgba(222,173,111,0.18);
-                transform: translateY(-8px) scale(1.04);
+                box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+                transform: scale(1.03);
             }
             .product-card img {
                 width: 100%;
@@ -191,23 +191,44 @@
                 box-shadow: 0 2px 8px rgba(222,173,111,0.06);
             }
             .card-content {
-                padding: 20px 18px 18px 18px;
-                flex-grow: 1;
+                flex: 1 1 auto;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                background: #fff;
+                min-height: 180px;
             }
             .card-content h5 {
-                margin: 0 0 10px 0;
-                font-size: 1.15rem;
-                font-weight: 700;
-                color: #cfa856;
-                min-height: 44px;
-                letter-spacing: 0.5px;
-                text-overflow: ellipsis;
+                min-height: 48px;
+                max-height: 48px;
                 overflow: hidden;
-                white-space: nowrap;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                color: #212529;
+                font-weight: 700;
+            }
+            .card-content .info-label {
+                color: #6c757d;
+                font-size: 14px;
+            }
+            .card-content .status-new {
+                color: #198754;
+                font-weight: 700;
+            }
+            .card-content .status-used {
+                color: #ffc107;
+                font-weight: 700;
+            }
+            .card-content .status-damaged {
+                color: #e74c3c;
+                font-weight: 700;
+            }
+            .card-content .stock-zero {
+                color: #e74c3c;
+                font-weight: 700;
+            }
+            .card-content b {
+                color: #212529;
             }
             .card-content p {
                 margin: 0 0 14px 0;
@@ -215,16 +236,13 @@
                 color: #DEAD6F;
                 font-weight: 700;
             }
+            /* Button */
             .btn-main {
                 background: #DEAD6F;
                 color: #fff !important;
-                border: none;
                 border-radius: 24px;
                 font-weight: 700;
-                padding: 9px 28px;
-                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
-                font-size: 16px;
-                transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+                transition: background 0.2s, color 0.2s;
             }
             .btn-main:hover, .btn-main:focus {
                 background: #cfa856;
@@ -262,23 +280,24 @@
                 color: #fff !important;
                 transform: scale(1.05);
             }
+            /* Nút View Detail */
             .btn-detail {
-                background: #DEAD6F;
-                color: #fff;
+                background: #6c757d;
+                color: #fff !important;
                 border: none;
                 border-radius: 18px;
                 font-weight: 600;
                 padding: 8px 20px;
                 transition: background 0.2s, color 0.2s, transform 0.2s;
-                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
                 display: inline-flex;
                 align-items: center;
                 gap: 6px;
                 font-size: 15px;
             }
             .btn-detail:hover {
-                background: #cfa856;
-                color: #fff;
+                background: #ffc107;
+                color: #212529 !important;
                 transform: scale(1.05);
             }
             .btn-contact-info {
@@ -532,31 +551,152 @@
     <body>
         <div class="top-bar py-2">
             <div class="container d-flex justify-content-center align-items-center position-relative">
-                <form id="searchOverlay" action="search" method="get" class="search-overlay-form" style="max-width: 400px; width: 100%;">
-                    <div class="input-group" style="border-radius: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #fff;">
-                        <span class="input-group-text bg-white border-0" style="border-radius: 24px 0 0 24px;">
-                            <i class="fas fa-search" style="color: #DEAD6F;"></i>
-                        </span>
-                        <input class="form-control border-0" type="search" name="keyword" placeholder="Find material..." required style="border-radius: 0 24px 24px 0; height: 44px; background: #fff; color: #222;">
-                        <button class="btn btn-main" type="submit" style="border-radius: 24px; height: 44px; min-width: 44px;">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
         <jsp:include page="Header.jsp" />
 
+        <!-- DASHBOARD OVERVIEW (clickable cards) -->
+        <div class="container my-4">
+            <div class="row g-4">
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3 || sessionScope.user.roleId == 4}">
+                    <div class="col-md-3">
+                        <a href="dashboardmaterial" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-boxes fa-2x mb-2" style="color:#DEAD6F;"></i>
+                                    <h5 class="card-title" style="color:#cfa856;">Total Materials</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#DEAD6F;">${materialCount}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2}">
+                    <div class="col-md-3">
+                        <a href="ExportRequestList" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-file-signature fa-2x mb-2" style="color:#cfa856;"></i>
+                                    <h5 class="card-title" style="color:#cfa856;">Pending Export Requests</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#cfa856;">${pendingExportRequestCount}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <div class="col-md-3">
+                        <a href="StaticInventory" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-warehouse fa-2x mb-2" style="color:#DEAD6F;"></i>
+                                    <h5 class="card-title" style="color:#cfa856;">Total Inventory</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#DEAD6F;">${totalStock}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <div class="col-md-3">
+                        <a href="StaticInventory?stockFilter=low" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color:#e67e22;"></i>
+                                    <h5 class="card-title" style="color:#e67e22;">Low Stock Materials</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#e67e22;">${lowStockCount}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <div class="col-md-3">
+                        <a href="StaticInventory?stockFilter=zero" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-times-circle fa-2x mb-2" style="color:#e74c3c;"></i>
+                                    <h5 class="card-title" style="color:#e74c3c;">Out of Stock</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#e74c3c;">
+                                        ${outOfStockCount}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <!-- Pending Purchase Requests -->
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <div class="col-md-3">
+                        <a href="ListPurchaseRequests" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-shopping-cart fa-2x mb-2" style="color:#198754;"></i>
+                                    <h5 class="card-title" style="color:#198754;">Pending Purchase Requests</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#198754;">${pendingPurchaseRequestCount}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <!-- Pending Repair Requests -->
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <div class="col-md-3">
+                        <a href="repairrequestlist" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-tools fa-2x mb-2" style="color:#0dcaf0;"></i>
+                                    <h5 class="card-title" style="color:#0dcaf0;">Pending Repair Requests</h5>
+                                    <p class="card-text fs-4 fw-bold" style="color:#0dcaf0;">${pendingRepairRequestCount}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+                <!-- My Requests (for employee) -->
+                <c:if test="${sessionScope.user.roleId == 4}">
+                    <div class="col-md-3">
+                        <a href="ListPurchaseRequests" style="text-decoration:none;">
+                            <div class="card shadow-sm text-center" style="border:2px solid #DEAD6F; background:#fffbe9; cursor:pointer; transition:box-shadow 0.2s,transform 0.2s;">
+                                <div class="card-body">
+                                    <i class="fas fa-user-check fa-2x mb-2" style="color:#cfa856;"></i>
+                                    <h5 class="card-title" style="color:#cfa856;">My Requests</h5>
+                                    <p class="card-text fs-5 fw-bold" style="color:#cfa856;">
+                                        Purchase: ${myPurchaseRequestCount}<br/>
+                                        Repair: ${myRepairRequestCount}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </c:if>
+            </div>
+        </div>
+
+        <!-- REMOVE QUICK ACTIONS BUTTONS -->
+        <!-- NOTIFICATIONS (if any) -->
+        <div class="container my-3">
+            <c:if test="${not empty notifications}">
+                <div class="alert alert-info" style="background:#fffbe9; border:1.5px solid #DEAD6F; color:#cfa856;">
+                    <i class="fas fa-info-circle"></i>
+                    <c:forEach var="noti" items="${notifications}">
+                        <div>${noti.message}</div>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </div>
+
         <div class="container-fluid my-5">
             <div class="row">
                 <div class="col-md-2 sidebar-col mt-5">
-                    <div class="sidebar">
+                    <div class="sidebar" style="max-height: 400px; overflow-y: auto;">
                         <h3 class="mb-4">Categories</h3>
                         <ul class="list-unstyled">
                             <c:forEach var="c" items="${categories}">
-                                <li>
-                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item" data-category-id="${c.category_id}">
-                                        <h5>${c.category_name}</h5>
+                                <li style="margin-bottom: 4px;">
+                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item <c:if test='${param.categoryId == c.category_id}'>active</c:if>" data-category-id="${c.category_id}" style="padding-left: <c:out value='${c.parent_id != null ? 32 : 16}'/>px;">
+                                        <h5 style="display:inline;">${c.category_name}</h5>
+                                        <!-- (Nâng cao: có thể hiển thị số lượng vật tư trong từng danh mục ở đây) -->
                                     </a>
                                 </li>
                             </c:forEach>
@@ -566,32 +706,66 @@
 
                 <div class="col-md-10 mb-1">
                     <div class="content">
+                        <!-- FILTER & SEARCH -->
+                        <form action="search" method="get" class="mb-3 d-flex gap-2 align-items-center">
+                            <input class="form-control" type="search" name="keyword" placeholder="Search material by name or code..." value="${param.keyword}" style="max-width: 300px;">
+                            <select class="form-select" name="status" style="max-width: 180px;">
+                                <option value="">All Status</option>
+                                <option value="new" <c:if test='${param.status == "new"}'>selected</c:if>>New</option>
+                                <option value="used" <c:if test='${param.status == "used"}'>selected</c:if>>Used</option>
+                                <option value="damaged" <c:if test='${param.status == "damaged"}'>selected</c:if>>Damaged</option>
+                            </select>
+                            <button class="btn btn-main" style="background:#DEAD6F; color:#fff; font-weight:700;" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='home'">
+                                <i class="fas fa-times"></i> Clear 
+                            </button>
+                        </form>
                         <section id="clothing" class="my-5 overflow-hidden">
                             <div class="container pb-5">
                                 <div class="section-header d-md-flex justify-content-between align-items-center mb-4">
                                     <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material List</h2>
-                                 
                                 </div>
-
                                 <div class="card-container">
                                     <c:forEach var="product" items="${productList}">
                                         <div class="product-card">
                                             <img src="images/material/${product.materialsUrl}" alt="${product.materialName}" width="200">
                                             <div class="card-content">
                                                 <h5>${product.materialName}</h5>
+                                                <div class="info-label">Code: <b>${product.materialCode}</b></div>
+                                                <div class="info-label">
+                                                    Status: <b class="status-${product.materialStatus}">${product.materialStatus}</b>
+                                                </div>
+                                                <div class="info-label">Unit: <b>${product.unit.unitName}</b></div>
+                                                <div class="info-label">
+                                                    Stock: 
+                                                    <b class="${product.quantity == 0 ? 'stock-zero' : ''}">${product.quantity}</b>
+                                                    <c:if test="${product.quantity == 0}">
+                                                        <i class="fas fa-exclamation-circle" style="color:#e74c3c;" title="Out of stock"></i>
+                                                    </c:if>
+                                                    <c:if test="${product.quantity > 0 && product.quantity < 10}">
+                                                        <span class="badge bg-warning text-dark" style="margin-left:6px;">
+                                                            <i class="fas fa-exclamation-triangle"></i> Low
+                                                        </span>
+                                                    </c:if>
+                                                </div>
                                                 <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
                                                     <i class="fas fa-eye me-1"></i> View Detail
                                                 </a>
                                             </div>
                                         </div>
                                     </c:forEach>
-
-                                    <!-- Pagination -->
-                                    <nav aria-label="Page navigation" style="padding-left: 500px">
-                                        <ul class="pagination justify-content-center mt-4" id="pagination">
-                                            <li class="page-item active"><a class="page-link" href="#" data-page="1">1</a></li>
-                                            <li class="page-item"><a class="page-link" href="#" data-page="2">2</a></li>
-                                            <li class="page-item"><a class="page-link" href="#" data-page="3">3</a></li>
+                                </div>
+                                <!-- Pagination cố định ở cuối -->
+                                <div class="d-flex justify-content-center mt-4 mb-5">
+                                    <nav aria-label="Material pagination">
+                                        <ul class="pagination">
+                                            <c:forEach var="i" begin="1" end="${totalPages}">
+                                                <li class="page-item <c:if test='${i == currentPage}'>active</c:if>">
+                                                    <a class="page-link" href="home?page=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
                                         </ul>
                                     </nav>
                                 </div>
@@ -599,62 +773,9 @@
                         </section>
                     </div>
                 </div>
-
             </div>
         </div>
-        <footer id="footer" class="footer-mms mt-5">
-            <div class="container py-4">
-                <div class="row">
-                    <div class="col-md-3 mb-4 mb-md-0">
-                        <h5 class="footer-title"><i class="fas fa-warehouse me-2"></i>About System</h5>
-                        <p class="footer-desc">
-                            This Material Management System is for internal company use only. All activities are monitored and restricted to authorized personnel.
-                        </p>
-                    </div>
-                    <div class="col-md-3 mb-4 mb-md-0">
-                        <h5 class="footer-title"><i class="fas fa-phone-alt me-2"></i>Internal Contact</h5>
-                        <ul class="footer-list">
-                            <li><i class="fas fa-envelope me-2"></i>it-support@company.com</li>
-                            <li><i class="fas fa-phone me-2"></i>Ext: 1234 (IT Dept.)</li>
-                            <li><i class="fas fa-user-tie me-2"></i>Warehouse Manager: John Doe</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-3 mb-4 mb-md-0">
-                        <h5 class="footer-title"><i class="fas fa-file-alt me-2"></i>Internal Policies</h5>
-                        <ul class="footer-list">
-                            <li><a href="#"><i class="fas fa-shield-alt me-2"></i>Data Security Policy</a></li>
-                            <li><a href="#"><i class="fas fa-user-lock me-2"></i>System Usage Rules</a></li>
-                            <li><a href="#"><i class="fas fa-headset me-2"></i>IT Support Policy</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-3">
-                        <h5 class="footer-title"><i class="fas fa-question-circle me-2"></i>Guides</h5>
-                        <ul class="footer-list">
-                            <li><a href="#"><i class="fas fa-user-cog me-2"></i>User Manual</a></li>
-                            <li><a href="#"><i class="fas fa-search me-2"></i>Check Inventory</a></li>
-                            <li><a href="#"><i class="fas fa-life-ring me-2"></i>Contact IT Support</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <hr class="my-3" style="border-top:1.5px solid #f9f5f0;opacity:0.15;">
-                <div class="text-center small" style="color:#bbb;">© 2024 Material Management System (Internal Use Only). All rights reserved.</div>
-            </div>
-        </footer>
-        <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="contactModalLabel"><i class="fas fa-user-shield me-2"></i>Internal Contact</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div><i class="fas fa-envelope me-2"></i> it-support@company.com</div>
-                        <div><i class="fas fa-phone me-2"></i> Ext: 1234 (IT Dept.)</div>
-                        <div><i class="fas fa-user-tie me-2"></i> Warehouse Manager: John Doe</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <jsp:include page="Footer.jsp" />
         <script src="js/jquery-1.11.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"

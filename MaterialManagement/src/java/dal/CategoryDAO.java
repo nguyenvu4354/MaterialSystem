@@ -275,6 +275,29 @@ public class CategoryDAO extends DBContext {
         return false;
     }
 
+    /**
+     * Lấy cây danh mục phân cấp, giới hạn số cấp và số con mỗi node
+     */
+    public List<Category> getCategoryTree(int maxLevel, int maxChildrenPerNode) {
+        List<Category> all = getAllCategories();
+        List<Category> tree = new ArrayList<>();
+        buildTree(tree, all, null, 1, maxLevel, maxChildrenPerNode);
+        return tree;
+    }
+
+    private void buildTree(List<Category> tree, List<Category> all, Integer parentId, int level, int maxLevel, int maxChildren) {
+        if (level > maxLevel) return;
+        int count = 0;
+        for (Category c : all) {
+            if ((parentId == null && c.getParent_id() == null) || (parentId != null && parentId.equals(c.getParent_id()))) {
+                tree.add(c);
+                count++;
+                if (count >= maxChildren) break;
+                buildTree(tree, all, c.getCategory_id(), level + 1, maxLevel, maxChildren);
+            }
+        }
+    }
+
     public static void main(String[] args) {
         CategoryDAO categoryDAO = new CategoryDAO();
         List<Category> categories = categoryDAO.getAllCategories();

@@ -47,12 +47,7 @@ public class LoginServlet extends HttpServlet {
                     session.removeAttribute("redirectURL");
                     response.sendRedirect(response.encodeRedirectURL(redirectURL));
                 } else {
-                    if (user.getRoleId() == 1) {
-                        response.sendRedirect(response.encodeRedirectURL("UserList"));
-                    
-                    } else {
-                        response.sendRedirect(response.encodeRedirectURL("home"));
-                    }
+                    response.sendRedirect(response.encodeRedirectURL("home"));
                 }
             }
         } else {

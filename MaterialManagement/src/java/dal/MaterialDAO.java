@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 public class MaterialDAO extends DBContext {
 
     public List<Material> searchMaterials(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
+        if (sortOption == null) sortOption = "";
         List<Material> list = new ArrayList<>();
         try {
             StringBuilder sql = new StringBuilder();
