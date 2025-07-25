@@ -1,35 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="dal.PermissionDAO" %>
-<%@ page import="entity.User" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
-
-<%
-User user = (User) session.getAttribute("user");
-if (user != null) {
-    PermissionDAO permissionDAO = new PermissionDAO();
-    List<String> permissionNames = permissionDAO.getPermissionsByRole(user.getRoleId())
-        .stream()
-        .map(permission -> permission.getPermissionName())
-        .collect(Collectors.toList());
-    session.setAttribute("userPermissions", permissionNames);
-}
-%>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Internal Material Management</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-          integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-</head>
-
-<body>
-
 <footer id="footer" class="bg-light border-top mt-5">
     <div class="container py-5">
         <div class="row">
@@ -84,5 +52,4 @@ if (user != null) {
         <hr class="mt-4">
     </div>
 </footer>
-
 </html>
