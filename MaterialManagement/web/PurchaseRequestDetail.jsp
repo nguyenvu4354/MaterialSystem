@@ -128,7 +128,6 @@
         <div class="card">
             <div class="card-header">Request Information</div>
             <div class="card-body">
-                <p><strong>Estimated Price:</strong> ${purchaseRequest.estimatedPrice}</p>
                 <p>Request Reason:</p>
                 <p>${purchaseRequest.reason != null ? purchaseRequest.reason : "N/A"}</p>
                 <c:if test="${not empty purchaseRequest.approvalReason}">
@@ -217,8 +216,8 @@
                 <div class="d-flex gap-2 mb-2">
                     <c:choose>
                         <c:when test="${purchaseRequest.status eq 'pending' && hasHandleRequestPermission}">
-                            <button type="button" class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('approve')">Approve</button>
-                            <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('reject')">Reject</button>
+                            <button type="button" class="btn btn-approve" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('approved')">Approve</button>
+                            <button type="button" class="btn btn-reject" data-bs-toggle="modal" data-bs-target="#updateStatusModal" onclick="setModalAction('rejected')">Reject</button>
                             <a href="ListPurchaseRequests" class="btn btn-cancel">Cancel</a>
                         </c:when>
                         <c:otherwise>
@@ -226,67 +225,42 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
-                <!-- Modal Popup giống ViewRequests.jsp, có Select Status -->
+                <!-- Modal nhập lý do duyệt/từ chối giống purchase order -->
                 <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="updateStatusModalLabel">Update Purchase Request Status</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
                       <form action="PurchaseRequestDetail" method="post" id="updateStatusForm">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="updateStatusModalLabel">Update Purchase Request Status</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
                         <div class="modal-body">
                           <input type="hidden" name="id" value="${purchaseRequest.purchaseRequestId}" />
-                          <input type="hidden" id="modalActionType" name="action" value="approve" />
+                          <input type="hidden" id="modalStatus" name="modalStatus" value="" />
                           <div class="mb-3">
-                            <label for="statusSelect" class="form-label">New Status <span style="color:#DEAD6F">*</span></label>
-                            <select class="form-select" id="statusSelect" name="modalStatus" style="border:2px solid #DEAD6F; color:#5c4434;">
-                              <option value="">Select Status</option>
-                              <option value="approved">Approved</option>
-                              <option value="rejected">Rejected</option>
-                            </select>
-                          </div>
-                          <div class="mb-3" id="reasonGroup" style="display:none;">
-                            <label for="modalReason" class="form-label">Approval Reason <span style="color:#DEAD6F">*</span></label>
-                            <textarea class="form-control" id="modalReason" name="reason" rows="3" placeholder="Enter approval reason..." style="border:2px solid #DEAD6F; color:#5c4434;"></textarea>
+                            <label for="modalReason" class="form-label" id="reasonLabel">Approval Reason <span style="color:#DEAD6F">*</span></label>
+                            <textarea class="form-control" id="modalReason" name="reason" rows="3" placeholder="Enter reason..." required></textarea>
                           </div>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn" style="background-color:#DEAD6F; color:#fff;" data-bs-dismiss="modal">Cancel</button>
-                          <button type="submit" id="updateStatusBtn" class="btn" style="background-color:#DEAD6F; color:#fff;" disabled>Update Status</button>
+                          <button type="submit" id="updateStatusBtn" class="btn" style="background-color:#DEAD6F; color:#fff;">Update Status</button>
                         </div>
                       </form>
                     </div>
                   </div>
                 </div>
                 <script>
-                  function setModalAction(type) {
-                    document.getElementById('modalActionType').value = type;
-                    document.getElementById('statusSelect').value = '';
-                    document.getElementById('reasonGroup').style.display = 'none';
-                    document.getElementById('updateStatusBtn').disabled = true;
+                  function setModalAction(status) {
+                    document.getElementById('modalStatus').value = status;
+                    document.getElementById('reasonLabel').innerText = status === 'approved' ? 'Approval Reason *' : 'Rejection Reason *';
+                    document.getElementById('modalReason').value = '';
                   }
-                  document.addEventListener('DOMContentLoaded', function() {
-                    var statusSelect = document.getElementById('statusSelect');
-                    var reasonGroup = document.getElementById('reasonGroup');
-                    var updateBtn = document.getElementById('updateStatusBtn');
-                    statusSelect.addEventListener('change', function() {
-                      if (this.value === '') {
-                        reasonGroup.style.display = 'none';
-                        updateBtn.disabled = true;
-                      } else {
-                        reasonGroup.style.display = '';
-                        updateBtn.disabled = false;
-                      }
-                    });
-                    // Ngăn submit nếu chưa chọn status
-                    document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
-                      if (statusSelect.value === '') {
-                        statusSelect.focus();
-                        updateBtn.disabled = true;
-                        e.preventDefault();
-                      }
-                    });
+                  document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
+                    if (!document.getElementById('modalReason').value.trim()) {
+                      document.getElementById('modalReason').focus();
+                      e.preventDefault();
+                    }
                   });
                 </script>
             </div>

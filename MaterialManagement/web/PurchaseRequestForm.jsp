@@ -121,10 +121,6 @@
                                             <input type="text" class="form-control" name="requestDate" value="${requestDate}" readonly>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label text-muted">Total Estimated Price ($)</label>
-                                            <input type="number" class="form-control" name="estimatedPrice" step="0.01">
-                                        </div>
-                                        <div class="col-md-6">
                                             <label class="form-label text-muted">Purchase Reason</label>
                                             <textarea class="form-control" name="reason" rows="1"></textarea>
                                         </div>
@@ -140,11 +136,6 @@
                                             <div class="col-md-2">
                                                 <label class="form-label text-muted">Quantity</label>
                                                 <input type="number" class="form-control" name="quantity">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label text-muted">Category</label>
-                                                <input type="text" class="form-control category-name" name="categoryName" readonly>
-                                                <input type="hidden" class="category-id" name="categoryId">
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label text-muted">Notes</label>
@@ -197,8 +188,6 @@
             const nameInput = row.querySelector('.material-name-input');
             const idInput = row.querySelector('.material-id-input');
             const img = row.querySelector('.material-image');
-            const categoryInput = row.querySelector('.category-name');
-            const categoryIdInput = row.querySelector('.category-id');
             $(nameInput).autocomplete({
                 source: function(request, response) {
                     const term = request.term.toLowerCase();
@@ -220,9 +209,6 @@
                     } else {
                         img.src = 'images/material/default.jpg';
                     }
-                    // Update category
-                    categoryInput.value = ui.item.categoryName;
-                    categoryIdInput.value = ui.item.categoryId;
                 },
                 change: function(event, ui) {
                     if (!ui.item) {
@@ -242,13 +228,9 @@
                             } else {
                                 img.src = 'images/material/default.jpg';
                             }
-                            categoryInput.value = selectedMaterial.categoryName;
-                            categoryIdInput.value = selectedMaterial.categoryId;
                         } else {
                             idInput.value = '';
                             img.src = 'images/material/default.jpg';
-                            categoryInput.value = '';
-                            categoryIdInput.value = '';
                         }
                     }
                 },
@@ -271,8 +253,6 @@
             // Reset fields in the new row
             newRow.querySelector('.material-name-input').value = '';
             newRow.querySelector('.material-id-input').value = '';
-            newRow.querySelector('.category-name').value = '';
-            newRow.querySelector('.category-id').value = '';
             newRow.querySelector('input[name="quantity"]').value = '';
             newRow.querySelector('input[name="note"]').value = '';
             newRow.querySelector('.material-image').src = 'images/material/default.jpg';

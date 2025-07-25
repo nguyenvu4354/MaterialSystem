@@ -104,7 +104,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
         }
 
         try {
-            String estimatedPriceStr = request.getParameter("estimatedPrice");
             String reason = request.getParameter("reason");
 
             String[] materialNames = request.getParameterValues("materialName");
@@ -112,7 +111,7 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             String[] quantities = request.getParameterValues("quantity");
             String[] notes = request.getParameterValues("note");
 
-            Map<String, String> formErrors = PurchaseRequestValidator.validatePurchaseRequestFormData(reason, estimatedPriceStr);
+            Map<String, String> formErrors = PurchaseRequestValidator.validatePurchaseRequestFormData(reason);
             Map<String, String> detailErrors = PurchaseRequestValidator.validatePurchaseRequestDetails(materialNames, quantities);
             formErrors.putAll(detailErrors);
 
@@ -166,7 +165,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
             purchaseRequest.setUserId(currentUser.getUserId());
             purchaseRequest.setRequestDate(new Timestamp(System.currentTimeMillis()));
             purchaseRequest.setStatus("PENDING");
-            purchaseRequest.setEstimatedPrice(Double.parseDouble(estimatedPriceStr));
             purchaseRequest.setReason(reason.trim());
 
             boolean success = prd.createPurchaseRequestWithDetails(purchaseRequest, purchaseRequestDetails);
@@ -188,7 +186,6 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                     content.append("Request Code: ").append(requestCode).append("\n");
                     content.append("Creator: ").append(currentUser.getFullName()).append(" (ID: ").append(currentUser.getUserId()).append(")\n");
                     content.append("Reason: ").append(reason).append("\n");
-                    content.append("Estimated Price: ").append(estimatedPriceStr).append("\n");
                     content.append("Time: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("\n\n");
                     content.append("Please log in to the system to view details and approve.");
 

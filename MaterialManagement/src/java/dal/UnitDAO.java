@@ -163,4 +163,45 @@ public class UnitDAO extends DBContext {
         }
         return count;
     }
+
+    // Kiểm tra tên đơn vị đã tồn tại chưa (không phân biệt hoa thường, không tính disable)
+    public boolean isUnitNameExists(String unitName) {
+        String sql = "SELECT 1 FROM units WHERE LOWER(unit_name) = ? AND disable = 0 LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, unitName.toLowerCase());
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Xoá tất cả vật tư có unit_id này
+    public void deleteMaterialsByUnitId(int unitId) {
+        String sql = "DELETE FROM materials WHERE unit_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, unitId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // Xoá mềm tất cả vật tư có unit_id này (disable=1)
+    public void disableMaterialsByUnitId(int unitId) {
+        String sql = "UPDATE materials SET disable = 1 WHERE unit_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, unitId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // Xoá mềm vật tư trước, sau đó xoá mềm đơn vị
+    public void deleteUnitAndMaterials(int unitId) {
+        disableMaterialsByUnitId(unitId);
+        deleteUnit(unitId); // deleteUnit đã là disable=1
+    }
 } 

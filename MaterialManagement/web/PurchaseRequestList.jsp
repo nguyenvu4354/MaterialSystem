@@ -160,7 +160,6 @@
                                                     <th>Request Code</th>
                                                     <th>Requester</th>
                                                     <th>Request Date</th>
-                                                    <th>Estimated Price</th>
                                                     <th>Reason</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
@@ -172,7 +171,6 @@
                                                         <td>${request.requestCode}</td>
                                                         <td>${userIdToName[request.userId]}</td>
                                                         <td>${request.requestDate}</td>
-                                                        <td>${request.estimatedPrice}</td>
                                                         <td>${request.reason}</td>
                                                         <td>
                                                             <c:choose>

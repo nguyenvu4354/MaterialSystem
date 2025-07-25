@@ -62,10 +62,9 @@ public class DashboardMaterialServlet extends HttpServlet {
                 }
             }
 
-            String keyword = request.getParameter("keyword");
-            if (keyword == null) {
-                keyword = "";
-            }
+            // Lấy tham số tìm kiếm tên vật tư đúng với form
+            String materialName = request.getParameter("materialName");
+            if (materialName == null) materialName = "";
             String status = request.getParameter("status");
             if (status == null) {
                 status = "";
@@ -79,7 +78,12 @@ public class DashboardMaterialServlet extends HttpServlet {
             request.setAttribute("categories", categories);
 
             // Thêm đoạn này để lấy tất cả vật tư cho autocomplete
-            List<Material> allMaterials = materialDAO.getAllProducts();
+            // List<Material> allMaterials = materialDAO.getAllProducts();
+            List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, 1000, "name_asc");
+            // Log dữ liệu vật tư để debug
+            for (Material m : allMaterials) {
+                System.out.println("[LOG] Material for autocomplete: ID=" + m.getMaterialId() + ", Name=" + m.getMaterialName());
+            }
             request.setAttribute("materials", allMaterials);
 
             String categoryIdParam = request.getParameter("categoryId");
@@ -106,15 +110,15 @@ public class DashboardMaterialServlet extends HttpServlet {
                 totalMaterials = list.size();
                 totalPages = 1;
             } else {
-                list = materialDAO.searchMaterials(keyword, status, pageIndex, pageSize, sortOption);
-                totalMaterials = materialDAO.countMaterials(keyword, status);
+                list = materialDAO.searchMaterials(materialName, status, pageIndex, pageSize, sortOption);
+                totalMaterials = materialDAO.countMaterials(materialName, status);
                 totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             }
 
             request.setAttribute("list", list);
             request.setAttribute("currentPage", pageIndex);
             request.setAttribute("totalPages", totalPages);
-            request.setAttribute("keyword", keyword);
+            request.setAttribute("materialName", materialName);
             request.setAttribute("status", status);
             request.setAttribute("sortOption", sortOption);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);

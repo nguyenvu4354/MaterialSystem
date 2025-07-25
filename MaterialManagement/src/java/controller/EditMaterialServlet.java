@@ -99,7 +99,6 @@ public class EditMaterialServlet extends HttpServlet {
             String materialCode = request.getParameter("materialCode");
             String materialName = request.getParameter("materialName");
             String materialStatus = request.getParameter("materialStatus");
-            String priceStr = request.getParameter("price");
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
             String urlInput = request.getParameter("materialsUrl");
@@ -109,7 +108,6 @@ public class EditMaterialServlet extends HttpServlet {
             System.out.println("materialCode: " + materialCode);
             System.out.println("materialName: " + materialName);
             System.out.println("materialStatus: " + materialStatus);
-            System.out.println("price: " + priceStr);
             System.out.println("categoryId: " + categoryId);
             System.out.println("unitId: " + unitId);
             System.out.println("materialsUrl: " + urlInput);
@@ -197,6 +195,20 @@ public class EditMaterialServlet extends HttpServlet {
             material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             System.out.println("📌 [EditMaterialServlet] Final Material Image URL: " + material.getMaterialsUrl());
+
+            // Kiểm tra trùng tên và trạng thái với vật tư khác
+            if (materialDAO.isMaterialNameAndStatusExists(materialName, materialStatus)) {
+                Material exist = materialDAO.getInformationByNameAndStatus(materialName, materialStatus);
+                if (exist != null && exist.getMaterialId() != Integer.parseInt(materialId)) {
+                    request.setAttribute("error", "Tên vật tư đã tồn tại với trạng thái này. Vui lòng chọn tên hoặc trạng thái khác.");
+                    material.setMaterialsUrl(imageUrl != null ? imageUrl : oldMaterial.getMaterialsUrl());
+                    request.setAttribute("m", material);
+                    request.setAttribute("categories", new CategoryDAO().getAllCategories());
+                    request.setAttribute("units", new UnitDAO().getAllUnits());
+                    request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
+                    return;
+                }
+            }
 
             // Update material
             System.out.println("🔄 [EditMaterialServlet] Updating material in database...");
