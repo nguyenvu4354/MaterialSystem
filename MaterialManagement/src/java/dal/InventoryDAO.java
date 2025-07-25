@@ -111,9 +111,9 @@ public class InventoryDAO extends DBContext {
 
     public List<Inventory> getAllInventory() throws SQLException {
         List<Inventory> inventoryList = new ArrayList<>();
-        String sql = "SELECT i.*, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name " +
-                    "FROM Inventory i " +
-                    "JOIN Materials m ON i.material_id = m.material_id " +
+        String sql = "SELECT m.material_id, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS stock, i.location, i.note, i.last_updated, i.updated_by, i.inventory_id " +
+                    "FROM Materials m " +
+                    "LEFT JOIN Inventory i ON m.material_id = i.material_id " +
                     "LEFT JOIN Categories c ON m.category_id = c.category_id " +
                     "LEFT JOIN Units u ON m.unit_id = u.unit_id " +
                     "WHERE m.disable = 0 " +
@@ -128,14 +128,15 @@ public class InventoryDAO extends DBContext {
                 inventory.setStock(rs.getInt("stock"));
                 inventory.setLocation(rs.getString("location"));
                 inventory.setNote(rs.getString("note"));
-                inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+                if (rs.getTimestamp("last_updated") != null) {
+                    inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+                }
                 inventory.setUpdatedBy(rs.getInt("updated_by"));
                 inventory.setMaterialName(rs.getString("material_name"));
                 inventory.setMaterialCode(rs.getString("material_code"));
                 inventory.setMaterialsUrl(rs.getString("materials_url"));
                 inventory.setCategoryName(rs.getString("category_name"));
                 inventory.setUnitName(rs.getString("unit_name"));
-                
                 inventoryList.add(inventory);
             }
         }
@@ -144,11 +145,11 @@ public class InventoryDAO extends DBContext {
     public Map<String, Integer> getInventoryStatistics() throws SQLException {
         Map<String, Integer> stats = new HashMap<>();
         String sql = "SELECT " +
-                    "SUM(i.stock) as total_stock, " +
-                    "COUNT(CASE WHEN i.stock > 0 AND i.stock < 10 THEN 1 END) as low_stock_count, " +
-                    "COUNT(CASE WHEN i.stock = 0 THEN 1 END) as out_of_stock_count " +
-                    "FROM Inventory i " +
-                    "JOIN Materials m ON i.material_id = m.material_id " +
+                    "SUM(IFNULL(i.stock,0)) as total_stock, " +
+                    "COUNT(CASE WHEN IFNULL(i.stock,0) > 0 AND IFNULL(i.stock,0) < 10 THEN 1 END) as low_stock_count, " +
+                    "COUNT(CASE WHEN IFNULL(i.stock,0) = 0 THEN 1 END) as out_of_stock_count " +
+                    "FROM Materials m " +
+                    "LEFT JOIN Inventory i ON m.material_id = i.material_id " +
                     "WHERE m.disable = 0";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql);
@@ -164,11 +165,10 @@ public class InventoryDAO extends DBContext {
     
     public List<Inventory> getInventoryWithPagination(String searchTerm, String stockFilter, String sortStock, int page, int pageSize) throws SQLException {
         List<Inventory> inventoryList = new ArrayList<>();
-        
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT i.*, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name ");
-        sql.append("FROM Inventory i ");
-        sql.append("JOIN Materials m ON i.material_id = m.material_id ");
+        sql.append("SELECT m.material_id, m.material_name, m.material_code, m.materials_url, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS stock, i.location, i.note, i.last_updated, i.updated_by, i.inventory_id ");
+        sql.append("FROM Materials m ");
+        sql.append("LEFT JOIN Inventory i ON m.material_id = i.material_id ");
         sql.append("LEFT JOIN Categories c ON m.category_id = c.category_id ");
         sql.append("LEFT JOIN Units u ON m.unit_id = u.unit_id ");
         sql.append("WHERE m.disable = 0 ");
@@ -178,25 +178,24 @@ public class InventoryDAO extends DBContext {
         if (stockFilter != null && !stockFilter.trim().isEmpty()) {
             switch (stockFilter) {
                 case "high":
-                    sql.append("AND i.stock > 50 ");
+                    sql.append("AND IFNULL(i.stock, 0) > 50 ");
                     break;
                 case "medium":
-                    sql.append("AND i.stock >= 10 AND i.stock <= 50 ");
+                    sql.append("AND IFNULL(i.stock, 0) >= 10 AND IFNULL(i.stock, 0) <= 50 ");
                     break;
                 case "low":
-                    sql.append("AND i.stock >= 1 AND i.stock < 10 ");
+                    sql.append("AND IFNULL(i.stock, 0) >= 1 AND IFNULL(i.stock, 0) < 10 ");
                     break;
                 case "zero":
-                    sql.append("AND i.stock = 0 ");
+                    sql.append("AND IFNULL(i.stock, 0) = 0 ");
                     break;
             }
         }
-        
         if (sortStock != null && !sortStock.trim().isEmpty()) {
             if (sortStock.equals("asc")) {
-                sql.append("ORDER BY i.stock ASC, m.material_code ASC ");
+                sql.append("ORDER BY IFNULL(i.stock, 0) ASC, m.material_code ASC ");
             } else if (sortStock.equals("desc")) {
-                sql.append("ORDER BY i.stock DESC, m.material_code ASC ");
+                sql.append("ORDER BY IFNULL(i.stock, 0) DESC, m.material_code ASC ");
             } else {
                 sql.append("ORDER BY m.material_code ASC ");
             }
@@ -204,20 +203,16 @@ public class InventoryDAO extends DBContext {
             sql.append("ORDER BY m.material_code ASC ");
         }
         sql.append("LIMIT ? OFFSET ?");
-        
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
-            
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 String searchPattern = "%" + searchTerm.toLowerCase().trim() + "%";
                 stmt.setString(paramIndex++, searchPattern);
                 stmt.setString(paramIndex++, searchPattern);
                 stmt.setString(paramIndex++, searchPattern);
             }
-            
             stmt.setInt(paramIndex++, pageSize);
             stmt.setInt(paramIndex, (page - 1) * pageSize);
-            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Inventory inventory = new Inventory();
@@ -226,14 +221,15 @@ public class InventoryDAO extends DBContext {
                     inventory.setStock(rs.getInt("stock"));
                     inventory.setLocation(rs.getString("location"));
                     inventory.setNote(rs.getString("note"));
-                    inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+                    if (rs.getTimestamp("last_updated") != null) {
+                        inventory.setLastUpdated(rs.getTimestamp("last_updated").toLocalDateTime());
+                    }
                     inventory.setUpdatedBy(rs.getInt("updated_by"));
                     inventory.setMaterialName(rs.getString("material_name"));
                     inventory.setMaterialCode(rs.getString("material_code"));
                     inventory.setMaterialsUrl(rs.getString("materials_url"));
                     inventory.setCategoryName(rs.getString("category_name"));
                     inventory.setUnitName(rs.getString("unit_name"));
-                    
                     inventoryList.add(inventory);
                 }
             }
@@ -243,8 +239,8 @@ public class InventoryDAO extends DBContext {
     public int getInventoryCount(String searchTerm, String stockFilter) throws SQLException {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) as total ");
-        sql.append("FROM Inventory i ");
-        sql.append("JOIN Materials m ON i.material_id = m.material_id ");
+        sql.append("FROM Materials m ");
+        sql.append("LEFT JOIN Inventory i ON m.material_id = i.material_id ");
         sql.append("LEFT JOIN Categories c ON m.category_id = c.category_id ");
         sql.append("WHERE m.disable = 0 ");
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -253,20 +249,19 @@ public class InventoryDAO extends DBContext {
         if (stockFilter != null && !stockFilter.trim().isEmpty()) {
             switch (stockFilter) {
                 case "high":
-                    sql.append("AND i.stock > 50 ");
+                    sql.append("AND IFNULL(i.stock, 0) > 50 ");
                     break;
                 case "medium":
-                    sql.append("AND i.stock >= 10 AND i.stock <= 50 ");
+                    sql.append("AND IFNULL(i.stock, 0) >= 10 AND IFNULL(i.stock, 0) <= 50 ");
                     break;
                 case "low":
-                    sql.append("AND i.stock >= 1 AND i.stock < 10 ");
+                    sql.append("AND IFNULL(i.stock, 0) >= 1 AND IFNULL(i.stock, 0) < 10 ");
                     break;
                 case "zero":
-                    sql.append("AND i.stock = 0 ");
+                    sql.append("AND IFNULL(i.stock, 0) = 0 ");
                     break;
             }
         }
-        
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -275,7 +270,6 @@ public class InventoryDAO extends DBContext {
                 stmt.setString(paramIndex++, searchPattern);
                 stmt.setString(paramIndex++, searchPattern);
             }
-            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("total");
