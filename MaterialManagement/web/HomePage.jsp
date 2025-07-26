@@ -13,6 +13,7 @@
         <meta name="author" content="">
         <meta name="keywords" content="inventory, material management, stock control, accessories">
         <meta name="description" content="A professional material management system for tracking and managing computer accessories and inventory.">
+
         <style>
             body {
                 font-family: 'Inter', sans-serif;
@@ -607,6 +608,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     </head>
     <body>
+       
         <div class="top-bar py-2">
             <div class="container d-flex justify-content-center align-items-center position-relative">
             </div>
