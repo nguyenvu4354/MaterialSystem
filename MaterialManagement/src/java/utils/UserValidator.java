@@ -3,13 +3,14 @@ package utils;
 import dal.UserDAO;
 import entity.User;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class UserValidator {
 
-    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$";
     private static final String PHONE_REGEX = "^\\+?[0-9]{1,15}$";
     private static final int USERNAME_MAX_LENGTH = 10;
     private static final int FULLNAME_MAX_LENGTH = 25;
@@ -76,6 +77,8 @@ public class UserValidator {
                 LocalDate dob = LocalDate.parse(dateOfBirth);
                 if (dob.isAfter(LocalDate.now())) {
                     errors.put("dateOfBirth", "Date of birth cannot be in the future.");
+                } else if (Period.between(dob, LocalDate.now()).getYears() < 18) {
+                    errors.put("dateOfBirth", "User must be at least 18 years old.");
                 }
             } catch (Exception e) {
                 errors.put("dateOfBirth", "Invalid date of birth format.");
@@ -130,6 +133,8 @@ public class UserValidator {
                 LocalDate dob = LocalDate.parse(dateOfBirth);
                 if (dob.isAfter(LocalDate.now())) {
                     errors.put("dateOfBirth", "Date of birth cannot be in the future.");
+                } else if (Period.between(dob, LocalDate.now()).getYears() < 18) {
+                    errors.put("dateOfBirth", "User must be at least 18 years old.");
                 }
             } catch (Exception e) {
                 errors.put("dateOfBirth", "Invalid date of birth format.");
