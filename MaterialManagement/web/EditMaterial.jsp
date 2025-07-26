@@ -178,18 +178,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Price và Description -->
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <label for="price" class="form-label">Price</label>
-                                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="${m.price}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="description" class="form-label">Description</label>
-                                                <textarea class="form-control" id="description" name="description" rows="3">${m.description}</textarea>
-                                            </div>
-                                        </div>
-
                                         <!-- Nút Submit và Cancel -->
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                             <button type="submit" class="btn btn-brown">
