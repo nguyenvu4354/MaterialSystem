@@ -120,7 +120,8 @@
                                             <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                                             <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                                             <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
-                                            <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
+                                            <option value="cancelled" ${status == 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                                            <option value="sent_to_supplier" ${status == 'sent_to_supplier' ? 'selected' : ''}>Sent to Supplier</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -150,6 +151,9 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="repair-tab" data-bs-toggle="tab" href="#Repair">Repair Requests</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="purchase-order-tab" data-bs-toggle="tab" href="#PurchaseOrder">Purchase Orders</a>
                                 </li>
                             </ul>
 
@@ -320,6 +324,63 @@
                                             </c:forEach>
                                             <li class="page-item ${currentPage == repairTotalPages ? 'disabled' : ''}">
                                                 <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=repair&page=${currentPage + 1}&status=${status}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Next</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+
+                                <div class="tab-pane fade" id="PurchaseOrder">
+                                    <h3 class="fw-normal mb-3">Purchase Orders</h3>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>PO Code</th>
+                                                    <th>Created Date</th>
+                                                    <th>Status</th>
+                                                    <th>Details</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:forEach var="po" items="${purchaseOrders}">
+                                                    <tr>
+                                                        <td>${po.poCode}</td>
+                                                        <td><fmt:formatDate value="${po.createdAt}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+                                                        <td>${po.status}</td>
+                                                        <td>
+                                                            <a href="${pageContext.request.contextPath}/ViewRequestDetails?type=purchase_order&id=${po.poId}" class="btn btn-outline-primary btn-sm mt-2 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-eye"></i> View
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <c:if test="${po.status == 'pending'}">
+                                                                <form action="${pageContext.request.contextPath}/ViewRequests" method="post" style="display:inline;">
+                                                                    <input type="hidden" name="action" value="cancel">
+                                                                    <input type="hidden" name="type" value="purchase_order">
+                                                                    <input type="hidden" name="id" value="${po.poId}">
+                                                                    <button type="submit" class="btn btn-danger btn-sm mt-2"
+                                                                            onclick="return confirm('Are you sure you want to cancel this purchase order?')">Cancel</button>
+                                                                </form>
+                                                            </c:if>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav class="mt-3">
+                                        <ul class="pagination justify-content-center">
+                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase_order&page=${currentPage - 1}&status=${status}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Previous</a>
+                                            </li>
+                                            <c:forEach begin="1" end="${purchaseOrderTotalPages}" var="i">
+                                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase_order&page=${i}&status=${status}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                            <li class="page-item ${currentPage == purchaseOrderTotalPages ? 'disabled' : ''}">
+                                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequests?tab=purchase_order&page=${currentPage + 1}&status=${status}&searchTerm=${searchTerm}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                             </li>
                                         </ul>
                                     </nav>

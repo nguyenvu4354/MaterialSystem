@@ -2,6 +2,7 @@ package controller;
 
 import dal.RequestDAO;
 import entity.ExportRequest;
+import entity.PurchaseOrder;
 import entity.PurchaseRequest;
 import entity.RepairRequest;
 import entity.User;
@@ -62,10 +63,12 @@ public class ViewRequestsServlet extends HttpServlet {
             List<ExportRequest> exportRequests = requestDAO.getExportRequestsByUser(userId, page, pageSize, status, startDate, endDate, materialName, materialCode);
             List<PurchaseRequest> purchaseRequests = requestDAO.getPurchaseRequestsByUser(userId, page, pageSize, status, startDate, endDate, materialName, materialCode);
             List<RepairRequest> repairRequests = requestDAO.getRepairRequestsByUser(userId, page, pageSize, status, startDate, endDate, materialName, materialCode);
+            List<PurchaseOrder> purchaseOrders = requestDAO.getPurchaseOrdersByUser(userId, page, pageSize, status, startDate, endDate, materialName, materialCode);
 
             int exportCount = requestDAO.getExportRequestCountByUser(userId, status, startDate, endDate, materialName, materialCode);
             int purchaseCount = requestDAO.getPurchaseRequestCountByUser(userId, status, startDate, endDate, materialName, materialCode);
             int repairCount = requestDAO.getRepairRequestCountByUser(userId, status, startDate, endDate, materialName, materialCode);
+            int purchaseOrderCount = requestDAO.getPurchaseOrderCountByUser(userId, status, startDate, endDate, materialName, materialCode);
 
             String message = request.getParameter("message");
             if (message != null) {
@@ -75,9 +78,11 @@ public class ViewRequestsServlet extends HttpServlet {
             request.setAttribute("exportRequests", exportRequests);
             request.setAttribute("purchaseRequests", purchaseRequests);
             request.setAttribute("repairRequests", repairRequests);
+            request.setAttribute("purchaseOrders", purchaseOrders);
             request.setAttribute("exportTotalPages", (int) Math.ceil((double) exportCount / pageSize));
             request.setAttribute("purchaseTotalPages", (int) Math.ceil((double) purchaseCount / pageSize));
             request.setAttribute("repairTotalPages", (int) Math.ceil((double) repairCount / pageSize));
+            request.setAttribute("purchaseOrderTotalPages", (int) Math.ceil((double) purchaseOrderCount / pageSize));
             request.setAttribute("currentPage", page);
             request.setAttribute("status", status);
             request.setAttribute("searchTerm", searchTerm);
@@ -121,11 +126,12 @@ public class ViewRequestsServlet extends HttpServlet {
                     success = requestDAO.cancelPurchaseRequest(id, user.getUserId());
                 } else if ("repair".equalsIgnoreCase(type)) {
                     success = requestDAO.cancelRepairRequest(id, user.getUserId());
+                } else if ("purchase_order".equalsIgnoreCase(type)) {
+                    success = requestDAO.cancelPurchaseOrder(id, user.getUserId());
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/ViewRequests?message=Error: Invalid request type");
+                    response.sendRedirect(request.getContextPath() + "/ViewRequests?message=Error: Invalid request type.");
                     return;
                 }
-
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/ViewRequests?message=Request canceled successfully");
                 } else {
