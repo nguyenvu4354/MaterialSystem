@@ -108,7 +108,6 @@
                 <div class="col-md-9 col-lg-10 content px-md-4">
                     <div class="bg-white rounded shadow-sm p-4 mt-4">
                         <h2 class="fw-bold display-6 border-bottom pb-2 mb-3">Import History</h2>
-                        <!-- Filter Form -->
                         <form action="ImportHistory" method="get" class="d-flex gap-2 align-items-center search-box">
                             <input type="date" name="fromDate" class="form-control" value="${fromDate}" placeholder="From Date" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="date" name="toDate" class="form-control" value="${toDate}" placeholder="To Date" style="width: 180px; height: 50px; border: 2px solid gray" />
@@ -133,7 +132,6 @@
                             </button>
                             <a href="ImportHistory" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 100px; height: 50px; border-radius: 8px; font-weight: 500;">Clear</a>
                         </form>
-                        <!-- Table -->
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover align-middle text-center">
                                 <thead class="table-light">

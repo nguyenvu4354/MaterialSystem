@@ -722,22 +722,7 @@
 
                 <div class="col-md-10 mb-1">
                     <div class="content">
-                        <!-- FILTER & SEARCH -->
-                        <form action="search" method="get" class="mb-3 d-flex gap-2 align-items-center">
-                            <input class="form-control" type="search" name="keyword" placeholder="Search material by name or code..." value="${param.keyword}" style="max-width: 300px;">
-                            <select class="form-select" name="status" style="max-width: 180px;">
-                                <option value="">All Status</option>
-                                <option value="new" <c:if test='${param.status == "new"}'>selected</c:if>>New</option>
-                                <option value="used" <c:if test='${param.status == "used"}'>selected</c:if>>Used</option>
-                                <option value="damaged" <c:if test='${param.status == "damaged"}'>selected</c:if>>Damaged</option>
-                            </select>
-                            <button class="btn btn-main" style="background:#DEAD6F; color:#fff; font-weight:700;" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='home'">
-                                <i class="fas fa-times"></i> Clear 
-                            </button>
-                        </form>
+                      
                         <section id="clothing" class="my-5 overflow-hidden">
                             <div class="container pb-5">
                                 <div class="section-header d-md-flex justify-content-between align-items-center mb-4">
