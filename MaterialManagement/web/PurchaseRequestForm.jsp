@@ -7,7 +7,6 @@
     <title>Create Purchase Request</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap & Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/vendor.css">
     <link rel="stylesheet" href="style.css">
@@ -40,7 +39,6 @@
             border: 1px solid #eee;
             display: block;
         }
-        /* Style cho box gợi ý autocomplete */
         .ui-autocomplete {
             background: #fff;
             border: 1px solid #dee2e6;
@@ -92,79 +90,86 @@
                             <a href="dashboardmaterial" class="btn btn-outline-secondary">Back to Dashboard</a>
                         </div>
                     </div>
-                </div>
-            </c:if>
-            <c:if test="${hasCreatePurchaseRequestPermission}">
-                <jsp:include page="Header.jsp" />
-                <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
-                    <div class="container">
-                        <div class="row my-5 py-5">
-                            <div class="col-12 bg-white p-4 rounded shadow purchase-form">
-                                <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
-                                <c:if test="${not empty errors}">
-                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
-                                        <ul style="margin-bottom: 0;">
-                                            <c:forEach var="error" items="${errors}">
-                                                <li>${error.value}</li>
-                                            </c:forEach>
-                                        </ul>
-                                    </div>
-                                </c:if>
-                                <form action="CreatePurchaseRequest" method="post">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label text-muted">Request Code</label>
-                                            <input type="text" class="form-control" name="requestCode" value="${requestCode}" readonly>
+                </c:if>
+                <c:if test="${hasCreatePurchaseRequestPermission}">
+                    <jsp:include page="Header.jsp"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3 col-lg-2 bg-light p-0">
+                                <jsp:include page="SidebarEmployee.jsp" />
+                            </div>
+                            <div class="col-md-9 col-lg-10">
+                                <section id="create-request" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+                                    <div class="container">
+                                        <div class="row my-5 py-5">
+                                            <div class="col-12 bg-white p-4 rounded shadow purchase-form">
+                                                <h2 class="display-4 fw-normal text-center mb-4">Create <span class="text-primary">Purchase Request</span></h2>
+                                                <c:if test="${not empty errors}">
+                                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                                        <ul style="margin-bottom: 0;">
+                                                            <c:forEach var="error" items="${errors}">
+                                                                <li>${error.value}</li>
+                                                            </c:forEach>
+                                                        </ul>
+                                                    </div>
+                                                </c:if>
+                                                <form action="CreatePurchaseRequest" method="post">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-muted">Request Code</label>
+                                                            <input type="text" class="form-control" name="requestCode" value="${requestCode}" readonly>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-muted">Request Date</label>
+                                                            <input type="text" class="form-control" name="requestDate" value="${requestDate}" readonly>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label text-muted">Purchase Reason</label>
+                                                            <textarea class="form-control" name="reason" rows="1"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <h3 class="fw-normal mt-5 mb-3">Materials</h3>
+                                                    <div id="materialList">
+                                                        <div class="row material-row align-items-center gy-2">
+                                                            <div class="col-md-3">
+                                                                <label class="form-label text-muted">Material</label>
+                                                                <input type="text" class="form-control material-name-input" name="materialName" placeholder="Type material name or code" autocomplete="off">
+                                                                <input type="hidden" name="materialId" class="material-id-input">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="form-label text-muted">Quantity</label>
+                                                                <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="form-label text-muted">Notes</label>
+                                                                <input type="text" class="form-control" name="note">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <img class="material-image" src="<c:out value='${materials[0].materialsUrl}'/>" alt="Material Image">
+                                                            </div>
+                                                            <div class="col-md-1 d-flex align-items-center">
+                                                                <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3">
+                                                        <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
+                                                    </div>
+                                                    <div class="mt-5 d-grid gap-2">
+                                                        <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                                                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label text-muted">Request Date</label>
-                                            <input type="text" class="form-control" name="requestDate" value="${requestDate}" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label text-muted">Purchase Reason</label>
-                                            <textarea class="form-control" name="reason" rows="1"></textarea>
-                                        </div>
                                     </div>
-                                    <h3 class="fw-normal mt-5 mb-3">Materials</h3>
-                                    <div id="materialList">
-                                        <div class="row material-row align-items-center gy-2">
-                                            <div class="col-md-3">
-                                                <label class="form-label text-muted">Material</label>
-                                                <input type="text" class="form-control material-name-input" name="materialName" placeholder="Type material name or code" autocomplete="off">
-                                                <input type="hidden" name="materialId" class="material-id-input">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label text-muted">Quantity</label>
-                                                <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label text-muted">Notes</label>
-                                                <input type="text" class="form-control" name="note">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <img class="material-image" src="<c:out value='${materials[0].materialsUrl}'/>" alt="Material Image">
-                                            </div>
-                                            <div class="col-md-1 d-flex align-items-center">
-                                                <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
-                                    </div>
-                                    <div class="mt-5 d-grid gap-2">
-                                        <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                                        <a href="dashboardmaterial" class="btn btn-outline-secondary btn-lg rounded-1">Back to Material List</a>
-                                    </div>
-                                </form>
+                                </section>
                             </div>
                         </div>
                     </div>
-                </section>
-            </c:if>
+                </c:if>
         </c:otherwise>
     </c:choose>
-
     <script src="js/jquery-1.11.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -183,7 +188,6 @@
             }<c:if test="${!status.last}">,</c:if>
         </c:forEach>
         ];
-
         function updateMaterialRowAutocomplete(row) {
             const nameInput = row.querySelector('.material-name-input');
             const idInput = row.querySelector('.material-id-input');
@@ -200,7 +204,6 @@
                 select: function(event, ui) {
                     idInput.value = ui.item.id;
                     nameInput.value = ui.item.name;
-                    // Update image
                     let imgUrl = ui.item.imageUrl && ui.item.imageUrl !== 'null' ? ui.item.imageUrl : '';
                     if (imgUrl.startsWith('http') || imgUrl.startsWith('/') || imgUrl.startsWith('images/material/')) {
                         img.src = imgUrl;
@@ -237,20 +240,15 @@
                 minLength: 1
             });
         }
-
-        // Initial setup for the first row
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.material-row').forEach(row => {
                 updateMaterialRowAutocomplete(row);
             });
         });
-
-        // When add material row
         document.getElementById('addMaterial').addEventListener('click', function () {
             const materialList = document.getElementById('materialList');
             const firstRow = materialList.querySelector('.material-row');
             const newRow = firstRow.cloneNode(true);
-            // Reset fields in the new row
             newRow.querySelector('.material-name-input').value = '';
             newRow.querySelector('.material-id-input').value = '';
             newRow.querySelector('input[name="quantity"]').value = '';
@@ -259,8 +257,6 @@
             materialList.appendChild(newRow);
             updateMaterialRowAutocomplete(newRow);
         });
-        
-        // Remove material row
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('remove-material')) {
                 const materialRows = document.querySelectorAll('.material-row');

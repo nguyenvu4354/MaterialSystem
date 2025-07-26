@@ -142,13 +142,41 @@
                     </div>
                 </c:if>
 
-                <p><strong>Request Code:</strong> ${request.requestCode}</p>
-                <p><strong>Request Date:</strong> <fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></p>
-                <p><strong>Status:</strong> ${request.status}</p>
-                <p><strong>Reason:</strong> ${request.reason != null ? request.reason : "N/A"}</p>
-                <p><strong>Approval Reason:</strong> ${request.approvalReason != null ? request.approvalReason : "N/A"}</p>
-                <p><strong>Rejection Reason:</strong> ${request.rejectionReason != null ? request.rejectionReason : "N/A"}</p>
+                <!-- Common attributes for all request types -->
+                <c:choose>
+                    <c:when test="${requestType == 'PurchaseOrder'}">
+                        <p><strong>PO Code:</strong> ${request.poCode}</p>
+                        <p><strong>Created Date:</strong> <fmt:formatDate value="${request.createdAt}" pattern="dd/MM/yyyy HH:mm:ss" /></p>
+                        <p><strong>Purchase Request Code:</strong> ${request.purchaseRequestCode}</p>
+                        <p><strong>Created By:</strong> ${request.createdByName}</p>
+                        <p><strong>Status:</strong> ${request.status}</p>
+                        <p><strong>Note:</strong> ${request.note != null ? request.note : "N/A"}</p>
+                        <p><strong>Approved By:</strong> ${request.approvedByName != null ? request.approvedByName : "N/A"}</p>
+                        <p><strong>Approved At:</strong> <c:choose>
+                            <c:when test="${request.approvedAt != null}">
+                                <fmt:formatDate value="${request.approvedAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                            </c:when>
+                            <c:otherwise>N/A</c:otherwise>
+                        </c:choose></p>
+                        <p><strong>Rejection Reason:</strong> ${request.rejectionReason != null ? request.rejectionReason : "N/A"}</p>
+                        <p><strong>Sent to Supplier At:</strong> <c:choose>
+                            <c:when test="${request.sentToSupplierAt != null}">
+                                <fmt:formatDate value="${request.sentToSupplierAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                            </c:when>
+                            <c:otherwise>N/A</c:otherwise>
+                        </c:choose></p>
+                    </c:when>
+                    <c:otherwise>
+                        <p><strong>Request Code:</strong> ${request.requestCode}</p>
+                        <p><strong>Request Date:</strong> <fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm:ss" /></p>
+                        <p><strong>Status:</strong> ${request.status}</p>
+                        <p><strong>Reason:</strong> ${request.reason != null ? request.reason : "N/A"}</p>
+                        <p><strong>Approval Reason:</strong> ${request.approvalReason != null ? request.approvalReason : "N/A"}</p>
+                        <p><strong>Rejection Reason:</strong> ${request.rejectionReason != null ? request.rejectionReason : "N/A"}</p>
+                    </c:otherwise>
+                </c:choose>
 
+                <!-- Type-specific attributes -->
                 <c:if test="${requestType == 'Export'}">
                     <p><strong>Recipient:</strong> ${request.recipientName}</p>
                     <p><strong>Approver:</strong> ${request.approverName != null ? request.approverName : "N/A"}</p>
@@ -166,6 +194,7 @@
                     </c:choose></p>
                 </c:if>
                 <c:if test="${requestType == 'Purchase'}">
+                    <!-- Add any Purchase-specific fields if needed -->
                 </c:if>
                 <c:if test="${requestType == 'Repair'}">
                     <p><strong>Estimated Return Date:</strong> <c:choose>
@@ -297,33 +326,63 @@
                             </tbody>
                         </table>
                     </c:when>
+                    <c:when test="${requestType == 'PurchaseOrder'}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Material Name</th>
+                                    <th>Category</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Total Price</th>
+                                    <th>Supplier</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="detail" items="${details}">
+                                    <tr>
+                                        <td>${detail.materialName}</td>
+                                        <td>${detail.categoryName}</td>
+                                        <td>${detail.quantity}</td>
+                                        <td><fmt:formatNumber value="${detail.unitPrice}" type="currency" currencySymbol="$" /></td>
+                                        <td><fmt:formatNumber value="${detail.quantity * detail.unitPrice}" type="currency" currencySymbol="$" /></td>
+                                        <td>${detail.supplierName != null ? detail.supplierName : "N/A"}</td>
+                                        <td>${detail.note != null ? detail.note : "N/A"}</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:when>
                 </c:choose>
 
+                <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage - 1}">Previous</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : (requestType == 'Repair' ? request.repairRequestId : request.poId))}&page=${currentPage - 1}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${i}">${i}</a>
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : (requestType == 'Repair' ? request.repairRequestId : request.poId))}&page=${i}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}&page=${currentPage + 1}">Next</a>
+                                <a class="page-link" href="${pageContext.request.contextPath}/ViewRequestDetails?type=${requestType.toLowerCase()}&id=${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : (requestType == 'Repair' ? request.repairRequestId : request.poId))}&page=${currentPage + 1}">Next</a>
                             </li>
                         </ul>
                     </nav>
                 </c:if>
 
+                <!-- Action buttons -->
                 <div class="mt-4">
                     <a href="${pageContext.request.contextPath}/ViewRequests" class="btn btn-secondary">Back to Requests</a>
                     <c:if test="${request.status == 'pending'}">
                         <form action="${pageContext.request.contextPath}/ViewRequestDetails" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="cancel">
                             <input type="hidden" name="type" value="${requestType.toLowerCase()}">
-                            <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : request.repairRequestId)}">
+                            <input type="hidden" name="id" value="${requestType == 'Export' ? request.exportRequestId : (requestType == 'Purchase' ? request.purchaseRequestId : (requestType == 'Repair' ? request.repairRequestId : request.poId))}">
                             <input type="hidden" name="page" value="${currentPage}">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">Cancel Request</button>
                         </form>
