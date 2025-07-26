@@ -200,7 +200,7 @@
                 </div>
                 <div class="action-buttons" style="justify-content: flex-start; margin-top: 32px;">
                     <a href="dashboardmaterial" class="btn btn-back-dashboard">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        <i class="fas fa-arrow-left"></i> Back to List Material
                     </a>
                     <a href="editmaterial?materialId=${m.materialId}" class="btn btn-edit-material">
                         <i class="fas fa-edit"></i> Edit Material

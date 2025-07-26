@@ -33,7 +33,7 @@ public class DeleteMaterialServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "DELETE_MATERIAL")) {
-            request.setAttribute("error", "Bạn không có quyền xóa vật tư.");
+            request.setAttribute("error", "You don't have permission to delete materials.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
@@ -45,7 +45,7 @@ public class DeleteMaterialServlet extends HttpServlet {
 
             if (materialId == null || materialId.trim().isEmpty()) {
                 System.out.println("[DeleteMaterialServlet] Error: Material ID is missing.");
-                request.setAttribute("error", "Mã vật tư không hợp lệ.");
+                request.setAttribute("error", "Invalid material ID.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
@@ -55,19 +55,26 @@ public class DeleteMaterialServlet extends HttpServlet {
 
             if (!exists) {
                 System.out.println("[DeleteMaterialServlet] Error: Material does not exist.");
-                request.setAttribute("error", "Vật tư không tồn tại.");
+                request.setAttribute("error", "Material does not exist.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
 
             System.out.println("[DeleteMaterialServlet] Deleting material from database...");
-            materialDAO.deleteMaterial(Integer.parseInt(materialId));
-            System.out.println("[DeleteMaterialServlet] Material deleted successfully, redirecting to dashboardmaterial");
-            response.sendRedirect("dashboardmaterial?success=Material deleted successfully");
+            boolean deleteSuccess = materialDAO.deleteMaterial(Integer.parseInt(materialId));
+            
+            if (deleteSuccess) {
+                System.out.println("[DeleteMaterialServlet] Material deleted successfully, redirecting to dashboardmaterial");
+                response.sendRedirect("dashboardmaterial?success=Material deleted successfully");
+            } else {
+                System.out.println("[DeleteMaterialServlet] Cannot delete material - stock quantity > 0");
+                request.setAttribute("error", "Cannot delete material. This material still has stock (quantity > 0).");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+            }
         } catch (Exception ex) {
             System.out.println("DeleteMaterialServlet] Error: " + ex.getMessage());
             ex.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi xóa vật tư: " + ex.getMessage());
+            request.setAttribute("error", "An error occurred while deleting the material: " + ex.getMessage());
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }

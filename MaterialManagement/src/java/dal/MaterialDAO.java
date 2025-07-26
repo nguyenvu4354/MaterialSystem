@@ -27,7 +27,7 @@ public class MaterialDAO extends DBContext {
             sql.append("SELECT m.*, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS quantity ")
                     .append("FROM materials m ")
                     .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
-                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id AND u.disable = 0 ")
                     .append("LEFT JOIN inventory i ON m.material_id = i.material_id ")
                     .append("WHERE m.disable = 0 ");
 
@@ -140,14 +140,36 @@ public class MaterialDAO extends DBContext {
         return count;
     }
 
-    public void deleteMaterial(int materialId) {
-        String sql = "UPDATE materials SET disable = 1 WHERE material_id = ?";
+    public boolean deleteMaterial(int materialId) {
+        // Kiểm tra quantity stock trước khi xóa
+        String checkStockSql = "SELECT IFNULL(i.stock, 0) AS quantity FROM materials m " +
+                              "LEFT JOIN inventory i ON m.material_id = i.material_id " +
+                              "WHERE m.material_id = ?";
+        
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, materialId);
-            ps.executeUpdate();
+            // Kiểm tra stock quantity
+            PreparedStatement checkPs = connection.prepareStatement(checkStockSql);
+            checkPs.setInt(1, materialId);
+            ResultSet rs = checkPs.executeQuery();
+            
+            if (rs.next()) {
+                int quantity = rs.getInt("quantity");
+                if (quantity > 0) {
+                    // Không thể xóa vì còn stock
+                    return false;
+                }
+            }
+            
+            // Nếu quantity = 0, tiến hành xóa (set disable = 1)
+            String deleteSql = "UPDATE materials SET disable = 1 WHERE material_id = ?";
+            PreparedStatement deletePs = connection.prepareStatement(deleteSql);
+            deletePs.setInt(1, materialId);
+            int affectedRows = deletePs.executeUpdate();
+            
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -701,7 +723,7 @@ public class MaterialDAO extends DBContext {
             sql.append("SELECT m.*, c.category_name, u.unit_name, IFNULL(i.stock, 0) AS quantity ")
                     .append("FROM materials m ")
                     .append("LEFT JOIN categories c ON m.category_id = c.category_id ")
-                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id ")
+                    .append("LEFT JOIN units u ON m.unit_id = u.unit_id AND u.disable = 0 ")
                     .append("LEFT JOIN inventory i ON m.material_id = i.material_id ")
                     .append("WHERE m.disable = 0 ");
 
