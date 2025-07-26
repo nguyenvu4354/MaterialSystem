@@ -27,13 +27,11 @@ public class ApproveRepairRequestServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
-        // Check if user is logged in
         if (user == null) {
             response.sendRedirect("Login.jsp");
             return;
         }
 
-        // Check if user is Admin (roleId = 1), Director (roleId = 2), or has APPROVE_REPAIR_REQUEST permission
         int roleId = user.getRoleId();
         if (roleId != 1 && roleId != 2 && !rolePermissionDAO.hasPermission(roleId, "APPROVE_REPAIR_REQUEST")) {
             request.setAttribute("error", "You do not have permission to approve repair requests.");

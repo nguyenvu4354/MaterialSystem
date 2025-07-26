@@ -27,7 +27,6 @@ public class RepairRequestListServlet extends HttpServlet {
             return;
         }
 
-        // Pagination parameters
         int page = 1;
         int pageSize = 10; // Number of records per page
         if (request.getParameter("page") != null) {
@@ -53,7 +52,6 @@ public class RepairRequestListServlet extends HttpServlet {
         }
 
         try {
-            // Fetch repair requests with pagination, filters, and sorting
             List<RepairRequest> repairRequests = repairRequestDAO.getRepairRequestsWithPagination(
                     offset, pageSize, searchKeyword, selectedStatus, sortByName, requestDateFrom, requestDateTo
             );
@@ -82,7 +80,7 @@ public class RepairRequestListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response); // Redirect POST to GET for simplicity
+        doGet(request, response); 
     }
 
     @Override

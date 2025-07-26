@@ -30,7 +30,6 @@ public class DepartmentServlet extends HttpServlet {
             return;
         }
 
-        // Check VIEW_LIST_DEPARTMENT permission
         int roleId = user.getRoleId();
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_DEPARTMENT")) {
             request.setAttribute("error", "You do not have permission to view the department list.");
@@ -69,7 +68,6 @@ public class DepartmentServlet extends HttpServlet {
             // Define statuses for dropdown
             List<String> statuses = Arrays.asList("Active", "Inactive", "Deleted");
 
-            // Fetch departments with pagination, search, sort, and filter
             List<Department> departments = departmentDAO.getDepartmentsWithPagination(
                     offset, pageSize, searchKeyword, sortByName, statusFilter
             );
@@ -97,7 +95,7 @@ public class DepartmentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response); // Redirect POST to GET for simplicity
+        doGet(request, response); 
     }
 
     @Override

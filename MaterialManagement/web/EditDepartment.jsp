@@ -140,11 +140,9 @@
                 const location = document.querySelector('input[name="location"]').value.trim();
                 const status = document.querySelector('select[name="status"]').value.trim();
 
-                // Reset error messages
                 document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
                 document.querySelectorAll('.form-control, .form-select').forEach(el => el.classList.remove('is-invalid'));
 
-                // Validate name
                 if (!name) {
                     document.getElementById('nameError').textContent = 'Department name cannot be left blank.';
                     document.querySelector('input[name="name"]').classList.add('is-invalid');
@@ -158,28 +156,24 @@
                     isValid = false;
                 }
 
-                // Validate phone
                 if (phone && !/^\d{10,12}$/.test(phone)) {
                     document.getElementById('phoneError').textContent = 'Phone number must contain 10 to 12 digits.';
                     document.querySelector('input[name="phone"]').classList.add('is-invalid');
                     isValid = false;
                 }
 
-                // Validate email
                 if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                     document.getElementById('emailError').textContent = 'Invalid email format.';
                     document.querySelector('input[name="email"]').classList.add('is-invalid');
                     isValid = false;
                 }
 
-                // Validate location
                 if (location && location.length > 100) {
                     document.getElementById('locationError').textContent = 'Location must not exceed 100 characters.';
                     document.querySelector('input[name="location"]').classList.add('is-invalid');
                     isValid = false;
                 }
 
-                // Validate status
                 if (!status) {
                     document.getElementById('statusError').textContent = 'Status cannot be left blank.';
                     document.querySelector('select[name="status"]').classList.add('is-invalid');

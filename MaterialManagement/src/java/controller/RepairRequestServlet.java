@@ -37,28 +37,23 @@ public class RepairRequestServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
 
-        // Kiểm tra đăng nhập
         if (currentUser == null) {
             response.sendRedirect("Login.jsp");
             return;
         }
 
-        // Kiểm tra quyền CREATE_REPAIR_REQUEST
         if (!rolePermissionDAO.hasPermission(currentUser.getRoleId(), "CREATE_REPAIR_REQUEST")) {
-            request.setAttribute("error", "Bạn không có quyền truy cập trang tạo yêu cầu sửa chữa.");
+            request.setAttribute("error", "You do not have permission to access the repair request creation page.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
 
-        // Lấy danh sách vật tư từ database
         MaterialDAO materialDAO = new MaterialDAO();
         List<Material> materialList = materialDAO.getAllProducts();
 
-        // Lấy danh sách nhà cung cấp từ database
         SupplierDAO supplierDAO = new SupplierDAO();
         List<Supplier> supplierList = supplierDAO.getAllSuppliers();
 
-        // Truyền danh sách vật tư và nhà cung cấp sang JSP
         request.setAttribute("materialList", materialList);
         request.setAttribute("supplierList", supplierList);
 
@@ -70,7 +65,6 @@ public class RepairRequestServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy user từ session
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
             if (user == null) {
@@ -78,19 +72,16 @@ public class RepairRequestServlet extends HttpServlet {
                 return;
             }
 
-            // Kiểm tra quyền CREATE_REPAIR_REQUEST
             if (!rolePermissionDAO.hasPermission(user.getRoleId(), "CREATE_REPAIR_REQUEST")) {
-                request.setAttribute("error", "Bạn không có quyền tạo yêu cầu sửa chữa.");
+                request.setAttribute("error", "You do not have permission to create a repair request.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
 
             int userId = user.getUserId();
 
-            // Sinh tự động requestCode
             String requestCode = generateRequestCode();
 
-            // Lấy thông tin từ form
             String supplierIdStr = request.getParameter("supplierId");
             String reason = request.getParameter("reason");
             Date estimatedReturnDate = Date.valueOf(request.getParameter("estimatedReturnDate"));
@@ -98,7 +89,7 @@ public class RepairRequestServlet extends HttpServlet {
 
             // Kiểm tra supplierId
             if (supplierIdStr == null || supplierIdStr.trim().isEmpty()) {
-                request.setAttribute("errorMessage", "Vui lòng chọn một nhà cung cấp.");
+                request.setAttribute("errorMessage", "Please select a provider.");
                 request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                 return;
             }
@@ -106,18 +97,17 @@ public class RepairRequestServlet extends HttpServlet {
             try {
                 supplierId = Integer.parseInt(supplierIdStr);
             } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "ID nhà cung cấp không hợp lệ.");
+                request.setAttribute("errorMessage", "Invalid vendor ID.");
                 request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                 return;
             }
 
-            // Tạo yêu cầu sửa chữa
             RepairRequest requestObj = new RepairRequest();
             requestObj.setRequestCode(requestCode);
             requestObj.setUserId(userId);
-            requestObj.setRepairPersonPhoneNumber(null); // Đặt null vì không sử dụng
-            requestObj.setRepairPersonEmail(null); // Đặt null vì không sử dụng
-            requestObj.setRepairLocation(null); // Đặt null vì không sử dụng
+            requestObj.setRepairPersonPhoneNumber(null); 
+            requestObj.setRepairPersonEmail(null); 
+            requestObj.setRepairLocation(null); 
             requestObj.setReason(reason);
             requestObj.setEstimatedReturnDate(estimatedReturnDate);
             requestObj.setRequestDate(now);
@@ -126,14 +116,12 @@ public class RepairRequestServlet extends HttpServlet {
             requestObj.setUpdatedAt(now);
             requestObj.setDisable(false);
 
-            // Lấy danh sách chi tiết vật tư
             String[] materialNames = request.getParameterValues("materialName");
             String[] quantities = request.getParameterValues("quantity");
             String[] descriptions = request.getParameterValues("damageDescription");
 
-            // Kiểm tra dữ liệu đầu vào
             if (materialNames == null || quantities == null || descriptions == null) {
-                request.setAttribute("errorMessage", "Dữ liệu vật tư không hợp lệ.");
+                request.setAttribute("errorMessage", "Invalid material data.");
                 request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                 return;
             }
@@ -146,7 +134,7 @@ public class RepairRequestServlet extends HttpServlet {
                 int materialId = materialDAO.getMaterialIdByName(materialName);
 
                 if (materialId == -1) {
-                    request.setAttribute("errorMessage", "Không tìm thấy vật tư có tên: " + materialName);
+                    request.setAttribute("errorMessage", "No material found with name: " + materialName);
                     request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                     return;
                 }
@@ -154,19 +142,19 @@ public class RepairRequestServlet extends HttpServlet {
                 try {
                     quantity = Integer.parseInt(quantities[i]);
                     if (quantity <= 0) {
-                        request.setAttribute("errorMessage", "Số lượng phải lớn hơn 0.");
+                        request.setAttribute("errorMessage", "Quantity must be greater than 0.");
                         request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                         return;
                     }
                 } catch (NumberFormatException e) {
-                    request.setAttribute("errorMessage", "Số lượng không hợp lệ cho vật tư: " + materialName);
+                    request.setAttribute("errorMessage", "Invalid quantity for material: " + materialName);
                     request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                     return;
                 }
 
                 String description = descriptions[i];
                 if (description == null || description.trim().isEmpty()) {
-                    request.setAttribute("errorMessage", "Mô tả hư hỏng là bắt buộc cho vật tư: " + materialName);
+                    request.setAttribute("errorMessage", "Damage description is required for the material: " + materialName);
                     request.getRequestDispatcher("CreateRepairRequest.jsp").forward(request, response);
                     return;
                 }
@@ -175,18 +163,16 @@ public class RepairRequestServlet extends HttpServlet {
                 detail.setMaterialId(materialId);
                 detail.setQuantity(quantity);
                 detail.setDamageDescription(description);
-                detail.setSupplierId(supplierId); // Gán supplierId vào chi tiết
+                detail.setSupplierId(supplierId); 
                 detail.setCreatedAt(now);
                 detail.setUpdatedAt(now);
 
                 detailList.add(detail);
             }
 
-            // Lưu yêu cầu vào DB
             boolean success = new RepairRequestDAO().createRepairRequest(requestObj, detailList);
             System.out.println("[DEBUG] [doPost] Kết quả lưu yêu cầu vào DB: " + success);
 
-            // Nếu thành công thì gửi email cho giám đốc
             if (success) {
                 UserDAO userDAO = new UserDAO();
                 SupplierDAO supplierDAO = new SupplierDAO();
@@ -242,7 +228,6 @@ public class RepairRequestServlet extends HttpServlet {
                 }
             }
 
-            // Chuyển đến trang thông báo thành công
             response.sendRedirect("RepairRequestSuccess.jsp");
 
         } catch (Exception e) {
@@ -252,7 +237,6 @@ public class RepairRequestServlet extends HttpServlet {
         }
     }
 
-    // Phương thức sinh requestCode tự động
     private String generateRequestCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
         String timestamp = sdf.format(new java.util.Date());

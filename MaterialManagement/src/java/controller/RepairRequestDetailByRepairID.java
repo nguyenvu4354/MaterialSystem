@@ -24,7 +24,6 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
         try {
             int requestId = Integer.parseInt(request.getParameter("requestId"));
 
-            // Get current page from request, default to 1 if not provided
             int currentPage = 1;
             String pageParam = request.getParameter("page");
             if (pageParam != null && !pageParam.isEmpty()) {
@@ -39,10 +38,8 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
             }
 
             RepairRequestDetailDAO dao = new RepairRequestDetailDAO();
-            // Get all details to calculate total records
             List<RepairRequestDetail> allDetails = dao.getRepairRequestDetailsByRequestId(requestId);
 
-            // Calculate pagination parameters
             int totalRecords = allDetails.size();
             int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
             if (totalPages < 1) {
@@ -52,12 +49,10 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
                 currentPage = totalPages;
             }
 
-            // Get paginated details
             int start = (currentPage - 1) * PAGE_SIZE;
             int end = Math.min(start + PAGE_SIZE, totalRecords);
             List<RepairRequestDetail> details = allDetails.subList(start, end);
 
-            // Get supplier name from the first detail (if available)
             String supplierName = (allDetails != null && !allDetails.isEmpty() && allDetails.get(0).getSupplierName() != null) 
                 ? allDetails.get(0).getSupplierName() : "N/A";
 
@@ -71,7 +66,6 @@ public class RepairRequestDetailByRepairID extends HttpServlet {
 
             int roleId = user != null ? user.getRoleId() : 0;
 
-            // Set attributes for JSP
             request.setAttribute("details", details);
             request.setAttribute("requestId", requestId);
             request.setAttribute("roleId", roleId);
