@@ -1,10 +1,11 @@
 package controller;
 
-import dal.CategoryDAO; 
+import dal.CategoryDAO;
 import dal.DepartmentDAO;
 import dal.RequestDAO;
-import entity.Category; 
+import entity.Category;
 import entity.ExportRequest;
+import entity.PurchaseOrder;
 import entity.PurchaseRequest;
 import entity.RepairRequest;
 import entity.User;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 
 @WebServlet(name = "ViewRequestDetailsServlet", urlPatterns = {"/ViewRequestDetails"})
 public class ViewRequestDetailsServlet extends HttpServlet {
-    private static final int PAGE_SIZE = 5; 
+    private static final int PAGE_SIZE = 5;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -52,6 +53,9 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 case "repair":
                     requestObj = requestDAO.getRepairRequestById(requestId);
                     break;
+                case "purchase_order":
+                    requestObj = requestDAO.getPurchaseOrderById(requestId);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request type");
                     return;
@@ -70,17 +74,20 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // Lấy danh sách vật tư từ DepartmentDAO
-            DepartmentDAO departmentDAO = new DepartmentDAO();
-            List<Material> materials = departmentDAO.getMaterials();
+            // Fetch materials for Export, Purchase, and Repair requests (not needed for Purchase Orders)
+            List<Material> materials = new ArrayList<>();
+            if (!type.equalsIgnoreCase("purchase_order")) {
+                DepartmentDAO departmentDAO = new DepartmentDAO();
+                materials = departmentDAO.getMaterials();
+            }
             request.setAttribute("materials", materials);
 
-            // Lấy danh sách danh mục từ CategoryDAO
+            // Fetch categories
             CategoryDAO categoryDAO = new CategoryDAO();
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
 
-            // Phân trang cho danh sách chi tiết
+            // Paginate details
             List<?> details = getRequestDetails(requestObj);
             int totalDetails = details.size();
             int totalPages = (int) Math.ceil((double) totalDetails / PAGE_SIZE);
@@ -94,7 +101,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             }
 
             request.setAttribute("request", requestObj);
-            request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+            request.setAttribute("requestType", type.equalsIgnoreCase("purchase_order") ? "PurchaseOrder" : type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
             request.setAttribute("details", paginatedDetails);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
@@ -123,7 +130,6 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             Object requestObj = null;
 
-            // Khởi tạo RequestDAO
             RequestDAO requestDAO = new RequestDAO();
 
             // Fetch the request based on type
@@ -136,6 +142,9 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                     break;
                 case "repair":
                     requestObj = requestDAO.getRepairRequestById(requestId);
+                    break;
+                case "purchase_order":
+                    requestObj = requestDAO.getPurchaseOrderById(requestId);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request type");
@@ -172,6 +181,9 @@ public class ViewRequestDetailsServlet extends HttpServlet {
                     case "repair":
                         cancelled = requestDAO.cancelRepairRequest(requestId, user.getUserId());
                         break;
+                    case "purchase_order":
+                        cancelled = requestDAO.cancelPurchaseOrder(requestId, user.getUserId());
+                        break;
                 }
 
                 if (cancelled) {
@@ -192,15 +204,20 @@ public class ViewRequestDetailsServlet extends HttpServlet {
 
     private void setRequestAttributes(HttpServletRequest request, HttpServletResponse response, Object requestObj, String type, int page)
             throws ServletException, IOException, SQLException {
-        // Lấy lại danh sách vật tư và danh mục
-        DepartmentDAO departmentDAO = new DepartmentDAO();
-        List<Material> materials = departmentDAO.getMaterials();
+        // Fetch materials for Export, Purchase, and Repair requests (not needed for Purchase Orders)
+        List<Material> materials = new ArrayList<>();
+        if (!type.equalsIgnoreCase("purchase_order")) {
+            DepartmentDAO departmentDAO = new DepartmentDAO();
+            materials = departmentDAO.getMaterials();
+        }
         request.setAttribute("materials", materials);
+
+        // Fetch categories
         CategoryDAO categoryDAO = new CategoryDAO();
         List<Category> categories = categoryDAO.getAllCategories();
         request.setAttribute("categories", categories);
 
-        // Phân trang cho danh sách chi tiết
+        // Paginate details
         List<?> details = getRequestDetails(requestObj);
         int totalDetails = details.size();
         int totalPages = (int) Math.ceil((double) totalDetails / PAGE_SIZE);
@@ -209,7 +226,7 @@ public class ViewRequestDetailsServlet extends HttpServlet {
         List<?> paginatedDetails = details.subList(start, end);
 
         request.setAttribute("request", requestObj);
-        request.setAttribute("requestType", type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
+        request.setAttribute("requestType", type.equalsIgnoreCase("purchase_order") ? "PurchaseOrder" : type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase());
         request.setAttribute("details", paginatedDetails);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -223,6 +240,8 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             return ((PurchaseRequest) request).getDetails();
         } else if (request instanceof RepairRequest) {
             return ((RepairRequest) request).getDetails();
+        } else if (request instanceof PurchaseOrder) {
+            return ((PurchaseOrder) request).getDetails();
         }
         return new ArrayList<>();
     }
@@ -234,6 +253,8 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             return ((PurchaseRequest) request).getUserId();
         } else if (request instanceof RepairRequest) {
             return ((RepairRequest) request).getUserId();
+        } else if (request instanceof PurchaseOrder) {
+            return ((PurchaseOrder) request).getCreatedBy();
         }
         return 0;
     }
@@ -245,6 +266,8 @@ public class ViewRequestDetailsServlet extends HttpServlet {
             return ((PurchaseRequest) request).getStatus();
         } else if (request instanceof RepairRequest) {
             return ((RepairRequest) request).getStatus();
+        } else if (request instanceof PurchaseOrder) {
+            return ((PurchaseOrder) request).getStatus();
         }
         return "";
     }
