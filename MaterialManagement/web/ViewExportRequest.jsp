@@ -129,21 +129,6 @@
         </div>
 
         <div class="card">
-            <div class="card-header">Recipient</div>
-            <div class="card-body d-flex align-items-center">
-                <div style="flex: 1;">
-                    <p><strong>Full Name:</strong> ${recipient.fullName}</p>
-                    <p><strong>Email:</strong> ${recipient.email}</p>
-                    <p><strong>Phone Number:</strong> ${recipient.phoneNumber}</p>
-                    <p><strong>Address:</strong> Hanoi</p>
-                </div>
-                <div style="flex: 0 0 100px; margin-left: 20px;">
-                    <img src="${recipientImg}" alt="${recipient.fullName}" class="img-fluid rounded-circle">
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
             <div class="card-header">Order Information</div>
             <div class="card-body">
                 <p><strong>Delivery Date:</strong> ${exportRequest.deliveryDate}</p>
@@ -173,7 +158,6 @@
                                 <th>Image</th>
                                 <th>Quantity</th>
                                 <th>Unit</th>
-                                <th>Export Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -188,7 +172,6 @@
                                     </td>
                                     <td>${detail.quantity}</td>
                                     <td>${detail.materialUnit}</td>
-                                    <td>${detail.exportCondition}</td>
                                 </tr>
                             </c:forEach>
                         </tbody>

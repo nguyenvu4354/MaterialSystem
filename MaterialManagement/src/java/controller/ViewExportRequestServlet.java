@@ -77,25 +77,17 @@ public class ViewExportRequestServlet extends HttpServlet {
             int end = Math.min(start + itemsPerPage, totalItems);
             List<ExportRequestDetail> paginatedDetails = (start < end) ? details.subList(start, end) : java.util.Collections.emptyList();
             User sender = userDAO.getUserById(exportRequest.getUserId());
-            User recipient = exportRequest.getRecipientId() > 0 ? userDAO.getUserById(exportRequest.getRecipientId()) : null;
             String senderImg = (sender == null || sender.getUserPicture() == null || sender.getUserPicture().isEmpty())
                     ? "images/placeholder.png"
                     : (sender.getUserPicture().startsWith("http") || sender.getUserPicture().startsWith("/")
                         ? sender.getUserPicture()
                         : "images/profiles/" + sender.getUserPicture());
-            String recipientImg = (recipient == null || recipient.getUserPicture() == null || recipient.getUserPicture().isEmpty())
-                    ? "images/placeholder.png"
-                    : (recipient.getUserPicture().startsWith("http") || recipient.getUserPicture().startsWith("/")
-                        ? recipient.getUserPicture()
-                        : "images/profiles/" + recipient.getUserPicture());
             request.setAttribute("exportRequest", exportRequest);
             request.setAttribute("details", paginatedDetails);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("sender", sender);
-            request.setAttribute("recipient", recipient);
             request.setAttribute("senderImg", senderImg);
-            request.setAttribute("recipientImg", recipientImg);
             request.setAttribute("roleId", user.getRoleId());
             request.setAttribute("user", user);
             request.getRequestDispatcher("ViewExportRequest.jsp").forward(request, response);

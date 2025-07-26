@@ -1,118 +1,55 @@
-<html lang="en">
-
-    <head>
-        <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-        <title>Computer accessories - Free eCommerce accesories Shop HTML Website Template</title>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="author" content="">
-        <meta name="keywords" content="">
-        <meta name="description" content="">
-    </head>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-
-    <link rel="stylesheet" type="text/css" href="css/vendor.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
-          rel="stylesheet">
-
-</head>
-<footer id="footer" class="my-5">
-    <div class="container py-5 my-5">
+<footer id="footer" class="bg-light border-top mt-5">
+    <div class="container py-5">
         <div class="row">
 
-            <div class="col-md-3">
-                <div class="footer-menu">
-                    <img src="images/loogo.jpg" alt="logo" width="300px" height="200px">
-                    <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
-                    <div class="social-links">
-                        <ul class="d-flex list-unstyled gap-2">
-                            <li class="social">
-                                <a href="#">
-                                    <iconify-icon class="social-icon" icon="ri:facebook-fill"></iconify-icon>
-                                </a>
-                            </li>
-                            <li class="social">
-                                <a href="#">
-                                    <iconify-icon class="social-icon" icon="ri:twitter-fill"></iconify-icon>
-                                </a>
-                            </li>
-                            <li class="social">
-                                <a href="#">
-                                    <iconify-icon class="social-icon" icon="ri:pinterest-fill"></iconify-icon>
-                                </a>
-                            </li>
-                            <li class="social">
-                                <a href="#">
-                                    <iconify-icon class="social-icon" icon="ri:instagram-fill"></iconify-icon>
-                                </a>
-                            </li>
-                            <li class="social">
-                                <a href="#">
-                                    <iconify-icon class="social-icon" icon="ri:youtube-fill"></iconify-icon>
-                                </a>
-                            </li>
+            <!-- Quick Links -->
+            <div class="col-md-3 order-md-1">
+                <h6 class="fw-bold mb-3">Quick Links</h6>
+                <ul class="list-unstyled text-muted small">
+                    <li><a href="home" class="text-decoration-none text-muted">Dashboard</a></li>
+                    <li><a href="dashboardmaterial" class="text-decoration-none text-muted">Materials</a></li>
+                    <li><a href="ImportMaterial" class="text-decoration-none text-muted">Import</a></li>
+                    <li><a href="ExportMaterial" class="text-decoration-none text-muted">Export</a></li>
+                    <li><a href="ExportRequestList" class="text-decoration-none text-muted">Requests</a></li>
+                </ul>
+            </div>
 
-                        </ul>
-                    </div>
+            <!-- Help Center -->
+            <div class="col-md-3 order-md-2">
+                <h6 class="fw-bold mb-3">Help Center</h6>
+                <ul class="list-unstyled text-muted small">
+                    <li><a href="#" class="text-decoration-none text-muted">User Guide</a></li>
+                    <li><a href="#" class="text-decoration-none text-muted">Policies</a></li>
+                    <li><a href="#" class="text-decoration-none text-muted">Return Materials</a></li>
+                    <li><a href="#" class="text-decoration-none text-muted">Report Issue</a></li>
+                    <li><a href="#" class="text-decoration-none text-muted">Technical Support</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-md-3 order-md-3">
+                <h6 class="fw-bold mb-3">Contact</h6>
+                <ul class="list-unstyled text-muted small">
+                    <li><strong>Material Dept.</strong></li>
+                    <li>Email: support@materials.company.com</li>
+                    <li>Phone: +1 234 567 890</li>
+                    <li>Address: 123 Company Street, District 1, HCMC</li>
+                </ul>
+            </div>
+
+            <!-- Logo & Social -->
+            <div class="col-md-3 order-md-4 text-md-end text-center">
+                <img src="images/AdminLogo.png" alt="Logo" width="180px" class="mb-3">
+                <p class="text-muted small">Internal Materials Management System</p>
+                <div class="d-flex justify-content-md-end justify-content-center gap-2">
+                    <a href="#"><iconify-icon class="text-dark" icon="ri:facebook-fill"></iconify-icon></a>
+                    <a href="#"><iconify-icon class="text-dark" icon="ri:linkedin-fill"></iconify-icon></a>
+                    <a href="#"><iconify-icon class="text-dark" icon="ri:github-fill"></iconify-icon></a>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="footer-menu">
-                    <h3>Quick Links</h3>
-                    <ul class="menu-list list-unstyled">
-                        <li class="menu-item">
-                            <a href="#" class="nav-link">Home</a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="nav-link">About us</a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="nav-link">Offer </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="nav-link">Services</a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="nav-link">Conatct Us</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="footer-menu">
-                    <h3>Help Center</h5>
-                        <ul class="menu-list list-unstyled">
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">FAQs</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Payment</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Returns & Refunds</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Checkout</a>
-                            </li>
-                            <li class="menu-item">
-                                <a href="#" class="nav-link">Delivery Information</a>
-                            </li>
-                        </ul>
-                </div>
-            </div>
-          
 
         </div>
+        <hr class="mt-4">
     </div>
 </footer>
+</html>
