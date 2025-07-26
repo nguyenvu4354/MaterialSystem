@@ -106,24 +106,9 @@ public class AddMaterialServlet extends HttpServlet {
             String urlInput = request.getParameter("materialsUrl");
             urlInput = urlInput != null ? urlInput.trim() : "";
 
-            System.out.println("🛠️ [AddMaterialServlet] Form Parameters:");
-            System.out.println("materialCode: " + materialCode);
-            System.out.println("materialName: " + materialName);
-            System.out.println("materialStatus: " + materialStatus);
-            System.out.println("categoryId: " + categoryIdStr);
-            System.out.println("unitId: " + unitIdStr);
-            System.out.println("materialsUrl: " + urlInput);
-            // Debug: In ra giá trị thực tế của categoryIdStr và unitIdStr
-            if (categoryIdStr == null || categoryIdStr.isEmpty()) {
-                System.out.println("[DEBUG] categoryIdStr is EMPTY or NULL");
-            } else {
-                System.out.println("[DEBUG] categoryIdStr value: " + categoryIdStr);
-            }
-            if (unitIdStr == null || unitIdStr.isEmpty()) {
-                System.out.println("[DEBUG] unitIdStr is EMPTY or NULL");
-            } else {
-                System.out.println("[DEBUG] unitIdStr value: " + unitIdStr);
-            }
+            
+    
+
 
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
                 materialCode, materialName, materialStatus, categoryIdStr, unitIdStr);
@@ -141,6 +126,14 @@ public class AddMaterialServlet extends HttpServlet {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("materialCode", materialCode);
+                
+                // Trả lại giá trị từ request parameters để giữ lại dữ liệu đã nhập
+                request.setAttribute("categoryName", request.getParameter("categoryName"));
+                request.setAttribute("categoryId", request.getParameter("categoryId"));
+                request.setAttribute("unitName", request.getParameter("unitName"));
+                request.setAttribute("unitId", request.getParameter("unitId"));
+                request.setAttribute("materialsUrl", urlInput);
+                
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
@@ -155,7 +148,7 @@ public class AddMaterialServlet extends HttpServlet {
                 String buildUploadPath = getServletContext().getRealPath("/") + UPLOAD_DIRECTORY + "/";
                 Files.createDirectories(Paths.get(buildUploadPath));
                 filePart.write(buildUploadPath + fileName);
-                System.out.println("✅ [AddMaterialServlet] Saved image to BUILD folder: " + buildUploadPath + fileName);
+    
 
                 Path projectRoot = Paths.get(buildUploadPath).getParent().getParent().getParent().getParent();
                 Path sourceDir = projectRoot.resolve("web").resolve("images").resolve("material");
@@ -166,18 +159,16 @@ public class AddMaterialServlet extends HttpServlet {
                             sourceDir.resolve(fileName),
                             StandardCopyOption.REPLACE_EXISTING
                     );
-                    System.out.println("✅ [AddMaterialServlet] Copied image to SOURCE folder: " + sourceDir.resolve(fileName));
                 } catch (IOException e) {
-                    System.out.println("❌ [AddMaterialServlet] Failed to copy to source: " + e.getMessage());
+                    e.printStackTrace();
                 }
 
                 relativeFilePath = fileName;
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 relativeFilePath = urlInput.trim();
-                System.out.println("📝 [AddMaterialServlet] Using URL input instead of new image: " + relativeFilePath);
+
             } else {
                 relativeFilePath = "default.jpg";
-                System.out.println("📎 [AddMaterialServlet] No image provided, using default.jpg");
             }
 
             // Validate categoryIdStr và unitIdStr trước khi parseInt
@@ -193,6 +184,14 @@ public class AddMaterialServlet extends HttpServlet {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("materialCode", materialCode);
+                
+                // Trả lại giá trị từ request parameters để giữ lại dữ liệu đã nhập
+                request.setAttribute("categoryName", request.getParameter("categoryName"));
+                request.setAttribute("categoryId", request.getParameter("categoryId"));
+                request.setAttribute("unitName", request.getParameter("unitName"));
+                request.setAttribute("unitId", request.getParameter("unitId"));
+                request.setAttribute("materialsUrl", urlInput);
+                
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
@@ -208,6 +207,14 @@ public class AddMaterialServlet extends HttpServlet {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
                 request.setAttribute("materialCode", materialCode);
+                
+                // Trả lại giá trị từ request parameters để giữ lại dữ liệu đã nhập
+                request.setAttribute("categoryName", request.getParameter("categoryName"));
+                request.setAttribute("categoryId", request.getParameter("categoryId"));
+                request.setAttribute("unitName", request.getParameter("unitName"));
+                request.setAttribute("unitId", request.getParameter("unitId"));
+                request.setAttribute("materialsUrl", urlInput);
+                
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
@@ -233,7 +240,7 @@ public class AddMaterialServlet extends HttpServlet {
             m.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             m.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-            System.out.println("📌 [AddMaterialServlet] Final Material Image URL: " + m.getMaterialsUrl());
+    
 
             MaterialDAO md = new MaterialDAO();
             if (md.isMaterialCodeExists(materialCode)) {
@@ -246,23 +253,21 @@ public class AddMaterialServlet extends HttpServlet {
                 return;
             }
 
-            // Check for duplicate (name, status)
+    
             if (md.isMaterialNameAndStatusExists(materialName, materialStatus)) {
                 request.setAttribute("categories", new CategoryDAO().getAllCategories());
                 request.setAttribute("units", new UnitDAO().getAllUnits());
-                request.setAttribute("error", "Tên vật tư đã tồn tại với trạng thái này. Vui lòng chọn tên hoặc trạng thái khác.");
+                request.setAttribute("error", "This material name already exists with the selected status. Please choose a different name or status.");
                 request.setAttribute("m", m);
                 request.setAttribute("materialCode", materialCode);
                 request.getRequestDispatcher("AddMaterial.jsp").forward(request, response);
                 return;
             }
 
-            System.out.println("🔄 [AddMaterialServlet] Adding material to database...");
+    
             md.addMaterial(m);
-            System.out.println("✅ [AddMaterialServlet] Material added successfully, redirecting to dashboardmaterial");
             response.sendRedirect("dashboardmaterial?success=Material added successfully");
         } catch (Exception ex) {
-            System.out.println("❌ [AddMaterialServlet] Error: " + ex.getMessage());
             ex.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi: " + ex.getMessage());
             request.setAttribute("categories", new CategoryDAO().getAllCategories());

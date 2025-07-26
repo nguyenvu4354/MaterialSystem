@@ -39,7 +39,7 @@ public class DashboardMaterialServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
-            // Kiểm tra quyền VIEW_LIST_MATERIAL
+    
             int roleId = user.getRoleId();
             if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_MATERIAL")) {
                 request.setAttribute("error", "Bạn không có quyền xem danh sách vật tư.");
@@ -62,7 +62,7 @@ public class DashboardMaterialServlet extends HttpServlet {
                 }
             }
 
-            // Lấy tham số tìm kiếm tên vật tư đúng với form
+    
             String materialName = request.getParameter("materialName");
             if (materialName == null) materialName = "";
             String status = request.getParameter("status");
@@ -77,12 +77,9 @@ public class DashboardMaterialServlet extends HttpServlet {
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
 
-            // Thêm đoạn này để lấy tất cả vật tư cho autocomplete
-            // List<Material> allMaterials = materialDAO.getAllProducts();
             List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, 1000, "name_asc");
-            // Log dữ liệu vật tư để debug
             for (Material m : allMaterials) {
-                System.out.println("[LOG] Material for autocomplete: ID=" + m.getMaterialId() + ", Name=" + m.getMaterialName());
+        
             }
             request.setAttribute("materials", allMaterials);
 
@@ -101,7 +98,7 @@ public class DashboardMaterialServlet extends HttpServlet {
             int totalMaterials;
             int totalPages;
             if (categoryName != null && !categoryName.trim().isEmpty() && (categoryId == null)) {
-                // Nhập tên nhưng không chọn gợi ý, trả về rỗng
+        
                 list = java.util.Collections.emptyList();
                 totalMaterials = 0;
                 totalPages = 1;

@@ -12,9 +12,31 @@
     <!-- Import Bootstrap and FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 
     <!-- Custom form styling -->
     <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .content {
+            padding-left: 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .form-container .form-control, .form-container .form-select {
+            height: 48px;
+            font-size: 1rem;
+        }
+        .form-container .form-label {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        .form-container .btn {
+            font-size: 1rem;
+            padding: 0.75rem;
+        }
         .form-select { padding: 0.6rem 1rem; border-color: #dee2e6; cursor: pointer; }
         .form-select:focus { border-color: #86b7fe; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
         .form-select option { padding: 8px; }
@@ -30,132 +52,136 @@
         }
     </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="card shadow">
-            <div class="card-header btn-brown text-white">
-                <h3 class="mb-0">Add New Material</h3>
+<body>
+    <jsp:include page="Header.jsp" />
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 bg-light p-0">
+                <jsp:include page="Sidebar.jsp" />
             </div>
 
-            <div class="card-body">
-                <!-- Display error message if it exists -->
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger" role="alert">
-                        ${error}
-                    </div>
-                </c:if>
+            <div class="col-md-9 col-lg-10 px-md-4 py-4">
+                <section id="AddMaterial" style="background: url('images/background-img.png') no-repeat; background-size: cover;">
+                    <div class="container">
+                        <div class="row my-5 py-5">
+                            <div class="col-10 bg-white p-4 mx-auto rounded shadow form-container">
+                                <h2 class="display-4 fw-normal text-center mb-4">Add New <span class="text-primary">Material</span></h2>
+                                
+                                <!-- Display error message if it exists -->
+                                <c:if test="${not empty error}">
+                                    <div class="alert alert-danger" role="alert">
+                                        ${error}
+                                    </div>
+                                </c:if>
 
-                <!-- Display success message if it exists -->
-                <c:if test="${not empty success}">
-                    <div class="alert alert-success" role="alert">
-                        ${success}
-                    </div>
-                </c:if>
+                                <!-- Display success message if it exists -->
+                                <c:if test="${not empty success}">
+                                    <div class="alert alert-success" role="alert">
+                                        ${success}
+                                    </div>
+                                </c:if>
 
-                <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
-                   if (errors != null && !errors.isEmpty()) { %>
-                    <div class="alert alert-danger" style="margin-bottom: 16px;">
-                        <ul style="margin-bottom: 0;">
-                        <% for (String err : errors.values()) { %>
-                            <li><%= err %></li>
-                        <% } %>
-                        </ul>
-                    </div>
-                <% } %>
+                                <% Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                                   if (errors != null && !errors.isEmpty()) { %>
+                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                        <ul style="margin-bottom: 0;">
+                                        <% for (String err : errors.values()) { %>
+                                            <li><%= err %></li>
+                                        <% } %>
+                                        </ul>
+                                    </div>
+                                <% } %>
 
-                <!-- Form for adding new material -->
-                <form action="addmaterial" method="POST" enctype="multipart/form-data">
-                    <!-- Material Code and Name -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="materialCode" class="form-label required-field">Material Code</label>
-                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${m != null ? m.materialCode : (param.materialCode != null ? param.materialCode : (materialCode != null ? materialCode : ''))}" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="materialName" class="form-label required-field">Material Name</label>
-                            <input type="text" class="form-control" id="materialName" name="materialName" value="${m != null ? m.materialName : (param.materialName != null ? param.materialName : (materialName != null ? materialName : ''))}">
-                        </div>
-                    </div>
+                                <!-- Form for adding new material -->
+                                <form action="addmaterial" method="POST" enctype="multipart/form-data">
+                                    <!-- Material Code and Name -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="materialCode" class="form-label required-field">Material Code</label>
+                                            <input type="text" class="form-control" id="materialCode" name="materialCode" value="${param.materialCode != null ? param.materialCode : (materialCode != null ? materialCode : (m != null ? m.materialCode : ''))}" readonly>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="materialName" class="form-label required-field">Material Name</label>
+                                            <input type="text" class="form-control" id="materialName" name="materialName" value="${param.materialName != null ? param.materialName : (materialName != null ? materialName : (m != null ? m.materialName : ''))}">
+                                        </div>
+                                    </div>
 
-                    <!-- Material Image: choose image or URL -->
-                    <div class="mb-3">
-                        <label class="form-label">Material Image</label>
-                        <div class="mb-3">
-                            <div id="imagePreview" style="display: none;">
-                                <img id="previewImg" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                    <!-- Material Image: choose image or URL -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Material Image</label>
+                                        <div class="mb-3">
+                                            <div id="imagePreview" style="display: none;">
+                                                <img id="previewImg" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                            </div>
+                                        </div>
+
+                                        <!-- Tabs for choosing image upload or URL input -->
+                                        <ul class="nav nav-tabs" id="imageInputTabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab">Media Upload</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-content" type="button" role="tab">Media URL</button>
+                                            </li>
+                                        </ul>
+
+                                        <!-- Content of each tab -->
+                                        <div class="tab-content pt-3" id="imageInputTabContent">
+                                            <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
+                                                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                                            </div>
+                                            <div class="tab-pane fade" id="url-content" role="tabpanel">
+                                                <input type="url" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter image URL" value="${param.materialsUrl != null ? param.materialsUrl : (materialsUrl != null ? materialsUrl : (m != null ? m.materialsUrl : ''))}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Material Status -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="materialStatus" class="form-label required-field">Material Status</label>
+                                            <select class="form-select" id="materialStatus" name="materialStatus" required>
+                                                <option value="">Select Status</option>
+                                                <option value="new" ${param.materialStatus == 'new' ? 'selected' : (materialStatus != null && materialStatus == 'new' ? 'selected' : (m != null && m.materialStatus == 'new' ? 'selected' : ''))}>New</option>
+                                                <option value="used" ${param.materialStatus == 'used' ? 'selected' : (materialStatus != null && materialStatus == 'used' ? 'selected' : (m != null && m.materialStatus == 'used' ? 'selected' : ''))}>Used</option>
+                                                <option value="damaged" ${param.materialStatus == 'damaged' ? 'selected' : (materialStatus != null && materialStatus == 'damaged' ? 'selected' : (m != null && m.materialStatus == 'damaged' ? 'selected' : ''))}>Damaged</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="categoryInput" class="form-label required-field">Category</label>
+                                            <input type="text" class="form-control" id="categoryInput" placeholder="Type category name" value="${param.categoryName != null ? param.categoryName : (categoryName != null ? categoryName : (m != null ? m.category.category_name : ''))}">
+                                            <input type="hidden" id="categoryId" name="categoryId" value="${param.categoryId != null ? param.categoryId : (categoryId != null ? categoryId : (m != null ? m.category.category_id : ''))}">
+                                            <div id="categorySuggestions" class="list-group" style="position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Unit -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="unitInput" class="form-label required-field">Unit</label>
+                                            <input type="text" class="form-control" id="unitInput" placeholder="Type unit name" value="${param.unitName != null ? param.unitName : (unitName != null ? unitName : (m != null ? m.unit.unitName : ''))}">
+                                            <input type="hidden" id="unitId" name="unitId" value="${param.unitId != null ? param.unitId : (unitId != null ? unitId : (m != null ? m.unit.id : ''))}">
+                                            <div id="unitSuggestions" class="list-group" style="position: absolute; z-index: 1000; width: 100%; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- Submit and Cancel buttons -->
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="submit" class="btn btn-brown">
+                                            <i class="fas fa-save"></i> Save Material
+                                        </button>
+                                        <a href="dashboardmaterial" class="btn btn-secondary ms-2">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-
-                        <!-- Tabs for choosing image upload or URL input -->
-                        <ul class="nav nav-tabs" id="imageInputTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload-content" type="button" role="tab">Media Upload</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-content" type="button" role="tab">Media URL</button>
-                            </li>
-                        </ul>
-
-                        <!-- Content of each tab -->
-                        <div class="tab-content pt-3" id="imageInputTabContent">
-                            <!-- Image upload tab -->
-                            <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
-                                <label class="form-label">Upload New Image</label>
-                                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
-                                <div class="form-text">Upload a new image file (Max size: 10MB)</div>
-                            </div>
-
-                            <!-- Image URL input tab -->
-                            <div class="tab-pane fade" id="url-content" role="tabpanel">
-                                <label class="form-label">Or Use Image URL</label>
-                                <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter an image URL from the internet" value="${m != null ? m.materialsUrl : (param.materialsUrl != null ? param.materialsUrl : '')}">
-                                <div class="form-text">Enter an image URL from the internet</div>
-                            </div>
-                        </div>
                     </div>
-
-                    <!-- Category and Unit -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="categoryInput" class="form-label required-field">Category</label>
-                            <div style="position: relative; display: inline-block; width: 100%;">
-                                <input type="text" id="categoryInput" name="categoryName" class="form-control" placeholder="Category..." autocomplete="off" value="${m != null && m.category != null ? m.category.category_name : (param.categoryName != null ? param.categoryName : '')}" />
-                                <input type="hidden" id="categoryId" name="categoryId" value="${m != null && m.category != null ? m.category.category_id : (param.categoryId != null ? param.categoryId : '')}" />
-                                <div id="categorySuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="unitInput" class="form-label required-field">Unit</label>
-                            <div style="position: relative; display: inline-block; width: 100%;">
-                                <input type="text" id="unitInput" name="unitName" class="form-control" placeholder="Unit..." autocomplete="off" value="${m != null && m.unit != null ? m.unit.unitName : (param.unitName != null ? param.unitName : '')}" />
-                                <input type="hidden" id="unitId" name="unitId" value="${m != null && m.unit != null ? m.unit.id : (param.unitId != null ? param.unitId : '')}" />
-                                <div id="unitSuggestions" class="list-group" style="position: absolute; left: 0; top: 100%; z-index: 1000; width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Material Status -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="materialStatus" class="form-label">Status</label>
-                            <select class="form-select" id="materialStatus" name="materialStatus">
-                                <option value="new" <c:if test="${(m != null && m.materialStatus == 'new') || (param.materialStatus == 'new')}">selected</c:if>>New</option>
-                                <option value="used" <c:if test="${(m != null && m.materialStatus == 'used') || (param.materialStatus == 'used')}">selected</c:if>>Used</option>
-                                <option value="damaged" <c:if test="${(m != null && m.materialStatus == 'damaged') || (param.materialStatus == 'damaged')}">selected</c:if>>Damaged</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Submit and Cancel Buttons -->
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-brown">
-                            <i class="fas fa-save"></i> Save Material
-                        </button>
-                        <a href="dashboardmaterial" class="btn btn-secondary ms-2">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                    </div>
-                </form>
+                </section>
             </div>
         </div>
     </div>
@@ -203,15 +229,24 @@
         const categoryInput = document.getElementById('categoryInput');
         const categorySuggestions = document.getElementById('categorySuggestions');
         const categoryHiddenId = document.getElementById('categoryId');
+        let lastCategoryValue = categoryInput.value;
+        
         categoryInput.addEventListener('input', function() {
-            const value = this.value.trim().toLowerCase();
+            const value = this.value.trim();
+            const valueLower = value.toLowerCase();
             categorySuggestions.innerHTML = '';
-            categoryHiddenId.value = '';
+            
+            // Chỉ reset hidden input nếu user thay đổi text khác với giá trị đã chọn
+            const selectedCategory = categories.find(cat => cat.name.toLowerCase() === valueLower);
+            if (!selectedCategory) {
+                categoryHiddenId.value = '';
+            }
+            
             if (value.length === 0) {
                 categorySuggestions.style.display = 'none';
                 return;
             }
-            const matches = categories.filter(cat => cat.name.toLowerCase().includes(value));
+            const matches = categories.filter(cat => cat.name.toLowerCase().includes(valueLower));
             if (matches.length === 0) {
                 categorySuggestions.style.display = 'none';
                 return;
@@ -224,6 +259,7 @@
                 item.onclick = function() {
                     categoryInput.value = cat.name;
                     categoryHiddenId.value = cat.id;
+                    lastCategoryValue = cat.name;
                     categorySuggestions.innerHTML = '';
                     categorySuggestions.style.display = 'none';
                 };
@@ -242,15 +278,24 @@
         const unitInput = document.getElementById('unitInput');
         const unitSuggestions = document.getElementById('unitSuggestions');
         const unitHiddenId = document.getElementById('unitId');
+        let lastUnitValue = unitInput.value;
+        
         unitInput.addEventListener('input', function() {
-            const value = this.value.trim().toLowerCase();
+            const value = this.value.trim();
+            const valueLower = value.toLowerCase();
             unitSuggestions.innerHTML = '';
-            unitHiddenId.value = '';
+            
+            // Chỉ reset hidden input nếu user thay đổi text khác với giá trị đã chọn
+            const selectedUnit = units.find(u => u.name.toLowerCase() === valueLower);
+            if (!selectedUnit) {
+                unitHiddenId.value = '';
+            }
+            
             if (value.length === 0) {
                 unitSuggestions.style.display = 'none';
                 return;
             }
-            const matches = units.filter(u => u.name.toLowerCase().includes(value));
+            const matches = units.filter(u => u.name.toLowerCase().includes(valueLower));
             if (matches.length === 0) {
                 unitSuggestions.style.display = 'none';
                 return;
@@ -263,6 +308,7 @@
                 item.onclick = function() {
                     unitInput.value = u.name;
                     unitHiddenId.value = u.id;
+                    lastUnitValue = u.name;
                     unitSuggestions.innerHTML = '';
                     unitSuggestions.style.display = 'none';
                 };

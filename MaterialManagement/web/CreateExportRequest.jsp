@@ -181,7 +181,7 @@ materialsData.push({
 });
 </c:forEach>
 
-console.log("materialsData", materialsData);
+
 
 function updateMaterialRowAutocomplete(row) {
     const nameInput = row.querySelector('.material-name-input');

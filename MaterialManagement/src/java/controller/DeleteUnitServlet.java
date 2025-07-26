@@ -15,7 +15,6 @@ public class DeleteUnitServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Kiểm tra phân quyền trước khi xóa
         jakarta.servlet.http.HttpSession session = request.getSession(false);
         dal.RolePermissionDAO rolePermissionDAO = new dal.RolePermissionDAO();
         entity.User user = (session != null) ? (entity.User) session.getAttribute("user") : null;

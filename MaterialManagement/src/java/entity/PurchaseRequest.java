@@ -13,6 +13,7 @@ public class PurchaseRequest {
     private int userId;
     private Timestamp requestDate;
     private String status; // ENUM: PENDING, APPROVED, REJECTED, CANCELLED
+    private double estimatedPrice;
     private String reason;
     private Integer approvedBy;
     private String approvalReason;
@@ -64,6 +65,14 @@ public class PurchaseRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public double getEstimatedPrice() {
+        return estimatedPrice;
+    }
+
+    public void setEstimatedPrice(double estimatedPrice) {
+        this.estimatedPrice = estimatedPrice;
     }
 
     public String getReason() {
