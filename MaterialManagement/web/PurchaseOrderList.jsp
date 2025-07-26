@@ -113,8 +113,20 @@
             color: #b8860b;
         }
         .pagination .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-link {
+            color: #DEAD6F;
+        }
+        .pagination .page-link:hover {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
         }
     </style>
 </head>
