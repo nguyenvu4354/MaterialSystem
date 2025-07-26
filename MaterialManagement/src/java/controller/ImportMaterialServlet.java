@@ -195,7 +195,7 @@ public class ImportMaterialServlet extends HttpServlet {
     private void handleUpdatePrice(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException, SQLException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
-        double newUnitPrice = Double.parseDouble(request.getParameter("newUnitPrice"));
+        double newUnitPrice = Double.parseDouble(request.getParameter("newPrice"));
         Integer tempImportId = (Integer) session.getAttribute("tempImportId");
 
         if (newUnitPrice <= 0) {
@@ -237,10 +237,9 @@ public class ImportMaterialServlet extends HttpServlet {
 
         String supplierIdStr = request.getParameter("supplierId");
         String destination = request.getParameter("destination");
-        String actualArrivalStr = request.getParameter("actualArrival");
         String note = request.getParameter("note");
         Map<String, String> formErrors = utils.ImportValidator.validateImportFormData(
-            supplierIdStr, destination, actualArrivalStr, note, supplierDAO
+            supplierIdStr, destination, note, supplierDAO
         );
         if (!formErrors.isEmpty()) {
             request.setAttribute("formErrors", formErrors);
@@ -249,7 +248,7 @@ public class ImportMaterialServlet extends HttpServlet {
         }
 
         Integer supplierId = Integer.parseInt(supplierIdStr);
-        java.time.LocalDateTime actualArrival = java.time.LocalDateTime.parse(actualArrivalStr);
+        java.time.LocalDateTime actualArrival = java.time.LocalDateTime.now();
 
         Import imports = new Import();
         imports.setImportId(tempImportId);

@@ -176,18 +176,22 @@
         border-radius: 8px;
         margin: 0 2px;
         border: 1px solid #dee2e6;
-        color: #0d6efd;
+        color: #DEAD6F;
         background: #fff;
         transition: background 0.2s, color 0.2s;
       }
       .pagination .page-item.active .page-link {
-        background: #0d6efd;
+        background: #DEAD6F;
         color: #fff;
-        border-color: #0d6efd;
+        border-color: #DEAD6F;
       }
       .pagination .page-link:hover {
-        background: #e7f1ff;
-        color: #0d6efd;
+        background: #DEAD6F;
+        color: #fff;
+        border-color: #DEAD6F;
+      }
+      .pagination .page-item.disabled .page-link {
+        color: #6c757d;
       }
       .stat-card.stat-stock {
         background: #388e3c;

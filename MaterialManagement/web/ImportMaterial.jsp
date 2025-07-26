@@ -277,7 +277,7 @@
                                                 <th style="width: 12%">Unit</th>
                                                 <th style="width: 15%">Category</th>
                                                 <th style="width: 10%">Quantity</th>
-                                                <th style="width: 12%">Price</th>
+                                                <th style="width: 15%">Price</th>
                                                 <th style="width: 12%">Value</th>
                                                 <th style="width: 10%">Status</th>
                                                 <th style="width: 8%">Stock</th>
@@ -319,18 +319,28 @@
                                                             </button>
                                                         </form>
                                                     </td>
-                                                    <td><strong>$<fmt:formatNumber value="${detail.unitPrice}" type="number" minFractionDigits="2"/></strong></td>
+                                                    <td>
+                                                        <form action="ImportMaterial" method="post" class="d-flex align-items-center">
+                                                            <input type="hidden" name="action" value="updatePrice">
+                                                            <input type="hidden" name="materialId" value="${detail.materialId}">
+                                                            <input type="number" name="newPrice" value="${detail.unitPrice}" min="0" step="0.01"
+                                                                   class="form-control me-2" style="width: 80px; text-align: center;" required>
+                                                            <button type="submit" class="btn btn-outline-primary btn-sm" title="Update Price">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
                                                     <td><strong>$<fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" minFractionDigits="2"/></strong></td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${materialMap[detail.materialId].materialStatus == 'new'}">
-                                                                <span class="badge bg-success">New</span>
+                                                                <span style="color: #000; font-weight: 600;">New</span>
                                                             </c:when>
                                                             <c:when test="${materialMap[detail.materialId].materialStatus == 'used'}">
-                                                                <span class="badge bg-warning text-dark">Used</span>
+                                                                <span style="color: #000; font-weight: 600;">Used</span>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <span class="badge bg-danger">Damaged</span>
+                                                                <span style="color: #000; font-weight: 600;">Damaged</span>
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </td>
@@ -436,14 +446,8 @@
                                             </c:choose>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted">Actual Arrival</label>
-                                        <input type="datetime-local" name="actualArrival" class="form-control" required value="${param.actualArrival}">
-                                        <c:if test="${not empty formErrors['actualArrival']}">
-                                            <div class="text-danger small mt-1">${formErrors['actualArrival']}</div>
-                                        </c:if>
-                                    </div>
-                                    <div class="col-md-6">
+                                    <input type="hidden" name="actualArrival" id="actualArrivalField">
+                                    <div class="col-md-12">
                                         <label class="form-label text-muted">Notes</label>
                                         <input type="text" name="note" class="form-control" placeholder="Enter Note" value="${param.note}">
                                         <c:if test="${not empty formErrors['note']}">
@@ -468,6 +472,18 @@
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script>
                                 document.addEventListener('DOMContentLoaded', function () {
+
+                                    const actualArrivalField = document.getElementById('actualArrivalField');
+                                    if (actualArrivalField) {
+                                        const now = new Date();
+                                        const year = now.getFullYear();
+                                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                                        const day = String(now.getDate()).padStart(2, '0');
+                                        const hours = String(now.getHours()).padStart(2, '0');
+                                        const minutes = String(now.getMinutes()).padStart(2, '0');
+                                        actualArrivalField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                                    }
+
                                     const alerts = document.querySelectorAll('.alert');
                                     alerts.forEach(function (alert) {
                                         setTimeout(function () {
@@ -552,7 +568,6 @@
                                     const supplierIdInput = form.querySelector('input[name="supplierId"]');
                                     const destination = form.querySelector('input[name="destination"]');
                                     const destinationOther = form.querySelector('input[name="destinationOther"]');
-                                    const actualArrival = form.querySelector('input[name="actualArrival"]');
 
                                     if (!supplierNameInput.value.trim()) {
                                         supplierNameInput.classList.add('is-invalid');
@@ -576,12 +591,6 @@
                                         }
                                     } else if (destination) {
                                         destination.classList.remove('is-invalid');
-                                    }
-                                    if (!actualArrival.value) {
-                                        actualArrival.classList.add('is-invalid');
-                                        isValid = false;
-                                    } else {
-                                        actualArrival.classList.remove('is-invalid');
                                     }
                                     return isValid;
                                 }

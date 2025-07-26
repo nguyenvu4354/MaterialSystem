@@ -28,6 +28,22 @@
             justify-content: center;
             margin-top: 20px;
         }
+        .pagination .page-item.active .page-link {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-link {
+            color: #DEAD6F;
+        }
+        .pagination .page-link:hover {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
         .btn-action {
             width: 50px;
             height: 32px;
@@ -175,18 +191,18 @@
                                 </tbody>
                             </table>
                         </div>
-                        <nav>
-                            <ul class="pagination justify-content-center mt-4">
+                        <nav class="mt-3">
+                            <ul class="pagination justify-content-center">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}">Previous</a>
+                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage - 1}&searchEmail=${param.searchEmail}&status=${param.status}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                        <a class="page-link" href="PasswordResetRequests?page=${i}">${i}</a>
+                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <a class="page-link" href="PasswordResetRequests?page=${i}&searchEmail=${param.searchEmail}&status=${param.status}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}">Next</a>
+                                    <a class="page-link" href="PasswordResetRequests?page=${currentPage + 1}&searchEmail=${param.searchEmail}&status=${param.status}">Next</a>
                                 </li>
                             </ul>
                         </nav>

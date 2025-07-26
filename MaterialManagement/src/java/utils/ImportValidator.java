@@ -24,10 +24,7 @@ public class ImportValidator {
             errors.put("destination", "Destination cannot exceed 100 characters.");
         }
 
-        // Validate actualArrival
-        if (imp.getActualArrival() == null) {
-            errors.put("actualArrival", "Actual Arrival is required.");
-        }
+
 
         // Validate note (optional)
         if (imp.getNote() != null && imp.getNote().trim().length() > 200) {
@@ -60,7 +57,7 @@ public class ImportValidator {
     }
 
     // Validate import form data 
-    public static Map<String, String> validateImportFormData(String supplierIdStr, String destination, String actualArrivalStr, String note, dal.SupplierDAO supplierDAO) {
+    public static Map<String, String> validateImportFormData(String supplierIdStr, String destination, String note, dal.SupplierDAO supplierDAO) {
         Map<String, String> errors = new HashMap<>();
         // Validate supplierId
         if (supplierIdStr == null || supplierIdStr.isEmpty()) {
@@ -81,16 +78,7 @@ public class ImportValidator {
         } else if (destination.length() > 100) {
             errors.put("destination", "Destination must not exceed 100 characters.");
         }
-        // Validate actualArrival
-        if (actualArrivalStr == null || actualArrivalStr.isEmpty()) {
-            errors.put("actualArrival", "Actual arrival date/time is required.");
-        } else {
-            try {
-                java.time.LocalDateTime.parse(actualArrivalStr);
-            } catch (Exception e) {
-                errors.put("actualArrival", "Invalid date/time format.");
-            }
-        }
+
         // Validate note
         if (note != null && note.length() > 255) {
             errors.put("note", "Note must not exceed 255 characters.");

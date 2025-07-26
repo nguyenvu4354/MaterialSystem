@@ -33,6 +33,22 @@
             justify-content: center;
             margin-top: 20px;
         }
+        .pagination .page-item.active .page-link {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-link {
+            color: #DEAD6F;
+        }
+        .pagination .page-link:hover {
+            background-color: #DEAD6F;
+            border-color: #DEAD6F;
+            color: #fff;
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
         .btn-action {
             width: 50px;
             height: 32px;
@@ -83,10 +99,6 @@
                         <div class="col-md-8">
                             <form action="Supplier" method="GET" class="d-flex gap-2">
                                 <input type="hidden" name="action" value="list" />
-                                <input type="text" name="code" class="form-control" 
-                                       placeholder="Search by code" 
-                                       value="${code != null ? code : ''}" 
-                                       style="width: 180px; height: 50px; border: 2px solid gray" />
                                 <input type="text" name="keyword" class="form-control" 
                                        placeholder="Search by name" 
                                        value="${keyword != null ? keyword : ''}" 
@@ -172,18 +184,18 @@
                         </table>
                     </div>
 
-                    <nav>
-                        <ul class="pagination justify-content-center mt-4">
+                    <nav class="mt-3">
+                        <ul class="pagination justify-content-center">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="Supplier?action=list&page=${currentPage - 1}">Previous</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage - 1}&keyword=${keyword}&sortBy=${sortBy}">Previous</a>
                             </li>
                             <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${i == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="Supplier?action=list&page=${i}">${i}</a>
+                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                    <a class="page-link" href="Supplier?action=list&page=${i}&keyword=${keyword}&sortBy=${sortBy}">${i}</a>
                                 </li>
                             </c:forEach>
                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="Supplier?action=list&page=${currentPage + 1}">Next</a>
+                                <a class="page-link" href="Supplier?action=list&page=${currentPage + 1}&keyword=${keyword}&sortBy=${sortBy}">Next</a>
                             </li>
                         </ul>
                     </nav>

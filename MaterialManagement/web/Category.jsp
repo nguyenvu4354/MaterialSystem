@@ -195,23 +195,21 @@
                     </table>
                 </div>
 
-                <c:if test="${totalPages > 1}">
-                    <nav class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage - 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Previous</a>
+                <nav class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage - 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Previous</a>
+                        </li>
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${i}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">${i}</a>
                             </li>
-                            <c:forEach begin="1" end="${totalPages}" var="i">
-                                <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                    <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${i}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">${i}</a>
-                                </li>
-                            </c:forEach>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage + 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </c:if>
+                        </c:forEach>
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="${pageContext.request.contextPath}/Category?service=listCategory&page=${currentPage + 1}&code=${code}&priority=${priority}&status=${status}&sortBy=${sortBy}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
