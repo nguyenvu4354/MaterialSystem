@@ -203,17 +203,23 @@ public class CreateUserServlet extends HttpServlet {
             boolean created = userDAO.createUser(newUser);
             if (created) {
                 try {
-                    String verificationLink = "http://localhost:8080/MaterialManagement/VerifyUser?token=" + newUser.getVerificationToken();
+                    String baseUrl = request.getScheme() + "://"
+                            + request.getServerName() + ":"
+                            + request.getServerPort()
+                            + request.getContextPath();
+
+                    String verificationLink = baseUrl + "/VerifyUser?token=" + newUser.getVerificationToken();
+
                     String subject = "Verify Your Account";
-                    String content = "<html><body>" +
-                            "<p>Hello " + newUser.getFullName() + ",</p>" +
-                            "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>" +
-                            "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>" +
-                            "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>" +
-                            "<p><strong>Password:</strong> " + randomPassword + "</p>" +
-                            "<p>This link will expire in 24 hours.</p>" +
-                            "<p>Best regards,<br>The Support Team</p>" +
-                            "</body></html>";
+                    String content = "<html><body>"
+                            + "<p>Hello " + newUser.getFullName() + ",</p>"
+                            + "<p>Your account has been successfully created. Please verify your email by clicking the link below:</p>"
+                            + "<p><a href=\"" + verificationLink + "\">Verify Your Account</a></p>"
+                            + "<p><strong>Username:</strong> " + newUser.getUsername() + "</p>"
+                            + "<p><strong>Password:</strong> " + randomPassword + "</p>"
+                            + "<p>This link will expire in 24 hours.</p>"
+                            + "<p>Best regards,<br>The Support Team</p>"
+                            + "</body></html>";
 
                     EmailUtils.sendEmail(newUser.getEmail(), subject, content);
                     session.setAttribute("successMessage", "Account created successfully! Verification email sent.");
@@ -239,7 +245,7 @@ public class CreateUserServlet extends HttpServlet {
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
         }
     }
-
+    
     private String hashPasswordWithMD5(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

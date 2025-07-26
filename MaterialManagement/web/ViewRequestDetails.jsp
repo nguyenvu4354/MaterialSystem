@@ -135,14 +135,12 @@
             <div class="detail-container">
                 <h2 class="display-4 fw-normal text-center mb-4">Request <span class="text-primary">Details</span></h2>
 
-                <!-- Display success or error message -->
                 <c:if test="${not empty message}">
                     <div class="alert ${message.startsWith('Error') ? 'alert-danger' : 'alert-success'}">
                         ${message}
                     </div>
                 </c:if>
 
-                <!-- Common attributes for all request types -->
                 <c:choose>
                     <c:when test="${requestType == 'PurchaseOrder'}">
                         <p><strong>PO Code:</strong> ${request.poCode}</p>
@@ -176,9 +174,7 @@
                     </c:otherwise>
                 </c:choose>
 
-                <!-- Type-specific attributes -->
                 <c:if test="${requestType == 'Export'}">
-                    <p><strong>Recipient:</strong> ${request.recipientName}</p>
                     <p><strong>Approver:</strong> ${request.approverName != null ? request.approverName : "N/A"}</p>
                     <p><strong>Approved At:</strong> <c:choose>
                         <c:when test="${request.approvedAt != null}">
@@ -194,7 +190,6 @@
                     </c:choose></p>
                 </c:if>
                 <c:if test="${requestType == 'Purchase'}">
-                    <!-- Add any Purchase-specific fields if needed -->
                 </c:if>
                 <c:if test="${requestType == 'Repair'}">
                     <p><strong>Estimated Return Date:</strong> <c:choose>
@@ -356,7 +351,6 @@
                     </c:when>
                 </c:choose>
 
-                <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">
@@ -375,7 +369,6 @@
                     </nav>
                 </c:if>
 
-                <!-- Action buttons -->
                 <div class="mt-4">
                     <a href="${pageContext.request.contextPath}/ViewRequests" class="btn btn-secondary">Back to Requests</a>
                     <c:if test="${request.status == 'pending'}">
