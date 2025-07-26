@@ -164,7 +164,9 @@
                                         </div>
                                     </div>
                                 </section>
+                                                            
                             </div>
+                                                             <jsp:include page="Footer.jsp" />
                         </div>
                     </div>
                 </c:if>

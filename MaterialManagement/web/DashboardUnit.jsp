@@ -39,6 +39,7 @@
     </style>
 </head>
 <body>
+
     <jsp:include page="Header.jsp" />
     <div class="container-fluid">
         <div class="row">
@@ -89,16 +90,16 @@
                                             <td>${unit.unitName}</td>
                                             <td>${unit.symbol}</td>
                                             <td>${unit.description}</td>
-                                            <!-- Chỉ hiển thị các nút action nếu user có quyền tương ứng -->
+                                       
                                             <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT') or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
-                                                <td>
-                                                    <!-- Nút Edit - chỉ hiển thị nếu có quyền UPDATE_UNIT hoặc là admin -->
+                                                <td style="display:flex; justify-content: center">
+                                                   
                                                     <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_UNIT')}">
-                                                        <a href="EditUnit?id=${unit.id}" class="btn btn-action btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
+                                                        <a href="EditUnit?id=${unit.id}"  class="btn btn-action btn-warning btn-sm me-1" title="Edit"><i class="fas fa-edit"></i></a>
                                                     </c:if>
-                                                    <!-- Nút Delete - chỉ hiển thị nếu có quyền DELETE_UNIT hoặc là admin -->
+                                                   
                                                     <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
-                                                        <form action="DeleteUnit" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this unit?');">
+                                                        <form action="DeleteUnit" method="post"  onsubmit="return confirm('Are you sure you want to delete this unit?');">
                                                             <input type="hidden" name="id" value="${unit.id}" />
                                                             <button type="submit" class="btn btn-action btn-danger btn-sm" title="Delete"><i class="fas fa-trash"></i></button>
                                                         </form>
@@ -121,7 +122,7 @@
                     </table>
                 </div>
                 <!-- Pagination -->
-                <c:if test="${totalPages > 1}">
+                <c:if test="${totalPages >= 1}">
                     <nav>
                         <ul class="pagination justify-content-center">
                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
