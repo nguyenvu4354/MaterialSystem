@@ -19,13 +19,13 @@ public class DeleteUnitServlet extends HttpServlet {
         dal.RolePermissionDAO rolePermissionDAO = new dal.RolePermissionDAO();
         entity.User user = (session != null) ? (entity.User) session.getAttribute("user") : null;
         if (user == null || !rolePermissionDAO.hasPermission(user.getRoleId(), "DELETE_UNIT")) {
-            request.setAttribute("error", "Bạn không có quyền xóa đơn vị.");
+            request.setAttribute("error", "You don't have permission to delete units.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
         dal.UnitDAO unitDAO = new dal.UnitDAO();
         int id = Integer.parseInt(request.getParameter("id"));
-        unitDAO.deleteUnitAndMaterials(id);
+        unitDAO.deleteUnit(id); // Chỉ xóa unit, không xóa materials
         response.sendRedirect("UnitList");
     }
 }

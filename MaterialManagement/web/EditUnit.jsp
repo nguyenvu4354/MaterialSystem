@@ -132,7 +132,7 @@
                                             </div>
                                         </form>
                                         <c:if test="${sessionScope.user.roleId == 1 or rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_UNIT')}">
-                                            <form action="DeleteUnit" method="post" onsubmit="return confirm('Are you sure you want to delete this unit?');" class="mt-2">
+                                            <form action="DeleteUnit" method="post" onsubmit="return confirm('Are you sure you want to delete this unit? (Materials belonging to this unit will remain unchanged)');" class="mt-2">
                                                 <input type="hidden" name="id" value="${unit.id}" />
                                                 <button type="submit" class="btn btn-danger w-100">Delete Unit</button>
                                             </form>
