@@ -3,6 +3,7 @@ package controller;
 import dal.MaterialDAO;
 import dal.RolePermissionDAO;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -39,7 +40,6 @@ public class DashboardMaterialServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
-            // Kiểm tra quyền VIEW_LIST_MATERIAL
             int roleId = user.getRoleId();
             if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_MATERIAL")) {
                 request.setAttribute("error", "Bạn không có quyền xem danh sách vật tư.");
@@ -62,9 +62,8 @@ public class DashboardMaterialServlet extends HttpServlet {
                 }
             }
 
-            // Lấy tham số tìm kiếm tên vật tư đúng với form
-            String materialName = request.getParameter("materialName");
-            if (materialName == null) materialName = "";
+            String materialSearch = request.getParameter("materialSearch");
+            if (materialSearch == null) materialSearch = "";
             String status = request.getParameter("status");
             if (status == null) {
                 status = "";
@@ -74,16 +73,20 @@ public class DashboardMaterialServlet extends HttpServlet {
                 sortOption = "";
             }
 
+            String materialIdParam = request.getParameter("materialId");
+            Integer materialId = null;
+            if (materialIdParam != null && !materialIdParam.isEmpty()) {
+                try {
+                    materialId = Integer.parseInt(materialIdParam);
+                } catch (NumberFormatException e) {
+                    materialId = null;
+                }
+            }
+
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
 
-            // Thêm đoạn này để lấy tất cả vật tư cho autocomplete
-            // List<Material> allMaterials = materialDAO.getAllProducts();
-            List<Material> allMaterials = materialDAO.searchMaterials("", "", 1, 1000, "name_asc");
-            // Log dữ liệu vật tư để debug
-            for (Material m : allMaterials) {
-                System.out.println("[LOG] Material for autocomplete: ID=" + m.getMaterialId() + ", Name=" + m.getMaterialName());
-            }
+            List<Material> allMaterials = materialDAO.getAllProducts();
             request.setAttribute("materials", allMaterials);
 
             String categoryIdParam = request.getParameter("categoryId");
@@ -101,7 +104,6 @@ public class DashboardMaterialServlet extends HttpServlet {
             int totalMaterials;
             int totalPages;
             if (categoryName != null && !categoryName.trim().isEmpty() && (categoryId == null)) {
-                // Nhập tên nhưng không chọn gợi ý, trả về rỗng
                 list = java.util.Collections.emptyList();
                 totalMaterials = 0;
                 totalPages = 1;
@@ -109,16 +111,24 @@ public class DashboardMaterialServlet extends HttpServlet {
                 list = materialDAO.searchMaterialsByCategoriesID(categoryId);
                 totalMaterials = list.size();
                 totalPages = 1;
+            } else if (materialId != null) {
+                Material material = materialDAO.getProductById(materialId);
+                list = new ArrayList<>();
+                if (material != null) {
+                    list.add(material);
+                }
+                totalMaterials = list.size();
+                totalPages = 1;
             } else {
-                list = materialDAO.searchMaterials(materialName, status, pageIndex, pageSize, sortOption);
-                totalMaterials = materialDAO.countMaterials(materialName, status);
+                list = materialDAO.searchMaterials(materialSearch, status, pageIndex, pageSize, sortOption);
+                totalMaterials = materialDAO.countMaterials(materialSearch, status);
                 totalPages = (int) Math.ceil((double) totalMaterials / pageSize);
             }
 
             request.setAttribute("list", list);
             request.setAttribute("currentPage", pageIndex);
             request.setAttribute("totalPages", totalPages);
-            request.setAttribute("materialName", materialName);
+            request.setAttribute("materialSearch", materialSearch);
             request.setAttribute("status", status);
             request.setAttribute("sortOption", sortOption);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
