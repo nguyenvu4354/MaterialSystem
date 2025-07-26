@@ -12,6 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -74,32 +75,41 @@
         .condition-bad { 
             background-color: #dc3545; 
         }
-        #materialSuggestions .list-group-item {
-            color: #212529 !important;
-            background: #fff !important;
-            font-size: 16px !important;
-            padding: 8px 12px !important;
-            border-bottom: 1px solid #eee;
+        .ui-autocomplete {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            z-index: 1000;
         }
-        #materialSuggestions .list-group-item:hover {
-            background: #f1f1f1 !important;
-            color: #007bff !important;
+        .ui-menu-item {
+            padding: 8px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .ui-menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        .ui-menu-item div {
+            display: flex;
+            justify-content: space-between;
+        }
+        .ui-menu-item .code {
+            color: #6c757d;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <jsp:include page="Header.jsp" />
-
-    <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 bg-light p-0">
                 <jsp:include page="Sidebar.jsp" />
             </div>
-
-            <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
@@ -113,12 +123,13 @@
                             </a>
                         </c:if>
                     </div>
-
-                    <!-- Search and Filter Section -->
                     <div class="row search-box">
                         <div class="col-md-12">
-                            <form method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
-                                <input type="text" id="materialInput" name="materialName" class="form-control" placeholder="Tên vật tư..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialName != null ? param.materialName : ''}" />
+                            <form id="searchForm" method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
+                                <div class="position-relative">
+                                    <input type="text" id="materialSearch" name="materialSearch" class="form-control" placeholder="Tên hoặc mã vật tư..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialSearch != null ? param.materialSearch : ''}" />
+                                    <input type="hidden" id="materialId" name="materialId" value="" />
+                                </div>
                                 <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
                                     <option value="">All Status</option>
                                     <option value="NEW" ${status == 'NEW' ? 'selected' : ''}>New</option>
@@ -139,8 +150,6 @@
                             </form>
                         </div>
                     </div>
-
-                    <!-- Material Table -->
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover align-middle text-center">
                             <thead class="table-light">
@@ -175,88 +184,148 @@
                                                 <td>${material.materialCode != null ? material.materialCode : 'N/A'}</td>
                                                 <td>${material.materialName != null ? material.materialName : 'N/A'}</td>
                                                 <td>
-                                  <c:choose>
-                                <c:when test="${material.materialStatus == 'new'}">
-                                  New
-                                </c:when>
-                                <c:when test="${material.materialStatus == 'used'}">
-                                  Used
-                                </c:when>
-                                <c:otherwise>
-                                  Damaged
-                                </c:otherwise>
-                              </c:choose>
-                            </td>
-                            <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
-                            <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                            <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
-                                            <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
-                                               class="btn btn-info btn-action" 
-                                               title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </c:if>
-                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
-                                            <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
-                                               class="btn btn-warning btn-action" 
-                                               title="Edit Material">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        </c:if>
-                                        <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                            <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
-                                                <input type="hidden" name="materialId" value="${material.materialId}" />
-                                                <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </c:if>
-                                    </div>
-                                </td>
-                            </c:if>
-                        </tr>
-                    </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <tr><td colspan="8">No materials found.</td></tr>
-                </c:otherwise>
-            </c:choose>
-        </tbody>
-    </table>
-</div>
-
-                    <!-- Pagination -->
+                                                    <c:choose>
+                                                        <c:when test="${material.materialStatus == 'new'}">
+                                                            New
+                                                        </c:when>
+                                                        <c:when test="${material.materialStatus == 'used'}">
+                                                            Used
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            Damaged
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>${material.category != null ? material.category.category_name : 'N/A'}</td>
+                                                <td><fmt:formatDate value="${material.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                                <td><fmt:formatDate value="${material.updatedAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                                <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                                    <td>
+                                                        <div class="d-flex justify-content-center">
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'VIEW_DETAIL_MATERIAL')}">
+                                                                <a href="${pageContext.request.contextPath}/viewmaterial?materialId=${material.materialId}" 
+                                                                   class="btn btn-info btn-action" 
+                                                                   title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_MATERIAL')}">
+                                                                <a href="${pageContext.request.contextPath}/editmaterial?materialId=${material.materialId}" 
+                                                                   class="btn btn-warning btn-action" 
+                                                                   title="Edit Material">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
+                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
+                                                                    <input type="hidden" name="materialId" value="${material.materialId}" />
+                                                                    <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </c:if>
+                                                        </div>
+                                                    </td>
+                                                </c:if>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <tr><td colspan="8">No materials found.</td></tr>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
+                    </div>
                     <c:if test="${totalPages > 1}">
                         <nav>
                             <ul class="pagination">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">Previous</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage - 1}&materialSearch=${materialSearch}&status=${status}&sortOption=${sortOption}">Previous</a>
                                 </li>
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="dashboardmaterial?page=${i}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">${i}</a>
+                                        <a class="page-link" href="dashboardmaterial?page=${i}&materialSearch=${materialSearch}&status=${status}&sortOption=${sortOption}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&materialName=${materialName}&status=${status}&sortOption=${sortOption}">Next</a>
+                                    <a class="page-link" href="dashboardmaterial?page=${currentPage + 1}&materialSearch=${materialSearch}&status=${status}&sortOption=${sortOption}">Next</a>
                                 </li>
                             </ul>
                         </nav>
                     </c:if>
                 </c:if>
-            </div> <!-- end content -->
-        </div> <!-- end row -->
-    </div> <!-- end container-fluid -->
-
-    <!-- Footer -->
+            </div>
+        </div>
+    </div>
     <jsp:include page="Footer.jsp" />
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/script.js"></script>
+        <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const materials = [
+                <c:forEach var="material" items="${materials}" varStatus="loop">
+                    {
+                        label: "${fn:escapeXml(material.materialName)}",
+                        value: "${fn:escapeXml(material.materialName)}",
+                        id: "${material.materialId}",
+                        code: "${fn:escapeXml(material.materialCode)}"
+                    }${loop.last ? '' : ','}
+                </c:forEach>
+            ];
+            $("#materialSearch").autocomplete({
+                source: function(request, response) {
+                    const term = request.term.toLowerCase();
+                    const matches = materials.filter(material =>
+                        material.label.toLowerCase().includes(term) ||
+                        material.code.toLowerCase().includes(term)
+                    );
+                    response(matches);
+                },
+                select: function(event, ui) {
+                    document.getElementById('materialId').value = ui.item.id;
+                    document.getElementById('materialSearch').value = ui.item.value;
+                    document.getElementById('materialSearch').classList.remove('is-invalid');
+                    document.getElementById('searchForm').submit();
+                },
+                change: function(event, ui) {
+                    if (!ui.item) {
+                        const inputValue = document.getElementById('materialSearch').value.toLowerCase().trim();
+                        const selectedMaterial = materials.find(material =>
+                            material.label.toLowerCase() === inputValue ||
+                            material.code.toLowerCase() === inputValue
+                        );
+                        if (selectedMaterial) {
+                            document.getElementById('materialId').value = selectedMaterial.id;
+                            document.getElementById('materialSearch').value = selectedMaterial.label;
+                            document.getElementById('materialSearch').classList.remove('is-invalid');
+                        } else {
+                            document.getElementById('materialId').value = '';
+                            document.getElementById('materialSearch').classList.add('is-invalid');
+                        }
+                        document.getElementById('searchForm').submit();
+                    }
+                },
+                minLength: 0,
+                open: function() {
+                    $(this).autocomplete('widget').css('z-index', 1000);
+                },
+                create: function() {
+                    $(this).data('ui-autocomplete')._renderItem = function(ul, item) {
+                        return $('<li>')
+                            .append('<div>' + item.label + '<span class="code">' + item.code + '</span></div>')
+                            .appendTo(ul);
+                    };
+                }
+            }).focus(function() {
+                $(this).autocomplete("search", $(this).val());
+            });
+        });
+    </script>
 </body>
 </html>
