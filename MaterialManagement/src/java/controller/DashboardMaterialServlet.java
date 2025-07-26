@@ -40,6 +40,7 @@ public class DashboardMaterialServlet extends HttpServlet {
                 request.getRequestDispatcher("error.jsp").forward(request, response);
                 return;
             }
+
             int roleId = user.getRoleId();
             if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "VIEW_LIST_MATERIAL")) {
                 request.setAttribute("error", "Bạn không có quyền xem danh sách vật tư.");
@@ -64,14 +65,12 @@ public class DashboardMaterialServlet extends HttpServlet {
 
             String materialSearch = request.getParameter("materialSearch");
             if (materialSearch == null) materialSearch = "";
+
             String status = request.getParameter("status");
-            if (status == null) {
-                status = "";
-            }
+            if (status == null) status = "";
+
             String sortOption = request.getParameter("sortOption");
-            if (sortOption == null) {
-                sortOption = "";
-            }
+            if (sortOption == null) sortOption = "";
 
             String materialIdParam = request.getParameter("materialId");
             Integer materialId = null;

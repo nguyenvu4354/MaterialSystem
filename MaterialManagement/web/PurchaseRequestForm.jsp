@@ -135,7 +135,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label text-muted">Quantity</label>
-                                                <input type="number" class="form-control" name="quantity">
+                                                <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity">
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label text-muted">Notes</label>
