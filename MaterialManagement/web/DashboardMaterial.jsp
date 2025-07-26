@@ -217,7 +217,7 @@
                                                                 </a>
                                                             </c:if>
                                                             <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_MATERIAL')}">
-                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material?');">
+                                                                <form method="post" action="${pageContext.request.contextPath}/deletematerial" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this material? (Only materials with stock quantity = 0 can be deleted)');">
                                                                     <input type="hidden" name="materialId" value="${material.materialId}" />
                                                                     <button type="submit" class="btn btn-danger btn-action" title="Delete Material">
                                                                         <i class="fas fa-trash"></i>

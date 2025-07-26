@@ -177,7 +177,8 @@ public class UnitDAO extends DBContext {
         return false;
     }
 
-    // Xoá tất cả vật tư có unit_id này
+    // Xoá tất cả vật tư có unit_id này - KHÔNG SỬ DỤNG NỮA
+    /*
     public void deleteMaterialsByUnitId(int unitId) {
         String sql = "DELETE FROM materials WHERE unit_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -187,8 +188,10 @@ public class UnitDAO extends DBContext {
             ex.printStackTrace();
         }
     }
+    */
 
-    // Xoá mềm tất cả vật tư có unit_id này (disable=1)
+    // Xoá mềm tất cả vật tư có unit_id này (disable=1) - KHÔNG SỬ DỤNG NỮA
+    /*
     public void disableMaterialsByUnitId(int unitId) {
         String sql = "UPDATE materials SET disable = 1 WHERE unit_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -198,10 +201,13 @@ public class UnitDAO extends DBContext {
             ex.printStackTrace();
         }
     }
+    */
 
-    // Xoá mềm vật tư trước, sau đó xoá mềm đơn vị
+    // Xoá mềm vật tư trước, sau đó xoá mềm đơn vị - KHÔNG SỬ DỤNG NỮA
+    /*
     public void deleteUnitAndMaterials(int unitId) {
         disableMaterialsByUnitId(unitId);
         deleteUnit(unitId); // deleteUnit đã là disable=1
     }
+    */
 } 
