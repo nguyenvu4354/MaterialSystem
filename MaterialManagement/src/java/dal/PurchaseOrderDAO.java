@@ -22,14 +22,11 @@ public class PurchaseOrderDAO extends DBContext {
         super();
     }
 
-    // Lấy danh sách Purchase Orders với pagination và filter
     public List<PurchaseOrder> getPurchaseOrders(int page, int pageSize, String status, String poCode, LocalDate startDate, LocalDate endDate) {
         List<PurchaseOrder> orders = new ArrayList<>();
-        LOGGER.info("Starting getPurchaseOrders method with page=" + page + ", pageSize=" + pageSize + ", status=" + status + ", poCode=" + poCode);
         
         Connection conn = getConnection();
         if (conn == null) {
-            LOGGER.severe("Database connection is null");
             return orders;
         }
 
@@ -77,25 +74,21 @@ public class PurchaseOrderDAO extends DBContext {
                 ps.setObject(i + 1, params.get(i));
             }
             
-            LOGGER.info("Executing SQL: " + sql.toString());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 PurchaseOrder order = mapResultSetToPurchaseOrder(rs);
                 orders.add(order);
             }
-            LOGGER.info("Retrieved " + orders.size() + " purchase orders");
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error fetching purchase orders: " + e.getMessage(), e);
         }
         return orders;
     }
 
-    // Đếm tổng số Purchase Orders
     public int getPurchaseOrderCount(String status, String poCode, LocalDate startDate, LocalDate endDate) {
         int count = 0;
         Connection conn = getConnection();
         if (conn == null) {
-            LOGGER.severe("Database connection is null");
             return count;
         }
 
@@ -138,11 +131,9 @@ public class PurchaseOrderDAO extends DBContext {
         return count;
     }
 
-    // Lấy Purchase Order theo ID
     public PurchaseOrder getPurchaseOrderById(int poId) {
         Connection conn = getConnection();
         if (conn == null) {
-            LOGGER.severe("Database connection is null");
             return null;
         }
 
@@ -162,9 +153,7 @@ public class PurchaseOrderDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 PurchaseOrder order = mapResultSetToPurchaseOrder(rs);
-                // Lấy chi tiết
                 order.setDetails(getPurchaseOrderDetails(poId));
-                LOGGER.info("Retrieved purchase order: " + order.getPoCode());
                 return order;
             }
         } catch (SQLException e) {
@@ -173,12 +162,10 @@ public class PurchaseOrderDAO extends DBContext {
         return null;
     }
 
-    // Lấy chi tiết Purchase Order
     public List<PurchaseOrderDetail> getPurchaseOrderDetails(int poId) {
         List<PurchaseOrderDetail> details = new ArrayList<>();
         Connection conn = getConnection();
         if (conn == null) {
-            LOGGER.severe("Database connection is null");
             return details;
         }
 
@@ -203,11 +190,9 @@ public class PurchaseOrderDAO extends DBContext {
         return details;
     }
 
-    // Cập nhật status của Purchase Order
     public boolean updatePurchaseOrderStatus(int poId, String status, Integer approvedBy, String approvalReason, String rejectionReason) {
         Connection conn = getConnection();
         if (conn == null) {
-            LOGGER.severe("Database connection is null");
             return false;
         }
 
@@ -228,7 +213,6 @@ public class PurchaseOrderDAO extends DBContext {
             
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
-                LOGGER.info("Successfully updated purchase order status, ID: " + poId);
                 return true;
             }
         } catch (SQLException e) {
@@ -237,7 +221,6 @@ public class PurchaseOrderDAO extends DBContext {
         return false;
     }
 
-    // Helper method để map ResultSet thành PurchaseOrder object
     private PurchaseOrder mapResultSetToPurchaseOrder(ResultSet rs) throws SQLException {
         PurchaseOrder order = new PurchaseOrder();
         order.setPoId(rs.getInt("po_id"));
@@ -260,7 +243,6 @@ public class PurchaseOrderDAO extends DBContext {
         return order;
     }
 
-    // Helper method để map ResultSet thành PurchaseOrderDetail object
     private PurchaseOrderDetail mapResultSetToPurchaseOrderDetail(ResultSet rs) throws SQLException {
         PurchaseOrderDetail detail = new PurchaseOrderDetail();
         detail.setPoDetailId(rs.getInt("po_detail_id"));
@@ -280,7 +262,6 @@ public class PurchaseOrderDAO extends DBContext {
         return detail;
     }
 
-    // Sinh mã PO code tự động theo định dạng PO001, PO002, ...
     public String generateNextPOCode() throws SQLException {
         String sql = "SELECT MAX(CAST(SUBSTRING(po_code, 3) AS UNSIGNED)) AS max_num FROM Purchase_Orders WHERE po_code LIKE 'PO%'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -294,16 +275,13 @@ public class PurchaseOrderDAO extends DBContext {
         }
     }
 
-    // Tạo Purchase Order mới
     public boolean createPurchaseOrder(PurchaseOrder purchaseOrder, List<PurchaseOrderDetail> details) {
         Connection conn = null;
         try {
             conn = getConnection();
             conn.setAutoCommit(false);
-            // Insert Purchase Order
             String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
             try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                // Sinh mã PO code tự động nếu chưa có
                 if (purchaseOrder.getPoCode() == null || purchaseOrder.getPoCode().isEmpty()) {
                     purchaseOrder.setPoCode(generateNextPOCode());
                 }
@@ -316,11 +294,9 @@ public class PurchaseOrderDAO extends DBContext {
                 if (rowsAffected == 0) {
                     throw new SQLException("Creating purchase order failed, no rows affected.");
                 }
-                // Get generated PO ID
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int poId = generatedKeys.getInt(1);
-                        // Insert Purchase Order Details
                         String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_id, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
                         try (PreparedStatement detailPs = conn.prepareStatement(insertDetailSql)) {
                             for (PurchaseOrderDetail detail : details) {
@@ -341,7 +317,6 @@ public class PurchaseOrderDAO extends DBContext {
                             }
                         }
                         conn.commit();
-                        LOGGER.info("Successfully created purchase order with ID: " + poId);
                         return true;
                     } else {
                         throw new SQLException("Creating purchase order failed, no ID obtained.");
@@ -361,7 +336,6 @@ public class PurchaseOrderDAO extends DBContext {
         }
     }
 
-    // Lấy connection để sử dụng trong servlet
     public java.sql.Connection getConnection() {
         return connection;
     }

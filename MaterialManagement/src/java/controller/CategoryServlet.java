@@ -10,10 +10,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 @WebServlet(name = "CategoryServlet", urlPatterns = {"/Category"})
@@ -80,7 +77,6 @@ public class CategoryServlet extends HttpServlet {
                             int disable = Integer.parseInt(request.getParameter("disable"));
                             String priority = request.getParameter("priority");
                             String code = request.getParameter("code");
-                            String createdAtRaw = request.getParameter("createdAt");
                             String parentIDRaw = request.getParameter("parentID");
 
                             if (code == null || code.trim().isEmpty()) {
@@ -92,7 +88,6 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Kiểm tra category name đã tồn tại chưa (loại trừ category hiện tại)
                             if (categoryDAO.isCategoryNameExists(categoryName.trim(), categoryId)) {
                                 request.setAttribute("error", "Category name '" + categoryName + "' already exists. Please choose a different name.");
                                 request.setAttribute("c", categoryDAO.getCategoryById(categoryId));
@@ -102,7 +97,6 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Thay thế searchCategoriesByCode bằng searchCategories
                             List<Category> existingCategories = categoryDAO.searchCategories(code.trim(), null, null, null, null);
                             for (Category existing : existingCategories) {
                                 if (existing.getCategory_id() != categoryId && existing.getCode().equalsIgnoreCase(code.trim())) {
@@ -115,7 +109,6 @@ public class CategoryServlet extends HttpServlet {
                                 }
                             }
 
-                            // Luôn set createdAt = new Timestamp(System.currentTimeMillis()) khi update
                             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
                             Integer parentId = null;
@@ -214,7 +207,6 @@ public class CategoryServlet extends HttpServlet {
                     String submit = request.getParameter("submit");
                     if (submit == null) {
                         int maxNum = categoryDAO.getMaxCategoryNumber();
-                        System.out.println("DEBUG maxNum (category): " + maxNum);
                         String newCategoryCode = "CAT" + (maxNum + 1);
                         request.setAttribute("categoryCode", newCategoryCode);
                         request.setAttribute("categories", categoryDAO.getAllCategories());
@@ -228,7 +220,6 @@ public class CategoryServlet extends HttpServlet {
                             int disable = Integer.parseInt(request.getParameter("disable"));
                             String priority = request.getParameter("priority");
                             String code = request.getParameter("code");
-                            String createdAtRaw = request.getParameter("createdAt");
                             String parentIDRaw = request.getParameter("parentID");
 
                             if (categoryName == null || categoryName.trim().isEmpty() || code == null || code.trim().isEmpty()) {
@@ -239,12 +230,10 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Kiểm tra category name đã tồn tại chưa
                             if (categoryDAO.isCategoryNameExists(categoryName.trim(), null)) {
                                 request.setAttribute("error", "Category name '" + categoryName + "' already exists. Please choose a different name.");
                                 request.setAttribute("categories", categoryDAO.getAllCategories());
                                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
-                                // Giữ lại thông tin đã nhập
                                 request.setAttribute("enteredCategoryCode", code);
                                 request.setAttribute("enteredCategoryName", categoryName);
                                 request.setAttribute("enteredDescription", description);
@@ -255,7 +244,6 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Thay thế searchCategoriesByCode bằng searchCategories
                             List<Category> existingCategories = categoryDAO.searchCategories(code.trim(), null, null, null, null);
                             if (!existingCategories.isEmpty()) {
                                 request.setAttribute("error", "Category code '" + code + "' already exists. Please choose a different code.");
@@ -265,7 +253,6 @@ public class CategoryServlet extends HttpServlet {
                                 return;
                             }
 
-                            // Thay vì lấy createdAtRaw từ request, set createdAt = new Timestamp(System.currentTimeMillis())
                             Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
                             Integer parentId = null;
@@ -322,7 +309,6 @@ public class CategoryServlet extends HttpServlet {
                         System.out.println("CategoryServlet - Invalid page number: " + pageStr);
                     }
 
-                    // Xác định sortBy/sortOrder
                     String sortCol = null;
                     String sortOrder = null;
                     if (sortBy != null && !sortBy.isEmpty()) {
@@ -335,7 +321,6 @@ public class CategoryServlet extends HttpServlet {
                         }
                     }
 
-                    // Lấy toàn bộ danh sách đã lọc
                     List<Category> filteredList = categoryDAO.searchCategories(name, priority, status, sortCol, sortOrder);
                     int totalCategories = filteredList.size();
                     int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);

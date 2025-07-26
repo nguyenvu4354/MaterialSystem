@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,12 +21,10 @@ public class ExportRequestDAO extends DBContext {
         super();
     }
     
-    public List<ExportRequest> getAll(String status, String search, String recipientId, int page, int itemsPerPage) {
+    public List<ExportRequest> getAll(String status, String search, String searchDate, int page, int itemsPerPage) {
         List<ExportRequest> requests = new ArrayList<>();
-        LOGGER.info("Starting getAll method with status=" + status + ", search=" + search + ", recipientId=" + recipientId + ", page=" + page + ", itemsPerPage=" + itemsPerPage);
 
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return requests;
         }
 
@@ -45,10 +42,6 @@ public class ExportRequestDAO extends DBContext {
         if (search != null && !search.isEmpty()) {
             sql.append("AND (er.request_code LIKE ? OR u.full_name LIKE ?) ");
         }
-        if (recipientId != null && !recipientId.isEmpty()) {
-            sql.append("AND er.recipient_user_id = ? ");
-        }
-
         sql.append("ORDER BY er.export_request_id ASC ");
 
         if (page > 0 && itemsPerPage > 0) {
@@ -64,9 +57,6 @@ public class ExportRequestDAO extends DBContext {
                 String searchPattern = "%" + search + "%";
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
-            }
-            if (recipientId != null && !recipientId.isEmpty()) {
-                ps.setInt(paramIndex++, Integer.parseInt(recipientId));
             }
             if (page > 0 && itemsPerPage > 0) {
                 ps.setInt(paramIndex++, itemsPerPage);
@@ -84,10 +74,9 @@ public class ExportRequestDAO extends DBContext {
         return requests;
     }
     
-    public int getTotalCount(String status, String search) {
+    public int getTotalCount(String status, String search, String searchDate) {
         int count = 0;
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return count;
         }
 
@@ -164,7 +153,6 @@ public class ExportRequestDAO extends DBContext {
     
     public boolean update(ExportRequest request) {
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return false;
         }
 
@@ -192,7 +180,6 @@ public class ExportRequestDAO extends DBContext {
     
     public boolean delete(int id) {
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return false;
         }
 
@@ -268,7 +255,6 @@ public class ExportRequestDAO extends DBContext {
 
     public int getNextCodeSequence() {
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return 1;
         }
 
@@ -299,7 +285,6 @@ public class ExportRequestDAO extends DBContext {
     private List<ExportRequest> getAllSorted(String sortColumn, String order) {
         List<ExportRequest> requests = new ArrayList<>();
         if (connection == null) {
-            LOGGER.severe("Database connection is null");
             return requests;
         }
 

@@ -21,7 +21,6 @@
         }
         .search-box {
             margin-bottom: 20px;
-          
         }
         .pagination {
             justify-content: center;
@@ -59,7 +58,6 @@
         .pagination .page-item.disabled .page-link {
             color: #6c757d;
         }
-        /* Autocomplete UI giống material */
         .ui-autocomplete {
             max-height: 200px;
             overflow-y: auto;
@@ -81,24 +79,19 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <jsp:include page="Header.jsp" />
 
-    <!-- Main content -->
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 bg-light p-0">
                 <jsp:include page="Sidebar.jsp" />
             </div>
 
-            <!-- Page Content -->
             <div class="col-md-9 col-lg-10 content px-md-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="text-primary fw-bold display-6 border-bottom pb-2" style="color: #DEAD6F;">
                         <i class="bi bi-list-ul"></i> Category List
                     </h2>
-                    <!-- Show Create Category button only if user has CREATE_CATEGORY permission -->
                     <c:if test="${sessionScope.user != null && rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'CREATE_CATEGORY')}">
                         <a href="${pageContext.request.contextPath}/Category?service=addCategory" class="btn btn-primary" style="width: 250px; height: 65px; background-color: #DEAD6F; color: white;">
                             <i class="fas fa-plus me-1"></i> Create Category
@@ -106,7 +99,6 @@
                     </c:if>
                 </div>
 
-                <!-- Search and Filter Section -->
                 <div class="row search-box">
                     <div class="col-md-8">
                         <form method="get" action="${pageContext.request.contextPath}/Category" class="d-flex gap-2 align-items-center">
@@ -147,7 +139,6 @@
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
 
-                <!-- Category Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle text-center">
                         <thead class="table-light">
@@ -155,12 +146,10 @@
                                 <th scope="col">ID</th>
                                 <th scope="col" style="width: 150px">Code</th>
                                 <th scope="col" style="width: 300px">Name</th>
-<!--                                <th scope="col" style="width: 150px">Parent ID</th>-->
                                 <th scope="col" style="width: 300px">Created Date</th>
                                 <th scope="col" style="width: 150px">Status</th>
                                 <th scope="col" style="width: 500px">Description</th>
                                 <th scope="col" style="width: 150px">Priority</th>
-                                <!-- Show Actions column only if user has UPDATE_CATEGORY or DELETE_CATEGORY permission -->
                                 <c:if test="${sessionScope.user != null && (rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_CATEGORY') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_CATEGORY'))}">
                                     <th scope="col" style="width: 150px">Actions</th>
                                 </c:if>
@@ -174,12 +163,10 @@
                                             <td>${cat.category_id}</td>
                                             <td>${cat.code}</td>
                                             <td>${cat.category_name}</td>
-<!--                                            <td>${categoryDAO.getParentCategoryName(cat.parent_id)}</td>-->
                                             <td><fmt:formatDate value="${cat.created_at}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                             <td>${cat.status}</td>
                                             <td>${cat.description}</td>
                                             <td>${cat.priority}</td>
-                                            <!-- Show Edit/Delete buttons based on permissions -->
                                             <c:if test="${sessionScope.user != null && (rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_CATEGORY') || rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'DELETE_CATEGORY'))}">
                                                 <td class="d-flex justify-content-center">
                                                     <c:if test="${rolePermissionDAO.hasPermission(sessionScope.user.roleId, 'UPDATE_CATEGORY')}">
@@ -208,7 +195,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
                     <nav class="mt-3">
                         <ul class="pagination justify-content-center">
@@ -226,20 +212,17 @@
                         </ul>
                     </nav>
                 </c:if>
-            </div> <!-- end content -->
-        </div> <!-- end row -->
-    </div> <!-- end container-fluid -->
+            </div>
+        </div>
+    </div>
 
-    <!-- Footer -->
     <jsp:include page="Footer.jsp" />
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="js/jquery-1.11.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script>
-        // Chuyển categories sang mảng JS cho autocomplete
         var categoriesData = [
             <c:forEach var="cat" items="${categories}" varStatus="loop">
                 {
@@ -259,9 +242,8 @@
                     });
                     response(matches);
                 },
-                minLength: 0 // Cho phép hiển thị khi chưa nhập gì
+                minLength: 0
             }).on('focus', function() {
-                // Khi focus vào input, hiển thị luôn danh sách
                 $(this).autocomplete('search', '');
             });
         });

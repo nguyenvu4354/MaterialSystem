@@ -110,7 +110,7 @@ public class HomeServlet extends HttpServlet {
 
         // Số yêu cầu xuất kho chờ duyệt
         ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
-        int pendingExportRequestCount = exportRequestDAO.getTotalCount("pending", null);
+        int pendingExportRequestCount = exportRequestDAO.getTotalCount("pending", null, null);
         request.setAttribute("pendingExportRequestCount", pendingExportRequestCount);
 
         // Tổng số người dùng (chỉ cho admin)

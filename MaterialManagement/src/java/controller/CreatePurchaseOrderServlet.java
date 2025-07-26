@@ -20,7 +20,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import utils.EmailUtils;
@@ -37,10 +36,10 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-            purchaseOrderDAO = new PurchaseOrderDAO();
-            purchaseRequestDAO = new PurchaseRequestDAO();
-            materialDAO = new MaterialDAO();
-            supplierDAO = new SupplierDAO();
+        purchaseOrderDAO = new PurchaseOrderDAO();
+        purchaseRequestDAO = new PurchaseRequestDAO();
+        materialDAO = new MaterialDAO();
+        supplierDAO = new SupplierDAO();
         purchaseRequestDetailDAO = new PurchaseRequestDetailDAO();
         rolePermissionDAO = new RolePermissionDAO();
     }
@@ -49,7 +48,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        entity.User user = (entity.User) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -73,7 +72,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             if (purchaseRequestIdStr != null && !purchaseRequestIdStr.isEmpty()) {
                 int purchaseRequestId = Integer.parseInt(purchaseRequestIdStr);
                 List<entity.PurchaseRequestDetail> purchaseRequestDetailList = purchaseRequestDetailDAO.paginationOfDetails(purchaseRequestId, 1, 1000);
-                if (purchaseRequestDetailList == null) purchaseRequestDetailList = new java.util.ArrayList<>();
+                if (purchaseRequestDetailList == null) purchaseRequestDetailList = new ArrayList<>();
                 request.setAttribute("purchaseRequestDetailList", purchaseRequestDetailList);
                 request.setAttribute("selectedPurchaseRequestId", purchaseRequestId);
                 java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
@@ -89,9 +88,9 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             request.getRequestDispatcher("CreatePurchaseOrder.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("error", "Error loading data: " + e.getMessage());
-            request.setAttribute("purchaseRequests", new java.util.ArrayList<PurchaseRequest>());
-            request.setAttribute("materials", new java.util.ArrayList<Material>());
-            request.setAttribute("suppliers", new java.util.ArrayList<Supplier>());
+            request.setAttribute("purchaseRequests", new ArrayList<PurchaseRequest>());
+            request.setAttribute("materials", new ArrayList<Material>());
+            request.setAttribute("suppliers", new ArrayList<Supplier>());
             request.getRequestDispatcher("CreatePurchaseOrder.jsp").forward(request, response);
         }
     }
@@ -100,7 +99,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        entity.User user = (entity.User) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
@@ -135,16 +134,16 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 materialIds.length == 0 || quantities.length == 0 || unitPrices.length == 0 || suppliers.length == 0) {
                 throw new Exception("At least one material is required.");
             }
-            java.util.List<entity.PurchaseOrderDetail> details = new java.util.ArrayList<>();
+            List<entity.PurchaseOrderDetail> details = new ArrayList<>();
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
-                java.math.BigDecimal unitPrice = new java.math.BigDecimal(unitPrices[i]);
+                BigDecimal unitPrice = new BigDecimal(unitPrices[i]);
                 int supplierId = Integer.parseInt(suppliers[i]);
                 if (quantity <= 0) {
                     throw new Exception("Quantity must be positive.");
                 }
-                if (unitPrice.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
                     throw new Exception("Unit price must be positive.");
                 }
                 Material material = materialDAO.getInformation(materialId);
@@ -165,15 +164,13 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             purchaseOrder.setPurchaseRequestId(purchaseRequestId);
             purchaseOrder.setCreatedBy(user.getUserId());
             purchaseOrder.setNote(note);
-            // Đảm bảo luôn set status là 'pending' khi tạo mới
             purchaseOrder.setStatus("pending");
             boolean success = purchaseOrderDAO.createPurchaseOrder(purchaseOrder, details);
             if (success) {
-                // Gửi email thông báo cho giám đốc
                 try {
                     sendPurchaseOrderNotification(purchaseOrder, details, purchaseRequest, user);
                 } catch (Exception e) {
-                    System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
+                    System.err.println("Error sending purchase order notification: " + e.getMessage());
                     e.printStackTrace();
                 }
                 response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");
@@ -198,14 +195,12 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             List<User> allUsers = userDAO.getAllUsers();
             List<User> directors = new ArrayList<>();
             
-            // Lấy danh sách giám đốc (roleId = 2)
             for (User u : allUsers) {
                 if (u.getRoleId() == 2) {
                     directors.add(u);
                 }
             }
             
-            // Tạo nội dung email
             String subject = "[Thông báo] Purchase Order mới đã được tạo";
             StringBuilder content = new StringBuilder();
             content.append("<html><body>");
@@ -236,20 +231,19 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             content.append("<p>Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý purchase order.</p>");
             content.append("</body></html>");
             
-            // Chỉ gửi email cho giám đốc
             for (User director : directors) {
                 if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
                     try {
                         EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
-                        System.out.println("✅ Đã gửi email thông báo purchase order cho giám đốc: " + director.getEmail());
+                        System.out.println("Email sent to director: " + director.getEmail());
                     } catch (Exception e) {
-                        System.err.println("❌ Lỗi khi gửi email cho giám đốc " + director.getEmail() + ": " + e.getMessage());
+                        System.err.println("Error sending email to director " + director.getEmail() + ": " + e.getMessage());
                     }
                 }
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi gửi email thông báo purchase order: " + e.getMessage());
+            System.err.println("Error sending purchase order notification: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -20,6 +20,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import utils.EmailUtils;
 
 @WebServlet(name = "CreateExportRequestServlet", urlPatterns = {"/CreateExportRequest"})
@@ -116,7 +118,7 @@ public class CreateExportRequestServlet extends HttpServlet {
                 materialIds.length == 0 || quantities.length == 0) {
                 throw new Exception("At least one material is required.");
             }
-            java.util.Map<Integer, Integer> materialQuantityMap = new java.util.HashMap<>();
+            Map<Integer, Integer> materialQuantityMap = new HashMap<>();
             List<ExportRequestDetail> details = new ArrayList<>();
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
@@ -140,11 +142,10 @@ public class CreateExportRequestServlet extends HttpServlet {
             }
             boolean success = exportRequestDAO.add(exportRequest, details);
             if (success) {
-                // Gửi email thông báo cho giám đốc
                 try {
                     sendExportRequestNotification(exportRequest, details, user);
                 } catch (Exception e) {
-                    System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
+                    System.err.println("Error sending export request notification: " + e.getMessage());
                     e.printStackTrace();
                 }
                 response.sendRedirect(request.getContextPath() + "/ExportRequestList");
@@ -167,14 +168,12 @@ public class CreateExportRequestServlet extends HttpServlet {
             List<User> allUsers = userDAO.getAllUsers();
             List<User> directors = new ArrayList<>();
             
-            // Lấy danh sách giám đốc (roleId = 2)
             for (User u : allUsers) {
                 if (u.getRoleId() == 2) {
                     directors.add(u);
                 }
             }
             
-            // Tạo nội dung email
             String subject = "[Thông báo] Export Request mới đã được tạo";
             StringBuilder content = new StringBuilder();
             content.append("<html><body>");
@@ -202,20 +201,19 @@ public class CreateExportRequestServlet extends HttpServlet {
             content.append("<p>Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý export request.</p>");
             content.append("</body></html>");
             
-            // Chỉ gửi email cho giám đốc
             for (User director : directors) {
                 if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
                     try {
                         EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
-                        System.out.println("✅ Đã gửi email thông báo export request cho giám đốc: " + director.getEmail());
+                        System.out.println("Email sent to director: " + director.getEmail());
                     } catch (Exception e) {
-                        System.err.println("❌ Lỗi khi gửi email cho giám đốc " + director.getEmail() + ": " + e.getMessage());
+                        System.err.println("Error sending email to director " + director.getEmail() + ": " + e.getMessage());
                     }
                 }
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Lỗi khi gửi email thông báo export request: " + e.getMessage());
+            System.err.println("Error sending export request notification: " + e.getMessage());
             e.printStackTrace();
         }
     }

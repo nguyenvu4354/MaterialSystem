@@ -1,33 +1,26 @@
 package controller;
 
 import dal.ExportRequestDAO;
-import dal.UserDAO;
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Logger;
+import dal.RolePermissionDAO;
+import entity.ExportRequest;
+import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import entity.ExportRequest;
-import entity.User;
+import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.Set;
-import java.util.HashSet;
-import dal.RolePermissionDAO;
+import java.util.logging.Logger;
 
 @WebServlet(name = "ExportRequestListServlet", urlPatterns = {"/ExportRequestList"})
 public class ExportRequestListServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(ExportRequestListServlet.class.getName());
     private final ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
-    private final UserDAO userDAO = new UserDAO();
     private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
     
-    // Hằng số cho phân trang
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_ITEMS_PER_PAGE = 10;
     private static final int MAX_ITEMS_PER_PAGE = 100;
@@ -57,7 +50,6 @@ public class ExportRequestListServlet extends HttpServlet {
         String toDate = request.getParameter("toDate");
         String sortBy = request.getParameter("sortBy");
         String sortOrder = request.getParameter("sortOrder");
-        String searchRecipient = request.getParameter("searchRecipient");
         int page = DEFAULT_PAGE;
         int itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
         try {
@@ -73,7 +65,6 @@ public class ExportRequestListServlet extends HttpServlet {
                 if (itemsPerPage > MAX_ITEMS_PER_PAGE) itemsPerPage = MAX_ITEMS_PER_PAGE;
             }
         } catch (NumberFormatException e) {
-            // ignore, use default
         }
         List<ExportRequest> exportRequests;
         if (sortBy != null && !sortBy.isEmpty()) {
@@ -88,15 +79,13 @@ public class ExportRequestListServlet extends HttpServlet {
                     exportRequests = exportRequestDAO.getAllSortedByRequestCode(sortOrder);
                     break;
                 default:
-                    exportRequests = exportRequestDAO.getAll(status, search, searchRecipient, page, itemsPerPage);
+                    exportRequests = exportRequestDAO.getAll(status, search, null, page, itemsPerPage);
             }
         } else {
-            exportRequests = exportRequestDAO.getAll(status, search, searchRecipient, page, itemsPerPage);
+            exportRequests = exportRequestDAO.getAll(status, search, null, page, itemsPerPage);
         }
-        int totalItems = exportRequestDAO.getTotalCount(status, search);
+        int totalItems = exportRequestDAO.getTotalCount(status, search, null);
         int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
-        List<User> recipients = new java.util.ArrayList<>();
-        request.setAttribute("recipients", recipients);
         request.setAttribute("exportRequests", exportRequests);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -108,7 +97,6 @@ public class ExportRequestListServlet extends HttpServlet {
         request.setAttribute("toDate", toDate);
         request.setAttribute("sortBy", sortBy);
         request.setAttribute("sortOrder", sortOrder);
-        request.setAttribute("searchRecipient", searchRecipient);
         request.getRequestDispatcher("ExportRequestList.jsp").forward(request, response);
     }
 }

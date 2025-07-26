@@ -140,7 +140,6 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-invoice"></i> Purchase Order List</h2>
                     <div class="d-flex gap-2">
-                        <!-- Đã xóa nút Export to Excel và Print List -->
                     </div>
                 </div>
                 
@@ -160,7 +159,6 @@
                         <input type="text" class="form-control" name="poCode" value="${poCode}" placeholder="Search by PO code" style="width:230px;">
                         <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
-      
                             <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                             <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                             <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
@@ -243,30 +241,27 @@
                             </table>
                         </div>
                         
-                        <!-- Pagination -->
-                       
-                            <nav aria-label="Purchase Order pagination">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                            Previous
-                                        </a>
+                        <nav aria-label="Purchase Order pagination">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                        Previous
+                                    </a>
+                                </li>
+                                
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                     </li>
-                                    
-                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
-                                        </li>
-                                    </c:forEach>
-                                    
-                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
-                                            Next
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                       
+                                </c:forEach>
+                                
+                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                        Next
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                     </c:if>
                     
                     <c:if test="${empty purchaseOrders}">
@@ -282,7 +277,6 @@
     </div>
 </div>
 
-<!-- Status Update Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -343,7 +337,6 @@
         document.getElementById('poId').value = poId;
         document.getElementById('status').value = status;
         
-        // Show/hide reason fields based on status
         const approvalReasonDiv = document.getElementById('approvalReasonDiv');
         const rejectionReasonDiv = document.getElementById('rejectionReasonDiv');
         const rejectionReason = document.getElementById('rejectionReason');
@@ -364,8 +357,6 @@
         
         new bootstrap.Modal(document.getElementById('statusModal')).show();
     }
-    
-    // Đã xóa hàm exportTableToExcel và printTableList ở cuối file
 </script>
 </body>
 </html> 

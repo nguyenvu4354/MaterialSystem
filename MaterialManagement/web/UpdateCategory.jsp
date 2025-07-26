@@ -67,8 +67,8 @@
                                         <div class="alert alert-danger">Category not found.</div>
                                         <div class="d-grid gap-2 mb-3">
                                             <a href="${pageContext.request.contextPath}/Category?service=listCategory" class="btn btn-secondary btn-lg rounded-1">
-                                                <i class="fas fa-arrow-left"></i> Back to Category List
-                                            </a>
+                                            <i class="fas fa-arrow-left"></i> Back to Category List
+                                        </a>
                                         </div>
                                     </c:if>
                                     <c:if test="${not empty c}">
@@ -118,11 +118,11 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-6">
+                                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="parentID" class="form-label text-muted">Parent Category</label>
                                                         <select id="parentID" name="parentID" class="form-select">
-                                                            <option value="">None</option>
+                                                                    <option value="">None</option>
                             <%
                                 CategoryDAO dao = new CategoryDAO();
                                 List<Category> categories = dao.getAllCategories();
@@ -145,7 +145,7 @@
                         </select>
                     </div>
                 </div>
-            </div>
+</div>
             <div class="row">
                 <div class="col-12">
                     <div class="mb-3">
@@ -154,13 +154,13 @@
                                   placeholder="Enter Description" rows="4" required>${fn:escapeXml(c.description)}</textarea>
                     </div>
                 </div>
-            </div>
+                                        </div>
             <div class="row">
                 <div class="col-12">
                     <div class="d-grid gap-2 mb-3">
                         <button type="submit" name="submit" value="Update Category" class="btn btn-dark btn-lg rounded-1">
-                            <i class="fas fa-save"></i> Update Category
-                        </button>
+                                                <i class="fas fa-save"></i> Update Category
+                                            </button>
                     </div>
                     <div class="d-grid gap-2 mb-3">
                         <a href="${pageContext.request.contextPath}/Category?service=listCategory" class="btn btn-secondary btn-lg rounded-1">
@@ -168,18 +168,18 @@
                         </a>
                     </div>
                 </div>
-            </div>
-        </form>
-    </c:if>
-</div>
-</div>
-</div>
+                                        </div>
+                                    </form>
+                                </c:if>
+                            </div>
+                        </div>
+                    </div>
 </section>
-</div>
-</div>
-</div>
+                </div>
+            </div>
+        </div>
 
-<jsp:include page="Footer.jsp" />
+        <jsp:include page="Footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -233,5 +233,5 @@
         }
     });
 </script>
-</body>
+    </body>
 </html>

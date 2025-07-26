@@ -2,6 +2,7 @@ package controller;
 
 import dal.PurchaseOrderDAO;
 import dal.RolePermissionDAO;
+import dal.UserDAO;
 import entity.PurchaseOrder;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -11,6 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "PurchaseOrderDetailServlet", urlPatterns = {"/PurchaseOrderDetail"})
 public class PurchaseOrderDetailServlet extends HttpServlet {
@@ -36,7 +40,6 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
 
         boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
         request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
-        // Thêm kiểm tra quyền gửi nhà cung cấp
         boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
         request.setAttribute("hasSendToSupplierPermission", hasSendToSupplierPermission);
 
@@ -50,12 +53,10 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
                 return;
             }
 
-            // Lấy thông tin đầy đủ của người tạo đơn
-            dal.UserDAO userDAO = new dal.UserDAO();
-            entity.User creator = userDAO.getUserById(purchaseOrder.getCreatedBy());
+            UserDAO userDAO = new UserDAO();
+            User creator = userDAO.getUserById(purchaseOrder.getCreatedBy());
             request.setAttribute("creator", creator);
 
-            // Phân trang cho chi tiết đơn hàng
             int itemsPerPage = 5;
             int currentPage = 1;
             String pageParam = request.getParameter("page");
@@ -72,12 +73,12 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
             if (totalPages == 0) totalPages = 1;
             int fromIndex = (currentPage - 1) * itemsPerPage;
             int toIndex = Math.min(fromIndex + itemsPerPage, totalItems);
-            java.util.List pagedDetails = new java.util.ArrayList();
+            List pagedDetails = new java.util.ArrayList();
             if (purchaseOrder.getDetails() != null && totalItems > 0 && fromIndex < totalItems) {
                 pagedDetails = purchaseOrder.getDetails().subList(fromIndex, toIndex);
             }
-            // Tạo map materialId -> materialImageUrl
-            java.util.Map<Integer, String> materialImages = new java.util.HashMap<>();
+            
+            Map<Integer, String> materialImages = new HashMap<>();
             if (purchaseOrder.getDetails() != null) {
                 for (entity.PurchaseOrderDetail detail : purchaseOrder.getDetails()) {
                     String url = detail.getMaterialImageUrl();
@@ -127,23 +128,19 @@ public class PurchaseOrderDetailServlet extends HttpServlet {
             String rejectionReason = request.getParameter("rejectionReason");
             PurchaseOrder purchaseOrder = purchaseOrderDAO.getPurchaseOrderById(poId);
             if ("updateStatus".equals(action)) {
-                // Xử lý quyền động
                 if ("approved".equals(status) || "rejected".equals(status)) {
-                    // Chỉ cho phép nếu có quyền HANDLE_REQUEST và đơn đang pending
                     boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
                     if (!hasHandleRequestPermission || purchaseOrder == null || !"pending".equals(purchaseOrder.getStatus())) {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                         return;
                     }
                 } else if ("sent_to_supplier".equals(status)) {
-                    // Chỉ cho phép nếu có quyền SENT_TO_SUPPLIER và đơn đang approved
                     boolean hasSendToSupplierPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "SENT_TO_SUPPLIER");
                     if (!hasSendToSupplierPermission || purchaseOrder == null || !"approved".equals(purchaseOrder.getStatus())) {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                         return;
                     }
                 } else {
-                    // Không cho phép các trạng thái khác
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid status update");
                     return;
                 }

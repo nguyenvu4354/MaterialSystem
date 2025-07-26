@@ -125,16 +125,9 @@
             <div class="container-main">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
-                    <!-- Đã xóa hoàn toàn các hàm exportTableToExcel và printTableList ở cuối file, cũng như mọi đoạn mã liên quan đến in và xuất excel. -->
                 </div>
                 <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
                     <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
-                    <select class="form-select" name="searchRecipient" style="max-width:260px; min-width:200px;">
-                        <option value="">All Recipients</option>
-                        <c:forEach var="recipient" items="${recipients}">
-                            <option value="${recipient.userId}" ${searchRecipient == recipient.userId ? 'selected' : ''}>${recipient.fullName}</option>
-                        </c:forEach>
-                    </select>
                     <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
                         <option value="">All Statuses</option>
                         <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
@@ -156,7 +149,6 @@
                                     <th>Status</th>
                                     <th>Delivery Date</th>
                                     <th>Sender</th>
-                                    <th>Recipient</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -195,16 +187,6 @@
                                             <c:choose>
                                                 <c:when test="${not empty request.userName}">
                                                     ${request.userName}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Unknown
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty request.recipientName}">
-                                                    ${request.recipientName}
                                                 </c:when>
                                                 <c:otherwise>
                                                     Unknown
@@ -252,6 +234,5 @@
 </div>
 <jsp:include page="Footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Đã xóa hoàn toàn các hàm exportTableToExcel và printTableList ở cuối file, cũng như mọi đoạn mã liên quan đến in và xuất excel. -->
 </body>
 </html>
