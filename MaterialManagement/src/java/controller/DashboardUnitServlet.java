@@ -20,7 +20,7 @@ public class DashboardUnitServlet extends HttpServlet {
         String keyword = request.getParameter("keyword");
         String pageParam = request.getParameter("page");
         int page = 1;
-        int pageSize = 10;
+        int pageSize = 5;
         if (pageParam != null) {
             try {
                 page = Integer.parseInt(pageParam);

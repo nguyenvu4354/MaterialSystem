@@ -158,32 +158,7 @@ public class SupplierDAO extends DBContext {
         return null;
     }
 
-    public List<Supplier> searchSuppliersByCode(String code) {
-        List<Supplier> list = new ArrayList<>();
-        String sql = "SELECT * FROM Suppliers WHERE disable=0 AND supplier_code LIKE ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            String searchCode = "%" + code + "%";
-            ps.setString(1, searchCode);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Supplier s = new Supplier();
-                    s.setSupplierId(rs.getInt("supplier_id"));
-                    s.setSupplierCode(rs.getString("supplier_code"));
-                    s.setSupplierName(rs.getString("supplier_name"));
-                    s.setContactInfo(rs.getString("contact_info"));
-                    s.setAddress(rs.getString("address"));
-                    s.setPhoneNumber(rs.getString("phone_number"));
-                    s.setEmail(rs.getString("email"));
-                    s.setDescription(rs.getString("description"));
-                    s.setTaxId(rs.getString("tax_id"));
-                    list.add(s);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+
 
     public String generateNextSupplierCode() {
         String sql = "SELECT supplier_code FROM Suppliers WHERE disable = 0 ORDER BY supplier_code DESC LIMIT 1";

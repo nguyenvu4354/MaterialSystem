@@ -77,6 +77,12 @@ public class HomeServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         User user = (User) session.getAttribute("user");
         
+        // Kiểm tra đăng nhập - nếu chưa đăng nhập thì redirect về trang login
+        if (user == null) {
+            response.sendRedirect("Login");
+            return;
+        }
+        
         MaterialDAO dao = new MaterialDAO();
         int page = 1;
         int pageSize = 8;

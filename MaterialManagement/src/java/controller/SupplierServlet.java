@@ -77,7 +77,6 @@ public class SupplierServlet extends HttpServlet {
     private void listSuppliers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
-        String code = request.getParameter("code");
         String sortBy = request.getParameter("sortBy");
         String pageStr = request.getParameter("page");
         int currentPage = pageStr != null ? Integer.parseInt(pageStr) : 1;
@@ -86,11 +85,7 @@ public class SupplierServlet extends HttpServlet {
         List<Supplier> list;
         int totalSuppliers;
 
-        if (code != null && !code.trim().isEmpty()) {
-            list = supplierDAO.searchSuppliersByCode(code);
-            totalSuppliers = list.size();
-            request.setAttribute("code", code);
-        } else if (keyword != null && !keyword.trim().isEmpty()) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
             list = supplierDAO.searchSuppliers(keyword);
             totalSuppliers = list.size();
             request.setAttribute("keyword", keyword);
@@ -126,7 +121,6 @@ public class SupplierServlet extends HttpServlet {
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
-        request.setAttribute("code", code);
         request.setAttribute("rolePermissionDAO", rolePermissionDAO); 
         request.getRequestDispatcher("/SupplierList.jsp").forward(request, response);
     }
