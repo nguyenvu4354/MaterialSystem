@@ -100,7 +100,6 @@ public class RolePermissionServlet extends HttpServlet {
         }
 
         try {
-            // Lưu trạng thái tìm kiếm và module được chọn
             String searchKeyword = request.getParameter("search");
             String selectedModule = request.getParameter("selectedModule");
             if (searchKeyword == null) searchKeyword = "";
