@@ -22,11 +22,27 @@ public class Import {
     private String note;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     private String importedByName;
     private String supplierName;
     private int totalQuantity;
     private double totalValue;
+
+    public Import(int importId, String importCode, LocalDateTime importDate, int importedBy, Integer supplierId, String destination, LocalDateTime actualArrival, String note, LocalDateTime createdAt, LocalDateTime updatedAt, String importedByName, String supplierName, int totalQuantity, double totalValue) {
+        this.importId = importId;
+        this.importCode = importCode;
+        this.importDate = importDate;
+        this.importedBy = importedBy;
+        this.supplierId = supplierId;
+        this.destination = destination;
+        this.actualArrival = actualArrival;
+        this.note = note;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.importedByName = importedByName;
+        this.supplierName = supplierName;
+        this.totalQuantity = totalQuantity;
+        this.totalValue = totalValue;
+    }
 
     public int getImportId() {
         return importId;
