@@ -144,6 +144,15 @@ public class EditMaterialServlet extends HttpServlet {
                 return;
             }
 
+            // Load existing material first
+            MaterialDAO materialDAO = new MaterialDAO();
+            Material oldMaterial = materialDAO.getInformation(Integer.parseInt(materialId));
+            if (oldMaterial == null) {
+                request.setAttribute("error", "Vật tư không tồn tại.");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+                return;
+            }
+
             // Handle file upload
             Part filePart = request.getPart("imageFile");
             String imageUrl = null;
@@ -181,15 +190,6 @@ public class EditMaterialServlet extends HttpServlet {
                 System.out.println("🔄 [EditMaterialServlet] Keeping existing image: " + imageUrl);
             }
 
-            // Load existing material
-            MaterialDAO materialDAO = new MaterialDAO();
-            Material oldMaterial = materialDAO.getInformation(Integer.parseInt(materialId));
-            if (oldMaterial == null) {
-                request.setAttribute("error", "Vật tư không tồn tại.");
-                request.getRequestDispatcher("error.jsp").forward(request, response);
-                return;
-            }
-
             // Create updated material object
             Material material = new Material();
             material.setMaterialId(Integer.parseInt(materialId));
@@ -205,7 +205,7 @@ public class EditMaterialServlet extends HttpServlet {
             unit.setId(Integer.parseInt(unitId));
             material.setUnit(unit);
 
-            material.setMaterialsUrl(imageUrl != null ? imageUrl : oldMaterial.getMaterialsUrl());
+            material.setMaterialsUrl(imageUrl);
             material.setDisable(oldMaterial.isDisable());
             material.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
