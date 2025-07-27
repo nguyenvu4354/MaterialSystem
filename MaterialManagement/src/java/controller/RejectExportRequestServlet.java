@@ -1,6 +1,7 @@
 package controller;
 
 import dal.ExportRequestDAO;
+import dal.RolePermissionDAO;
 import entity.ExportRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,10 +16,12 @@ import java.io.IOException;
 public class RejectExportRequestServlet extends HttpServlet {
 
     private ExportRequestDAO exportRequestDAO;
+    private RolePermissionDAO rolePermissionDAO;
 
     @Override
     public void init() throws ServletException {
         exportRequestDAO = new ExportRequestDAO();
+        rolePermissionDAO = new RolePermissionDAO();
     }
 
     @Override
@@ -30,11 +33,18 @@ public class RejectExportRequestServlet extends HttpServlet {
             return;
         }
         User user = (User) session.getAttribute("user");
-        // Chỉ Director (roleId == 2) được từ chối
-        if (user == null || user.getRoleId() != 2) {
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
+        
+        int roleId = user.getRoleId();
+        if (roleId != 1 && roleId != 2 && !rolePermissionDAO.hasPermission(roleId, "HANDLE_REQUEST")) {
+            request.setAttribute("error", "You do not have permission to reject export requests.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+        
         try {
             int requestId = Integer.parseInt(request.getParameter("requestId"));
             String rejectionReason = request.getParameter("rejectionReason");

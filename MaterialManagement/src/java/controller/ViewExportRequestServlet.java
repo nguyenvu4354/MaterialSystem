@@ -44,7 +44,8 @@ public class ViewExportRequestServlet extends HttpServlet {
             return;
         }
         boolean canView = rolePermissionDAO.hasPermission(user.getRoleId(), "VIEW_EXPORT_REQUEST_LIST");
-        boolean hasHandleRequestPermission = rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
+        boolean hasHandleRequestPermission = (user.getRoleId() == 1 || user.getRoleId() == 2) || 
+                                           rolePermissionDAO.hasPermission(user.getRoleId(), "HANDLE_REQUEST");
         request.setAttribute("canViewExportRequest", canView);
         request.setAttribute("hasHandleRequestPermission", hasHandleRequestPermission);
         if (!canView) {
@@ -60,7 +61,6 @@ public class ViewExportRequestServlet extends HttpServlet {
                 return;
             }
             List<ExportRequestDetail> details = exportRequestDetailDAO.getByRequestId(requestId);
-            // Phân trang cho details
             int itemsPerPage = 10;
             int currentPage = 1;
             String pageStr = request.getParameter("page");
