@@ -323,12 +323,12 @@ public class ExportDAO extends DBContext {
     public List<Export> getExportHistory(String fromDate, String toDate, String exportCode, String recipientId, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
-                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
+                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id AND d.status != 'draft') as totalQuantity, "
                 + "0 as totalValue "
                 + "FROM Exports e "
                 + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
                 + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
-                + "WHERE 1=1 ";
+                + "WHERE 1=1 AND EXISTS (SELECT 1 FROM Export_Details d WHERE d.export_id = e.export_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND e.export_date >= ? ";
@@ -380,7 +380,7 @@ public class ExportDAO extends DBContext {
 
     public int countExportHistory(String fromDate, String toDate, String exportCode, String recipientId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM Exports WHERE 1=1 ";
+        String sql = "SELECT COUNT(*) FROM Exports WHERE 1=1 AND EXISTS (SELECT 1 FROM Export_Details d WHERE d.export_id = Exports.export_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND export_date >= ? ";
@@ -415,14 +415,14 @@ public class ExportDAO extends DBContext {
     public List<Export> getExportHistoryAdvanced(String fromDate, String toDate, String materialName, String sortByRecipient, String sortByExportedBy, int page, int pageSize) {
         List<Export> list = new ArrayList<>();
         String sql = "SELECT DISTINCT e.*, u1.full_name as exportedByName, u2.full_name as recipientName, "
-                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id) as totalQuantity, "
+                + "(SELECT SUM(quantity) FROM Export_Details d WHERE d.export_id = e.export_id AND d.status != 'draft') as totalQuantity, "
                 + "0 as totalValue "
                 + "FROM Exports e "
                 + "LEFT JOIN Users u1 ON e.exported_by = u1.user_id "
                 + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
                 + "LEFT JOIN Export_Details edt ON e.export_id = edt.export_id "
                 + "LEFT JOIN Materials m ON edt.material_id = m.material_id "
-                + "WHERE 1=1 ";
+                + "WHERE 1=1 AND EXISTS (SELECT 1 FROM Export_Details d WHERE d.export_id = e.export_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND e.export_date >= ? ";
@@ -489,7 +489,8 @@ public class ExportDAO extends DBContext {
         String sql = "SELECT COUNT(DISTINCT e.export_id) FROM Exports e "
                 + "LEFT JOIN Users u2 ON e.recipient_user_id = u2.user_id "
                 + "LEFT JOIN Export_Details edt ON e.export_id = edt.export_id "
-                + "LEFT JOIN Materials m ON edt.material_id = m.material_id WHERE 1=1 ";
+                + "LEFT JOIN Materials m ON edt.material_id = m.material_id WHERE 1=1 "
+                + "AND EXISTS (SELECT 1 FROM Export_Details d WHERE d.export_id = e.export_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND e.export_date >= ? ";
