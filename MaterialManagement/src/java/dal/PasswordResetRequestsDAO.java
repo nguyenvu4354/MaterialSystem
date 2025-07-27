@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import entity.DBContext;
@@ -22,7 +18,7 @@ public class PasswordResetRequestsDAO extends DBContext {
                     rs.getString("user_email"),
                     rs.getTimestamp("request_date"),
                     rs.getString("status"),
-                    rs.getString("new_password"), // Đổi từ admin_notes sang new_password
+                    rs.getString("new_password"),
                     (Integer)rs.getObject("processed_by"),
                     rs.getTimestamp("processed_date")
                 );

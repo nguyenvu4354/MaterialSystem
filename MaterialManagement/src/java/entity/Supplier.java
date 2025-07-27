@@ -14,7 +14,7 @@ public class Supplier {
     public Supplier() {
         
     }
-    // Getters và setters
+
     public int getSupplierId() {
         return supplierId;
     }

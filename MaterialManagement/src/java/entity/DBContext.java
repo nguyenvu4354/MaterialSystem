@@ -13,10 +13,9 @@ public class DBContext {
     protected Connection connection;
 
     public DBContext() {
-        connect(); // Tạo kết nối khi khởi tạo
+        connect();
     }
 
-    // Phương thức tạo kết nối mới
     private void connect() {
         try {
             if (connection == null || connection.isClosed()) {
@@ -29,11 +28,10 @@ public class DBContext {
         }
     }
 
-    // Luôn đảm bảo trả về Connection đang hoạt động
     public Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                connect(); // Kết nối lại nếu cần
+                connect();
             }
         } catch (SQLException e) {
             System.err.println("❌ Lỗi khi kiểm tra kết nối: " + e.getMessage());

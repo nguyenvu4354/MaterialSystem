@@ -199,7 +199,6 @@ public class SupplierServlet extends HttpServlet {
         String desc = request.getParameter("description");
         String taxId = request.getParameter("tax_id");
 
-        // Use SupplierValidator for validation
         Map<String, String> errors = SupplierValidator.validateSupplierFormData(
             code, name, contactInfo, address, phone, email, taxId, desc
         );
@@ -218,9 +217,9 @@ public class SupplierServlet extends HttpServlet {
             if (idStr != null && !idStr.isEmpty()) {
                 try {
                     supplier.setSupplierId(Integer.parseInt(idStr));
-                } catch (NumberFormatException e) {
-                    // Handle error
-                }
+                            } catch (NumberFormatException e) {
+                // Ignore parsing error
+            }
             }
             
             StringBuilder errorMessage = new StringBuilder();

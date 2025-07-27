@@ -119,7 +119,6 @@ public class ImportMaterialServlet extends HttpServlet {
         String quantityStr = request.getParameter("quantity");
         String unitPriceStr = request.getParameter("unitPrice");
 
-        // Validate nghiệp vụ phía backend
         Map<String, String> errors = utils.ImportValidator.validateAddMaterial(materialIdStr, quantityStr, unitPriceStr, materialDAO);
         if (!errors.isEmpty()) {
             request.setAttribute("formErrors", errors);
@@ -143,8 +142,6 @@ public class ImportMaterialServlet extends HttpServlet {
         detail.setQuantity(Integer.parseInt(quantityStr));
         detail.setUnitPrice(Double.parseDouble(unitPriceStr));
         detail.setStatus("draft");
-        // Tính lại total value phía backend nếu cần (quantity * unitPrice)
-        // (Nếu ImportDetail có trường totalValue thì set ở đây)
 
         importDAO.createImportDetails(Collections.singletonList(detail));
         request.setAttribute("success", "Material added to import list successfully.");
@@ -292,7 +289,11 @@ public class ImportMaterialServlet extends HttpServlet {
             int currentPage = 1;
             String pageParam = request.getParameter("page");
             if (pageParam != null) {
-                try { currentPage = Integer.parseInt(pageParam); } catch (Exception e) {}
+                try { 
+                    currentPage = Integer.parseInt(pageParam); 
+                } catch (Exception e) {
+                    // Ignore parsing error
+                }
             }
             int totalItems = allDetails.size();
             int totalPages = (int) Math.ceil((double) totalItems / pageSize);
