@@ -166,7 +166,10 @@
                                                 <td>${user.email}</td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER')}">
+                                                        <c:when test="${user.roleId == 2}">
+                                                            No Department
+                                                        </c:when>
+                                                        <c:when test="${rolePermissionDAO.hasPermission(roleId, 'UPDATE_USER') && user.roleId != 2}">
                                                             <form method="post" action="UserList" style="display:inline;">
                                                                 <input type="hidden" name="userId" value="${user.userId}"/>
                                                                 <input type="hidden" name="action" value="updateDepartment"/>
@@ -302,7 +305,6 @@
 
         <jsp:include page="Footer.jsp" />
 
-        <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" integrity="sha512-yFjZbTYRCJodnuyGlsKamNE/LlEaEAxSUDe5+u61mV8zzqJVFOH7TnULE2/PP/l5vKWpUNnF4VGVkXh3MjgLsg==" crossorigin="anonymous"></script>
     </body>

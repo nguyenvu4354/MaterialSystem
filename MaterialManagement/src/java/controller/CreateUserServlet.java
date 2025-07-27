@@ -99,11 +99,13 @@ public class CreateUserServlet extends HttpServlet {
                 return;
             }
 
-            try {
-                if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
-                    departmentId = Integer.parseInt(departmentIdStr);
+            if (roleId != 2) {
+                try {
+                    if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
+                        departmentId = Integer.parseInt(departmentIdStr);
+                    }
+                } catch (NumberFormatException ignored) {
                 }
-            } catch (NumberFormatException ignored) {
             }
 
             User newUser = new User();
@@ -152,14 +154,20 @@ public class CreateUserServlet extends HttpServlet {
             }
 
             errors.putAll(UserValidator.validateForCreateUser(newUser, userDAO, fullName, address, dateOfBirthStr, gender, departmentIdStr, userPicture));
-            
-            if (departmentId != null) {
-                final Integer finalDepartmentId = departmentId;
-                List<Department> departments = userDAO.getActiveDepartments();
-                boolean departmentExists = departments.stream().anyMatch(dept -> dept.getDepartmentId() == finalDepartmentId);
-                if (!departmentExists) {
-                    errors.put("departmentId", "Selected department does not exist or is not active.");
+
+            if (roleId != 2) {
+                if (departmentId == null || departmentIdStr == null || departmentIdStr.isEmpty()) {
+                    errors.put("departmentId", "Department is required for non-Director roles.");
+                } else {
+                    final Integer finalDepartmentId = departmentId;
+                    List<Department> departments = userDAO.getActiveDepartments();
+                    boolean departmentExists = departments.stream().anyMatch(dept -> dept.getDepartmentId() == finalDepartmentId);
+                    if (!departmentExists) {
+                        errors.put("departmentId", "Selected department does not exist or is not active.");
+                    }
                 }
+            } else {
+                newUser.setDepartmentId(null);
             }
 
             if (dateOfBirthStr != null && !dateOfBirthStr.isEmpty()) {
@@ -245,7 +253,7 @@ public class CreateUserServlet extends HttpServlet {
             request.getRequestDispatcher("/CreateUser.jsp").forward(request, response);
         }
     }
-    
+
     private String hashPasswordWithMD5(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

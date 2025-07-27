@@ -254,119 +254,163 @@
                 }
             });
 
+            // Handle role selection to enable/disable department field
+            document.getElementById('roleId').addEventListener('change', function() {
+                const departmentNameInput = document.getElementById('departmentName');
+                const departmentIdInput = document.getElementById('departmentId');
+                if (this.value === '2') { // Director role
+                    departmentNameInput.disabled = true;
+                    departmentNameInput.value = '';
+                    departmentIdInput.value = '';
+                    departmentNameInput.classList.remove('is-invalid');
+                } else {
+                    departmentNameInput.disabled = false;
+                }
+            });
+
             document.addEventListener('DOMContentLoaded', function() {
-            const departments = [
-            <c:forEach var="dept" items="${departments}" varStatus="loop">
-            {
-            label: "${fn:escapeXml(dept.departmentName)}",
-                    value: "${fn:escapeXml(dept.departmentName)}",
-                    id: "${dept.departmentId}"
-            }${loop.last ? '' : ','}
-            </c:forEach>
-            ];
-                    $("#departmentName").autocomplete({
-            source: function(request, response) {
-            const term = request.term.toLowerCase();
-                    const matches = departments.filter(dept =>
+                const roleId = document.getElementById('roleId').value;
+                const departmentNameInput = document.getElementById('departmentName');
+                const departmentIdInput = document.getElementById('departmentId');
+                if (roleId === '2') {
+                    departmentNameInput.disabled = true;
+                    departmentNameInput.value = '';
+                    departmentIdInput.value = '';
+                    departmentNameInput.classList.remove('is-invalid');
+                }
+
+                const departments = [
+                    <c:forEach var="dept" items="${departments}" varStatus="loop">
+                    {
+                        label: "${fn:escapeXml(dept.departmentName)}",
+                        value: "${fn:escapeXml(dept.departmentName)}",
+                        id: "${dept.departmentId}"
+                    }${loop.last ? '' : ','}
+                    </c:forEach>
+                ];
+
+                $("#departmentName").autocomplete({
+                    source: function(request, response) {
+                        const term = request.term.toLowerCase();
+                        const matches = departments.filter(dept =>
                             dept.label.toLowerCase().includes(term)
-                            );
-                    response(matches);
-            },
+                        );
+                        response(matches);
+                    },
                     select: function(event, ui) {
-                    document.getElementById('departmentId').value = ui.item.id;
-                            document.getElementById('departmentName').value = ui.item.value;
-                            document.getElementById('departmentName').classList.remove('is-invalid');
+                        document.getElementById('departmentId').value = ui.item.id;
+                        document.getElementById('departmentName').value = ui.item.value;
+                        document.getElementById('departmentName').classList.remove('is-invalid');
                     },
                     change: function(event, ui) {
-                    if (!ui.item) {
-                    const inputValue = document.getElementById('departmentName').value.toLowerCase().trim();
+                        if (!ui.item) {
+                            const inputValue = document.getElementById('departmentName').value.toLowerCase().trim();
                             const selectedDept = departments.find(dept =>
-                                    dept.label.toLowerCase() === inputValue
-                                    );
+                                dept.label.toLowerCase() === inputValue
+                            );
                             if (selectedDept) {
-                    document.getElementById('departmentId').value = selectedDept.id;
-                            document.getElementById('departmentName').value = selectedDept.label;
-                            document.getElementById('departmentName').classList.remove('is-invalid');
-                    } else {
-                    document.getElementById('departmentId').value = '';
-                            document.getElementById('departmentName').classList.add('is-invalid');
-                    }
-                    }
+                                document.getElementById('departmentId').value = selectedDept.id;
+                                document.getElementById('departmentName').value = selectedDept.label;
+                                document.getElementById('departmentName').classList.remove('is-invalid');
+                            } else {
+                                document.getElementById('departmentId').value = '';
+                                document.getElementById('departmentName').classList.add('is-invalid');
+                            }
+                        }
                     },
                     minLength: 1
+                });
             });
-                    document.getElementById('createUserForm').addEventListener('submit', function(event) {
-            let errors = [];
-                    const username = document.getElementById('username').value;
-                    if (!username) {
-            errors.push('Username is required.');
+
+            document.getElementById('createUserForm').addEventListener('submit', function(event) {
+                let errors = [];
+                const roleId = document.getElementById('roleId').value;
+                const departmentId = document.getElementById('departmentId').value;
+                const departmentName = document.getElementById('departmentName').value;
+
+                if (roleId !== '2') {
+                    if (!departmentId || !departmentName) {
+                        errors.push('Department is required for non-Director roles.');
+                        document.getElementById('departmentName').classList.add('is-invalid');
+                        document.getElementById('departmentName').nextElementSibling.textContent = 'Department is required.';
+                    } else {
+                        document.getElementById('departmentName').classList.remove('is-invalid');
+                    }
+                } else {
+                    // Clear department fields for Director
+                    document.getElementById('departmentId').value = '';
+                    document.getElementById('departmentName').value = '';
+                    document.getElementById('departmentName').classList.remove('is-invalid');
+                }
+
+                const username = document.getElementById('username').value;
+                if (!username) {
+                    errors.push('Username is required.');
                     document.getElementById('username').classList.add('is-invalid');
                     document.getElementById('username').nextElementSibling.textContent = 'Username is required.';
-            } else if (username.length > 10) {
-            errors.push('Username must not exceed 10 characters.');
+                } else if (username.length > 10) {
+                    errors.push('Username must not exceed 10 characters.');
                     document.getElementById('username').classList.add('is-invalid');
                     document.getElementById('username').nextElementSibling.textContent = 'Username must not exceed 10 characters.';
-            } else {
-            document.getElementById('username').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('username').classList.remove('is-invalid');
+                }
 
-            const fullName = document.getElementById('fullName').value;
-                    if (!fullName) {
-            errors.push('Full name is required.');
+                const fullName = document.getElementById('fullName').value;
+                if (!fullName) {
+                    errors.push('Full name is required.');
                     document.getElementById('fullName').classList.add('is-invalid');
                     document.getElementById('fullName').nextElementSibling.textContent = 'Full name is required.';
-            } else if (fullName.length > 25) {
-            errors.push('Full name must not exceed 25 characters.');
+                } else if (fullName.length > 25) {
+                    errors.push('Full name must not exceed 25 characters.');
                     document.getElementById('fullName').classList.add('is-invalid');
                     document.getElementById('fullName').nextElementSibling.textContent = 'Full name must not exceed 25 characters.';
-            } else {
-            document.getElementById('fullName').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('fullName').classList.remove('is-invalid');
+                }
 
-            const email = document.getElementById('email').value;
-                    if (!email) {
-            errors.push('Email is required.');
+                const email = document.getElementById('email').value;
+                if (!email) {
+                    errors.push('Email is required.');
                     document.getElementById('email').classList.add('is-invalid');
                     document.getElementById('email').nextElementSibling.textContent = 'Email is required.';
-            } else {
-            document.getElementById('email').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('email').classList.remove('is-invalid');
+                }
 
-            const phoneNumber = document.getElementById('phoneNumber').value;
-                    if (!phoneNumber) {
-            errors.push('Phone number is required.');
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                if (!phoneNumber) {
+                    errors.push('Phone number is required.');
                     document.getElementById('phoneNumber').classList.add('is-invalid');
                     document.getElementById('phoneNumber').nextElementSibling.textContent = 'Phone number is required.';
-            } else {
-            document.getElementById('phoneNumber').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('phoneNumber').classList.remove('is-invalid');
+                }
 
-            const address = document.getElementById('address').value;
-                    if (!address) {
-            errors.push('Address is required.');
+                const address = document.getElementById('address').value;
+                if (!address) {
+                    errors.push('Address is required.');
                     document.getElementById('address').classList.add('is-invalid');
                     document.getElementById('address').nextElementSibling.textContent = 'Address is required.';
-            } else if (address.length > 25) {
-            errors.push('Address must not exceed 25 characters.');
+                } else if (address.length > 25) {
+                    errors.push('Address must not exceed 25 characters.');
                     document.getElementById('address').classList.add('is-invalid');
                     document.getElementById('address').nextElementSibling.textContent = 'Address must not exceed 25 characters.';
-            } else {
-            document.getElementById('address').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('address').classList.remove('is-invalid');
+                }
 
-            const roleId = document.getElementById('roleId').value;
-                    if (!roleId) {
-            errors.push('Role is required.');
+                if (!roleId) {
+                    errors.push('Role is required.');
                     document.getElementById('roleId').classList.add('is-invalid');
                     document.getElementById('roleId').nextElementSibling.textContent = 'Role is required.';
-            } else {
-            document.getElementById('roleId').classList.remove('is-invalid');
-            }
+                } else {
+                    document.getElementById('roleId').classList.remove('is-invalid');
+                }
 
-            if (errors.length > 0) {
-            event.preventDefault();
-            }
-            });
+                if (errors.length > 0) {
+                    event.preventDefault();
+                }
             });
         </script>
     </body>

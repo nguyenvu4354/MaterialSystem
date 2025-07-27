@@ -154,6 +154,12 @@ public class UserListServlet extends HttpServlet {
                     response.sendRedirect(queryString.toString());
                     return;
                 }
+                User user = userDAO.getUserById(userId);
+                if (user != null && user.getRoleId() == 2) {
+                    request.getSession().setAttribute("error", "Cannot update department for Director role.");
+                    response.sendRedirect(queryString.toString());
+                    return;
+                }
                 String departmentIdStr = request.getParameter("departmentId");
                 Integer departmentId = null;
                 if (departmentIdStr != null && !departmentIdStr.isEmpty()) {
@@ -199,12 +205,17 @@ public class UserListServlet extends HttpServlet {
                     response.sendRedirect(queryString.toString());
                     return;
                 }
-                int roleId = Integer.parseInt(roleIdStr);
-                boolean updated = userDAO.updateRole(userId, roleId);
-                if (updated) {
-                    request.getSession().setAttribute("message", "Role updated successfully.");
-                } else {
-                    request.getSession().setAttribute("error", "Failed to update role.");
+                try {
+                    int roleId = Integer.parseInt(roleIdStr);
+                    boolean updated = userDAO.updateRole(userId, roleId);
+                    if (updated) {
+                        request.getSession().setAttribute("message", "Role updated successfully.");
+                    } else {
+                        request.getSession().setAttribute("error", "Failed to update role.");
+                    }
+                } catch (NumberFormatException e) {
+                    request.getSession().setAttribute("error", "Invalid role ID.");
+                    response.sendRedirect(queryString.toString());
                 }
             } else {
                 request.getSession().setAttribute("error", "Invalid action.");
