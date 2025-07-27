@@ -23,18 +23,7 @@ public class ImportDetail {
     private String unitName;
     private String materialsUrl;
 
-    public ImportDetail(int importDetailId, int importId, int materialId, int quantity, double unitPrice, String status, LocalDateTime createdAt, String materialName, String unitName, String materialsUrl) {
-        this.importDetailId = importDetailId;
-        this.importId = importId;
-        this.materialId = materialId;
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.materialName = materialName;
-        this.unitName = unitName;
-        this.materialsUrl = materialsUrl;
-    }
+  
 
     public int getImportDetailId() {
         return importDetailId;
