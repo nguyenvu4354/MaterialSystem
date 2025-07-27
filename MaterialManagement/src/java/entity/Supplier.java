@@ -11,8 +11,16 @@ public class Supplier {
     private String description;
     private String taxId;
 
-    public Supplier() {
-        
+    public Supplier(int supplierId, String supplierCode, String supplierName, String contactInfo, String address, String phoneNumber, String email, String description, String taxId) {
+        this.supplierId = supplierId;
+        this.supplierCode = supplierCode;
+        this.supplierName = supplierName;
+        this.contactInfo = contactInfo;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.description = description;
+        this.taxId = taxId;
     }
 
     public int getSupplierId() {
