@@ -84,7 +84,9 @@
                         <div class="container">
                             <div class="row my-5 py-5">
                                 <div class="col-10 bg-white p-4 mx-auto rounded shadow form-container">
-                                    <h2 class="display-4 fw-normal text-center mb-4">Edit <span class="text-primary">Material</span></h2>
+                                                                         <h2 class="display-4 fw-normal text-center mb-4">Edit <span class="text-primary">Material</span></h2>
+                                     
+
 
                                     <!-- Hiển thị lỗi nếu có -->
                                     <c:if test="${not empty error}">
@@ -136,9 +138,20 @@
                                         <div class="mb-3">
                                             <label class="form-label">Material Image</label>
                                             <div class="mb-3">
-                                                <div id="imagePreview">
-                                                    <img id="previewImg" class="img-thumbnail" src="${param.materialsUrl != null ? param.materialsUrl : (materialsUrl != null ? materialsUrl : (m != null ? m.materialsUrl : ''))}" alt="Material Image">
-                                                </div>
+                                                                                                 <div id="imagePreview">
+                                                     <c:choose>
+                                                         <c:when test="${m != null && m.materialsUrl != null && m.materialsUrl != ''}">
+                                                             <c:set var="imagePath" value="${m.materialsUrl}" />
+                                                             <c:if test="${!m.materialsUrl.startsWith('images/material/') && !m.materialsUrl.startsWith('http')}">
+                                                                 <c:set var="imagePath" value="images/material/${m.materialsUrl}" />
+                                                             </c:if>
+                                                             <img id="previewImg" class="img-thumbnail" src="${imagePath}" alt="Material Image" onerror="this.src='images/material/default.jpg'">
+                                                         </c:when>
+                                                         <c:otherwise>
+                                                             <img id="previewImg" class="img-thumbnail" src="images/material/default.jpg" alt="Material Image">
+                                                         </c:otherwise>
+                                                     </c:choose>
+                                                 </div>
                                             </div>
 
                                             <!-- Tabs cho chọn upload ảnh hoặc nhập URL -->
@@ -217,28 +230,43 @@
 
                           <script>
              
-             // Preview ảnh khi chọn file hoặc nhập URL
-            document.getElementById('imageFile').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    document.getElementById('materialsUrl').value = '';
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('previewImg').src = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                    const uploadTab = document.getElementById('upload-tab');
-                    bootstrap.Tab.getOrCreateInstance(uploadTab).show();
-                }
-            });
+                          // Preview ảnh khi chọn file hoặc nhập URL
+             document.getElementById('imageFile').addEventListener('change', function(event) {
+                 const file = event.target.files[0];
+                 if (file) {
+                     document.getElementById('materialsUrl').value = '';
+                     const reader = new FileReader();
+                     reader.onload = function(e) {
+                         document.getElementById('previewImg').src = e.target.result;
+                     }
+                     reader.readAsDataURL(file);
+                     const uploadTab = document.getElementById('upload-tab');
+                     bootstrap.Tab.getOrCreateInstance(uploadTab).show();
+                 }
+             });
 
-            document.getElementById('materialsUrl').addEventListener('input', function(event) {
-                const url = event.target.value.trim();
-                if (url) {
-                    document.getElementById('imageFile').value = '';
-                    document.getElementById('previewImg').src = url;
-                }
-            });
+                           document.getElementById('materialsUrl').addEventListener('input', function(event) {
+                  const url = event.target.value.trim();
+                  if (url) {
+                      document.getElementById('imageFile').value = '';
+                      document.getElementById('previewImg').src = url;
+                  } else {
+                      // Nếu URL trống, hiển thị lại ảnh gốc
+                      const materialImageUrl = '${m != null ? m.materialsUrl : ""}';
+                      let originalImage = 'images/material/default.jpg';
+                      
+                                             if (materialImageUrl && materialImageUrl.trim() !== '') {
+                           // Nếu URL đã có prefix hoặc là URL http thì dùng nguyên, không thì thêm prefix
+                           if (materialImageUrl.startsWith('images/material/') || materialImageUrl.startsWith('http')) {
+                               originalImage = materialImageUrl;
+                           } else {
+                               originalImage = 'images/material/' + materialImageUrl;
+                           }
+                       }
+                      
+                      document.getElementById('previewImg').src = originalImage;
+                  }
+              });
 
             // Truyền categories và units sang JS
             var categories = [
