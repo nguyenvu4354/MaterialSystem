@@ -143,7 +143,7 @@
                         <div class="col-md-12">
                             <form id="searchForm" method="get" action="dashboardmaterial" class="d-flex gap-2 align-items-center">
                                 <div class="position-relative">
-                                    <input type="text" id="materialSearch" name="materialSearch" class="form-control" placeholder="Tên hoặc mã vật tư..." autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialSearch != null ? param.materialSearch : ''}" />
+                                    <input type="text" id="materialSearch" name="materialSearch" class="form-control" placeholder="Search by name" autocomplete="off" style="width: 220px; height: 50px; border: 2px solid gray" value="${param.materialSearch != null ? param.materialSearch : ''}" />
                                     <input type="hidden" id="materialId" name="materialId" value="" />
                                 </div>
                                 <select name="status" class="form-select" style="width: 150px; height: 50px; border: 2px solid gray">
