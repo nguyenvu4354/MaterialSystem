@@ -296,7 +296,7 @@ public class ImportDAO extends DBContext {
 
     public List<Import> getImports(LocalDateTime startDate, LocalDateTime endDate, int pageIndex, int pageSize) throws SQLException {
         List<Import> imports = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Imports WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM Imports WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = Imports.import_id AND d.status != 'draft')");
         List<Object> params = new ArrayList<>();
 
         if (startDate != null) {
@@ -351,14 +351,14 @@ public class ImportDAO extends DBContext {
     public List<Import> getImportHistoryAdvanced(String fromDate, String toDate, String materialName, String sortSupplier, String sortImportedBy, int page, int pageSize) {
         List<Import> list = new ArrayList<>();
         String sql = "SELECT DISTINCT i.*, u.full_name as importedByName, s.supplier_name, "
-                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id) as totalQuantity, "
-                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id) as totalValue "
+                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') as totalQuantity, "
+                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') as totalValue "
                 + "FROM Imports i "
                 + "LEFT JOIN Users u ON i.imported_by = u.user_id "
                 + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
                 + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
                 + "LEFT JOIN Materials m ON idt.material_id = m.material_id "
-                + "WHERE 1=1 ";
+                + "WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND i.import_date >= ? ";
@@ -439,7 +439,8 @@ public class ImportDAO extends DBContext {
         String sql = "SELECT COUNT(DISTINCT i.import_id) FROM Imports i "
                 + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
                 + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
-                + "LEFT JOIN Materials m ON idt.material_id = m.material_id WHERE 1=1 ";
+                + "LEFT JOIN Materials m ON idt.material_id = m.material_id WHERE 1=1 "
+                + "AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND i.import_date >= ? ";
