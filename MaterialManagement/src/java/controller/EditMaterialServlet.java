@@ -18,6 +18,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet(name = "EditMaterialServlet", urlPatterns = {"/editmaterial"})
@@ -55,6 +56,7 @@ public class EditMaterialServlet extends HttpServlet {
         }
 
         String materialId = request.getParameter("materialId");
+        
         if (materialId == null || materialId.trim().isEmpty()) {
             response.sendRedirect("dashboardmaterial");
             return;
@@ -69,8 +71,16 @@ public class EditMaterialServlet extends HttpServlet {
         }
 
         request.setAttribute("m", material);
-        request.setAttribute("categories", new CategoryDAO().getAllCategories());
-        request.setAttribute("units", new UnitDAO().getAllUnits());
+        
+        CategoryDAO categoryDAO = new CategoryDAO();
+        UnitDAO unitDAO = new UnitDAO();
+        
+        List<Category> categories = categoryDAO.getAllCategories();
+        List<Unit> units = unitDAO.getAllUnits();
+        
+        request.setAttribute("categories", categories);
+        request.setAttribute("units", units);
+        
         request.getRequestDispatcher("EditMaterial.jsp").forward(request, response);
     }
 
@@ -135,7 +145,7 @@ public class EditMaterialServlet extends HttpServlet {
             }
 
             // Handle file upload
-            Part filePart = request.getPart("materialImage");
+            Part filePart = request.getPart("imageFile");
             String imageUrl = null;
 
             if (filePart != null && filePart.getSize() > 0) {
@@ -165,6 +175,10 @@ public class EditMaterialServlet extends HttpServlet {
             } else if (urlInput != null && !urlInput.trim().isEmpty()) {
                 imageUrl = urlInput.trim();
                 System.out.println("📝 [EditMaterialServlet] Using URL input instead of new image: " + imageUrl);
+            } else {
+                // Keep existing image if no new image or URL provided
+                imageUrl = oldMaterial.getMaterialsUrl();
+                System.out.println("🔄 [EditMaterialServlet] Keeping existing image: " + imageUrl);
             }
 
             // Load existing material
