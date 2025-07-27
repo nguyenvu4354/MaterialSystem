@@ -114,8 +114,8 @@
                                         </div>
                                     <% } %>
 
-                                    <!-- Form gửi POST lên servlet xử lý 'editmaterial', enctype để upload file ảnh -->
-                                    <form action="${pageContext.request.contextPath}/editmaterial" method="POST" enctype="multipart/form-data">
+                                                                         <!-- Form gửi POST lên servlet xử lý 'editmaterial', enctype để upload file ảnh -->
+                                     <form action="${pageContext.request.contextPath}/editmaterial" method="POST" enctype="multipart/form-data" novalidate>
 
                                         <!-- Ẩn input chứa ID vật tư để biết sửa cái nào -->
                                         <input type="hidden" name="materialId" value="${m.materialId}">
@@ -156,9 +156,25 @@
                                                 <div class="tab-pane fade show active" id="upload-content" role="tabpanel">
                                                     <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
                                                 </div>
-                                                <div class="tab-pane fade" id="url-content" role="tabpanel">
-                                                    <input type="url" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter image URL" value="${param.materialsUrl != null ? param.materialsUrl : (materialsUrl != null ? materialsUrl : (m != null ? m.materialsUrl : ''))}">
-                                                </div>
+                                                                                                 <div class="tab-pane fade" id="url-content" role="tabpanel">
+                                                     <input type="text" class="form-control" id="materialsUrl" name="materialsUrl" placeholder="Enter image URL" value="${param.materialsUrl != null ? param.materialsUrl : (materialsUrl != null ? materialsUrl : (m != null ? m.materialsUrl : ''))}">
+                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Material Status -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="materialStatus" class="form-label">Material Status</label>
+                                                                                                 <select class="form-select" id="materialStatus" name="materialStatus">
+                                                    <option value="">Select Status</option>
+                                                    <option value="new" ${param.materialStatus == 'new' ? 'selected' : (materialStatus != null && materialStatus == 'new' ? 'selected' : (m != null && m.materialStatus == 'new' ? 'selected' : ''))}>New</option>
+                                                    <option value="used" ${param.materialStatus == 'used' ? 'selected' : (materialStatus != null && materialStatus == 'used' ? 'selected' : (m != null && m.materialStatus == 'used' ? 'selected' : ''))}>Used</option>
+                                                    <option value="damaged" ${param.materialStatus == 'damaged' ? 'selected' : (materialStatus != null && materialStatus == 'damaged' ? 'selected' : (m != null && m.materialStatus == 'damaged' ? 'selected' : ''))}>Damaged</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <!-- Empty column for layout -->
                                             </div>
                                         </div>
 
@@ -199,8 +215,9 @@
         <!-- Import Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script>
-            // Preview ảnh khi chọn file hoặc nhập URL
+                          <script>
+             
+             // Preview ảnh khi chọn file hoặc nhập URL
             document.getElementById('imageFile').addEventListener('change', function(event) {
                 const file = event.target.files[0];
                 if (file) {

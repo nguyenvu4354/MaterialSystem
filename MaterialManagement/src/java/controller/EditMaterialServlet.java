@@ -86,6 +86,7 @@ public class EditMaterialServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
         int roleId = user.getRoleId();
+        
         if (roleId != 1 && !rolePermissionDAO.hasPermission(roleId, "UPDATE_MATERIAL")) {
             request.setAttribute("error", "Bạn không có quyền chỉnh sửa vật tư.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
@@ -103,16 +104,6 @@ public class EditMaterialServlet extends HttpServlet {
             String categoryId = request.getParameter("categoryId");
             String unitId = request.getParameter("unitId");
             String urlInput = request.getParameter("materialsUrl");
-
-            System.out.println("🛠️ [EditMaterialServlet] Form Parameters:");
-            System.out.println("materialId: " + materialId);
-            System.out.println("materialCode: " + materialCode);
-            System.out.println("materialName: " + materialName);
-            System.out.println("materialStatus: " + materialStatus);
-            System.out.println("price: " + priceStr);
-            System.out.println("categoryId: " + categoryId);
-            System.out.println("unitId: " + unitId);
-            System.out.println("materialsUrl: " + urlInput);
 
             // Validate form data
             Map<String, String> errors = MaterialValidator.validateMaterialFormData(
