@@ -146,6 +146,7 @@ public class ViewRequestsServlet extends HttpServlet {
         }
     }
 
+    //a
     @Override
     public String getServletInfo() {
         return "Servlet for listing and canceling user requests (export, purchase, repair)";
