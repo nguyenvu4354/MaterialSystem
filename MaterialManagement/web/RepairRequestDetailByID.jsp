@@ -273,11 +273,12 @@
                             </div>
                             <div class="action-buttons">
                                 <c:if test="${canApprove}">
-                                    <button class="btn btn-approve" type="submit" formaction="approve" onclick="return confirm('Are you sure you want to approve this request?')">✅ Approve</button>
+                                    <button class="btn btn-approve" type="submit" formaction="approve" onclick="return confirm('Are you sure you want to approve this request?')"> Approve</button>
                                 </c:if>
                                 <c:if test="${canReject}">
-                                    <button class="btn btn-reject" type="submit" formaction="reject" onclick="return confirm('Are you sure you want to reject this request?')">❌ Reject</button>
+                                    <button class="btn btn-reject" type="submit" formaction="reject" onclick="return confirm('Are you sure you want to reject this request?')">Reject</button>
                                 </c:if>
+                                    <a href="repairrequestlist" class="btn btn-cancel">Cancel</a>
                             </div>
                         </form>
                     </div>
@@ -286,7 +287,7 @@
             <c:if test="${!canApprove && !canReject}">
                 <div class="text-muted fst-italic text-center">You only have permission to view the repair request details.</div>
             </c:if>
-            <a href="repairrequestlist" class="btn btn-cancel">Cancel</a>
+            
 
         </div>
     </body>

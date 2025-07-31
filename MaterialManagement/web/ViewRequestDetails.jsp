@@ -192,12 +192,7 @@
                 <c:if test="${requestType == 'Purchase'}">
                 </c:if>
                 <c:if test="${requestType == 'Repair'}">
-                    <p><strong>Estimated Return Date:</strong> <c:choose>
-                        <c:when test="${request.estimatedReturnDate != null}">
-                            <fmt:formatDate value="${request.estimatedReturnDate}" pattern="dd/MM/yyyy" />
-                        </c:when>
-                        <c:otherwise>N/A</c:otherwise>
-                    </c:choose></p>
+                    <!-- Đã loại bỏ hiển thị Estimated Return Date -->
                 </c:if>
 
                 <h3>Details</h3>

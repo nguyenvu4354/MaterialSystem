@@ -106,10 +106,10 @@
                                             <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
                                         </div>
 
-                                        <h3 class="fw-normal mt-5 mb-3">Repairer and Schedule Information</h3>
+                                        <h3 class="fw-normal mt-5 mb-3">Information about the repairer and the reason for the repair</h3>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label class="form-label text-muted">Supplier</label>
+                                                <label class="form-label text-muted">Name of repair person</label>
                                                 <select class="form-select" name="supplierId" required>
                                                     <option value="" disabled selected>Select a supplier</option>
                                                     <c:forEach var="supplier" items="${supplierList}">
@@ -118,11 +118,7 @@
                                                 </select>
                                                 <div class="invalid-feedback">Please select a supplier.</div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label text-muted">Estimated Return Date</label>
-                                                <input type="date" class="form-control" name="estimatedReturnDate" id="returnDate" required>
-                                                <div class="invalid-feedback">Estimated return date cannot be left blank.</div>
-                                            </div>
+                                            <!-- Đã loại bỏ trường Estimated Return Date -->
                                             <div class="col-12">
                                                 <label class="form-label text-muted">Reason for Repair</label>
                                                 <textarea name="reason" rows="3" class="form-control" required></textarea>
@@ -147,12 +143,6 @@
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Set date to today only
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('returnDate').setAttribute('value', today);
-            document.getElementById('returnDate').setAttribute('min', today);
-            document.getElementById('returnDate').setAttribute('max', today);
-
             // Autocomplete for material names
             const availableMaterials = [
             <c:forEach var="m" items="${materialList}" varStatus="loop">
@@ -213,19 +203,6 @@
                 document.querySelectorAll('.invalid-feedback').forEach(feedback => {
                     feedback.style.display = 'none';
                 });
-
-                // Validate return date
-                const returnDate = document.getElementById('returnDate').value;
-                if (!returnDate) {
-                    document.getElementById('returnDate').classList.add('is-invalid');
-                    document.getElementById('returnDate').nextElementSibling.style.display = 'block';
-                    isValid = false;
-                } else if (returnDate !== today) {
-                    document.getElementById('returnDate').classList.add('is-invalid');
-                    document.getElementById('returnDate').nextElementSibling.textContent = 'Estimated return date must be today only.';
-                    document.getElementById('returnDate').nextElementSibling.style.display = 'block';
-                    isValid = false;
-                }
 
                 // Validate supplier
                 const supplierId = document.querySelector('select[name="supplierId"]').value;
