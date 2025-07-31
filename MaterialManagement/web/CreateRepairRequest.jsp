@@ -106,23 +106,23 @@
                                             <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
                                         </div>
 
-                                        <h3 class="fw-normal mt-5 mb-3">Information about the repairer and the reason for the repair</h3>
+                                        <h3 class="fw-normal mt-5 mb-3">Repairer Information and Repair Reason</h3>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <label class="form-label text-muted">Name of repair person</label>
+                                                <label class="form-label text-muted">Name of Repairer</label>
                                                 <select class="form-select" name="supplierId" required>
-                                                    <option value="" disabled selected>Select a supplier</option>
+                                                    <option value="" disabled selected>Select a repair</option>
                                                     <c:forEach var="supplier" items="${supplierList}">
                                                         <option value="${supplier.supplierId}">${supplier.supplierName}</option>
                                                     </c:forEach>
                                                 </select>
-                                                <div class="invalid-feedback">Please select a supplier.</div>
+                                                <div class="invalid-feedback">Please select a repairer.</div>
                                             </div>
                                             <!-- Đã loại bỏ trường Estimated Return Date -->
                                             <div class="col-12">
                                                 <label class="form-label text-muted">Reason for Repair</label>
                                                 <textarea name="reason" rows="3" class="form-control" required></textarea>
-                                                <div class="invalid-feedback">Reason for repair cannot be left blank.</div>
+                                                <div class="invalid-feedback">Reason for repair cannot be empty.</div>
                                             </div>
                                         </div>
 
