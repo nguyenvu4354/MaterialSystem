@@ -12,7 +12,7 @@
     }
     User user = (User) session.getAttribute("user");
     boolean canApprove = user != null && (user.getRoleId() == 1 || user.getRoleId() == 2 || rolePermissionDAO.hasPermission(user.getRoleId(), "APPROVE_REPAIR_REQUEST"));
-    boolean canReject = user != null && (user.getRoleId() == 1 || user.getRoleId() == 106 || rolePermissionDAO.hasPermission(user.getRoleId(), "REJECT_REPAIR_REQUEST"));
+    boolean canReject = user != null && (user.getRoleId() == 1 || user.getRoleId() == 2 || rolePermissionDAO.hasPermission(user.getRoleId(), "REJECT_REPAIR_REQUEST"));
     request.setAttribute("canApprove", canApprove);
     request.setAttribute("canReject", canReject);
 %>
@@ -262,33 +262,36 @@
                 </div>
             </div>
 
-            <c:if test="${canApprove || canReject}">
-                <div class="card">
-                    <div class="card-header">Actions</div>
-                    <div class="card-body">
-                        <form action="${canApprove ? 'approve' : 'reject'}" method="post">
-                            <input type="hidden" name="requestId" value="${requestId}">
-                            <div class="mb-3">
-                                <textarea class="form-control" name="reason" placeholder="Enter reason for action..." required></textarea>
-                            </div>
-                            <div class="action-buttons">
-                                <c:if test="${canApprove}">
-                                    <button class="btn btn-approve" type="submit" formaction="approve" onclick="return confirm('Are you sure you want to approve this request?')"> Approve</button>
-                                </c:if>
-                                <c:if test="${canReject}">
-                                    <button class="btn btn-reject" type="submit" formaction="reject" onclick="return confirm('Are you sure you want to reject this request?')">Reject</button>
-                                </c:if>
-                                    <a href="repairrequestlist" class="btn btn-cancel">Cancel</a>
-                            </div>
-                        </form>
+            <c:choose>
+                <c:when test="${status == 'pending' && (canApprove || canReject)}">
+                    <div class="card">
+                        <div class="card-header">Actions</div>
+                        <div class="card-body">
+                            <form action="${canApprove ? 'approve' : 'reject'}" method="post">
+                                <input type="hidden" name="requestId" value="${requestId}">
+                                <div class="mb-3">
+                                    <textarea class="form-control" name="reason" placeholder="Enter reason for action..." required></textarea>
+                                </div>
+                                <div class="action-buttons">
+                                    <c:if test="${canApprove}">
+                                        <button class="btn btn-approve" type="submit" formaction="approve" onclick="return confirm('Are you sure you want to approve this request?')"> Approve</button>
+                                    </c:if>
+                                    <c:if test="${canReject}">
+                                        <button class="btn btn-reject" type="submit" formaction="reject" onclick="return confirm('Are you sure you want to reject this request?')">Reject</button>
+                                    </c:if>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            </c:if>
-            <c:if test="${!canApprove && !canReject}">
-                <div class="text-muted fst-italic text-center">You only have permission to view the repair request details.</div>
-            </c:if>
-            
+                </c:when>
 
+                <c:otherwise>
+                    <c:if test="${!canApprove && !canReject}">
+                        <div class="text-muted fst-italic text-center">You only have permission to view the repair request details.</div>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
+            <a href="repairrequestlist" class="btn btn-cancel">Cancel</a>
         </div>
     </body>
 </html>
