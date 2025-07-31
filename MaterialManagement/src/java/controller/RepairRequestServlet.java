@@ -84,7 +84,6 @@ public class RepairRequestServlet extends HttpServlet {
 
             String supplierIdStr = request.getParameter("supplierId");
             String reason = request.getParameter("reason");
-            Date estimatedReturnDate = Date.valueOf(request.getParameter("estimatedReturnDate"));
             Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
             // Kiểm tra supplierId
@@ -109,7 +108,6 @@ public class RepairRequestServlet extends HttpServlet {
             requestObj.setRepairPersonEmail(null); 
             requestObj.setRepairLocation(null); 
             requestObj.setReason(reason);
-            requestObj.setEstimatedReturnDate(estimatedReturnDate);
             requestObj.setRequestDate(now);
             requestObj.setStatus("Pending");
             requestObj.setCreatedAt(now);
@@ -195,7 +193,6 @@ public class RepairRequestServlet extends HttpServlet {
                     content.append("Người tạo: ").append(user.getFullName()).append(" (ID: ").append(user.getUserId()).append(")\n");
                     content.append("Lý do: ").append(reason).append("\n");
                     content.append("Nhà cung cấp: ").append(supplier != null ? supplier.getSupplierName() : "N/A").append("\n");
-                    content.append("Ngày dự kiến hoàn trả: ").append(estimatedReturnDate).append("\n");
                     content.append("Thời gian gửi yêu cầu: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(now)).append("\n\n");
                     content.append("Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý yêu cầu.");
 

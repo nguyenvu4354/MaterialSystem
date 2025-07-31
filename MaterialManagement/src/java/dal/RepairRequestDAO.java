@@ -13,8 +13,8 @@ import java.util.List;
 public class RepairRequestDAO extends DBContext {
 
     public boolean createRepairRequest(RepairRequest request, List<RepairRequestDetail> details) throws SQLException {
-        String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, estimated_return_date, reason, status, request_date, created_at, updated_at, disable) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String requestSql = "INSERT INTO Repair_Requests (request_code, user_id, reason, status, request_date, created_at, updated_at, disable) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String detailSql = "INSERT INTO Repair_Request_Details "
                 + "(repair_request_id, material_id, quantity, damage_description, repair_cost, supplier_id, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -28,13 +28,13 @@ public class RepairRequestDAO extends DBContext {
             // Insert into Repair_Requests
             psRequest.setString(1, request.getRequestCode());
             psRequest.setInt(2, request.getUserId());
-            psRequest.setDate(3, request.getEstimatedReturnDate());
-            psRequest.setString(4, request.getReason());
-            psRequest.setString(5, request.getStatus());
-            psRequest.setTimestamp(6, request.getRequestDate());
-            psRequest.setTimestamp(7, request.getCreatedAt());
-            psRequest.setTimestamp(8, request.getUpdatedAt());
-            psRequest.setBoolean(9, request.isDisable());
+            // Đã loại bỏ setDate cho estimatedReturnDate
+            psRequest.setString(3, request.getReason());
+            psRequest.setString(4, request.getStatus());
+            psRequest.setTimestamp(5, request.getRequestDate());
+            psRequest.setTimestamp(6, request.getCreatedAt());
+            psRequest.setTimestamp(7, request.getUpdatedAt());
+            psRequest.setBoolean(8, request.isDisable());
             psRequest.executeUpdate();
 
             // Get generated repair request ID
@@ -123,7 +123,6 @@ public class RepairRequestDAO extends DBContext {
                     request.setUserId(rs.getInt("user_id"));
                     request.setFullName(rs.getString("full_name"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
-                    request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     request.setStatus(rs.getString("status"));
                     request.setReason(rs.getString("reason"));
                     request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
@@ -244,7 +243,6 @@ public class RepairRequestDAO extends DBContext {
                     req.setUserId(rs.getInt("user_id"));
                     req.setFullName(rs.getString("full_name"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
-                    req.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     req.setReason(rs.getString("reason"));
                     req.setStatus(rs.getString("status"));
                     list.add(req);
@@ -269,7 +267,6 @@ public class RepairRequestDAO extends DBContext {
                     req.setUserId(rs.getInt("user_id"));
                     req.setFullName(rs.getString("full_name"));
                     req.setRequestDate(rs.getTimestamp("request_date"));
-                    req.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     req.setReason(rs.getString("reason"));
                     req.setStatus(rs.getString("status"));
                     list.add(req);
@@ -293,7 +290,6 @@ public class RepairRequestDAO extends DBContext {
                     request.setUserId(rs.getInt("user_id"));
                     request.setFullName(rs.getString("full_name"));
                     request.setRequestDate(rs.getTimestamp("request_date"));
-                    request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                     request.setStatus(rs.getString("status"));
                     request.setReason(rs.getString("reason"));
                     request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
@@ -309,4 +305,16 @@ public class RepairRequestDAO extends DBContext {
         }
         return null;
     }
+    public static void main(String[] args) {
+    RepairRequestDAO dao = new RepairRequestDAO();
+    try {
+        // Example: Get repair requests with pagination
+        List<RepairRequest> requests = dao.getRepairRequestsWithPagination(0, 5, "equipment", "pending", "asc", "2025-01-01", "2025-12-31");
+        for (RepairRequest req : requests) {
+            System.out.println("Request ID: " + req.getRepairRequestId() + ", Code: " + req.getRequestCode() + ", Status: " + req.getStatus());
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
 }

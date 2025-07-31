@@ -469,7 +469,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
-                request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
@@ -503,7 +502,6 @@ public class RequestDAO extends DBContext {
                 request.setRequestCode(rs.getString("request_code"));
                 request.setUserId(rs.getInt("user_id"));
                 request.setRequestDate(rs.getTimestamp("request_date"));
-                request.setEstimatedReturnDate(rs.getDate("estimated_return_date"));
                 request.setStatus(rs.getString("status"));
                 request.setReason(rs.getString("reason"));
                 request.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);

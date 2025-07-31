@@ -13,6 +13,7 @@ import java.util.List;
  * @author Nhat Anh
  */
 public class RepairRequest {
+
     private int repairRequestId;
     private String requestCode;
     private int userId;
@@ -20,7 +21,6 @@ public class RepairRequest {
     private String repairPersonPhoneNumber;
     private String repairPersonEmail;
     private String repairLocation;
-    private Date estimatedReturnDate;
     private String status;
     private String reason;
     private Integer approvedBy; // Nullable theo FOREIGN KEY
@@ -31,28 +31,22 @@ public class RepairRequest {
     private Timestamp updatedAt;
     private boolean disable;
     private List<RepairRequestDetail> details; // Added field
-    
+
     private String fullName;
-    
 
     // Constructor mặc định
     public RepairRequest() {
     }
 
     // Constructor với tất cả các thuộc tính, including details
-    public RepairRequest(int repairRequestId, String requestCode, int userId, Timestamp requestDate, 
-            String repairPersonPhoneNumber, String repairPersonEmail, String repairLocation, 
-            Date estimatedReturnDate, String status, String reason, Integer approvedBy, 
-            String approvalReason, Timestamp approvedAt, String rejectionReason, 
-            Timestamp createdAt, Timestamp updatedAt, boolean disable, List<RepairRequestDetail> details) {
+    public RepairRequest(int repairRequestId, String requestCode, int userId, Timestamp requestDate,
+            String status, String reason, Integer approvedBy, String approvalReason,
+            Timestamp approvedAt, String rejectionReason, Timestamp createdAt,
+            Timestamp updatedAt, boolean disable, List<RepairRequestDetail> details) {
         this.repairRequestId = repairRequestId;
         this.requestCode = requestCode;
         this.userId = userId;
         this.requestDate = requestDate;
-        this.repairPersonPhoneNumber = repairPersonPhoneNumber;
-        this.repairPersonEmail = repairPersonEmail;
-        this.repairLocation = repairLocation;
-        this.estimatedReturnDate = estimatedReturnDate;
         this.status = status;
         this.reason = reason;
         this.approvedBy = approvedBy;
@@ -76,9 +70,6 @@ public class RepairRequest {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-
-   
-    
 
     public void setRepairRequestId(int repairRequestId) {
         this.repairRequestId = repairRequestId;
@@ -130,14 +121,6 @@ public class RepairRequest {
 
     public void setRepairLocation(String repairLocation) {
         this.repairLocation = repairLocation;
-    }
-
-    public Date getEstimatedReturnDate() {
-        return estimatedReturnDate;
-    }
-
-    public void setEstimatedReturnDate(Date estimatedReturnDate) {
-        this.estimatedReturnDate = estimatedReturnDate;
     }
 
     public String getStatus() {
@@ -223,25 +206,24 @@ public class RepairRequest {
 
     @Override
     public String toString() {
-        return "RepairRequest{" +
-                "repairRequestId=" + repairRequestId +
-                ", requestCode='" + requestCode + '\'' +
-                ", userId=" + userId +
-                ", requestDate=" + requestDate +
-                ", repairPersonPhoneNumber='" + repairPersonPhoneNumber + '\'' +
-                ", repairPersonEmail='" + repairPersonEmail + '\'' +
-                ", repairLocation='" + repairLocation + '\'' +
-                ", estimatedReturnDate=" + estimatedReturnDate +
-                ", status='" + status + '\'' +
-                ", reason='" + reason + '\'' +
-                ", approvedBy=" + approvedBy +
-                ", approvalReason='" + approvalReason + '\'' +
-                ", approvedAt=" + approvedAt +
-                ", rejectionReason='" + rejectionReason + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", disable=" + disable +
-                ", details=" + details +
-                '}';
+        return "RepairRequest{"
+                + "repairRequestId=" + repairRequestId
+                + ", requestCode='" + requestCode + '\''
+                + ", userId=" + userId
+                + ", requestDate=" + requestDate
+                + ", repairPersonPhoneNumber='" + repairPersonPhoneNumber + '\''
+                + ", repairPersonEmail='" + repairPersonEmail + '\''
+                + ", repairLocation='" + repairLocation + '\''
+                + ", status='" + status + '\''
+                + ", reason='" + reason + '\''
+                + ", approvedBy=" + approvedBy
+                + ", approvalReason='" + approvalReason + '\''
+                + ", approvedAt=" + approvedAt
+                + ", rejectionReason='" + rejectionReason + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + ", disable=" + disable
+                + ", details=" + details
+                + '}';
     }
 }
