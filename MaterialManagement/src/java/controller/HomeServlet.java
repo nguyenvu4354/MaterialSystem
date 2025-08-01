@@ -127,7 +127,7 @@ public class HomeServlet extends HttpServlet {
 
         // Số yêu cầu mua vật tư chờ duyệt
         PurchaseRequestDAO purchaseRequestDAO = new PurchaseRequestDAO();
-        int pendingPurchaseRequestCount = purchaseRequestDAO.countPurchaseRequest(null, "pending");
+        int pendingPurchaseRequestCount = purchaseRequestDAO.countPurchaseRequest(null, "pending", null, null);
         request.setAttribute("pendingPurchaseRequestCount", pendingPurchaseRequestCount);
 
         // Số yêu cầu sửa chữa chờ duyệt
