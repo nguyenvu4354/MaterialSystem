@@ -7,16 +7,7 @@ Description: Waggy is specially designed product packaged for eCommerce pet stor
 Version: 1.1
 */
 
-/*--------------------------------------------------------------
-This is main CSS file that contains custom style rules used in this template
---------------------------------------------------------------*/
-
-/*------------------------------------*\
-    Table of contents
-\*------------------------------------*/
-
 /*------------------------------------------------
-
 CSS STRUCTURE:
 
 1. VARIABLES
@@ -82,10 +73,10 @@ CSS STRUCTURE:
 7. OTHER PAGES
   7.1 Product detail
   7.2 Shop page
+--------------------------------------------------------------*/
 
-    
 /*--------------------------------------------------------------
-/** 1. VARIABLES
+1. VARIABLES
 --------------------------------------------------------------*/
 :root {
   /* widths for rows and containers
