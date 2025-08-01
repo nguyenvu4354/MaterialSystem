@@ -125,7 +125,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label text-muted">Purchase Reason</label>
-                                                            <textarea class="form-control" name="reason" rows="1"></textarea>
+                                                            <textarea class="form-control" name="reason" rows="3" placeholder="Please describe the reason for purchase request...">${submittedReason}</textarea>
                                                         </div>
                                                     </div>
                                                     <h3 class="fw-normal mt-5 mb-3">Materials</h3>
@@ -246,6 +246,87 @@
             document.querySelectorAll('.material-row').forEach(row => {
                 updateMaterialRowAutocomplete(row);
             });
+            
+            // Restore submitted data if there were validation errors
+            <c:if test="${not empty submittedMaterialNames}">
+                const submittedMaterialNames = [
+                    <c:forEach var="materialName" items="${submittedMaterialNames}" varStatus="status">
+                        "${fn:escapeXml(materialName)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                const submittedQuantities = [
+                    <c:forEach var="quantity" items="${submittedQuantities}" varStatus="status">
+                        "${fn:escapeXml(quantity)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                const submittedNotes = [
+                    <c:forEach var="note" items="${submittedNotes}" varStatus="status">
+                        "${fn:escapeXml(note)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                
+                // Clear existing rows and restore data
+                const materialList = document.getElementById('materialList');
+                materialList.innerHTML = '';
+                
+                for (let i = 0; i < submittedMaterialNames.length; i++) {
+                    if (i === 0) {
+                        // Create first row manually
+                        const firstRowTemplate = `
+                            <div class="row material-row align-items-center gy-2">
+                                <div class="col-md-3">
+                                    <label class="form-label text-muted">Material</label>
+                                    <input type="text" class="form-control material-name-input" name="materialName" placeholder="Type material name or code" autocomplete="off">
+                                    <input type="hidden" name="materialId" class="material-id-input">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted">Quantity</label>
+                                    <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-muted">Notes</label>
+                                    <input type="text" class="form-control" name="note">
+                                </div>
+                                <div class="col-md-2">
+                                    <img class="material-image" src="images/material/default.jpg" alt="Material Image">
+                                </div>
+                                <div class="col-md-1 d-flex align-items-center">
+                                    <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                                </div>
+                            </div>
+                        `;
+                        materialList.innerHTML = firstRowTemplate;
+                    } else {
+                        // Add new row for additional materials
+                        const addButton = document.getElementById('addMaterial');
+                        addButton.click();
+                    }
+                    
+                    const currentRow = materialList.querySelector('.material-row:last-child');
+                    if (currentRow) {
+                        const nameInput = currentRow.querySelector('.material-name-input');
+                        const quantityInput = currentRow.querySelector('input[name="quantity"]');
+                        const noteInput = currentRow.querySelector('input[name="note"]');
+                        
+                        if (nameInput && submittedMaterialNames[i]) {
+                            nameInput.value = submittedMaterialNames[i];
+                            // Trigger autocomplete to set material ID and image
+                            setTimeout(() => {
+                                $(nameInput).autocomplete('search', submittedMaterialNames[i]);
+                            }, 100);
+                        }
+                        if (quantityInput && submittedQuantities[i]) {
+                            quantityInput.value = submittedQuantities[i];
+                        }
+                        if (noteInput && submittedNotes[i]) {
+                            noteInput.value = submittedNotes[i];
+                        }
+                        
+                        // Update autocomplete for the new row
+                        updateMaterialRowAutocomplete(currentRow);
+                    }
+                }
+            </c:if>
         });
         document.getElementById('addMaterial').addEventListener('click', function () {
             const materialList = document.getElementById('materialList');

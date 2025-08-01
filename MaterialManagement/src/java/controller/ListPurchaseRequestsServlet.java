@@ -47,6 +47,8 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             String keyword = request.getParameter("keyword");
             String status = request.getParameter("status");
             String sortOption = request.getParameter("sort");
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
             int pageIndex = 1;
             int pageSize = 10;
 
@@ -59,11 +61,14 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             }
 
             if (sortOption == null || sortOption.isEmpty()) {
-                sortOption = "date_desc";
+                sortOption = "code_desc"; // Sort by request code descending to show newest PR codes first
             }
 
-            List<PurchaseRequest> list = prd.searchPurchaseRequest(keyword, status, pageIndex, pageSize, sortOption);
-            int totalItems = prd.countPurchaseRequest(keyword, status);
+            // Debug: Show all request codes
+            prd.debugAllRequestCodes();
+            
+            List<PurchaseRequest> list = prd.searchPurchaseRequest(keyword, status, startDate, endDate, pageIndex, pageSize, sortOption);
+            int totalItems = prd.countPurchaseRequest(keyword, status, startDate, endDate);
 
             // Lọc bỏ các đơn có trạng thái cancel
             for (int i = list.size() - 1; i >= 0; i--) {
@@ -71,8 +76,17 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
                     list.remove(i);
                 }
             }
-            // Cập nhật lại totalItems sau khi lọc
-            totalItems = list.size();
+            
+            // Debug: Check pagination
+            System.out.println("=== DEBUG: Pagination ===");
+            System.out.println("Page Index: " + pageIndex);
+            System.out.println("Page Size: " + pageSize);
+            System.out.println("Total Items (before filter): " + totalItems);
+            System.out.println("List size (after filter): " + list.size());
+            System.out.println("Request codes in current page:");
+            for (PurchaseRequest pr : list) {
+                System.out.println("  - " + pr.getRequestCode() + " (Status: " + pr.getStatus() + ")");
+            }
 
             // Tạo Map userId -> tên requester
             HashMap<Integer, String> userIdToName = new HashMap<>();
@@ -93,6 +107,8 @@ public class ListPurchaseRequestsServlet extends HttpServlet {
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
             request.setAttribute("sortOption", sortOption);
+            request.setAttribute("startDate", startDate);
+            request.setAttribute("endDate", endDate);
             request.setAttribute("rolePermissionDAO", rolePermissionDAO); // Để JSP sử dụng
             request.setAttribute("canApprove", rolePermissionDAO.hasPermission(currentUser.getRoleId(), "HANDLE_REQUEST"));
 
