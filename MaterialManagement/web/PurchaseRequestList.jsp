@@ -155,15 +155,24 @@
                                     </div>
                                 </div>
                                 <form class="filter-bar align-items-center" method="GET" action="ListPurchaseRequests" style="gap: 8px; flex-wrap:nowrap;">
-                                    <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search by request code" style="width:230px;">
-                                    <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                                    <input type="text" class="form-control" name="keyword" value="${keyword}" placeholder="Search by request code" style="width:200px;">
+                                    <select class="form-select" name="status" style="max-width:120px;">
                                         <option value="">All Statuses</option>
                                         <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
                                         <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
                                         <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                                     </select>
+                                    <select class="form-select" name="sort" style="max-width:150px;">
+                                        <option value="">Sort by</option>
+                                        <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
+                                        <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
+                                        <option value="date_asc" ${sortOption == 'date_asc' ? 'selected' : ''}>Date (Oldest)</option>
+                                        <option value="date_desc" ${sortOption == 'date_desc' ? 'selected' : ''}>Date (Newest)</option>
+                                    </select>
+                                    <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:140px;">
+                                    <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:140px;">
                                     <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                                     <a href="${pageContext.request.contextPath}/ListPurchaseRequests" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
+                                    <a href="${pageContext.request.contextPath}/ListPurchaseRequests" class="btn btn-secondary" style="width: 75px; height: 50px;">Clear</a>
                                 </form>
                                 <c:if test="${not empty purchaseRequests}">
                                     <div class="table-responsive" id="printTableListArea">
@@ -218,15 +227,15 @@
                                     <nav class="mt-3">
                                         <ul class="pagination justify-content-center">
                                             <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage - 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Previous</a>
+                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage - 1}&status=${status}&keyword=${keyword}&sort=${sortOption}&startDate=${startDate}&endDate=${endDate}">Previous</a>
                                             </li>
                                             <c:forEach begin="1" end="${totalPages}" var="i">
                                                 <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                                    <a class="page-link" href="ListPurchaseRequests?page=${i}&status=${status}&keyword=${keyword}&sort=${sortOption}">${i}</a>
+                                                    <a class="page-link" href="ListPurchaseRequests?page=${i}&status=${status}&keyword=${keyword}&sort=${sortOption}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                                 </li>
                                             </c:forEach>
                                             <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage + 1}&status=${status}&keyword=${keyword}&sort=${sortOption}">Next</a>
+                                                <a class="page-link" href="ListPurchaseRequests?page=${currentPage + 1}&status=${status}&keyword=${keyword}&sort=${sortOption}&startDate=${startDate}&endDate=${endDate}">Next</a>
                                             </li>
                                         </ul>
                                     </nav>
