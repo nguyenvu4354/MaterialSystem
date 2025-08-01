@@ -191,7 +191,6 @@ if (user != null) {
                             <iconify-icon icon="tabler:search" class="fs-4"></iconify-icon>
                         </a>
                     </div>
-
                 </div>
             </div>
         </nav>
