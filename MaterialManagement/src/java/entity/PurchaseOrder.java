@@ -19,7 +19,6 @@ public class PurchaseOrder {
     private String rejectionReason;
     private Timestamp sentToSupplierAt;
     private boolean disable;
-    private Integer supplierId;
     
     // Additional fields for display
     private String purchaseRequestCode;
@@ -147,14 +146,6 @@ public class PurchaseOrder {
 
     public void setDisable(boolean disable) {
         this.disable = disable;
-    }
-
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
     }
 
     public String getPurchaseRequestCode() {
