@@ -61,9 +61,14 @@ public class RepairRequestValidator {
 
             // Check if material exists in database
             String trimmedMaterialName = materialName.trim();
-            Material material = materialDAO.getMaterialByName(trimmedMaterialName);
+            // Xử lý trường hợp tên vật tư có "(damaged)" ở cuối
+            if (trimmedMaterialName.endsWith(" (damaged)")) {
+                trimmedMaterialName = trimmedMaterialName.substring(0, trimmedMaterialName.length() - 10); // Bỏ "(damaged)"
+            }
+            
+            Material material = materialDAO.getInformationByNameAndStatus(trimmedMaterialName, "damaged");
             if (material == null) {
-                errors.put("material_" + i, "Material '" + trimmedMaterialName + "' does not exist in inventory.");
+                errors.put("material_" + i, "Material '" + materialName.trim() + "' does not exist in inventory.");
                 continue;
             }
 

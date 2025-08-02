@@ -150,7 +150,7 @@
             // Autocomplete for material names
             const availableMaterials = [
             <c:forEach var="m" items="${materialList}" varStatus="loop">
-            "${m.materialName}"${loop.last ? '' : ','}
+            "${fn:escapeXml(m.materialName)} (damaged)"${loop.last ? '' : ','}
             </c:forEach>
             ];
 

@@ -88,6 +88,8 @@ public class RepairRequestDAO extends DBContext {
         if (sortByName != null && !sortByName.isEmpty()) {
             if ("oldest".equalsIgnoreCase(sortByName)) {
                 sql.append(" ORDER BY rr.created_at ASC, rr.repair_request_id ASC");
+            } else if ("newest".equalsIgnoreCase(sortByName)) {
+                sql.append(" ORDER BY rr.created_at DESC, rr.repair_request_id DESC");
             }
         } else {
             sql.append(" ORDER BY rr.created_at DESC, rr.repair_request_id DESC");

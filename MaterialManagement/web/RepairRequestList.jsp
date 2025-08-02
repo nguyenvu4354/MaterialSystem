@@ -145,7 +145,7 @@
                                 <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
                             </select>
                             <select name="sortByName" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
-                                <option value="" ${sortByName == null || sortByName == '' ? 'selected' : ''}>Newest First</option>
+                                <option value="newest" ${sortByName == 'newest' || sortByName == null || sortByName == '' ? 'selected' : ''}>Newest First</option>
                                 <option value="oldest" ${sortByName == 'oldest' ? 'selected' : ''}>Oldest First</option>
                             </select>
                             <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">

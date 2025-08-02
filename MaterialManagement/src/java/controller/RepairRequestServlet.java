@@ -51,7 +51,13 @@ public class RepairRequestServlet extends HttpServlet {
         }
 
         MaterialDAO materialDAO = new MaterialDAO();
-        List<Material> materialList = materialDAO.getAllProducts();
+        List<Material> materialList = materialDAO.searchMaterials("", "damaged", 1, Integer.MAX_VALUE, "code_asc");
+        
+        // Debug log
+        System.out.println("[DEBUG] Found " + materialList.size() + " damaged materials:");
+        for (Material m : materialList) {
+            System.out.println("[DEBUG] - " + m.getMaterialName() + " (ID: " + m.getMaterialId() + ", Status: " + m.getMaterialStatus() + ")");
+        }
 
         SupplierDAO supplierDAO = new SupplierDAO();
         List<Supplier> supplierList = supplierDAO.getAllSuppliers();
@@ -106,7 +112,7 @@ public class RepairRequestServlet extends HttpServlet {
                 // Preserve form data for retry
                 MaterialDAO materialDAO = new MaterialDAO();
                 SupplierDAO supplierDAO = new SupplierDAO();
-                List<Material> materialList = materialDAO.getAllProducts();
+                List<Material> materialList = materialDAO.searchMaterials("", "damaged", 1, Integer.MAX_VALUE, "code_asc");
                 List<Supplier> supplierList = supplierDAO.getAllSuppliers();
 
                 String requestDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").format(new java.util.Date());
@@ -156,11 +162,21 @@ public class RepairRequestServlet extends HttpServlet {
                 }
                 
                 String trimmedMaterialName = materialName.trim();
-                Material material = materialDAO.getMaterialByName(trimmedMaterialName);
+                // Xử lý trường hợp tên vật tư có "(damaged)" ở cuối
+                if (trimmedMaterialName.endsWith(" (damaged)")) {
+                    trimmedMaterialName = trimmedMaterialName.substring(0, trimmedMaterialName.length() - 10); // Bỏ "(damaged)"
+                }
+                
+                System.out.println("[DEBUG] Processing material: '" + materialName.trim() + "' -> trimmed: '" + trimmedMaterialName + "'");
+                
+                Material material = materialDAO.getInformationByNameAndStatus(trimmedMaterialName, "damaged");
                 
                 if (material == null) {
+                    System.out.println("[DEBUG] Material not found: '" + trimmedMaterialName + "' with status 'damaged'");
                     continue; // Already validated above
                 }
+                
+                System.out.println("[DEBUG] Found material: " + material.getMaterialName() + " (ID: " + material.getMaterialId() + ")");
                 
                 int quantity = Integer.parseInt(quantities[i]);
                 String damageDescription = damageDescriptions[i];
