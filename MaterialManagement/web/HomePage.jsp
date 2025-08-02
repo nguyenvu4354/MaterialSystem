@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
-uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html lang="en">
   <head>
     <title>Internal Material Management System</title>
@@ -10,15 +10,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -136,6 +130,90 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       <div class="row">
         <!-- Main Content Area -->
         <div class="col-12">
+          <!-- ACTIVITY SUMMARY SECTION -->
+          <div class="section-card">
+            <div class="section-header">
+              <h4 class="mb-0">
+                <i class="fas fa-clock me-2"></i>Activity Summary
+              </h4>
+            </div>
+            <div class="section-body">
+              <div class="row text-center">
+                <div class="col-md-3 mb-3">
+                  <div class="activity-card">
+                    <i class="fas fa-arrow-down" style="color: #28a745"></i>
+                    <h4 class="mb-1">${totalImported}</h4>
+                    <small class="text-muted">Total Imported</small>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="activity-card">
+                    <i class="fas fa-arrow-up" style="color: #fd7e14"></i>
+                    <h4 class="mb-1">${totalExported}</h4>
+                    <small class="text-muted">Total Exported</small>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="activity-card">
+                    <i class="fas fa-boxes" style="color: #007bff"></i>
+                    <h4 class="mb-1">${materialCount}</h4>
+                    <small class="text-muted">Total Materials</small>
+                  </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <div class="activity-card">
+                    <i class="fas fa-warehouse" style="color: #6f42c1"></i>
+                    <h4 class="mb-1">${totalStock}</h4>
+                    <small class="text-muted">Current Stock</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANALYTICS & REPORTS SECTION -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                  <i class="fas fa-chart-bar me-2"></i>Analytics & Reports
+                </h4>
+                <button id="toggleReportsBtn" class="btn btn-outline-light btn-sm" style="border-radius: 20px">
+                  <i class="fas fa-eye-slash me-1"></i> Hide Reports
+                </button>
+              </div>
+            </div>
+            <div id="reportsSection" class="section-body">
+              <!-- Charts Row -->
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="card" style="border: 1px solid #dead6f; border-radius: 12px">
+                    <div class="card-header" style="background: #f8f9fa; border-bottom: 1px solid #dead6f;">
+                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
+                        <i class="fas fa-chart-pie me-2"></i>Inventory Overview
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <canvas id="pieChart" style="max-height: 300px"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="card" style="border: 1px solid #dead6f; border-radius: 12px">
+                    <div class="card-header" style="background: #f8f9fa; border-bottom: 1px solid #dead6f;">
+                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
+                        <i class="fas fa-chart-line me-2"></i>Stock Level Distribution
+                      </h6>
+                    </div>
+                    <div class="card-body">
+                      <canvas id="barChart" style="max-height: 300px"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- CRITICAL ALERTS SECTION -->
           <div class="section-card">
             <div class="section-header">
@@ -150,19 +228,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <div class="col-md-6 mb-3">
                     <div class="alert-custom alert-warning-custom">
                       <div class="d-flex align-items-center">
-                        <i
-                          class="fas fa-exclamation-triangle fa-2x me-3"
-                          style="color: #856404"
-                        ></i>
+                        <i class="fas fa-exclamation-triangle fa-2x me-3" style="color: #856404"></i>
                         <div>
                           <h5 class="alert-heading mb-1">Low Stock</h5>
-                          <p class="mb-2">
-                            ${lowStockCount} materials are low on stock
-                          </p>
-                          <a
-                            href="StaticInventory?stockFilter=low"
-                            class="btn btn-warning btn-sm"
-                          >
+                          <p class="mb-2">${lowStockCount} materials are low on stock</p>
+                          <a href="StaticInventory?stockFilter=low" class="btn btn-warning btn-sm">
                             <i class="fas fa-eye me-1"></i>View Details
                           </a>
                         </div>
@@ -176,19 +246,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <div class="col-md-6 mb-3">
                     <div class="alert-custom alert-danger-custom">
                       <div class="d-flex align-items-center">
-                        <i
-                          class="fas fa-times-circle fa-2x me-3"
-                          style="color: #721c24"
-                        ></i>
+                        <i class="fas fa-times-circle fa-2x me-3" style="color: #721c24"></i>
                         <div>
                           <h5 class="alert-heading mb-1">Out of Stock</h5>
-                          <p class="mb-2">
-                            ${outOfStockCount} materials are out of stock
-                          </p>
-                          <a
-                            href="StaticInventory?stockFilter=zero"
-                            class="btn btn-danger btn-sm"
-                          >
+                          <p class="mb-2">${outOfStockCount} materials are out of stock</p>
+                          <a href="StaticInventory?stockFilter=zero" class="btn btn-danger btn-sm">
                             <i class="fas fa-eye me-1"></i>View Details
                           </a>
                         </div>
@@ -198,38 +260,16 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 </c:if>
 
                 <!-- Damaged Materials Alert (Admin/Director/Warehouse Staff) -->
-                <c:if
-                  test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}"
-                >
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
                   <c:if test="${damagedMaterialsCount > 0}">
                     <div class="col-md-6 mb-3">
-                      <div
-                        class="alert-custom"
-                        style="
-                          background: linear-gradient(
-                            135deg,
-                            #fff3cd 0%,
-                            #ffeaa7 100%
-                          );
-                          border-left: 4px solid #ffc107;
-                        "
-                      >
+                      <div class="alert-custom" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left: 4px solid #ffc107;">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-exclamation-triangle fa-2x me-3"
-                            style="color: #856404"
-                          ></i>
+                          <i class="fas fa-exclamation-triangle fa-2x me-3" style="color: #856404"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              Damaged Materials
-                            </h5>
-                            <p class="mb-2">
-                              ${damagedMaterialsCount} materials are damaged
-                            </p>
-                            <a
-                              href="StaticInventory?status=damaged"
-                              class="btn btn-warning btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">Damaged Materials</h5>
+                            <p class="mb-2">${damagedMaterialsCount} materials are damaged</p>
+                            <a href="StaticInventory?status=damaged" class="btn btn-warning btn-sm">
                               <i class="fas fa-eye me-1"></i>View Details
                             </a>
                           </div>
@@ -240,29 +280,16 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 </c:if>
 
                 <!-- Pending Requests Alerts (Admin/Director/Warehouse Staff) -->
-                <c:if
-                  test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}"
-                >
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
                   <c:if test="${pendingExportRequestCount > 0}">
                     <div class="col-md-6 mb-3">
                       <div class="alert-custom alert-info-custom">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-file-signature fa-2x me-3"
-                            style="color: #0c5460"
-                          ></i>
+                          <i class="fas fa-file-signature fa-2x me-3" style="color: #0c5460"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Export Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingExportRequestCount} requests waiting for
-                              approval
-                            </p>
-                            <a
-                              href="ExportRequestList"
-                              class="btn btn-info btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">Pending Export Requests</h5>
+                            <p class="mb-2">${pendingExportRequestCount} requests waiting for approval</p>
+                            <a href="ExportRequestList" class="btn btn-info btn-sm">
                               <i class="fas fa-eye me-1"></i>Review Requests
                             </a>
                           </div>
@@ -275,22 +302,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="col-md-6 mb-3">
                       <div class="alert-custom alert-primary-custom">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-shopping-cart fa-2x me-3"
-                            style="color: #004085"
-                          ></i>
+                          <i class="fas fa-shopping-cart fa-2x me-3" style="color: #004085"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Purchase Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingPurchaseRequestCount} requests waiting
-                              for approval
-                            </p>
-                            <a
-                              href="ListPurchaseRequests"
-                              class="btn btn-primary btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">Pending Purchase Requests</h5>
+                            <p class="mb-2">${pendingPurchaseRequestCount} requests waiting for approval</p>
+                            <a href="ListPurchaseRequests" class="btn btn-primary btn-sm">
                               <i class="fas fa-eye me-1"></i>Review Requests
                             </a>
                           </div>
@@ -301,34 +317,13 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 
                   <c:if test="${pendingRepairRequestCount > 0}">
                     <div class="col-md-6 mb-3">
-                      <div
-                        class="alert-custom"
-                        style="
-                          background: linear-gradient(
-                            135deg,
-                            #e2e3e5 0%,
-                            #d6d8db 100%
-                          );
-                          border-left: 4px solid #6c757d;
-                        "
-                      >
+                      <div class="alert-custom" style="background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%); border-left: 4px solid #6c757d;">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-tools fa-2x me-3"
-                            style="color: #495057"
-                          ></i>
+                          <i class="fas fa-tools fa-2x me-3" style="color: #495057"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Repair Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingRepairRequestCount} requests waiting for
-                              approval
-                            </p>
-                            <a
-                              href="repairrequestlist"
-                              class="btn btn-secondary btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">Pending Repair Requests</h5>
+                            <p class="mb-2">${pendingRepairRequestCount} requests waiting for approval</p>
+                            <a href="repairrequestlist" class="btn btn-secondary btn-sm">
                               <i class="fas fa-eye me-1"></i>Review Requests
                             </a>
                           </div>
@@ -345,18 +340,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="col-md-6 mb-3">
                       <div class="alert-custom alert-info-custom">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-clock fa-2x me-3"
-                            style="color: #17a2b8"
-                          ></i>
+                          <i class="fas fa-clock fa-2x me-3" style="color: #17a2b8"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              My Pending Requests
-                            </h5>
-                            <p class="mb-2">
-                              You have ${myPendingRequestCount} requests waiting
-                              for approval
-                            </p>
+                            <h5 class="alert-heading mb-1">My Pending Requests</h5>
+                            <p class="mb-2">You have ${myPendingRequestCount} requests waiting for approval</p>
                             <a href="ViewRequests" class="btn btn-info btn-sm">
                               <i class="fas fa-eye me-1"></i>View My Requests
                             </a>
@@ -371,22 +358,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="col-md-6 mb-3">
                       <div class="alert-custom alert-success-custom">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-check-circle fa-2x me-3"
-                            style="color: #28a745"
-                          ></i>
+                          <i class="fas fa-check-circle fa-2x me-3" style="color: #28a745"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              My Approved Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${myApprovedRequestCount} of your requests have
-                              been approved
-                            </p>
-                            <a
-                              href="ViewRequests"
-                              class="btn btn-success btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">My Approved Requests</h5>
+                            <p class="mb-2">${myApprovedRequestCount} of your requests have been approved</p>
+                            <a href="ViewRequests" class="btn btn-success btn-sm">
                               <i class="fas fa-eye me-1"></i>View Details
                             </a>
                           </div>
@@ -400,22 +376,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="col-md-6 mb-3">
                       <div class="alert-custom alert-primary-custom">
                         <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-boxes fa-2x me-3"
-                            style="color: #007bff"
-                          ></i>
+                          <i class="fas fa-boxes fa-2x me-3" style="color: #007bff"></i>
                           <div>
-                            <h5 class="alert-heading mb-1">
-                              Available Materials
-                            </h5>
-                            <p class="mb-2">
-                              ${availableMaterialsCount} materials are available
-                              for request
-                            </p>
-                            <a
-                              href="StaticInventory"
-                              class="btn btn-primary btn-sm"
-                            >
+                            <h5 class="alert-heading mb-1">Available Materials</h5>
+                            <p class="mb-2">${availableMaterialsCount} materials are available for request</p>
+                            <a href="StaticInventory" class="btn btn-primary btn-sm">
                               <i class="fas fa-search me-1"></i>Browse Materials
                             </a>
                           </div>
@@ -454,7 +419,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     </a>
                   </div>
                   <div class="col-md-2 mb-3">
-                    <a href="AddMaterial" class="quick-action-btn">
+                    <a href="addmaterial" class="quick-action-btn">
                       <i class="fas fa-box" style="color: #007bff"></i>
                       <h6 class="mb-1">Add New Material</h6>
                       <small>Create new item</small>
@@ -462,10 +427,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   </div>
                   <div class="col-md-2 mb-3">
                     <a href="StaticInventory" class="quick-action-btn">
-                      <i
-                        class="fas fa-clipboard-list"
-                        style="color: #17a2b8"
-                      ></i>
+                      <i class="fas fa-clipboard-list" style="color: #17a2b8"></i>
                       <h6 class="mb-1">Inventory Report</h6>
                       <small>View all stock</small>
                     </a>
@@ -511,10 +473,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   </div>
                   <div class="col-md-2 mb-3">
                     <a href="StaticInventory" class="quick-action-btn">
-                      <i
-                        class="fas fa-clipboard-list"
-                        style="color: #17a2b8"
-                      ></i>
+                      <i class="fas fa-clipboard-list" style="color: #17a2b8"></i>
                       <h6 class="mb-1">Inventory Report</h6>
                       <small>View all stock</small>
                     </a>
@@ -580,113 +539,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               </div>
             </div>
           </div>
-
-          <!-- ANALYTICS & REPORTS SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">
-                  <i class="fas fa-chart-bar me-2"></i>Analytics & Reports
-                </h4>
-                <button
-                  id="toggleReportsBtn"
-                  class="btn btn-outline-light btn-sm"
-                  style="border-radius: 20px"
-                >
-                  <i class="fas fa-eye-slash me-1"></i> Hide Reports
-                </button>
-              </div>
-            </div>
-            <div id="reportsSection" class="section-body">
-              <!-- Charts Row -->
-              <div class="row">
-                <div class="col-md-6 mb-4">
-                  <div
-                    class="card"
-                    style="border: 1px solid #dead6f; border-radius: 12px"
-                  >
-                    <div
-                      class="card-header"
-                      style="
-                        background: #f8f9fa;
-                        border-bottom: 1px solid #dead6f;
-                      "
-                    >
-                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
-                        <i class="fas fa-chart-pie me-2"></i>Inventory Overview
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <canvas id="pieChart" style="max-height: 300px"></canvas>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div
-                    class="card"
-                    style="border: 1px solid #dead6f; border-radius: 12px"
-                  >
-                    <div
-                      class="card-header"
-                      style="
-                        background: #f8f9fa;
-                        border-bottom: 1px solid #dead6f;
-                      "
-                    >
-                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
-                        <i class="fas fa-chart-line me-2"></i>Stock Level
-                        Distribution
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <canvas id="barChart" style="max-height: 300px"></canvas>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ACTIVITY SUMMARY SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <h4 class="mb-0">
-                <i class="fas fa-clock me-2"></i>Activity Summary
-              </h4>
-            </div>
-            <div class="section-body">
-              <div class="row text-center">
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-arrow-down" style="color: #28a745"></i>
-                    <h4 class="mb-1">${totalImported}</h4>
-                    <small class="text-muted">Total Imported</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-arrow-up" style="color: #fd7e14"></i>
-                    <h4 class="mb-1">${totalExported}</h4>
-                    <small class="text-muted">Total Exported</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-boxes" style="color: #007bff"></i>
-                    <h4 class="mb-1">${materialCount}</h4>
-                    <small class="text-muted">Total Materials</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-warehouse" style="color: #6f42c1"></i>
-                    <h4 class="mb-1">${totalStock}</h4>
-                    <small class="text-muted">Current Stock</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -716,12 +568,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 
             if (isVisible) {
               reportsSection.style.display = "none";
-              toggleBtn.innerHTML =
-                '<i class="fas fa-eye me-1"></i> Show Reports';
+              toggleBtn.innerHTML = '<i class="fas fa-eye me-1"></i> Show Reports';
             } else {
               reportsSection.style.display = "block";
-              toggleBtn.innerHTML =
-                '<i class="fas fa-eye-slash me-1"></i> Hide Reports';
+              toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Hide Reports';
             }
           });
         }
