@@ -164,7 +164,7 @@ public class RepairRequestServlet extends HttpServlet {
                 
                 int quantity = Integer.parseInt(quantities[i]);
                 String damageDescription = damageDescriptions[i];
-                
+
                 RepairRequestDetail detail = new RepairRequestDetail();
                 detail.setMaterialId(material.getMaterialId());
                 detail.setQuantity(quantity);
