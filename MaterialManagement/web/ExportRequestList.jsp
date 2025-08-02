@@ -114,14 +114,6 @@
         .pagination .page-item.disabled .page-link {
             color: #6c757d;
         }
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            padding: 10px;
-            margin: 10px 0;
-        }
     </style>
 </head>
 <body>
@@ -134,31 +126,18 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="fw-bold display-6 border-bottom pb-2 m-0" style="color: #DEAD6F;"><i class="fas fa-file-export"></i> Export Request Management</h2>
                 </div>
-                <form method="get" action="ExportRequestList" class="filter-bar align-items-center" style="gap: 8px; flex-wrap: nowrap;">
-                    <input type="text" name="search" class="form-control" placeholder="Search by request code"
-                           value="${searchKeyword != null ? searchKeyword : ''}" style="width: 230px;">
-                    <select name="status" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
-                        <option value="all" ${selectedStatus == null || selectedStatus == 'all' ? 'selected' : ''}>All Status</option>
-                        <option value="pending" ${selectedStatus == 'pending' ? 'selected' : ''}>Pending</option>
-                        <option value="approved" ${selectedStatus == 'approved' ? 'selected' : ''}>Approved</option>
-                        <option value="rejected" ${selectedStatus == 'rejected' ? 'selected' : ''}>Rejected</option>
-                        <option value="cancel" ${selectedStatus == 'cancel' ? 'selected' : ''}>Cancelled</option>
+                <form class="filter-bar align-items-center" method="GET" action="${pageContext.request.contextPath}/ExportRequestList" style="gap: 8px; flex-wrap:nowrap;">
+                    <input type="text" class="form-control" name="search" value="${search}" placeholder="Search by request code" style="width:230px;">
+                    <select class="form-select" name="status" style="max-width:150px;" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="approved" ${status == 'approved' ? 'selected' : ''}>Approved</option>
+                        <option value="rejected" ${status == 'rejected' ? 'selected' : ''}>Rejected</option>
+                        <option value="cancel" ${status == 'cancel' ? 'selected' : ''}>Cancelled</option>
                     </select>
-                    <select name="sortByName" class="form-select" style="max-width: 150px;" onchange="this.form.submit()">
-                        <option value="" ${sortByName == null || sortByName == '' ? 'selected' : ''}>Newest First</option>
-                        <option value="oldest" ${sortByName == 'oldest' ? 'selected' : ''}>Oldest First</option>
-                    </select>
-                    <input type="hidden" name="page" value="${currentPage != null ? currentPage : 1}">
-                    <input type="date" name="requestDateFrom" class="form-control" placeholder="From Date"
-                           value="${requestDateFrom != null ? requestDateFrom : ''}" style="width: 230px;">
-                    <input type="date" name="requestDateTo" class="form-control" placeholder="To Date"
-                           value="${requestDateTo != null ? requestDateTo : ''}" style="width: 230px;">
-                    <button type="submit" class="btn btn-filter" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
-                    <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-secondary" style="width: 75px; height: 50px; display: flex; justify-content: center; align-items: center">Clear</a>
+                    <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white; width: 150px; height: 50px;">Filter</button>
+                    <a href="${pageContext.request.contextPath}/ExportRequestList" class="btn btn-secondary d-flex align-items-center justify-content-center" style="width: 75px; height: 50px">Clear</a>
                 </form>
-                <c:if test="${not empty error}">
-                    <p class="error">${error}</p>
-                </c:if>
                 <c:if test="${canViewExportRequest}">
                     <c:if test="${not empty exportRequests}">
                         <div class="table-responsive" id="printTableListArea">
@@ -224,27 +203,21 @@
                                 </tbody>
                             </table>
                         </div>
-                        <c:if test="${totalPages > 0}">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="ExportRequestList?page=${currentPage - 1}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}" aria-label="Previous">
-                                            <span aria-hidden="true">« Previous</span>
-                                        </a>
+                        <nav class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage - 1}&status=${status}&search=${search}">Previous</a>
+                                </li>
+                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                    <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                        <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${i}&status=${status}&search=${search}">${i}</a>
                                     </li>
-                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="ExportRequestList?page=${i}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}">${i}</a>
-                                        </li>
-                                    </c:forEach>
-                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="ExportRequestList?page=${currentPage + 1}&search=${searchKeyword}&status=${selectedStatus}&sortByName=${sortByName}&requestDateFrom=${requestDateFrom}&requestDateTo=${requestDateTo}" aria-label="Next">
-                                            <span aria-hidden="true">Next »</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </c:if>
+                                </c:forEach>
+                                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="${pageContext.request.contextPath}/ExportRequestList?page=${currentPage + 1}&status=${status}&search=${search}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </c:if>
                     <c:if test="${empty exportRequests}">
                         <div class="alert alert-info mt-4">

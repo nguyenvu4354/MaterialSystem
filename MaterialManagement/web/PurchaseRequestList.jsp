@@ -163,8 +163,11 @@
                                         <option value="pending" ${status == 'pending' ? 'selected' : ''}>Pending</option>
                                     </select>
                                     <select class="form-select" name="sort" style="max-width:150px;">
-                                        <option value="" ${sortOption == null || sortOption == '' ? 'selected' : ''}>Newest First</option>
-                                        <option value="date_asc" ${sortOption == 'date_asc' ? 'selected' : ''}>Oldest First</option>
+                                        <option value="">Sort by</option>
+                                        <option value="code_asc" ${sortOption == 'code_asc' ? 'selected' : ''}>Code (A-Z)</option>
+                                        <option value="code_desc" ${sortOption == 'code_desc' ? 'selected' : ''}>Code (Z-A)</option>
+                                        <option value="date_asc" ${sortOption == 'date_asc' ? 'selected' : ''}>Date (Oldest)</option>
+                                        <option value="date_desc" ${sortOption == 'date_desc' ? 'selected' : ''}>Date (Newest)</option>
                                     </select>
                                     <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:140px;">
                                     <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:140px;">
