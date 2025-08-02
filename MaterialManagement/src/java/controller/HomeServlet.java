@@ -79,7 +79,7 @@ public class HomeServlet extends HttpServlet {
         
         // Kiểm tra đăng nhập - nếu chưa đăng nhập thì redirect về trang login
         if (user == null) {
-            response.sendRedirect("Login");
+            response.sendRedirect("Login.jsp");
             return;
         }
         

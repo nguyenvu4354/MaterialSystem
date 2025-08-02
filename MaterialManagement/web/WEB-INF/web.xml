@@ -61,4 +61,9 @@
         <servlet-name>updateServlet</servlet-name>
         <url-pattern>/edit</url-pattern>
     </servlet-mapping>
+    
+    <!-- Welcome file configuration -->
+    <welcome-file-list>
+        <welcome-file>Login.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
