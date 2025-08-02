@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import utils.EmailUtils;
@@ -59,7 +60,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
         }
 
         try {
-            String poCode = generatePOCode();
+            String poCode = "PO" + System.currentTimeMillis(); // Temporary code for display
             List<PurchaseRequest> purchaseRequests = purchaseRequestDAO.getApprovedPurchaseRequests();
             List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
@@ -133,22 +134,13 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             String[] unitPrices = request.getParameterValues("unitPrices[]");
             String[] suppliers = request.getParameterValues("suppliers[]");
             
-            // Debug: Print parameters
-            System.out.println("DEBUG - poCode: " + poCode);
-            System.out.println("DEBUG - purchaseRequestIdStr: " + purchaseRequestIdStr);
-            System.out.println("DEBUG - note: " + note);
-            System.out.println("DEBUG - materialIds: " + (materialIds != null ? java.util.Arrays.toString(materialIds) : "null"));
-            System.out.println("DEBUG - unitPrices: " + (unitPrices != null ? java.util.Arrays.toString(unitPrices) : "null"));
-            System.out.println("DEBUG - suppliers: " + (suppliers != null ? java.util.Arrays.toString(suppliers) : "null"));
+           
 
             Map<String, String> formErrors = PurchaseOrderValidator.validatePurchaseOrderFormData(poCode, purchaseRequestIdStr, note);
             Map<String, String> detailErrors = PurchaseOrderValidator.validatePurchaseOrderDetails(materialIds, quantities, unitPrices, suppliers);
             formErrors.putAll(detailErrors);
             
-            // Debug: Print validation errors
-            System.out.println("DEBUG - formErrors: " + formErrors);
-            System.out.println("DEBUG - detailErrors: " + detailErrors);
-            System.out.println("DEBUG - Combined errors: " + formErrors);
+           
 
             if (!formErrors.isEmpty()) {
                 List<PurchaseRequest> purchaseRequests = purchaseRequestDAO.getApprovedPurchaseRequests();
@@ -156,7 +148,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 List<Supplier> suppliersList = supplierDAO.getAllSuppliers();
                 
                 // Always generate a new PO code for retry
-                String newPoCode = generatePOCode();
+                String newPoCode = "PO" + System.currentTimeMillis(); // Temporary code for display
                 
                 // Preserve form data for retry
                 request.setAttribute("poCode", newPoCode);
@@ -164,9 +156,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 request.setAttribute("materials", materials);
                 request.setAttribute("suppliers", suppliersList);
                 request.setAttribute("errors", formErrors);
-                System.out.println("DEBUG - Set errors attribute: " + formErrors.size() + " errors");
                 for (Map.Entry<String, String> entry : formErrors.entrySet()) {
-                    System.out.println("DEBUG - Error key: '" + entry.getKey() + "', value: '" + entry.getValue() + "'");
                 }
                 request.setAttribute("rolePermissionDAO", rolePermissionDAO);
                 
@@ -223,7 +213,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                     request.setAttribute("selectedPurchaseRequestId", null);
                 }
                 
-                System.out.println("DEBUG - Forwarding to JSP with errors: " + formErrors.size() + " errors");
+                
                 request.getRequestDispatcher("CreatePurchaseOrder.jsp").forward(request, response);
                 return;
             }
@@ -238,8 +228,9 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 throw new Exception("Purchase request must be approved to create purchase order.");
             }
 
-            // Create purchase order details
-            List<entity.PurchaseOrderDetail> details = new ArrayList<>();
+            // Group materials by supplier
+            Map<Integer, List<entity.PurchaseOrderDetail>> supplierGroups = new HashMap<>();
+            
             for (int i = 0; i < materialIds.length; i++) {
                 int materialId = Integer.parseInt(materialIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
@@ -258,30 +249,66 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 detail.setQuantity(quantity);
                 detail.setUnitPrice(unitPrice);
                 detail.setSupplierId(supplierId);
-                details.add(detail);
+                
+                // Group by supplier
+                supplierGroups.computeIfAbsent(supplierId, k -> new ArrayList<>()).add(detail);
             }
 
-            // Create purchase order
-            entity.PurchaseOrder purchaseOrder = new entity.PurchaseOrder();
-            purchaseOrder.setPoCode(poCode);
-            purchaseOrder.setPurchaseRequestId(purchaseRequestId);
-            purchaseOrder.setCreatedBy(currentUser.getUserId());
-            purchaseOrder.setNote(note);
-            purchaseOrder.setStatus("pending");
-
-            boolean success = purchaseOrderDAO.createPurchaseOrder(purchaseOrder, details);
-
-            if (success) {
-                try {
-                    sendPurchaseOrderNotification(purchaseOrder, details, purchaseRequest, currentUser);
-                } catch (Exception e) {
-                    System.err.println("Error sending purchase order notification: " + e.getMessage());
-                    e.printStackTrace();
+            // Create all purchase orders in a single transaction
+            List<entity.PurchaseOrder> createdOrders = new ArrayList<>();
+            
+            // Prepare all purchase orders first
+            List<entity.PurchaseOrder> purchaseOrdersToCreate = new ArrayList<>();
+            for (Map.Entry<Integer, List<entity.PurchaseOrderDetail>> entry : supplierGroups.entrySet()) {
+                int supplierId = entry.getKey();
+                List<entity.PurchaseOrderDetail> supplierDetails = entry.getValue();
+                
+                // Create purchase order for this supplier (PO code will be auto-generated by DAO)
+                entity.PurchaseOrder purchaseOrder = new entity.PurchaseOrder();
+                purchaseOrder.setPoCode(null); // Let DAO generate the code
+                purchaseOrder.setPurchaseRequestId(purchaseRequestId);
+                purchaseOrder.setCreatedBy(currentUser.getUserId());
+                purchaseOrder.setNote(note);
+                purchaseOrder.setStatus("pending");
+                
+                purchaseOrdersToCreate.add(purchaseOrder);
+            }
+            
+            // Create all purchase orders in batch
+            boolean allSuccess = purchaseOrderDAO.createPurchaseOrdersBatch(purchaseOrdersToCreate, supplierGroups);
+            
+            if (allSuccess) {
+                createdOrders.addAll(purchaseOrdersToCreate);
+                
+                // Send notifications for all created orders
+                for (Map.Entry<Integer, List<entity.PurchaseOrderDetail>> entry : supplierGroups.entrySet()) {
+                    int supplierId = entry.getKey();
+                    List<entity.PurchaseOrderDetail> supplierDetails = entry.getValue();
+                    
+                    // Find the corresponding purchase order
+                    entity.PurchaseOrder purchaseOrder = createdOrders.stream()
+                        .filter(po -> po.getPurchaseRequestId() == purchaseRequestId)
+                        .findFirst()
+                        .orElse(null);
+                    
+                    if (purchaseOrder != null) {
+                        try {
+                            sendPurchaseOrderNotification(purchaseOrder, supplierDetails, purchaseRequest, currentUser);
+                        } catch (Exception e) {
+                            System.err.println("Error sending purchase order notification: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
                 }
+            } else {
+                throw new Exception("Failed to create purchase orders");
+            }
+
+            if (!createdOrders.isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/PurchaseOrderList");
                 return;
             } else {
-                request.setAttribute("error", "Failed to create purchase order.");
+                request.setAttribute("error", "Failed to create purchase orders.");
                 doGet(request, response);
                 return;
             }
@@ -316,7 +343,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             // Header with golden brown theme
             content.append("<div style='background: linear-gradient(135deg, #E9B775 0%, #D4A574 100%); padding: 30px; text-align: center;'>");
             content.append("<h1 style='color: #000000; margin: 0; font-size: 28px; font-weight: bold;'>New Purchase Order</h1>");
-            content.append("<p style='color: #000000; margin: 10px 0 0 0; font-size: 16px;'>A new purchase order has been created and requires your attention</p>");
+            content.append("<p style='color: #000000; margin: 10px 0 0 0; font-size: 16px;'>A new purchase order has been submitted and requires your attention</p>");
             content.append("</div>");
             
             // Main content
@@ -324,22 +351,32 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             
             // Request information section
             content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
-            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Order Information</h2>");
+            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Request Information</h2>");
             
             content.append("<table style='width: 100%; border-collapse: collapse;'>");
-            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold; width: 40%;'>Order Code:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getPoCode()).append("</td></tr>");
-            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Created By:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getFullName()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold; width: 40%;'>Request Code:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getPoCode()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Requested By:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getFullName()).append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Submitted:</td><td style='padding: 8px 0; color: #333333;'>").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Email:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getEmail() != null ? creator.getEmail() : "N/A").append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Phone:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getPhoneNumber() != null ? creator.getPhoneNumber() : "N/A").append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Purchase Request:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseRequest.getRequestCode()).append("</td></tr>");
-            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Note:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getNote() != null && !purchaseOrder.getNote().trim().isEmpty() ? purchaseOrder.getNote() : "No additional notes").append("</td></tr>");
+            
+            // Get supplier information from first detail (all details have same supplier)
+            SupplierDAO supplierDAO = new SupplierDAO();
+            Supplier supplier = null;
+            if (!details.isEmpty()) {
+                supplier = supplierDAO.getSupplierByID(details.get(0).getSupplierId());
+            }
+            String supplierName = (supplier != null) ? supplier.getSupplierName() : "N/A";
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Supplier:</td><td style='padding: 8px 0; color: #333333;'>").append(supplierName).append("</td></tr>");
+            
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Reason:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getNote() != null && !purchaseOrder.getNote().trim().isEmpty() ? purchaseOrder.getNote() : "No additional notes").append("</td></tr>");
             content.append("</table>");
             content.append("</div>");
             
             // Material details section
             content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
-            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Order Details</h2>");
+            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Material Details</h2>");
             
             content.append("<table style='width: 100%; border-collapse: collapse; border: 1px solid #dee2e6;'>");
             content.append("<thead><tr style='background-color: #E9B775;'>");
@@ -399,7 +436,6 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {
                     try {
                         EmailUtils.sendEmail(director.getEmail(), subject, content.toString());
-                        System.out.println("Email sent to director: " + director.getEmail());
                     } catch (Exception e) {
                         System.err.println("Error sending email to director " + director.getEmail() + ": " + e.getMessage());
                     }
@@ -412,29 +448,7 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
         }
     }
 
-    private String generatePOCode() {
-        String prefix = "PO";
-        String sql = "SELECT po_code FROM Purchase_Orders WHERE po_code LIKE ? ORDER BY po_code DESC LIMIT 1";
-        String likePattern = prefix + "%";
-        try (java.sql.Connection conn = new entity.DBContext().getConnection();
-             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, likePattern);
-            try (java.sql.ResultSet rs = ps.executeQuery()) {
-                int nextSeq = 1;
-                if (rs.next()) {
-                    String lastCode = rs.getString("po_code");
-                    String numberPart = lastCode.replace(prefix, "");
-                    try {
-                        nextSeq = Integer.parseInt(numberPart) + 1;
-                    } catch (NumberFormatException ignore) {}
-                }
-                return prefix + nextSeq;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return prefix + "1";
-        }
-    }
+
 
     @Override
     public String getServletInfo() {

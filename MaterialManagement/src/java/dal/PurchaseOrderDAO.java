@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -268,9 +269,10 @@ public class PurchaseOrderDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 int nextNum = 1;
                 if (rs.next()) {
-                    nextNum = rs.getInt("max_num") + 1;
+                    Integer maxNum = rs.getObject("max_num") != null ? rs.getInt("max_num") : 0;
+                    nextNum = maxNum + 1;
                 }
-                return String.format("PO%03d", nextNum);
+                return "PO" + nextNum;
             }
         }
     }
@@ -328,6 +330,89 @@ public class PurchaseOrderDAO extends DBContext {
                 try { conn.rollback(); } catch (SQLException rollbackEx) { LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx); }
             }
             LOGGER.log(Level.SEVERE, "Error creating purchase order: " + e.getMessage(), e);
+            System.err.println("DEBUG - SQL Error creating purchase order: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { LOGGER.log(Level.SEVERE, "Error closing connection", e); }
+            }
+        }
+    }
+
+    public boolean createPurchaseOrdersBatch(List<PurchaseOrder> purchaseOrders, Map<Integer, List<PurchaseOrderDetail>> supplierGroups) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+            
+            for (PurchaseOrder purchaseOrder : purchaseOrders) {
+                String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    if (purchaseOrder.getPoCode() == null || purchaseOrder.getPoCode().isEmpty()) {
+                        purchaseOrder.setPoCode(generateNextPOCode());
+                    }
+                    ps.setString(1, purchaseOrder.getPoCode());
+                    ps.setInt(2, purchaseOrder.getPurchaseRequestId());
+                    ps.setInt(3, purchaseOrder.getCreatedBy());
+                    ps.setString(4, purchaseOrder.getStatus());
+                    ps.setString(5, purchaseOrder.getNote());
+                    int rowsAffected = ps.executeUpdate();
+                    if (rowsAffected == 0) {
+                        throw new SQLException("Creating purchase order failed, no rows affected.");
+                    }
+                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int poId = generatedKeys.getInt(1);
+                            purchaseOrder.setPoId(poId); // Set the generated ID
+                            
+                            // Find the corresponding details for this PO
+                            List<PurchaseOrderDetail> details = null;
+                            for (List<PurchaseOrderDetail> detailList : supplierGroups.values()) {
+                                if (!detailList.isEmpty() && detailList.get(0).getSupplierId() != null) {
+                                    details = detailList;
+                                    break;
+                                }
+                            }
+                            
+                            if (details != null) {
+                                String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_id, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                                try (PreparedStatement detailPs = conn.prepareStatement(insertDetailSql)) {
+                                    for (PurchaseOrderDetail detail : details) {
+                                        detailPs.setInt(1, poId);
+                                        detailPs.setInt(2, detail.getMaterialId());
+                                        detailPs.setInt(3, detail.getCategoryId());
+                                        detailPs.setInt(4, detail.getQuantity());
+                                        detailPs.setBigDecimal(5, detail.getUnitPrice());
+                                        if (detail.getSupplierId() != null) {
+                                            detailPs.setInt(6, detail.getSupplierId());
+                                        } else {
+                                            detailPs.setNull(6, java.sql.Types.INTEGER);
+                                        }
+                                        int detailRowsAffected = detailPs.executeUpdate();
+                                        if (detailRowsAffected == 0) {
+                                            throw new SQLException("Creating purchase order detail failed, no rows affected.");
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            throw new SQLException("Creating purchase order failed, no ID obtained.");
+                        }
+                    }
+                }
+            }
+            
+            conn.commit();
+            return true;
+            
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException rollbackEx) { LOGGER.log(Level.SEVERE, "Error rolling back transaction", rollbackEx); }
+            }
+            LOGGER.log(Level.SEVERE, "Error creating purchase orders batch: " + e.getMessage(), e);
+            System.err.println("DEBUG - SQL Error creating purchase orders batch: " + e.getMessage());
+            e.printStackTrace();
             return false;
         } finally {
             if (conn != null) {
