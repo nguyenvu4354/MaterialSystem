@@ -12,7 +12,7 @@ import java.util.List;
 public class ImportDAO extends DBContext {
 
     public int createImport(Import importData) throws SQLException {
-        String sql = "INSERT INTO Imports (import_code, import_date, imported_by, supplier_id, destination, actual_arrival, note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Imports (import_code, import_date, imported_by, supplier_id, actual_arrival, note) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, importData.getImportCode());
             stmt.setObject(2, importData.getImportDate());
@@ -22,13 +22,12 @@ public class ImportDAO extends DBContext {
             } else {
                 stmt.setNull(4, Types.INTEGER);
             }
-            stmt.setString(5, importData.getDestination());
             if (importData.getActualArrival() != null) {
-                stmt.setTimestamp(6, Timestamp.valueOf(importData.getActualArrival()));
+                stmt.setTimestamp(5, Timestamp.valueOf(importData.getActualArrival()));
             } else {
-                stmt.setNull(6, Types.TIMESTAMP);
+                stmt.setNull(5, Types.TIMESTAMP);
             }
-            stmt.setString(7, importData.getNote());
+            stmt.setString(6, importData.getNote());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -185,7 +184,7 @@ public class ImportDAO extends DBContext {
     }
 
     public void updateImport(Import importData) throws SQLException {
-        String sql = "UPDATE Imports SET import_code = ?, import_date = ?, imported_by = ?, supplier_id = ?, destination = ?, actual_arrival = ?, note = ? WHERE import_id = ?";
+        String sql = "UPDATE Imports SET import_code = ?, import_date = ?, imported_by = ?, supplier_id = ?, actual_arrival = ?, note = ? WHERE import_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, importData.getImportCode());
             stmt.setObject(2, importData.getImportDate());
@@ -195,14 +194,13 @@ public class ImportDAO extends DBContext {
             } else {
                 stmt.setNull(4, Types.INTEGER);
             }
-            stmt.setString(5, importData.getDestination());
             if (importData.getActualArrival() != null) {
-                stmt.setTimestamp(6, Timestamp.valueOf(importData.getActualArrival()));
+                stmt.setTimestamp(5, Timestamp.valueOf(importData.getActualArrival()));
             } else {
-                stmt.setNull(6, Types.TIMESTAMP);
+                stmt.setNull(5, Types.TIMESTAMP);
             }
-            stmt.setString(7, importData.getNote());
-            stmt.setInt(8, importData.getImportId());
+            stmt.setString(6, importData.getNote());
+            stmt.setInt(7, importData.getImportId());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -276,7 +274,7 @@ public class ImportDAO extends DBContext {
                     }
                     importData.setImportedBy(rs.getInt("imported_by"));
                     importData.setSupplierId(rs.getInt("supplier_id"));
-                    importData.setDestination(rs.getString("destination"));
+                    // Bỏ destination vì database không có
                     if (rs.getTimestamp("actual_arrival") != null) {
                         importData.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
                     }
@@ -296,7 +294,7 @@ public class ImportDAO extends DBContext {
 
     public List<Import> getImports(LocalDateTime startDate, LocalDateTime endDate, int pageIndex, int pageSize) throws SQLException {
         List<Import> imports = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Imports WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = Imports.import_id AND d.status != 'draft')");
+        StringBuilder sql = new StringBuilder("SELECT * FROM Imports WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = Imports.import_id AND d.status = 'imported')");
         List<Object> params = new ArrayList<>();
 
         if (startDate != null) {
@@ -324,7 +322,7 @@ public class ImportDAO extends DBContext {
                     importData.setImportDate(rs.getTimestamp("import_date").toLocalDateTime());
                     importData.setImportedBy(rs.getInt("imported_by"));
                     importData.setSupplierId(rs.getInt("supplier_id"));
-                    importData.setDestination(rs.getString("destination"));
+                    // Bỏ destination vì database không có
                     if (rs.getTimestamp("actual_arrival") != null) {
                         importData.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
                     }
@@ -351,14 +349,14 @@ public class ImportDAO extends DBContext {
     public List<Import> getImportHistoryAdvanced(String fromDate, String toDate, String materialName, String sortSupplier, String sortImportedBy, int page, int pageSize) {
         List<Import> list = new ArrayList<>();
         String sql = "SELECT DISTINCT i.*, u.full_name as importedByName, s.supplier_name, "
-                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') as totalQuantity, "
-                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') as totalValue "
+                + "(SELECT SUM(quantity) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status = 'imported') as totalQuantity, "
+                + "(SELECT SUM(quantity * unit_price) FROM Import_Details d WHERE d.import_id = i.import_id AND d.status = 'imported') as totalValue "
                 + "FROM Imports i "
                 + "LEFT JOIN Users u ON i.imported_by = u.user_id "
                 + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
                 + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
                 + "LEFT JOIN Materials m ON idt.material_id = m.material_id "
-                + "WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') ";
+                + "WHERE 1=1 AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status = 'imported') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND i.import_date >= ? ";
@@ -415,7 +413,7 @@ public class ImportDAO extends DBContext {
                 }
                 imp.setImportedBy(rs.getInt("imported_by"));
                 imp.setSupplierId(rs.getInt("supplier_id"));
-                imp.setDestination(rs.getString("destination"));
+                // Bỏ destination vì database không có
                 if (rs.getTimestamp("actual_arrival") != null) {
                     imp.setActualArrival(rs.getTimestamp("actual_arrival").toLocalDateTime());
                 }
@@ -440,7 +438,7 @@ public class ImportDAO extends DBContext {
                 + "LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id "
                 + "LEFT JOIN Import_Details idt ON i.import_id = idt.import_id "
                 + "LEFT JOIN Materials m ON idt.material_id = m.material_id WHERE 1=1 "
-                + "AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status != 'draft') ";
+                + "AND EXISTS (SELECT 1 FROM Import_Details d WHERE d.import_id = i.import_id AND d.status = 'imported') ";
         List<Object> params = new ArrayList<>();
         if (fromDate != null && !fromDate.isEmpty()) {
             sql += "AND i.import_date >= ? ";

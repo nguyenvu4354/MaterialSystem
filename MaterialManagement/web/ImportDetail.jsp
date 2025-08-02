@@ -69,13 +69,13 @@
                 text-align: center;
             }
             .material-img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 5px;
-    display: block;
-    background-color: #eee;
-}
+                width: 60px;
+                height: 60px;
+                object-fit: cover;
+                border-radius: 5px;
+                display: block;
+                background-color: #eee;
+            }
         </style>
     </head>
     <body>
@@ -102,7 +102,6 @@
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Destination:</strong> ${importData.destination}</p>
                             <p><strong>Note:</strong> ${importData.note}</p>
                         </div>
                     </div>

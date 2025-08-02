@@ -15,7 +15,7 @@
                 background-color: #faf4ee;
             }
             .container-main {
-                max-width: 1200px;
+                max-width: 1350px;
                 margin: 30px auto;
                 background: #fff;
                 padding: 32px;
@@ -34,6 +34,7 @@
                 gap: 12px;
                 margin: 20px 0;
                 align-items: center;
+                justify-content: flex-start;
             }
             .filter-bar .form-control,
             .filter-bar .form-select,
@@ -44,6 +45,11 @@
             .btn-filter:hover {
                 background-color: #cfa856;
                 color: #fff;
+            }
+            .custom-table {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 100%;
             }
             .custom-table thead th {
                 background-color: #f9f5f0;
@@ -101,15 +107,12 @@
     <body>
         <jsp:include page="Header.jsp" />
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-3 col-lg-2 bg-light p-0">
-                    <jsp:include page="Sidebar.jsp" />
-                </div>
-                <div class="col-md-9 col-lg-10 content px-md-4">
-                    <div class="bg-white rounded shadow-sm p-4 mt-4">
-                        <h2 class="text-primary fw-bold display-6 border-bottom pb-2 mb-3">Export History</h2>
+            <div class="row justify-content-center">
+                <div class="col-12 px-md-4">
+                    <div class="bg-white rounded shadow-sm p-4 mt-4 container-main">
+                        <h2 class="fw-bold display-6 border-bottom pb-2 mb-3">Export History</h2>
                         <!-- Filter Form -->
-                        <form action="ExportHistory" method="get" class="d-flex gap-2 align-items-center search-box">
+                        <form action="ExportHistory" method="get" class="filter-bar search-box">
                             <input type="date" name="fromDate" class="form-control" value="${fromDate}" placeholder="From Date" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="date" name="toDate" class="form-control" value="${toDate}" placeholder="To Date" style="width: 180px; height: 50px; border: 2px solid gray" />
                             <input type="text" name="materialName" id="materialNameInput" class="form-control" placeholder="Search By Material" list="materialNameList" value="${materialName}" style="width: 200px; height: 50px; border: 2px solid gray" />
@@ -121,7 +124,6 @@
                             <select name="sortByRecipient" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
                                 <option value="" ${empty sortByRecipient ? 'selected' : ''}>Sort By Recipient</option>
                                 <option value="A-Z" ${sortByRecipient == 'A-Z' ? 'selected' : ''}>Recipient A-Z</option>
-                               的分0.5px; color: #3B3B3B; } /* Dark Gray */
                                 <option value="Z-A" ${sortByRecipient == 'Z-A' ? 'selected' : ''}>Recipient Z-A</option>
                             </select>
                             <select name="sortByExportedBy" class="form-select" style="width: 200px; height: 50px; border: 2px solid gray">
@@ -136,7 +138,7 @@
                         </form>
                         <!-- Table -->
                         <div class="table-responsive">
-                            <table class="table table-bordered table-hover align-middle text-center">
+                            <table class="table table-bordered table-hover align-middle text-center custom-table">
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
@@ -168,7 +170,7 @@
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
-                                            <tr><td colspan="8" class="text-center text-muted">No export records found.</td></tr>
+                                            <tr><td colspan="7" class="text-center text-muted">No export records found.</td></tr>
                                         </c:otherwise>
                                     </c:choose>
                                 </tbody>
@@ -221,7 +223,7 @@
             </c:forEach>
             ];
             $(function () {
-                $("#materialNameInput").autocomplete({source: materialNames, minLengthソーシャルメディアのシェアードリンクはこちらminLength: 1});
+                $("#materialNameInput").autocomplete({source: materialNames, minLength: 1});
             });
         </script>
     </body>
