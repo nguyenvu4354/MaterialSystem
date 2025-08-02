@@ -8,10 +8,10 @@ package entity;
  *
  * @author Admin
  */
-
 import java.sql.Timestamp;
 
 public class PurchaseRequestDetail {
+
     private int purchaseRequestDetailId;
     private int purchaseRequestId;
     private int quantity;
@@ -20,8 +20,9 @@ public class PurchaseRequestDetail {
     private Timestamp updatedAt;
     private int materialId;
     private String materialName;
+    private String materialCode;
+    private String unitName;
 
-    
     public PurchaseRequestDetail() {
     }
 
@@ -80,12 +81,28 @@ public class PurchaseRequestDetail {
     public void setMaterialId(int materialId) {
         this.materialId = materialId;
     }
-    
+
     public String getMaterialName() {
         return materialName;
     }
 
     public void setMaterialName(String materialName) {
         this.materialName = materialName;
+    }
+
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 }

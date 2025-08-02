@@ -172,6 +172,8 @@ public class RequestDAO extends DBContext {
                 detail.setPurchaseRequestId(rs.getInt("purchase_request_id"));
                 detail.setMaterialId(rs.getInt("material_id"));
                 detail.setMaterialName(rs.getString("material_name"));
+                detail.setMaterialCode(rs.getString("material_code"));
+                detail.setUnitName(rs.getString("unit_name"));
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setNotes(rs.getString("notes"));
                 detail.setCreatedAt(rs.getTimestamp("created_at"));
@@ -186,9 +188,10 @@ public class RequestDAO extends DBContext {
 
     private List<RepairRequestDetail> getRepairRequestDetails(int repairRequestId) {
         List<RepairRequestDetail> details = new ArrayList<>();
-        String sql = "SELECT rrd.*, m.material_code, m.material_name "
+        String sql = "SELECT rrd.*, m.material_code, m.material_name, u.unit_name "
                 + "FROM Repair_Request_Details rrd "
                 + "JOIN Materials m ON rrd.material_id = m.material_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id "
                 + "WHERE rrd.repair_request_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -199,6 +202,9 @@ public class RequestDAO extends DBContext {
                 detail.setDetailId(rs.getInt("detail_id"));
                 detail.setRepairRequestId(rs.getInt("repair_request_id"));
                 detail.setMaterialId(rs.getInt("material_id"));
+                detail.setMaterialCode(rs.getString("material_code"));
+                detail.setMaterialName(rs.getString("material_name"));
+                detail.setUnitName(rs.getString("unit_name"));
                 detail.setQuantity(rs.getInt("quantity"));
                 detail.setDamageDescription(rs.getString("damage_description"));
                 detail.setRepairCost(rs.getObject("repair_cost") != null ? rs.getDouble("repair_cost") : null);
@@ -568,7 +574,8 @@ public class RequestDAO extends DBContext {
         }
         return 0;
     }
-public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
+
+    public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pageSize, String status, LocalDate startDate, LocalDate endDate, String materialName, String materialCode) {
         List<PurchaseOrder> orders = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT DISTINCT po.*, u.full_name AS created_by_name, u2.full_name AS approved_by_name, pr.request_code AS purchase_request_code "
@@ -643,6 +650,7 @@ public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pag
         }
         return orders;
     }
+
     public PurchaseOrder getPurchaseOrderById(int poId) {
         String sql = "SELECT po.*, u.full_name AS created_by_name, u2.full_name AS approved_by_name, pr.request_code AS purchase_request_code "
                 + "FROM Purchase_Orders po "
@@ -682,11 +690,12 @@ public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pag
 
     private List<PurchaseOrderDetail> getPurchaseOrderDetails(int poId) {
         List<PurchaseOrderDetail> details = new ArrayList<>();
-        String sql = "SELECT pod.*, m.material_name, m.material_code, c.category_name, s.supplier_name "
+        String sql = "SELECT pod.*, m.material_name, m.material_code, c.category_name, s.supplier_name, u.unit_name "
                 + "FROM Purchase_Order_Details pod "
                 + "JOIN Materials m ON pod.material_id = m.material_id "
                 + "JOIN Categories c ON pod.category_id = c.category_id "
                 + "LEFT JOIN Suppliers s ON pod.supplier_id = s.supplier_id "
+                + "LEFT JOIN Units u ON m.unit_id = u.unit_id " // Added join with Units table
                 + "WHERE pod.po_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -707,6 +716,7 @@ public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pag
                 detail.setNote(rs.getString("note"));
                 detail.setCreatedAt(rs.getTimestamp("created_at"));
                 detail.setUpdatedAt(rs.getTimestamp("updated_at"));
+                detail.setUnitName(rs.getString("unit_name"));
                 details.add(detail);
             }
         } catch (SQLException e) {
@@ -777,6 +787,7 @@ public List<PurchaseOrder> getPurchaseOrdersByUser(int userId, int page, int pag
             return false;
         }
     }
+
     public boolean cancelExportRequest(int exportRequestId, int userId) {
         String sql = "UPDATE Export_Requests SET status = 'cancel', updated_at = CURRENT_TIMESTAMP "
                 + "WHERE export_request_id = ? AND user_id = ? AND status = 'pending' AND disable = 0";

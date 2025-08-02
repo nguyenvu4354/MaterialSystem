@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public class PurchaseOrderDetail {
+
     private int poDetailId;
     private int poId;
     private String materialName;
@@ -18,6 +19,7 @@ public class PurchaseOrderDetail {
     private Timestamp updatedAt;
     private int materialId;
     private String materialImageUrl;
+    private String unitName;
 
     public PurchaseOrderDetail() {
     }
@@ -140,4 +142,12 @@ public class PurchaseOrderDetail {
     public void setMaterialImageUrl(String materialImageUrl) {
         this.materialImageUrl = materialImageUrl;
     }
-} 
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+}
