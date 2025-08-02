@@ -179,7 +179,7 @@ public class PurchaseRequestDAO extends DBContext {
             String sql = "SELECT pr.*, u.full_name, u.email, u.phone_number "
                     + "FROM material_management.purchase_requests pr "
                     + "LEFT JOIN material_management.users u ON pr.user_id = u.user_id "
-                    + "WHERE pr.status = 'APPROVED' AND pr.disable = 0 "
+                    + "WHERE (pr.status = 'APPROVED' OR pr.status = 'approved') AND pr.disable = 0 "
                     + "ORDER BY pr.request_date DESC";
 
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -325,41 +325,9 @@ public class PurchaseRequestDAO extends DBContext {
             String sortBy = "request_date";
             String sortOrder = "DESC";
 
-            if (sortOption != null) {
-                switch (sortOption) {
-                    case "code_asc":
-                        sortBy = "request_code";
-                        sortOrder = "ASC";
-                        break;
-                    case "code_desc":
-                        sortBy = "request_code";
-                        sortOrder = "DESC";
-                        break;
-                    case "date_asc":
-                        sortBy = "request_date";
-                        sortOrder = "ASC";
-                        break;
-                    case "date_desc":
-                        sortBy = "request_date";
-                        sortOrder = "DESC";
-                        break;
-                    case "id_asc":
-                        sortBy = "purchase_request_id";
-                        sortOrder = "ASC";
-                        break;
-                    case "id_desc":
-                        sortBy = "purchase_request_id";
-                        sortOrder = "DESC";
-                        break;
-                    case "status_asc":
-                        sortBy = "status";
-                        sortOrder = "ASC";
-                        break;
-                    case "status_desc":
-                        sortBy = "status";
-                        sortOrder = "DESC";
-                        break;
-                }
+            if (sortOption != null && sortOption.equals("date_asc")) {
+                sortBy = "request_date";
+                sortOrder = "ASC";
             }
 
             sql.append("ORDER BY ").append(sortBy).append(" ").append(sortOrder);
@@ -399,32 +367,7 @@ public class PurchaseRequestDAO extends DBContext {
                 list.add(pr);
             }
 
-            // If sorting by code, do additional in-memory sorting for numeric order
-            if (sortOption != null && (sortOption.equals("code_asc") || sortOption.equals("code_desc"))) {
-                list.sort((pr1, pr2) -> {
-                    try {
-                        String code1 = pr1.getRequestCode();
-                        String code2 = pr2.getRequestCode();
-                        
-                        // Extract numbers from PR codes
-                        int num1 = Integer.parseInt(code1.replace("PR", ""));
-                        int num2 = Integer.parseInt(code2.replace("PR", ""));
-                        
-                        if (sortOption.equals("code_asc")) {
-                            return Integer.compare(num1, num2);
-                        } else {
-                            return Integer.compare(num2, num1);
-                        }
-                    } catch (NumberFormatException e) {
-                        // Fallback to string comparison
-                        if (sortOption.equals("code_asc")) {
-                            return pr1.getRequestCode().compareTo(pr2.getRequestCode());
-                        } else {
-                            return pr2.getRequestCode().compareTo(pr1.getRequestCode());
-                        }
-                    }
-                });
-            }
+
 
         } catch (SQLException ex) {
             ex.printStackTrace();

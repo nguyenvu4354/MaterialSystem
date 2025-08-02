@@ -22,98 +22,135 @@ public class ExportRequestDAO extends DBContext {
     }
     
     public List<ExportRequest> getAll(String status, String search, String searchDate, int page, int itemsPerPage) {
+        try {
+            return getAllWithPagination(0, itemsPerPage, search, status, null, null, null);
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching export requests: " + e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+    
+    public List<ExportRequest> getAllWithPagination(int offset, int pageSize, String searchKeyword, String status, String sortByName, String requestDateFrom, String requestDateTo) throws SQLException {
         List<ExportRequest> requests = new ArrayList<>();
-
-        if (connection == null) {
-            return requests;
+        StringBuilder sql = new StringBuilder(
+                "SELECT er.*, COALESCE(u.full_name, 'Unknown') as userName, "
+                + "COALESCE(a.full_name, 'Unknown') as approverName "
+                + "FROM Export_Requests er "
+                + "LEFT JOIN Users u ON er.user_id = u.user_id "
+                + "LEFT JOIN Users a ON er.approved_by = a.user_id "
+                + "WHERE er.disable = 0"
+        );
+        
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append(" AND (er.request_code LIKE ? OR u.full_name LIKE ?)");
         }
-
-        StringBuilder sql = new StringBuilder()
-            .append("SELECT er.*, COALESCE(u.full_name, 'Unknown') as userName, ")
-            .append("COALESCE(a.full_name, 'Unknown') as approverName ")
-            .append("FROM Export_Requests er ")
-            .append("LEFT JOIN Users u ON er.user_id = u.user_id ")
-            .append("LEFT JOIN Users a ON er.approved_by = a.user_id ")
-            .append("WHERE er.disable = 0 ");
-
-        if (status != null && !status.isEmpty()) {
-            sql.append("AND er.status = ? ");
+        if (status != null && !status.equalsIgnoreCase("all")) {
+            sql.append(" AND er.status = ?");
         }
-        if (search != null && !search.isEmpty()) {
-            sql.append("AND (er.request_code LIKE ? OR u.full_name LIKE ?) ");
+        if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND er.request_date BETWEEN ? AND ?");
+        } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+            sql.append(" AND DATE(er.request_date) >= ?");
+        } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND DATE(er.request_date) <= ?");
         }
-        sql.append("ORDER BY er.export_request_id ASC ");
-
-        if (page > 0 && itemsPerPage > 0) {
-            sql.append("LIMIT ? OFFSET ?");
+        
+        if (sortByName != null && !sortByName.isEmpty()) {
+            if ("oldest".equalsIgnoreCase(sortByName)) {
+                sql.append(" ORDER BY er.created_at ASC, er.export_request_id ASC");
+            }
+        } else {
+            sql.append(" ORDER BY er.created_at DESC, er.export_request_id DESC");
         }
+        sql.append(" LIMIT ? OFFSET ?");
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
-            if (status != null && !status.isEmpty()) {
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+            }
+            if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
             }
-            if (search != null && !search.isEmpty()) {
-                String searchPattern = "%" + search + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+            if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
+            } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+            } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
             }
-            if (page > 0 && itemsPerPage > 0) {
-                ps.setInt(paramIndex++, itemsPerPage);
-                ps.setInt(paramIndex, (page - 1) * itemsPerPage);
-            }
+            ps.setInt(paramIndex++, pageSize);
+            ps.setInt(paramIndex, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     requests.add(mapResultSetToExportRequest(rs));
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching export requests: " + e.getMessage(), e);
         }
         return requests;
     }
     
     public int getTotalCount(String status, String search, String searchDate) {
-        int count = 0;
-        if (connection == null) {
-            return count;
+        try {
+            return getTotalExportRequestCount(search, status, null, null);
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error counting export requests: " + e.getMessage(), e);
+            return 0;
         }
-
-        StringBuilder sql = new StringBuilder()
-            .append("SELECT COUNT(*) FROM Export_Requests er ")
-            .append("LEFT JOIN Users u ON er.user_id = u.user_id ")
-            .append("LEFT JOIN Users a ON er.approved_by = a.user_id ")
-            .append("WHERE er.disable = 0 ");
-
-        if (status != null && !status.isEmpty()) {
-            sql.append("AND er.status = ? ");
+    }
+    
+    public int getTotalExportRequestCount(String searchKeyword, String status, String requestDateFrom, String requestDateTo) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM Export_Requests er "
+                + "LEFT JOIN Users u ON er.user_id = u.user_id "
+                + "LEFT JOIN Users a ON er.approved_by = a.user_id "
+                + "WHERE er.disable = 0"
+        );
+        
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sql.append(" AND (er.request_code LIKE ? OR u.full_name LIKE ?)");
         }
-        if (search != null && !search.isEmpty()) {
-            sql.append("AND (er.request_code LIKE ? OR u.full_name LIKE ?) ");
+        if (status != null && !status.equalsIgnoreCase("all")) {
+            sql.append(" AND er.status = ?");
+        }
+        if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND er.request_date BETWEEN ? AND ?");
+        } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+            sql.append(" AND DATE(er.request_date) >= ?");
+        } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+            sql.append(" AND DATE(er.request_date) <= ?");
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             
-            if (status != null && !status.isEmpty()) {
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+                ps.setString(paramIndex++, "%" + searchKeyword.trim() + "%");
+            }
+            if (status != null && !status.equalsIgnoreCase("all")) {
                 ps.setString(paramIndex++, status);
             }
-            if (search != null && !search.isEmpty()) {
-                String searchPattern = "%" + search + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+            if (requestDateFrom != null && !requestDateFrom.trim().isEmpty() && requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
+            } else if (requestDateFrom != null && !requestDateFrom.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateFrom);
+            } else if (requestDateTo != null && !requestDateTo.trim().isEmpty()) {
+                ps.setString(paramIndex++, requestDateTo + " 23:59:59");
             }
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    count = rs.getInt(1);
+                    return rs.getInt(1);
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error counting export requests: " + e.getMessage(), e);
         }
-        return count;
+        return 0;
     }
     
     public ExportRequest getById(int id) {
