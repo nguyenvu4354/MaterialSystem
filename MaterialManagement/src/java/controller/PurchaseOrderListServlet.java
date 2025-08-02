@@ -53,7 +53,6 @@ public class PurchaseOrderListServlet extends HttpServlet {
 
             String status = request.getParameter("status");
             String poCode = request.getParameter("poCode");
-            String sortBy = request.getParameter("sortBy");
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
             
@@ -94,7 +93,7 @@ public class PurchaseOrderListServlet extends HttpServlet {
                 }
             }
 
-            List<PurchaseOrder> purchaseOrders = purchaseOrderDAO.getPurchaseOrders(page, itemsPerPage, status, poCode, startDate, endDate, sortBy);
+            List<PurchaseOrder> purchaseOrders = purchaseOrderDAO.getPurchaseOrders(page, itemsPerPage, status, poCode, startDate, endDate);
             int totalItems = purchaseOrderDAO.getPurchaseOrderCount(status, poCode, startDate, endDate);
             int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
 
@@ -109,7 +108,6 @@ public class PurchaseOrderListServlet extends HttpServlet {
             request.setAttribute("totalItems", totalItems);
             request.setAttribute("status", status);
             request.setAttribute("poCode", poCode);
-            request.setAttribute("sortBy", sortBy);
             request.setAttribute("startDate", startDateStr);
             request.setAttribute("endDate", endDateStr);
 

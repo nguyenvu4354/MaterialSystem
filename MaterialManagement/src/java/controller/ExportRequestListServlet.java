@@ -20,6 +20,10 @@ public class ExportRequestListServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ExportRequestListServlet.class.getName());
     private final ExportRequestDAO exportRequestDAO = new ExportRequestDAO();
     private final RolePermissionDAO rolePermissionDAO = new RolePermissionDAO();
+    
+    private static final int DEFAULT_PAGE = 1;
+    private static final int DEFAULT_ITEMS_PER_PAGE = 10;
+    private static final int MAX_ITEMS_PER_PAGE = 100;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,65 +44,59 @@ public class ExportRequestListServlet extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
             return;
         }
-        
-        // Filter parameters
-        String searchKeyword = request.getParameter("search");
-        String selectedStatus = request.getParameter("status");
-        String sortByName = request.getParameter("sortByName");
-        String requestDateFrom = request.getParameter("requestDateFrom");
-        String requestDateTo = request.getParameter("requestDateTo");
-        if (selectedStatus == null || selectedStatus.isEmpty()) {
-            selectedStatus = "all";
-        }
-
-        int page = 1;
-        int pageSize = 10; // Number of records per page
-        if (request.getParameter("page") != null) {
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-                if (page < 1) {
-                    page = 1;
-                }
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int offset = (page - 1) * pageSize;
-
+        String status = request.getParameter("status");
+        String search = request.getParameter("search");
+        String fromDate = request.getParameter("fromDate");
+        String toDate = request.getParameter("toDate");
+        String sortBy = request.getParameter("sortBy");
+        String sortOrder = request.getParameter("sortOrder");
+        int page = DEFAULT_PAGE;
+        int itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
         try {
-            List<ExportRequest> exportRequests = exportRequestDAO.getAllWithPagination(
-                    offset, pageSize, searchKeyword, selectedStatus, sortByName, requestDateFrom, requestDateTo
-            );
-            int totalRecords = exportRequestDAO.getTotalExportRequestCount(
-                    searchKeyword, selectedStatus, requestDateFrom, requestDateTo
-            );
-            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
-            // Set attributes for JSP
-            request.setAttribute("exportRequests", exportRequests);
-            request.setAttribute("searchKeyword", searchKeyword);
-            request.setAttribute("selectedStatus", selectedStatus);
-            request.setAttribute("sortByName", sortByName);
-            request.setAttribute("requestDateFrom", requestDateFrom);
-            request.setAttribute("requestDateTo", requestDateTo);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Error retrieving export request list!");
+            String pageStr = request.getParameter("page");
+            if (pageStr != null && !pageStr.isEmpty()) {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) page = DEFAULT_PAGE;
+            }
+            String itemsPerPageStr = request.getParameter("itemsPerPage");
+            if (itemsPerPageStr != null && !itemsPerPageStr.isEmpty()) {
+                itemsPerPage = Integer.parseInt(itemsPerPageStr);
+                if (itemsPerPage < 1) itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
+                if (itemsPerPage > MAX_ITEMS_PER_PAGE) itemsPerPage = MAX_ITEMS_PER_PAGE;
+            }
+        } catch (NumberFormatException e) {
         }
-
+        List<ExportRequest> exportRequests;
+        if (sortBy != null && !sortBy.isEmpty()) {
+            switch (sortBy) {
+                case "requestDate":
+                    exportRequests = exportRequestDAO.getAllSortedByRequestDate(sortOrder);
+                    break;
+                case "status":
+                    exportRequests = exportRequestDAO.getAllSortedByStatus(sortOrder);
+                    break;
+                case "requestCode":
+                    exportRequests = exportRequestDAO.getAllSortedByRequestCode(sortOrder);
+                    break;
+                default:
+                    exportRequests = exportRequestDAO.getAll(status, search, null, page, itemsPerPage);
+            }
+        } else {
+            exportRequests = exportRequestDAO.getAll(status, search, null, page, itemsPerPage);
+        }
+        int totalItems = exportRequestDAO.getTotalCount(status, search, null);
+        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+        request.setAttribute("exportRequests", exportRequests);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("itemsPerPage", itemsPerPage);
+        request.setAttribute("totalItems", totalItems);
+        request.setAttribute("status", status);
+        request.setAttribute("search", search);
+        request.setAttribute("fromDate", fromDate);
+        request.setAttribute("toDate", toDate);
+        request.setAttribute("sortBy", sortBy);
+        request.setAttribute("sortOrder", sortOrder);
         request.getRequestDispatcher("ExportRequestList.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Export Request List Servlet";
     }
 }
