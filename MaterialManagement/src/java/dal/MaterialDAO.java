@@ -848,4 +848,47 @@ public class MaterialDAO extends DBContext {
         }
         return m;
     }
+
+    public Material getMaterialByName(String materialName) {
+        Material m = null;
+        try {
+            String sql = "SELECT m.material_id, m.material_code, m.material_name, m.materials_url, "
+                    + "m.material_status, "
+                    + "c.category_id, c.category_name, "
+                    + "u.unit_id, u.unit_name, "
+                    + "m.created_at, m.updated_at, m.disable "
+                    + "FROM materials m "
+                    + "LEFT JOIN categories c ON m.category_id = c.category_id "
+                    + "LEFT JOIN units u ON m.unit_id = u.unit_id "
+                    + "WHERE m.material_name = ? AND m.disable = 0";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, materialName);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                m = new Material();
+                m.setMaterialId(rs.getInt("material_id"));
+                m.setMaterialCode(rs.getString("material_code"));
+                m.setMaterialName(rs.getString("material_name"));
+                m.setMaterialsUrl(rs.getString("materials_url"));
+                m.setMaterialStatus(rs.getString("material_status"));
+                m.setCreatedAt(rs.getTimestamp("created_at"));
+                m.setUpdatedAt(rs.getTimestamp("updated_at"));
+                m.setDisable(rs.getBoolean("disable"));
+
+                Category c = new Category();
+                c.setCategory_id(rs.getInt("category_id"));
+                c.setCategory_name(rs.getString("category_name"));
+                m.setCategory(c);
+
+                Unit u = new Unit();
+                u.setId(rs.getInt("unit_id"));
+                u.setUnitName(rs.getString("unit_name"));
+                m.setUnit(u);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return m;
+    }
 }
