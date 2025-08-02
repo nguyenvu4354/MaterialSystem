@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.UUID;
+import java.util.ArrayList;
 import utils.ImportValidator;
 
 @WebServlet(name = "ImportMaterialServlet", urlPatterns = {"/ImportMaterial"})
@@ -391,9 +392,9 @@ public class ImportMaterialServlet extends HttpServlet {
             if (supplierIdStr == null || supplierIdStr.trim().isEmpty()) {
                 Integer selectedPurchaseOrderId = (Integer) session.getAttribute("selectedPurchaseOrderId");
                 if (selectedPurchaseOrderId != null) {
-                    PurchaseOrder selectedPO = purchaseOrderDAO.getPurchaseOrderById(selectedPurchaseOrderId); // If we can't get the PO, continue without supplier
-                    if (selectedPO != null) {
-                        supplierIdStr = String.valueOf(selectedPO.getSupplierId());
+                    List<PurchaseOrderDetail> poDetails = purchaseOrderDAO.getPurchaseOrderDetails(selectedPurchaseOrderId);
+                    if (!poDetails.isEmpty() && poDetails.get(0).getSupplierId() != null) {
+                        supplierIdStr = String.valueOf(poDetails.get(0).getSupplierId());
                     }
                 }
             }
@@ -405,45 +406,42 @@ public class ImportMaterialServlet extends HttpServlet {
                 return;
             }
 
-            try {
-                Integer supplierId = Integer.parseInt(supplierIdStr);
-                LocalDateTime now = LocalDateTime.now();
+            Integer supplierId = Integer.parseInt(supplierIdStr);
+            LocalDateTime now = LocalDateTime.now();
 
-                Import imports = new Import();
-                imports.setImportId(tempImportId);
-                imports.setImportCode(importDAO.generateNextImportCode());
-                imports.setImportDate(now);
-                imports.setImportedBy(user.getUserId());
-                imports.setSupplierId(supplierId);
-                imports.setDestination("Warehouse"); // Default destination
-                imports.setActualArrival(now);
-                imports.setNote(note);
+            Import imports = new Import();
+            imports.setImportId(tempImportId);
+            imports.setImportCode(importDAO.generateNextImportCode());
+            imports.setImportDate(now);
+            imports.setImportedBy(user.getUserId());
+            imports.setSupplierId(supplierId);
+            imports.setDestination("Warehouse"); // Default destination
+            imports.setActualArrival(now);
+            imports.setNote(note);
 
-                double totalImportValue = details.stream()
-                        .mapToDouble(detail -> detail.getUnitPrice() * detail.getQuantity())
-                        .sum();
+            double totalImportValue = details.stream()
+                    .mapToDouble(detail -> detail.getUnitPrice() * detail.getQuantity())
+                    .sum();
 
-                importDAO.updateImport(imports);
-                importDAO.confirmImport(tempImportId);
-                importDAO.updateInventoryByImportId(tempImportId, user.getUserId(), "Warehouse");
-                
-                                        // Clear session data
-                        session.setAttribute("tempImportId", 0);
-                        session.removeAttribute("selectedPurchaseOrderId");
-                        session.removeAttribute("selectedSupplierId");
-                        session.removeAttribute("usingManualInput");
-                
-                request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + 
-                        ". Total value: $" + String.format("%.2f", totalImportValue));
-                safeLoadDataAndForward(request, response);
-                
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid supplier ID format.");
-                safeLoadDataAndForward(request, response);
-            }
+            importDAO.updateImport(imports);
+            importDAO.confirmImport(tempImportId);
+            importDAO.updateInventoryByImportId(tempImportId, user.getUserId(), "Warehouse");
+            
+            // Clear session data
+            session.setAttribute("tempImportId", 0);
+            session.removeAttribute("selectedPurchaseOrderId");
+            session.removeAttribute("selectedSupplierId");
+            session.removeAttribute("usingManualInput");
+            
+            request.setAttribute("success", "Import completed successfully with code: " + imports.getImportCode() + 
+                    ". Total value: $" + String.format("%.2f", totalImportValue));
+            safeLoadDataAndForward(request, response);
             
         } catch (SQLException e) {
             request.setAttribute("error", "Database error: " + e.getMessage());
+            safeLoadDataAndForward(request, response);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid supplier ID format.");
             safeLoadDataAndForward(request, response);
         }
     }
@@ -538,11 +536,11 @@ public class ImportMaterialServlet extends HttpServlet {
     private void safeLoadDataAndForward(HttpServletRequest request, HttpServletResponse response) {
         try {
             loadDataAndForward(request, response);
-        } catch (ServletException | IOException e) {
+        } catch (Exception e) {
             request.setAttribute("error", "Error processing request: " + e.getMessage());
             try {
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
-            } catch (ServletException | IOException ex) {
+            } catch (Exception ex) {
                 // Log the error but can't do much more
             }
         }
