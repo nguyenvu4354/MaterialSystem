@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import utils.EmailUtils;
+import utils.ExportRequestValidator;
 
 @WebServlet(name = "CreateExportRequestServlet", urlPatterns = {"/CreateExportRequest"})
 public class CreateExportRequestServlet extends HttpServlet {
@@ -94,38 +95,76 @@ public class CreateExportRequestServlet extends HttpServlet {
             String requestCode = request.getParameter("requestCode");
             String deliveryDateStr = request.getParameter("deliveryDate");
             String reason = request.getParameter("reason");
-            if (requestCode == null || requestCode.trim().isEmpty() ||
-                deliveryDateStr == null || deliveryDateStr.trim().isEmpty() ||
-                reason == null || reason.trim().isEmpty()) {
-                throw new Exception("Request code, delivery date, and reason are required.");
-            }
-            Date deliveryDate = Date.valueOf(deliveryDateStr);
-            LocalDate deliveryLocalDate = deliveryDate.toLocalDate();
-            LocalDate today = LocalDate.now();
             
-            if (deliveryLocalDate.isBefore(today)) {
-                throw new Exception("Delivery date cannot be in the past. Please select today or a future date.");
+            // Validate form data using ExportRequestValidator
+            Map<String, String> formErrors = ExportRequestValidator.validateExportRequestFormData(reason, deliveryDateStr);
+            
+            if (!formErrors.isEmpty()) {
+                // Set submitted data to repopulate form
+                request.setAttribute("submittedReason", reason);
+                request.setAttribute("submittedDeliveryDate", deliveryDateStr);
+                request.setAttribute("errors", formErrors);
+                
+                // Reload form data
+                String newRequestCode = generateRequestCode();
+                request.setAttribute("requestCode", newRequestCode);
+                List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
+                request.setAttribute("materials", materials);
+                List<User> staffUsers = userDAO.getUsersByRoleId(3);
+                request.setAttribute("users", staffUsers);
+                
+                request.getRequestDispatcher("CreateExportRequest.jsp").forward(request, response);
+                return;
             }
+            
+            Date deliveryDate = Date.valueOf(deliveryDateStr);
             ExportRequest exportRequest = new ExportRequest();
             exportRequest.setRequestCode(requestCode);
             exportRequest.setDeliveryDate(deliveryDate);
             exportRequest.setReason(reason);
             exportRequest.setUserId(user.getUserId());
             exportRequest.setStatus("pending");
-            String[] materialIds = request.getParameterValues("materials[]");
+            String[] materialNames = request.getParameterValues("materialNames[]");
             String[] quantities = request.getParameterValues("quantities[]");
-            if (materialIds == null || quantities == null ||
-                materialIds.length == 0 || quantities.length == 0) {
-                throw new Exception("At least one material is required.");
+            
+            // Validate material details
+            Map<String, String> detailErrors = ExportRequestValidator.validateExportRequestDetails(materialNames, quantities);
+            
+            if (!detailErrors.isEmpty()) {
+                // Set submitted data to repopulate form
+                request.setAttribute("submittedReason", reason);
+                request.setAttribute("submittedDeliveryDate", deliveryDateStr);
+                request.setAttribute("submittedMaterialNames", materialNames);
+                request.setAttribute("submittedQuantities", quantities);
+                request.setAttribute("errors", detailErrors);
+                
+                // Reload form data
+                String newRequestCode = generateRequestCode();
+                request.setAttribute("requestCode", newRequestCode);
+                List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
+                request.setAttribute("materials", materials);
+                List<User> staffUsers = userDAO.getUsersByRoleId(3);
+                request.setAttribute("users", staffUsers);
+                
+                request.getRequestDispatcher("CreateExportRequest.jsp").forward(request, response);
+                return;
+            }
+            
+            // Convert material names to IDs
+            List<Integer> materialIds = new ArrayList<>();
+            for (String materialName : materialNames) {
+                if (materialName != null && !materialName.trim().isEmpty()) {
+                    Material material = materialDAO.getMaterialByName(materialName.trim());
+                    if (material != null) {
+                        materialIds.add(material.getMaterialId());
+                    }
+                }
             }
             Map<Integer, Integer> materialQuantityMap = new HashMap<>();
             List<ExportRequestDetail> details = new ArrayList<>();
-            for (int i = 0; i < materialIds.length; i++) {
-                int materialId = Integer.parseInt(materialIds[i]);
+            for (int i = 0; i < materialIds.size(); i++) {
+                int materialId = materialIds.get(i);
                 int quantity = Integer.parseInt(quantities[i]);
-                if (quantity <= 0) {
-                    throw new Exception("Quantity must be positive.");
-                }
                 materialQuantityMap.put(materialId, materialQuantityMap.getOrDefault(materialId, 0) + quantity);
                 ExportRequestDetail detail = new ExportRequestDetail();
                 detail.setMaterialId(materialId);
@@ -174,32 +213,79 @@ public class CreateExportRequestServlet extends HttpServlet {
                 }
             }
             
-            String subject = "[Thông báo] Export Request mới đã được tạo";
+            String subject = "[Notification] New Export Request Created";
             StringBuilder content = new StringBuilder();
-            content.append("<html><body>");
-            content.append("<h2>Export Request mới đã được tạo</h2>");
-            content.append("<p><strong>Mã Export Request:</strong> ").append(exportRequest.getRequestCode()).append("</p>");
-            content.append("<p><strong>Người tạo:</strong> ").append(creator.getFullName()).append(" (ID: ").append(creator.getUserId()).append(")</p>");
-            content.append("<p><strong>Ngày giao hàng:</strong> ").append(exportRequest.getDeliveryDate()).append("</p>");
-            content.append("<p><strong>Lý do:</strong> ").append(exportRequest.getReason()).append("</p>");
-            content.append("<p><strong>Thời gian tạo:</strong> ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</p>");
+            content.append("<html><body style='margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;'>");
             
-            content.append("<h3>Chi tiết vật tư:</h3>");
-            content.append("<table border='1' style='border-collapse: collapse; width: 100%;'>");
-            content.append("<tr><th>Vật tư</th><th>Số lượng</th><th>Tình trạng</th></tr>");
+            // Email container
+            content.append("<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff;'>");
+            
+            // Header with golden brown theme
+            content.append("<div style='background: linear-gradient(135deg, #E9B775 0%, #D4A574 100%); padding: 30px; text-align: center;'>");
+            content.append("<h1 style='color: #000000; margin: 0; font-size: 28px; font-weight: bold;'>New Export Request</h1>");
+            content.append("<p style='color: #000000; margin: 10px 0 0 0; font-size: 16px;'>A new export request has been submitted and requires your attention</p>");
+            content.append("</div>");
+            
+            // Main content
+            content.append("<div style='padding: 40px 30px;'>");
+            
+            // Request information section
+            content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
+            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Request Information</h2>");
+            
+            content.append("<table style='width: 100%; border-collapse: collapse;'>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold; width: 40%;'>Request Code:</td><td style='padding: 8px 0; color: #333333;'>").append(exportRequest.getRequestCode()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Requested By:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getFullName()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Submitted:</td><td style='padding: 8px 0; color: #333333;'>").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Email:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getEmail()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Phone:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getPhoneNumber()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Delivery Date:</td><td style='padding: 8px 0; color: #333333;'>").append(exportRequest.getDeliveryDate()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Reason:</td><td style='padding: 8px 0; color: #333333;'>").append(exportRequest.getReason()).append("</td></tr>");
+            content.append("</table>");
+            content.append("</div>");
+            
+            // Material details section
+            content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
+            content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Material Details</h2>");
+            
+            content.append("<table style='width: 100%; border-collapse: collapse; border: 1px solid #dee2e6;'>");
+            content.append("<thead><tr style='background-color: #E9B775;'>");
+            content.append("<th style='padding: 12px; text-align: left; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Material Name</th>");
+            content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Quantity</th>");
+            content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Category</th>");
+            content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Unit</th>");
+            content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Status</th>");
+            content.append("</tr></thead>");
+            content.append("<tbody>");
             
             for (ExportRequestDetail detail : details) {
-                Material material = materialDAO.getInformation(detail.getMaterialId());
-                String materialName = (material != null) ? material.getMaterialName() : "Unknown Material";
-                content.append("<tr>");
-                content.append("<td>").append(materialName).append("</td>");
-                content.append("<td>").append(detail.getQuantity()).append("</td>");
-                content.append("<td>").append(detail.getStatus()).append("</td>");
-                content.append("</tr>");
+                Material material = materialDAO.getProductById(detail.getMaterialId());
+                if (material != null) {
+                    content.append("<tr style='background-color: #ffffff;'>");
+                    content.append("<td style='padding: 12px; border: 1px solid #dee2e6; color: #333333;'>").append(material.getMaterialName()).append("</td>");
+                    content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(detail.getQuantity()).append("</td>");
+                    content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material.getCategory().getCategory_name()).append("</td>");
+                    content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material.getUnit().getUnitName()).append("</td>");
+                    content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material.getMaterialStatus()).append("</td>");
+                    content.append("</tr>");
+                }
             }
-            content.append("</table>");
-            content.append("<p>Vui lòng đăng nhập hệ thống để xem chi tiết và xử lý export request.</p>");
-            content.append("</body></html>");
+            content.append("</tbody></table>");
+            content.append("</div>");
+            
+            // Action button
+            content.append("<div style='text-align: center; margin-top: 30px;'>");
+            content.append("<a href='http://localhost:8080/MaterialManagement/ExportRequestList' style='display: inline-block; background-color: #E9B775; color: #FFFFFF !important; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;'>VIEW IN SYSTEM</a>");
+            content.append("</div>");
+            
+            content.append("</div>");
+            
+            // Footer
+            content.append("<div style='background-color: #E9B775; padding: 20px; text-align: center;'>");
+            content.append("<p style='color: #000000; margin: 0; font-size: 14px;'>This is an automated notification from the Material Management System</p>");
+            content.append("</div>");
+            
+            content.append("</div></body></html>");
             
             for (User director : directors) {
                 if (director.getEmail() != null && !director.getEmail().trim().isEmpty()) {

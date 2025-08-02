@@ -891,4 +891,20 @@ public class MaterialDAO extends DBContext {
         }
         return m;
     }
+
+    public int getAvailableStock(int materialId) {
+        int stock = 0;
+        try {
+            String sql = "SELECT IFNULL(stock, 0) AS available_stock FROM inventory WHERE material_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, materialId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                stock = rs.getInt("available_stock");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stock;
+    }
 }

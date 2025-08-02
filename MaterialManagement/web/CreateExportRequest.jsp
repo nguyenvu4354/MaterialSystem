@@ -91,6 +91,15 @@
                                 <c:if test="${not empty success}">
                                     <div class="alert alert-success text-center" style="font-size:1.1rem; font-weight:600;">${success}</div>
                                 </c:if>
+                                <c:if test="${not empty errors}">
+                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                        <ul style="margin-bottom: 0;">
+                                            <c:forEach var="error" items="${errors}">
+                                                <li>${error.value}</li>
+                                            </c:forEach>
+                                        </ul>
+                                    </div>
+                                </c:if>
 
                                 <form action="CreateExportRequest" method="post">
                                     <div class="row g-3">
@@ -100,12 +109,17 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label for="deliveryDate" class="form-label text-muted">Delivery Date</label>
-                                            <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" required>
-                                            <div class="invalid-feedback" id="dateError" style="display:none;">Delivery date cannot be in the past.</div>
+                                            <input type="date" class="form-control" id="deliveryDate" name="deliveryDate" value="${submittedDeliveryDate}">
+                                            <c:if test="${not empty errors.deliveryDate}">
+                                                <div class="text-danger small mt-1">${errors.deliveryDate}</div>
+                                            </c:if>
                                         </div>
                                         <div class="col-12">
                                             <label for="reason" class="form-label text-muted">Reason</label>
-                                            <textarea class="form-control" id="reason" name="reason" required rows="1" style="height: 40px; padding: 6px 12px; resize: vertical;"></textarea>
+                                            <textarea class="form-control" id="reason" name="reason" rows="1" style="height: 40px; padding: 6px 12px; resize: vertical;">${submittedReason}</textarea>
+                                            <c:if test="${not empty errors.reason}">
+                                                <div class="text-danger small mt-1">${errors.reason}</div>
+                                            </c:if>
                                         </div>
                                     </div>
 
@@ -114,7 +128,7 @@
                                         <div class="row material-row align-items-center gy-2">
                                             <div class="col-md-3">
                                                 <label class="form-label text-muted">Material</label>
-                                                <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" required autocomplete="off" data-touched="false">
+                                                <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" autocomplete="off" data-touched="false">
                                                 <input type="hidden" name="materials[]" class="material-id-input">
                                                 <div class="invalid-feedback" style="display:none;">Please enter a valid material name or code.</div>
                                             </div>
@@ -124,7 +138,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label text-muted">Quantity</label>
-                                                <input type="number" class="form-control quantity-input" name="quantities[]" min="1" required data-touched="false">
+                                                <input type="number" class="form-control quantity-input" name="quantities[]" min="1" data-touched="false">
                                                 <div class="invalid-feedback" style="display:none;">Not enough stock!</div>
                                             </div>
                                             <div class="col-md-2" style="display:none;">
@@ -315,26 +329,78 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.dateValidation) {
         window.dateValidation.initDateValidation();
     }
-    // Validate all on submit
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            let valid = true;
-            document.querySelectorAll('.material-row').forEach(row => {
-                const nameInput = row.querySelector('.material-name-input');
-                const quantityInput = row.querySelector('.quantity-input');
-                nameInput.setAttribute('data-touched', 'true');
-                quantityInput.setAttribute('data-touched', 'true');
-                if (!validateMaterialNameInput(nameInput, true)) valid = false;
-                if (!validateQuantityInput(quantityInput, true)) valid = false;
-            });
-            if (!valid) {
-                e.preventDefault();
-                alert('Please fix the errors in the materials section.');
-                return false;
+    // Remove client-side validation - let server handle all validation
+    // Form will submit directly to server for Java validation
+    
+    // Restore submitted data if there were validation errors
+    <c:if test="${not empty submittedMaterialNames}">
+        const submittedMaterialNames = [
+            <c:forEach var="materialName" items="${submittedMaterialNames}" varStatus="status">
+                "${fn:escapeXml(materialName)}"<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        ];
+        const submittedQuantities = [
+            <c:forEach var="quantity" items="${submittedQuantities}" varStatus="status">
+                "${fn:escapeXml(quantity)}"<c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        ];
+        
+        // Restore data to existing rows
+        const materialList = document.getElementById('materialList');
+        const existingRows = materialList.querySelectorAll('.material-row');
+        
+        for (let i = 0; i < submittedMaterialNames.length; i++) {
+            if (i < existingRows.length) {
+                // Use existing row
+                const row = existingRows[i];
+                row.querySelector('.material-name-input').value = submittedMaterialNames[i];
+                row.querySelector('.quantity-input').value = submittedQuantities[i];
+            } else {
+                // Create new rows if needed
+                const newRow = document.createElement('div');
+                newRow.className = 'row material-row align-items-center gy-2';
+                newRow.innerHTML = `
+                    <div class="col-md-3">
+                        <label class="form-label text-muted">Material</label>
+                        <input type="text" class="form-control material-name-input" name="materialNames[]" placeholder="Type material name or code" autocomplete="off" data-touched="false">
+                        <input type="hidden" name="materials[]" class="material-id-input">
+                        <div class="invalid-feedback" style="display:none;">Please enter a valid material name or code.</div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted">In Stock</label>
+                        <input type="text" class="form-control stock-quantity" readonly value="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted">Quantity</label>
+                        <input type="number" class="form-control quantity-input" name="quantities[]" min="1" data-touched="false">
+                        <div class="invalid-feedback" style="display:none;">Not enough stock!</div>
+                    </div>
+                    <div class="col-md-2" style="display:none;">
+                        <label class="form-label text-muted">Condition</label>
+                        <select class="form-select" name="conditions[]" >
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                            <option value="refurbished">Refurbished</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <img src="images/placeholder.png" class="img-fluid rounded material-image" style="height: 80px; width: 100%; object-fit: cover;" alt="Material Image">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                    </div>
+                `;
+                materialList.appendChild(newRow);
+                
+                // Set values
+                newRow.querySelector('.material-name-input').value = submittedMaterialNames[i];
+                newRow.querySelector('.quantity-input').value = submittedQuantities[i];
+                
+                // Setup autocomplete
+                updateMaterialRowAutocomplete(newRow);
             }
-        });
-    }
+        }
+    </c:if>
 });
 
 // When add material row
