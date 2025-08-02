@@ -126,7 +126,7 @@ if (user != null) {
                                 <option value="ImportMaterial">Import Stock</option>
                                 <option value="ImportHistory">Import History</option>
                             </c:if>
-                            <c:if test="${sessionScope.userPermissions.contains('CREATE_REPAIR_REQUEST') && sessionScope.user.roleId == 3}">
+                            <c:if test="${sessionScope.userPermissions.contains('CREATE_REPAIR_REQUEST')}">
                                 <option value="repairrequest">Repair Request</option>
                             </c:if>
                         </select>
