@@ -206,98 +206,82 @@ public class CreatePurchaseRequestServlet extends HttpServlet {
                 }
 
                 if (!managers.isEmpty()) {
-                    String subject = "🔔 New Purchase Request Created - " + requestCode;
+                    String subject = "[Notification] New Purchase Request Created";
                     StringBuilder content = new StringBuilder();
-                    content.append("<!DOCTYPE html>");
-                    content.append("<html>");
-                    content.append("<head>");
-                    content.append("<meta charset='UTF-8'>");
-                    content.append("<style>");
-                    content.append("body { font-family: Arial, sans-serif; line-height: 1.4; color: #4A3C31; margin: 0; padding: 20px; background-color: #FDF8F0; }");
-                    content.append(".container { max-width: 600px; margin: 0 auto; background: #FEFEFE; border: 2px solid #E9B775; border-radius: 8px; box-shadow: 0 4px 8px rgba(233, 183, 117, 0.3); }");
-                    content.append(".header { background: linear-gradient(135deg, #E9B775, #D4A574); color: white; padding: 20px; text-align: center; border-radius: 6px 6px 0 0; }");
-                    content.append(".header h1 { margin: 0; font-size: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }");
-                    content.append(".content { padding: 20px; }");
-                    content.append(".info-section { border: 2px solid #E9B775; background: #FEFEFE; padding: 15px; margin: 15px 0; border-radius: 6px; }");
-                    content.append(".info-row { display: flex; justify-content: space-between; margin: 8px 0; padding: 5px 0; border-bottom: 1px solid #F0E6D6; }");
-                    content.append(".info-row:last-child { border-bottom: none; }");
-                    content.append(".label { font-weight: bold; color: #E9B775; }");
-                    content.append(".value { color: #4A3C31; }");
-                    content.append(".request-code { background: linear-gradient(135deg, #E9B775, #D4A574); color: white; padding: 8px 12px; font-weight: bold; font-size: 16px; display: inline-block; margin: 10px 0; border-radius: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }");
-                    content.append(".reason-box { border: 2px solid #E9B775; background: #FEFEFE; padding: 12px; margin: 15px 0; border-radius: 6px; }");
-                    content.append(".reason-title { font-weight: bold; color: #E9B775; margin-bottom: 8px; }");
-                    content.append(".action-section { text-align: center; margin: 20px 0; }");
-                    content.append(".btn { display: inline-block; background: linear-gradient(135deg, #E9B775, #D4A574); color: #FFFFFF !important; padding: 10px 20px; text-decoration: none; font-weight: bold; margin: 10px; border-radius: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }");
-                    content.append(".footer { border-top: 2px solid #E9B775; padding: 15px; text-align: center; color: #E9B775; font-size: 12px; background: #FDF8F0; border-radius: 0 0 6px 6px; }");
-                    content.append(".materials-section { margin: 15px 0; }");
-                    content.append(".materials-table { width: 100%; border-collapse: collapse; margin: 15px 0; border: 2px solid #E9B775; border-radius: 6px; overflow: hidden; }");
-                    content.append(".materials-table th { background: linear-gradient(135deg, #E9B775, #D4A574); color: white; padding: 10px 8px; text-align: left; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }");
-                    content.append(".materials-table td { padding: 8px; border: 1px solid #F0E6D6; font-size: 12px; background: #FEFEFE; }");
-                    content.append(".materials-table tr:nth-child(even) { background: #FDF8F0; }");
-                    content.append("</style>");
-                    content.append("</head>");
-                    content.append("<body>");
-                    content.append("<div class='container'>");
-                    content.append("<div class='header'>");
-                    content.append("<h1 style='color: #000;'>PURCHASE REQUEST</h1>");
-                    content.append("<p style='color: #000;'>A new purchase request has been submitted and requires your approval</p>");
+                    content.append("<html><body style='margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;'>");
+                    
+                    // Email container
+                    content.append("<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff;'>");
+                    
+                    // Header with golden brown theme
+                    content.append("<div style='background: linear-gradient(135deg, #E9B775 0%, #D4A574 100%); padding: 30px; text-align: center;'>");
+                    content.append("<h1 style='color: #000000; margin: 0; font-size: 28px; font-weight: bold;'>New Purchase Request</h1>");
+                    content.append("<p style='color: #000000; margin: 10px 0 0 0; font-size: 16px;'>A new purchase request has been submitted and requires your approval</p>");
                     content.append("</div>");
-                    content.append("<div class='content'>");
-                    content.append("<div class='info-section'>");
-                    content.append("<div class='request-code'>").append(requestCode).append("</div>");
-                    content.append("<div class='info-row'>");
-                    content.append("<span class='label' style='color: #000;'>Requested By:</span>");
-                    content.append("<span class='value'>").append(currentUser.getFullName()).append(" (ID: ").append(currentUser.getUserId()).append(")</span>");
+                    
+                    // Main content
+                    content.append("<div style='padding: 40px 30px;'>");
+                    
+                    // Request information section
+                    content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
+                    content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Request Information</h2>");
+                    
+                    content.append("<table style='width: 100%; border-collapse: collapse;'>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold; width: 40%;'>Request Code:</td><td style='padding: 8px 0; color: #333333;'>").append(requestCode).append("</td></tr>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Requested By:</td><td style='padding: 8px 0; color: #333333;'>").append(currentUser.getFullName()).append("</td></tr>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Submitted:</td><td style='padding: 8px 0; color: #333333;'>").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</td></tr>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Email:</td><td style='padding: 8px 0; color: #333333;'>").append(currentUser.getEmail() != null ? currentUser.getEmail() : "N/A").append("</td></tr>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Phone:</td><td style='padding: 8px 0; color: #333333;'>").append(currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber() : "N/A").append("</td></tr>");
+                    content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Reason:</td><td style='padding: 8px 0; color: #333333;'>").append(reason).append("</td></tr>");
+                    content.append("</table>");
                     content.append("</div>");
-                    content.append("<div class='info-row'>");
-                    content.append("<span class='label' style='color: #000;'>Submitted:</span>");
-                    content.append("<span class='value'>").append(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date())).append("</span>");
-                    content.append("</div>");
-                    content.append("<div class='info-row'>");
-                    content.append("<span class='label' style='color: #000;'>Email:</span>");
-                    content.append("<span class='value'>").append(currentUser.getEmail() != null ? currentUser.getEmail() : "N/A").append("</span>");
-                    content.append("</div>");
-                    content.append("<div class='info-row'>");
-                    content.append("<span class='label' style='color: #000;'>Phone:</span>");
-                    content.append("<span class='value'>").append(currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber() : "N/A").append("</span>");
-                    content.append("</div>");
-                    content.append("</div>");
-                    content.append("<div class='reason-box'>");
-                    content.append("<div class='reason-title' style='color: #000;'>Request Reason:</div>");
-                    content.append("<p style='color: #000;'>").append(reason).append("</p>");
-                    content.append("</div>");
-                    content.append("<div class='materials-section'>");
-                    content.append("<h3 style='color: #E9B775; margin-bottom: 15px; font-weight: bold; text-shadow: 1px 1px 2px rgba(233, 183, 117, 0.3);'>REQUESTED MATERIALS:</h3>");
-                    content.append("<table class='materials-table'>");
-                    content.append("<thead>");
-                    content.append("<tr>");
-                    content.append("<th>Material</th>");
-                    content.append("<th>Quantity</th>");
-                    content.append("<th>Category</th>");
-                    content.append("<th>Unit</th>");
-                    content.append("<th>Status</th>");
-                    content.append("<th>Notes</th>");
-                    content.append("</tr>");
-                    content.append("</thead>");
+                    
+                    // Material details section
+                    content.append("<div style='background-color: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 30px;'>");
+                    content.append("<h2 style='color: #000000; margin: 0 0 20px 0; font-size: 20px; font-weight: bold;'>Requested Materials</h2>");
+                    
+                    content.append("<table style='width: 100%; border-collapse: collapse; border: 1px solid #dee2e6;'>");
+                    content.append("<thead><tr style='background-color: #E9B775;'>");
+                    content.append("<th style='padding: 12px; text-align: left; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Material Name</th>");
+                    content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Quantity</th>");
+                    content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Category</th>");
+                    content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Unit</th>");
+                    content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Status</th>");
+                    content.append("<th style='padding: 12px; text-align: center; color: #000000; font-weight: bold; border: 1px solid #dee2e6;'>Notes</th>");
+                    content.append("</tr></thead>");
                     content.append("<tbody>");
+                    
                     for (PurchaseRequestDetail detail : purchaseRequestDetails) {
                         Material material = null;
                         if (detail.getMaterialId() > 0) {
                             material = materialDAO.getProductById(detail.getMaterialId());
                         }
                         
-                        content.append("<tr>");
-                        content.append("<td><strong>").append(detail.getMaterialName()).append("</strong></td>");
-                        content.append("<td>").append(detail.getQuantity()).append("</td>");
-                        content.append("<td>").append(material != null && material.getCategory() != null && material.getCategory().getCategory_name() != null ? material.getCategory().getCategory_name() : "N/A").append("</td>");
-                        content.append("<td>").append(material != null && material.getUnit() != null && material.getUnit().getUnitName() != null ? material.getUnit().getUnitName() : "N/A").append("</td>");
-                        content.append("<td>").append(material != null && material.getMaterialStatus() != null ? material.getMaterialStatus() : "N/A").append("</td>");
-                        content.append("<td>").append(detail.getNotes() != null && !detail.getNotes().trim().isEmpty() ? detail.getNotes() : "-").append("</td>");
+                        content.append("<tr style='background-color: #ffffff;'>");
+                        content.append("<td style='padding: 12px; border: 1px solid #dee2e6; color: #333333;'>").append(detail.getMaterialName()).append("</td>");
+                        content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(detail.getQuantity()).append("</td>");
+                        content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material != null && material.getCategory() != null && material.getCategory().getCategory_name() != null ? material.getCategory().getCategory_name() : "N/A").append("</td>");
+                        content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material != null && material.getUnit() != null && material.getUnit().getUnitName() != null ? material.getUnit().getUnitName() : "N/A").append("</td>");
+                        content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(material != null && material.getMaterialStatus() != null ? material.getMaterialStatus() : "N/A").append("</td>");
+                        content.append("<td style='padding: 12px; text-align: center; border: 1px solid #dee2e6; color: #333333;'>").append(detail.getNotes() != null && !detail.getNotes().trim().isEmpty() ? detail.getNotes() : "-").append("</td>");
                         content.append("</tr>");
                     }
-                    content.append("</tbody>");
-                    content.append("</table>");
+                    content.append("</tbody></table>");
                     content.append("</div>");
+                    
+                    // Action button
+                    content.append("<div style='text-align: center; margin-top: 30px;'>");
+                    content.append("<a href='http://localhost:8080/MaterialManagement/PurchaseRequestList' style='display: inline-block; background-color: #E9B775; color: #FFFFFF !important; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;'>VIEW IN SYSTEM</a>");
+                    content.append("</div>");
+                    
+                    content.append("</div>");
+                    
+                    // Footer
+                    content.append("<div style='background-color: #E9B775; padding: 20px; text-align: center;'>");
+                    content.append("<p style='color: #000000; margin: 0; font-size: 14px;'>This is an automated notification from the Material Management System</p>");
+                    content.append("</div>");
+                    
+                    content.append("</div></body></html>");
                     content.append("<div class='action-section'>");
                     content.append("<p style='color: #E9B775; margin-bottom: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(233, 183, 117, 0.3);'>Please review and take action on this purchase request:</p>");
                     content.append("<a href='").append(request.getScheme()).append("://").append(request.getServerName()).append(":").append(request.getServerPort()).append(request.getContextPath()).append("/ListPurchaseRequests' class='btn'>VIEW IN SYSTEM</a>");
