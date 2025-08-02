@@ -66,7 +66,7 @@
                                             <ul style="margin-bottom: 0;">
                                                 <c:forEach var="error" items="${errors}">
                                                     <li>${error.value}</li>
-                                                </c:forEach>
+                                                    </c:forEach>
                                             </ul>
                                         </div>
                                     </c:if>
@@ -88,7 +88,8 @@
                                         </div>
                                         <h3 class="fw-normal mt-5 mb-3">Materials for Repair</h3>
                                         <div id="materialList">
-                                            <div class="row material-row align-items-center gy-2">
+
+                                            <div class="row material-row align-items-end gy-3">
                                                 <div class="col-md-3">
                                                     <label class="form-label text-muted">Material</label>
                                                     <input type="text" class="form-control material-autocomplete" name="materialName" placeholder="Type material name or code" autocomplete="off">
@@ -121,19 +122,19 @@
                                                     <c:if test="${not empty errors.supplierId}">
                                                         <div class="text-danger small mt-1">${errors.supplierId}</div>
                                                     </c:if>
-                                                    </div>
-                                                <div class="col-md-1 d-flex align-items-center">
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end justify-content-center">
                                                     <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="mt-3">
-                                            <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
-                                        </div>
-                                        <div class="mt-5 d-grid gap-2">
-                                            <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
-                                            <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
-                                        </div>
+
+                                            <div class="mt-3">
+                                                <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
+                                            </div>
+                                            <div class="mt-5 d-grid gap-2">
+                                                <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
+                                                <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
+                                            </div>
                                     </form>
                                 </div>
                             </div>
@@ -186,9 +187,9 @@
                         <label class="form-label text-muted">Repairer</label>
                         <select class="form-select" name="supplierId">
                             <option value="" selected>Select repairer</option>
-                            <c:forEach var="supplier" items="${supplierList}">
+            <c:forEach var="supplier" items="${supplierList}">
                                 <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                            </c:forEach>
+            </c:forEach>
                         </select>
                     </div>
                     <div class="col-md-1 d-flex align-items-center">
@@ -212,38 +213,38 @@
 
             // Restore submitted data if there were validation errors
             <c:if test="${not empty submittedMaterialNames}">
-                const submittedMaterialNames = [
-                    <c:forEach var="materialName" items="${submittedMaterialNames}" varStatus="status">
-                        "${fn:escapeXml(materialName)}"<c:if test="${!status.last}">,</c:if>
-                    </c:forEach>
-                ];
-                const submittedQuantities = [
-                    <c:forEach var="quantity" items="${submittedQuantities}" varStatus="status">
-                        "${fn:escapeXml(quantity)}"<c:if test="${!status.last}">,</c:if>
-                    </c:forEach>
-                ];
-                const submittedDamageDescriptions = [
-                    <c:forEach var="damageDescription" items="${submittedDamageDescriptions}" varStatus="status">
-                        "${fn:escapeXml(damageDescription)}"<c:if test="${!status.last}">,</c:if>
-                    </c:forEach>
-                ];
-                
-                // Restore data to existing rows
-                const materialList = document.getElementById('materialList');
-                const existingRows = materialList.querySelectorAll('.material-row');
-                
-                for (let i = 0; i < submittedMaterialNames.length; i++) {
-                    if (i < existingRows.length) {
-                        // Use existing row
-                        const row = existingRows[i];
-                        row.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
-                        row.querySelector('input[name="quantity"]').value = submittedQuantities[i];
-                        row.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
-                    } else {
-                        // Create new rows if needed
-                        const newRow = document.createElement('div');
-                        newRow.className = 'row material-row align-items-center gy-2';
-                        newRow.innerHTML = `
+            const submittedMaterialNames = [
+                <c:forEach var="materialName" items="${submittedMaterialNames}" varStatus="status">
+            "${fn:escapeXml(materialName)}"<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+            ];
+            const submittedQuantities = [
+                <c:forEach var="quantity" items="${submittedQuantities}" varStatus="status">
+            "${fn:escapeXml(quantity)}"<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+            ];
+            const submittedDamageDescriptions = [
+                <c:forEach var="damageDescription" items="${submittedDamageDescriptions}" varStatus="status">
+            "${fn:escapeXml(damageDescription)}"<c:if test="${!status.last}">,</c:if>
+                </c:forEach>
+            ];
+
+            // Restore data to existing rows
+            const materialList = document.getElementById('materialList');
+            const existingRows = materialList.querySelectorAll('.material-row');
+
+            for (let i = 0; i < submittedMaterialNames.length; i++) {
+                if (i < existingRows.length) {
+                    // Use existing row
+                    const row = existingRows[i];
+                    row.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
+                    row.querySelector('input[name="quantity"]').value = submittedQuantities[i];
+                    row.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
+                } else {
+                    // Create new rows if needed
+                    const newRow = document.createElement('div');
+                    newRow.className = 'row material-row align-items-center gy-2';
+                    newRow.innerHTML = `
                             <div class="col-md-3">
                                 <label class="form-label text-muted">Material</label>
                                 <input type="text" class="form-control material-autocomplete" name="materialName" placeholder="Type material name or code" autocomplete="off">
@@ -260,30 +261,28 @@
                                 <label class="form-label text-muted">Repairer</label>
                                 <select class="form-select" name="supplierId">
                                     <option value="" selected>Select repairer</option>
-                                    <c:forEach var="supplier" items="${supplierList}">
+                <c:forEach var="supplier" items="${supplierList}">
                                         <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                                    </c:forEach>
+                </c:forEach>
                                 </select>
                             </div>
                             <div class="col-md-1 d-flex align-items-center">
                                 <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                             </div>
                         `;
-                        materialList.appendChild(newRow);
-                        
-                        // Set values
-                        newRow.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
-                        newRow.querySelector('input[name="quantity"]').value = submittedQuantities[i];
-                        newRow.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
-                        
-                        // Setup autocomplete
-                        setupAutocomplete(newRow.querySelector('.material-autocomplete'));
-                    }
+                    materialList.appendChild(newRow);
+
+                    // Set values
+                    newRow.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
+                    newRow.querySelector('input[name="quantity"]').value = submittedQuantities[i];
+                    newRow.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
+
+                    // Setup autocomplete
+                    setupAutocomplete(newRow.querySelector('.material-autocomplete'));
                 }
+            }
             </c:if>
 
-            // Remove client-side validation - let server handle all validation
-            // Form will submit directly to server for Java validation
         </script>
     </body>
 </html>
