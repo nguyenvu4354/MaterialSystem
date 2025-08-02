@@ -86,29 +86,12 @@ public class HomeServlet extends HttpServlet {
         
         System.out.println("DEBUG - User logged in: " + user.getUsername() + ", role: " + user.getRoleId());
         
+        // Lấy thống kê cơ bản
         MaterialDAO dao = new MaterialDAO();
-        int page = 1;
-        int pageSize = 8;
-        String pageParam = request.getParameter("page");
-        if (pageParam != null) {
-            try {
-                page = Integer.parseInt(pageParam);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
         int materialCount = dao.countMaterials(null, null);
-        int totalPages = (materialCount + pageSize - 1) / pageSize;
-        if (page > totalPages && totalPages > 0) page = totalPages;
-        List<Material> productList = dao.searchMaterials(null, null, page, pageSize, null);
-        request.setAttribute("productList", productList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("materialCount", materialCount);
 
-        CategoryDAO categoryDAO = new CategoryDAO();
-        List<Category> categoryTree = categoryDAO.getCategoryTree(3, 10); // tối đa 3 cấp, mỗi node 10 con
-        request.setAttribute("categories", categoryTree);
+
 
         // Dashboard tổng quan cho tất cả role
         request.setAttribute("materialCount", materialCount);
@@ -137,22 +120,39 @@ public class HomeServlet extends HttpServlet {
         RepairRequestDAO repairRequestDAO = new RepairRequestDAO();
         int pendingRepairRequestCount = 0;
         try {
-            pendingRepairRequestCount = repairRequestDAO.getTotalRepairRequestCount(null, "pending", null, null);
+            pendingRepairRequestCount = repairRequestDAO.getTotalRepairRequestCount(null, "Pending", null, null);
+            System.out.println("DEBUG - Pending repair requests count: " + pendingRepairRequestCount);
         } catch (Exception e) {
             pendingRepairRequestCount = 0;
+            System.err.println("ERROR - Failed to get pending repair requests: " + e.getMessage());
+            e.printStackTrace();
         }
         request.setAttribute("pendingRepairRequestCount", pendingRepairRequestCount);
 
         // Số yêu cầu của user hiện tại
         int myPurchaseRequestCount = 0;
         int myRepairRequestCount = 0;
+        int myPendingRequestCount = 0;
+        int myApprovedRequestCount = 0;
+        int availableMaterialsCount = 0;
+        
         if (user != null) {
             RequestDAO requestDAO = new RequestDAO();
             myPurchaseRequestCount = requestDAO.getPurchaseRequestCountByUser(user.getUserId(), null, null, null, null, null);
             myRepairRequestCount = requestDAO.getRepairRequestCountByUser(user.getUserId(), null, null, null, null, null);
+            
+            // Đếm yêu cầu pending và approved của user
+            myPendingRequestCount = requestDAO.getExportRequestCountByUser(user.getUserId(), "pending", null, null, null, null);
+            myApprovedRequestCount = requestDAO.getExportRequestCountByUser(user.getUserId(), "approved", null, null, null, null);
+            
+            // Đếm vật tư có sẵn (có stock > 0)
+            availableMaterialsCount = dao.countMaterials(null, "new") + dao.countMaterials(null, "used");
         }
         request.setAttribute("myPurchaseRequestCount", myPurchaseRequestCount);
         request.setAttribute("myRepairRequestCount", myRepairRequestCount);
+        request.setAttribute("myPendingRequestCount", myPendingRequestCount);
+        request.setAttribute("myApprovedRequestCount", myApprovedRequestCount);
+        request.setAttribute("availableMaterialsCount", availableMaterialsCount);
 
         // Thống kê tồn kho
         InventoryDAO inventoryDAO = new InventoryDAO();
@@ -168,6 +168,27 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("totalStock", totalStock);
         request.setAttribute("lowStockCount", lowStockCount);
         request.setAttribute("outOfStockCount", outOfStockCount);
+
+        // Đếm vật tư bị hư hỏng
+        int damagedMaterialsCount = dao.countMaterials(null, "damaged");
+        request.setAttribute("damagedMaterialsCount", damagedMaterialsCount);
+
+        // Thống kê Import/Export cho Reports section
+        dal.ImportDAO importDAO = new dal.ImportDAO();
+        dal.ExportDAO exportDAO = new dal.ExportDAO();
+        int totalImported = 0, totalExported = 0;
+        try {
+            totalImported = importDAO.getTotalImportedQuantity();
+        } catch (Exception e) {
+            totalImported = 0;
+        }
+        try {
+            totalExported = exportDAO.getTotalExportedQuantity();
+        } catch (Exception e) {
+            totalExported = 0;
+        }
+        request.setAttribute("totalImported", totalImported);
+        request.setAttribute("totalExported", totalExported);
 
         // Lấy roleName nếu chưa có
         if (user != null && (user.getRoleName() == null || user.getRoleName().isEmpty())) {
