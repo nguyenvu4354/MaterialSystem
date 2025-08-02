@@ -317,4 +317,43 @@ public class RepairRequestDAO extends DBContext {
         e.printStackTrace();
     }
 }
+
+    public String generateNextRequestCode() {
+        String nextCode = "RR1";
+        try {
+            String sql = "SELECT request_code FROM Repair_Requests WHERE disable = 0 ORDER BY request_code";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            
+            List<String> existingCodes = new ArrayList<>();
+            while (rs.next()) {
+                String code = rs.getString("request_code");
+                if (code != null && code.startsWith("RR")) {
+                    existingCodes.add(code);
+                }
+            }
+            
+            if (!existingCodes.isEmpty()) {
+                // Sort codes numerically
+                existingCodes.sort((a, b) -> {
+                    try {
+                        int numA = Integer.parseInt(a.substring(2));
+                        int numB = Integer.parseInt(b.substring(2));
+                        return Integer.compare(numA, numB);
+                    } catch (NumberFormatException e) {
+                        return a.compareTo(b);
+                    }
+                });
+                
+                // Get the highest number and increment
+                String lastCode = existingCodes.get(existingCodes.size() - 1);
+                int lastNumber = Integer.parseInt(lastCode.substring(2));
+                nextCode = "RR" + (lastNumber + 1);
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error generating next request code: " + e.getMessage());
+        }
+        return nextCode;
+    }
 }

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:if test="${empty sessionScope.user}">
     <c:redirect url="Login.jsp"/>
@@ -37,22 +38,6 @@
                 margin-bottom: 1rem;
                 border-bottom: 1px solid #dee2e6;
                 padding-bottom: 1rem;
-                align-items: center; 
-            }
-            .repair-form .remove-material {
-                height: 48px; 
-                width: 48px; 
-                padding: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.2rem;
-                margin-left: 0.5rem; 
-                border: 1px solid #dc3545; 
-            }
-            .repair-cost-container {
-                display: flex;
-                align-items: center;
             }
         </style>
     </head>
@@ -76,56 +61,75 @@
                                     <c:if test="${not empty errorMessage}">
                                         <div class="alert alert-danger">${errorMessage}</div>
                                     </c:if>
+                                    <c:if test="${not empty errors}">
+                                        <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                            <ul style="margin-bottom: 0;">
+                                                <c:forEach var="error" items="${errors}">
+                                                    <li>${error.value}</li>
+                                                </c:forEach>
+                                            </ul>
+                                        </div>
+                                    </c:if>
 
                                     <form action="repairrequest" method="post" id="repairForm">
-                                        <h3 class="fw-normal mt-4 mb-3">Materials for Repair</h3>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Request Code</label>
+                                                <input type="text" class="form-control" name="requestCode" value="${requestCode}" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Request Date</label>
+                                                <input type="text" class="form-control" name="requestDate" value="${requestDate}" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted">Repair Reason</label>
+                                                <textarea class="form-control" name="reason" rows="3" placeholder="Please describe the reason for repair request...">${submittedReason}</textarea>
+                                            </div>
+                                        </div>
+                                        <h3 class="fw-normal mt-5 mb-3">Materials for Repair</h3>
                                         <div id="materialList">
-                                            <!-- Initial Material Row -->
-                                            <div class="row material-row align-items-end gy-2">
+                                            <div class="row material-row align-items-center gy-2">
                                                 <div class="col-md-3">
-                                                    <label class="form-label text-muted">Material Name</label>
-                                                    <input type="text" class="form-control material-autocomplete" name="materialName" required>
+                                                    <label class="form-label text-muted">Material</label>
+                                                    <input type="text" class="form-control material-autocomplete" name="materialName" placeholder="Type material name or code" autocomplete="off">
+                                                    <c:if test="${not empty errors.material_0}">
+                                                        <div class="text-danger small mt-1">${errors.material_0}</div>
+                                                    </c:if>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label text-muted">Quantity</label>
-                                                    <input type="number" class="form-control" name="quantity" required min="1" value="1">
+                                                    <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity" value="1">
+                                                    <c:if test="${not empty errors.quantity_0}">
+                                                        <div class="text-danger small mt-1">${errors.quantity_0}</div>
+                                                    </c:if>
                                                 </div>
-                                                <div class="col-md-5">
-                                                    <label class="form-label text-muted">Description of Damage</label>
-                                                    <input type="text" class="form-control" name="damageDescription" required>
+                                                <div class="col-md-4">
+                                                    <label class="form-label text-muted">Damage Description</label>
+                                                    <input type="text" class="form-control" name="damageDescription" placeholder="Describe the damage">
+                                                    <c:if test="${not empty errors.damageDescription_0}">
+                                                        <div class="text-danger small mt-1">${errors.damageDescription_0}</div>
+                                                    </c:if>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <div class="repair-cost-container">
-                                                        <button type="button" class="btn btn-sm btn-outline-danger remove-material">X</button>
-                                                    </div>
+                                                    <label class="form-label text-muted">Repairer</label>
+                                                    <select class="form-select" name="supplierId">
+                                                        <option value="" selected>Select repairer</option>
+                                                        <c:forEach var="supplier" items="${supplierList}">
+                                                            <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                    <c:if test="${not empty errors.supplierId}">
+                                                        <div class="text-danger small mt-1">${errors.supplierId}</div>
+                                                    </c:if>
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-center">
+                                                    <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="mt-2 mb-4">
-                                            <button type="button" class="btn btn-outline-secondary" id="addMaterial">+ Add Material</button>
+                                        <div class="mt-3">
+                                            <button type="button" class="btn btn-outline-secondary" id="addMaterial">Add Material</button>
                                         </div>
-
-                                        <h3 class="fw-normal mt-5 mb-3">Repairer Information and Repair Reason</h3>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label text-muted">Name of Repairer</label>
-                                                <select class="form-select" name="supplierId" required>
-                                                    <option value="" disabled selected>Select a repair</option>
-                                                    <c:forEach var="supplier" items="${supplierList}">
-                                                        <option value="${supplier.supplierId}">${supplier.supplierName}</option>
-                                                    </c:forEach>
-                                                </select>
-                                                <div class="invalid-feedback">Please select a repairer.</div>
-                                            </div>
-                                            <!-- Đã loại bỏ trường Estimated Return Date -->
-                                            <div class="col-12">
-                                                <label class="form-label text-muted">Reason for Repair</label>
-                                                <textarea name="reason" rows="3" class="form-control" required></textarea>
-                                                <div class="invalid-feedback">Reason for repair cannot be empty.</div>
-                                            </div>
-                                        </div>
-
                                         <div class="mt-5 d-grid gap-2">
                                             <button type="submit" class="btn btn-dark btn-lg rounded-1">Submit Request</button>
                                             <a href="home" class="btn btn-outline-secondary btn-lg rounded-1">Back to Home</a>
@@ -163,18 +167,34 @@
             // Add new material row
             document.getElementById('addMaterial').addEventListener('click', function () {
                 const materialList = document.getElementById('materialList');
-                const firstRow = materialList.querySelector('.material-row');
-                const newRow = firstRow.cloneNode(true);
-
-                newRow.querySelectorAll('input').forEach(input => {
-                    input.value = (input.name === 'quantity' ? '1' : '');
-                });
-
-                // Update remove button in new row
-                const repairCostContainer = newRow.querySelector('.repair-cost-container');
-                const removeButton = repairCostContainer.querySelector('.remove-material');
-                repairCostContainer.appendChild(removeButton);
-
+                const newRow = document.createElement('div');
+                newRow.className = 'row material-row align-items-center gy-2';
+                newRow.innerHTML = `
+                    <div class="col-md-3">
+                        <label class="form-label text-muted">Material</label>
+                        <input type="text" class="form-control material-autocomplete" name="materialName" placeholder="Type material name or code" autocomplete="off">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity" value="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-muted">Damage Description</label>
+                        <input type="text" class="form-control" name="damageDescription" placeholder="Describe the damage">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-muted">Repairer</label>
+                        <select class="form-select" name="supplierId">
+                            <option value="" selected>Select repairer</option>
+                            <c:forEach var="supplier" items="${supplierList}">
+                                <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center">
+                        <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                    </div>
+                `;
                 materialList.appendChild(newRow);
                 setupAutocomplete(newRow.querySelector('.material-autocomplete'));
             });
@@ -186,78 +206,84 @@
                     const rows = document.querySelectorAll('.material-row');
                     if (rows.length > 1) {
                         removeBtn.closest('.material-row').remove();
+                    }
+                }
+            });
+
+            // Restore submitted data if there were validation errors
+            <c:if test="${not empty submittedMaterialNames}">
+                const submittedMaterialNames = [
+                    <c:forEach var="materialName" items="${submittedMaterialNames}" varStatus="status">
+                        "${fn:escapeXml(materialName)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                const submittedQuantities = [
+                    <c:forEach var="quantity" items="${submittedQuantities}" varStatus="status">
+                        "${fn:escapeXml(quantity)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                const submittedDamageDescriptions = [
+                    <c:forEach var="damageDescription" items="${submittedDamageDescriptions}" varStatus="status">
+                        "${fn:escapeXml(damageDescription)}"<c:if test="${!status.last}">,</c:if>
+                    </c:forEach>
+                ];
+                
+                // Restore data to existing rows
+                const materialList = document.getElementById('materialList');
+                const existingRows = materialList.querySelectorAll('.material-row');
+                
+                for (let i = 0; i < submittedMaterialNames.length; i++) {
+                    if (i < existingRows.length) {
+                        // Use existing row
+                        const row = existingRows[i];
+                        row.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
+                        row.querySelector('input[name="quantity"]').value = submittedQuantities[i];
+                        row.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
                     } else {
-                        alert("At least one material is required.");
+                        // Create new rows if needed
+                        const newRow = document.createElement('div');
+                        newRow.className = 'row material-row align-items-center gy-2';
+                        newRow.innerHTML = `
+                            <div class="col-md-3">
+                                <label class="form-label text-muted">Material</label>
+                                <input type="text" class="form-control material-autocomplete" name="materialName" placeholder="Type material name or code" autocomplete="off">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted">Quantity</label>
+                                <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity" value="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-muted">Damage Description</label>
+                                <input type="text" class="form-control" name="damageDescription" placeholder="Describe the damage">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label text-muted">Repairer</label>
+                                <select class="form-select" name="supplierId">
+                                    <option value="" selected>Select repairer</option>
+                                    <c:forEach var="supplier" items="${supplierList}">
+                                        <option value="${supplier.supplierId}">${supplier.supplierName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-center">
+                                <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
+                            </div>
+                        `;
+                        materialList.appendChild(newRow);
+                        
+                        // Set values
+                        newRow.querySelector('input[name="materialName"]').value = submittedMaterialNames[i];
+                        newRow.querySelector('input[name="quantity"]').value = submittedQuantities[i];
+                        newRow.querySelector('input[name="damageDescription"]').value = submittedDamageDescriptions[i];
+                        
+                        // Setup autocomplete
+                        setupAutocomplete(newRow.querySelector('.material-autocomplete'));
                     }
                 }
-            });
+            </c:if>
 
-            // Form validation
-            document.getElementById('repairForm').addEventListener('submit', function (e) {
-                let isValid = true;
-
-                // Reset validation styles
-                document.querySelectorAll('.form-control, .form-select').forEach(input => {
-                    input.classList.remove('is-invalid');
-                });
-                document.querySelectorAll('.invalid-feedback').forEach(feedback => {
-                    feedback.style.display = 'none';
-                });
-
-                // Validate supplier
-                const supplierId = document.querySelector('select[name="supplierId"]').value;
-                if (!supplierId) {
-                    document.querySelector('select[name="supplierId"]').classList.add('is-invalid');
-                    document.querySelector('select[name="supplierId"]').nextElementSibling.style.display = 'block';
-                    isValid = false;
-                }
-
-                // Validate reason
-                const reason = document.querySelector('textarea[name="reason"]').value.trim();
-                if (!reason) {
-                    document.querySelector('textarea[name="reason"]').classList.add('is-invalid');
-                    document.querySelector('textarea[name="reason"]').nextElementSibling.style.display = 'block';
-                    isValid = false;
-                }
-
-                // Validate material inputs
-                const materialInputs = document.querySelectorAll('.material-autocomplete');
-                for (let input of materialInputs) {
-                    if (!input.value.trim()) {
-                        input.classList.add('is-invalid');
-                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Material name cannot be left blank.</div>');
-                        isValid = false;
-                    } else if (!availableMaterials.includes(input.value)) {
-                        input.classList.add('is-invalid');
-                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Please select a valid material name from the suggestions.</div>');
-                        isValid = false;
-                    }
-                }
-
-                // Validate quantity inputs
-                const quantityInputs = document.querySelectorAll('input[name="quantity"]');
-                for (let input of quantityInputs) {
-                    if (!input.value || input.value < 1) {
-                        input.classList.add('is-invalid');
-                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Quantity must be at least 1.</div>');
-                        isValid = false;
-                    }
-                }
-
-                // Validate damage description inputs
-                const damageInputs = document.querySelectorAll('input[name="damageDescription"]');
-                for (let input of damageInputs) {
-                    if (!input.value.trim()) {
-                        input.classList.add('is-invalid');
-                        input.insertAdjacentHTML('afterend', '<div class="invalid-feedback">Damage description cannot be left blank.</div>');
-                        isValid = false;
-                    }
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
+            // Remove client-side validation - let server handle all validation
+            // Form will submit directly to server for Java validation
         </script>
     </body>
 </html>
