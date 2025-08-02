@@ -197,6 +197,25 @@
                 font-size: 1rem;
                 opacity: 1 !important;
             }
+            /* Autocomplete styling */
+            .ui-autocomplete {
+                max-height: 200px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                background-color: #fff;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                z-index: 1000;
+            }
+            .ui-menu-item {
+                padding: 8px 12px;
+                font-size: 1rem;
+                cursor: pointer;
+            }
+            .ui-menu-item:hover {
+                background-color: #f8f9fa;
+            }
         </style>
     </head>
     <body>
@@ -224,65 +243,112 @@
                                 <div class="alert alert-success">${success}</div>
                             </c:if>
 
-                            <!-- Add Material Form -->
-                            <h3 class="fw-normal mb-3">Add Material to Import List</h3>
-                            <form id="addMaterialForm" action="ImportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
-                                <input type="hidden" name="action" value="add">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label for="materialName" class="form-label text-muted">Material</label>
-                                        <input type="text" id="materialName" name="materialName" class="form-control" required placeholder="Type material name or code" autocomplete="off">
-                                        <input type="hidden" name="materialId" id="materialId">
-                                        <div class="invalid-feedback">Please enter a valid material name or code.</div>
-                                        <c:if test="${not empty formErrors['materialId']}">
-                                            <div class="text-danger small mt-1">${formErrors['materialId']}</div>
+                            <!-- Load from Purchase Order Section - Hide when using manual input -->
+                            <c:if test="${empty usingManualInput}">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Load from Purchase Order (Auto-render)</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-3">Type purchase order code or request code to automatically load materials for import:</p>
+                                        <form action="ImportMaterial" method="post" class="mb-3">
+                                            <input type="hidden" name="action" value="loadFromPurchaseOrder">
+                                            <div class="row g-3">
+                                                <div class="col-md-8">
+                                                    <label for="purchaseOrderName" class="form-label">Purchase Order</label>
+                                                    <input type="text" id="purchaseOrderName" name="purchaseOrderName" class="form-control" placeholder="Type PO code or request code" autocomplete="off">
+                                                    <input type="hidden" name="purchaseOrderId" id="purchaseOrderId">
+                                                    <div class="invalid-feedback">Please enter a valid purchase order code or request code.</div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">&nbsp;</label>
+                                                    <button type="submit" class="btn btn-primary w-100" disabled id="loadPoBtn">
+                                                        <i class="fas fa-download me-2"></i>Load Materials
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <c:if test="${not empty selectedPurchaseOrderId}">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Materials loaded from Purchase Order. You can now proceed with the import.
+                                            </div>
                                         </c:if>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="quantity" class="form-label text-muted">Quantity</label>
-                                        <input type="number" name="quantity" id="quantity" class="form-control" min="1" required placeholder="Qty">
-                                        <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
-                                        <c:if test="${not empty formErrors['quantity']}">
-                                            <div class="text-danger small mt-1">${formErrors['quantity']}</div>
-                                        </c:if>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="unitPrice" class="form-label text-muted">Unit Price ($)</label>
-                                        <input type="number" name="unitPrice" id="unitPrice" class="form-control" min="0" step="0.01" required placeholder="Unit Price ($)">
-                                        <c:if test="${not empty formErrors['unitPrice']}">
-                                            <div class="text-danger small mt-1">${formErrors['unitPrice']}</div>
-                                        </c:if>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="totalValue" class="form-label text-muted">Total Value</label>
-                                        <input type="text" id="totalValue" class="form-control" readonly placeholder="Auto">
-                                    </div>
-                                    <div class="col-12 mt-4">
-                                        <button type="submit" class="btn btn-dark btn-lg rounded-1 w-100">
-                                            <i class="fas fa-plus-circle me-2"></i>Add to Import List
-                                        </button>
                                     </div>
                                 </div>
-                            </form>
+                            </c:if>
+
+                            <!-- Add Material Form - Only show when no PO is selected -->
+                            <c:if test="${empty selectedPurchaseOrderId}">
+                                <h3 class="fw-normal mb-3">Add Material to Import List</h3>
+                                <form id="addMaterialForm" action="ImportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
+                                    <input type="hidden" name="action" value="add">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label for="materialName" class="form-label text-muted">Material</label>
+                                            <input type="text" id="materialName" name="materialName" class="form-control" required placeholder="Type material name or code" autocomplete="off">
+                                            <input type="hidden" name="materialId" id="materialId">
+                                            <div class="invalid-feedback">Please enter a valid material name or code.</div>
+                                            <c:if test="${not empty formErrors['materialId']}">
+                                                <div class="text-danger small mt-1">${formErrors['materialId']}</div>
+                                            </c:if>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="quantity" class="form-label text-muted">Quantity</label>
+                                            <input type="number" name="quantity" id="quantity" class="form-control" min="1" required placeholder="Qty">
+                                            <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
+                                            <c:if test="${not empty formErrors['quantity']}">
+                                                <div class="text-danger small mt-1">${formErrors['quantity']}</div>
+                                            </c:if>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="unitPrice" class="form-label text-muted">Unit Price ($)</label>
+                                            <input type="number" name="unitPrice" id="unitPrice" class="form-control" min="0" step="0.01" required placeholder="Unit Price ($)">
+                                            <c:if test="${not empty formErrors['unitPrice']}">
+                                                <div class="text-danger small mt-1">${formErrors['unitPrice']}</div>
+                                            </c:if>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="totalValue" class="form-label text-muted">Total Value</label>
+                                            <input type="text" id="totalValue" class="form-control" readonly placeholder="Auto">
+                                        </div>
+                                        <div class="col-12 mt-4">
+                                            <button type="submit" class="btn btn-dark btn-lg rounded-1 w-100">
+                                                <i class="fas fa-plus-circle me-2"></i>Add to Import List
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </c:if>
 
                             <!-- Current Import List -->
-                            <h3 class="fw-normal mb-3">Current Import List</h3>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="fw-normal mb-0">Current Import List</h3>
+                                <c:if test="${not empty importDetails}">
+                                    <form action="ImportMaterial" method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="reset">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-refresh me-1"></i>Reset Form
+                                        </button>
+                                    </form>
+                                </c:if>
+                            </div>
                             <c:if test="${not empty importDetails}">
                                 <div class="table-responsive">
                                     <table class="table align-middle text-center">
                                         <thead>
-                                            <tr>
-                                                <th style="width: 8%">Image</th>
-                                                <th style="width: 18%">Material</th>
-                                                <th style="width: 12%">Unit</th>
-                                                <th style="width: 15%">Category</th>
-                                                <th style="width: 10%">Quantity</th>
-                                                <th style="width: 15%">Price</th>
-                                                <th style="width: 12%">Value</th>
-                                                <th style="width: 10%">Status</th>
-                                                <th style="width: 8%">Stock</th>
-                                                <th style="width: 5%">Action</th>
-                                            </tr>
+                                                                                         <tr>
+                                                 <th style="width: 8%">Image</th>
+                                                 <th style="width: 18%">Material</th>
+                                                 <th style="width: 12%">Unit</th>
+                                                 <th style="width: 15%">Category</th>
+                                                 <th style="width: 10%">Quantity</th>
+                                                 <th style="width: 15%">Price</th>
+                                                 <th style="width: 12%">Value</th>
+                                                 <th style="width: 10%">Supplier</th>
+                                                 <th style="width: 8%">Stock</th>
+                                                 <th style="width: 5%">Action</th>
+                                             </tr>
                                         </thead>
                                         <tbody>
                                             <c:forEach var="detail" items="${importDetails}">
@@ -330,20 +396,19 @@
                                                             </button>
                                                         </form>
                                                     </td>
-                                                    <td><strong>$<fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" minFractionDigits="2"/></strong></td>
-                                                    <td>
-                                                        <c:choose>
-                                                            <c:when test="${materialMap[detail.materialId].materialStatus == 'new'}">
-                                                                <span style="color: #000; font-weight: 600;">New</span>
-                                                            </c:when>
-                                                            <c:when test="${materialMap[detail.materialId].materialStatus == 'used'}">
-                                                                <span style="color: #000; font-weight: 600;">Used</span>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <span style="color: #000; font-weight: 600;">Damaged</span>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </td>
+                                                                                                         <td><strong>$<fmt:formatNumber value="${detail.unitPrice * detail.quantity}" type="number" minFractionDigits="2"/></strong></td>
+                                                     <td>
+                                                         <c:if test="${not empty selectedSupplierId}">
+                                                             <c:forEach var="supplier" items="${suppliers}">
+                                                                 <c:if test="${supplier.supplierId == selectedSupplierId}">
+                                                                     <span style="color: #000; font-weight: 600;">${supplier.supplierName}</span>
+                                                                 </c:if>
+                                                             </c:forEach>
+                                                         </c:if>
+                                                         <c:if test="${empty selectedSupplierId}">
+                                                             <span style="color: #666; font-style: italic;">Not set</span>
+                                                         </c:if>
+                                                     </td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${stockMap[detail.materialId] > 50}">
@@ -405,63 +470,36 @@
                                 </div>
                             </c:if>
 
-                            <h3 class="fw-normal mb-3 mt-5">Confirm Import</h3>
-                            <c:if test="${not empty formErrors}">
-                                <div class="alert alert-danger">
-                                    <ul class="mb-0">
-                                        <c:forEach var="err" items="${formErrors.values()}">
-                                            <li>${err}</li>
-                                            </c:forEach>
-                                    </ul>
-                                </div>
-                            </c:if>
-                            <form id="confirmImportForm" action="ImportMaterial" method="post" onsubmit="return validateConfirmForm()">
-                                <input type="hidden" name="action" value="import">
-                                <div class="row g-4"> <!-- Increased gap for better spacing -->
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted">Supplier</label>
-                                        <input type="text" id="supplierName" name="supplierName" class="form-control" list="supplierList" required placeholder="Type Or Select Supplier">
-                                        <input type="hidden" name="supplierId" id="supplierId">
-                                        <datalist id="supplierList">
-                                            <c:forEach var="supplier" items="${suppliers}">
-                                                <option value="${supplier.supplierName}" data-id="${supplier.supplierId}"></option>
-                                            </c:forEach>
-                                        </datalist>
-                                        <div class="invalid-feedback">Please select a valid supplier.</div>
-                                        <c:if test="${not empty formErrors['supplierId']}">
-                                            <div class="text-danger small mt-1">${formErrors['supplierId']}</div>
-                                        </c:if>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted">Destination</label>
-                                        <input type="text" id="destination" name="destination" class="form-control<c:if test='${not empty formErrors["destination"]}'> is-invalid</c:if>" value="${param.destination}">
-                                            <div class="invalid-feedback" id="destinationError">
-                                            <c:choose>
-                                                <c:when test="${not empty formErrors['destination']}">
-                                                    ${formErrors['destination']}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Please enter a destination (max 100 characters).
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="actualArrival" id="actualArrivalField">
-                                    <div class="col-md-12">
-                                        <label class="form-label text-muted">Notes</label>
-                                        <input type="text" name="note" class="form-control" placeholder="Enter Note" value="${param.note}">
-                                        <c:if test="${not empty formErrors['note']}">
-                                            <div class="text-danger small mt-1">${formErrors['note']}</div>
-                                        </c:if>
-                                    </div>
-                                    <div class="col-12 mt-4">
-                                        <div class="d-grid gap-2">
-                                            <button type="submit" class="btn btn-dark btn-lg rounded-1">Confirm Import</button>
-                                            <a href="StaticInventory" class="btn btn-outline-secondary btn-lg rounded-1">Back to Inventory</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                                                         <h3 class="fw-normal mb-3 mt-5">Confirm Import</h3>
+                             <c:if test="${not empty formErrors}">
+                                 <div class="alert alert-danger">
+                                     <ul class="mb-0">
+                                         <c:forEach var="err" items="${formErrors.values()}">
+                                             <li>${err}</li>
+                                             </c:forEach>
+                                     </ul>
+                                 </div>
+                             </c:if>
+                             <form id="confirmImportForm" action="ImportMaterial" method="post" onsubmit="return validateConfirmForm()">
+                                 <input type="hidden" name="action" value="import">
+                                 <input type="hidden" name="supplierId" id="supplierId" value="${selectedSupplierId}">
+                                 <input type="hidden" name="actualArrival" id="actualArrivalField">
+                                 <div class="row g-4">
+                                     <div class="col-md-12">
+                                         <label class="form-label text-muted">Notes</label>
+                                         <input type="text" name="note" class="form-control" placeholder="Enter Note" value="${param.note}">
+                                         <c:if test="${not empty formErrors['note']}">
+                                             <div class="text-danger small mt-1">${formErrors['note']}</div>
+                                         </c:if>
+                                     </div>
+                                     <div class="col-12 mt-4">
+                                         <div class="d-grid gap-2">
+                                             <button type="submit" class="btn btn-dark btn-lg rounded-1">Confirm Import</button>
+                                             <a href="StaticInventory" class="btn btn-outline-secondary btn-lg rounded-1">Back to Inventory</a>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </form>
                         </c:if>
                     </div>
                 </div>
@@ -511,18 +549,31 @@
                                 });
 
                                 function calculateTotal() {
-                                    const quantity = document.querySelector('input[name="quantity"]').value;
-                                    const unitPrice = document.querySelector('input[name="unitPrice"]').value;
+                                    const quantityInput = document.querySelector('input[name="quantity"]');
+                                    const unitPriceInput = document.querySelector('input[name="unitPrice"]');
                                     const totalField = document.getElementById('totalValue');
-                                    if (quantity && unitPrice) {
-                                        const total = (parseInt(quantity) * parseFloat(unitPrice)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                        totalField.value = '$' + total;
-                                    } else {
-                                        totalField.value = '';
+                                    
+                                    if (quantityInput && unitPriceInput && totalField) {
+                                        const quantity = quantityInput.value;
+                                        const unitPrice = unitPriceInput.value;
+                                        if (quantity && unitPrice) {
+                                            const total = (parseInt(quantity) * parseFloat(unitPrice)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                            totalField.value = '$' + total;
+                                        } else {
+                                            totalField.value = '';
+                                        }
                                     }
                                 }
-                                document.querySelector('input[name="quantity"]').addEventListener('input', calculateTotal);
-                                document.querySelector('input[name="unitPrice"]').addEventListener('input', calculateTotal);
+                                
+                                // Only add event listeners if the form elements exist
+                                const quantityInput = document.querySelector('input[name="quantity"]');
+                                const unitPriceInput = document.querySelector('input[name="unitPrice"]');
+                                if (quantityInput) {
+                                    quantityInput.addEventListener('input', calculateTotal);
+                                }
+                                if (unitPriceInput) {
+                                    unitPriceInput.addEventListener('input', calculateTotal);
+                                }
 
                                 function validateAddForm() {
                                     const form = document.getElementById('addMaterialForm');
@@ -562,102 +613,131 @@
                                 }
 
                                 function validateConfirmForm() {
-                                    const form = document.getElementById('confirmImportForm');
-                                    let isValid = true;
-                                    const supplierNameInput = form.querySelector('input[name="supplierName"]');
-                                    const supplierIdInput = form.querySelector('input[name="supplierId"]');
-                                    const destination = form.querySelector('input[name="destination"]');
-                                    const destinationOther = form.querySelector('input[name="destinationOther"]');
-
-                                    if (!supplierNameInput.value.trim()) {
-                                        supplierNameInput.classList.add('is-invalid');
-                                        isValid = false;
-                                    } else {
-                                        supplierNameInput.classList.remove('is-invalid');
+                                    const supplierIdInput = document.querySelector('input[name="supplierId"]');
+                                    if (!supplierIdInput || !supplierIdInput.value) {
+                                        alert('Please select a Purchase Order first to set the supplier.');
+                                        return false;
                                     }
-                                    if (!supplierIdInput.value) {
-                                        supplierIdInput.classList.add('is-invalid');
-                                        isValid = false;
-                                    } else {
-                                        supplierIdInput.classList.remove('is-invalid');
-                                    }
-
-                                    if (destination && destination.value === 'other') {
-                                        if (!destinationOther.value.trim()) {
-                                            destinationOther.classList.add('is-invalid');
-                                            isValid = false;
-                                        } else {
-                                            destinationOther.classList.remove('is-invalid');
-                                        }
-                                    } else if (destination) {
-                                        destination.classList.remove('is-invalid');
-                                    }
-                                    return isValid;
+                                    return true;
                                 }
         </script>
         <script>
-            // Supplier and material autocomplete logic (consolidated, no duplicates)
+            // Material autocomplete - only when form exists
             $(function() {
-            var materials = [
-            <c:forEach var="material" items="${materials}" varStatus="loop">
-            {
-            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
-                    value: "${fn:escapeXml(material.materialName)}",
-                    id: "${material.materialId}",
-                    name: "${fn:escapeXml(material.materialName)}",
-                    code: "${fn:escapeXml(material.materialCode)}"
-            }${loop.last ? '' : ','}
-            </c:forEach>
-            ];
-                    $("#materialName").autocomplete({
-            source: function(request, response) {
-            var term = request.term.toLowerCase();
-                    var matches = materials.filter(function(material) {
-                    return material.name.toLowerCase().includes(term) || material.code.toLowerCase().includes(term);
-                    });
-                    response(matches);
-            },
-                    select: function(event, ui) {
-                    $("#materialId").val(ui.item.id);
+                var materialNameInput = $("#materialName");
+                if (materialNameInput.length > 0) {
+                    var materials = [
+                        <c:forEach var="material" items="${materials}" varStatus="loop">
+                        {
+                            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+                            value: "${fn:escapeXml(material.materialName)}",
+                            id: "${material.materialId}",
+                            name: "${fn:escapeXml(material.materialName)}",
+                            code: "${fn:escapeXml(material.materialCode)}"
+                        }${loop.last ? '' : ','}
+                        </c:forEach>
+                    ];
+                    
+                    materialNameInput.autocomplete({
+                        source: function(request, response) {
+                            var term = request.term.toLowerCase();
+                            var matches = materials.filter(function(material) {
+                                return material.name.toLowerCase().includes(term) || 
+                                       material.code.toLowerCase().includes(term);
+                            });
+                            response(matches);
+                        },
+                        select: function(event, ui) {
+                            $("#materialId").val(ui.item.id);
                             $("#materialName").val(ui.item.name);
                             $("#materialName").removeClass('is-invalid');
+                        },
+                        change: function(event, ui) {
+                            if (!ui.item) {
+                                var inputValue = $("#materialName").val().toLowerCase().trim();
+                                var selectedMaterial = materials.find(function(material) {
+                                    return material.name.toLowerCase() === inputValue || 
+                                           material.code.toLowerCase() === inputValue;
+                                });
+                                if (selectedMaterial) {
+                                    $("#materialId").val(selectedMaterial.id);
+                                    $("#materialName").val(selectedMaterial.name);
+                                    $("#materialName").removeClass('is-invalid');
+                                } else {
+                                    $("#materialId").val('');
+                                    $("#materialName").addClass('is-invalid');
+                                }
+                            }
+                        },
+                        minLength: 1
+                    });
+                }
+            });
+
+            // Purchase Order autocomplete
+            var purchaseOrdersData = [
+                <c:forEach var="po" items="${sentToSupplierOrders}" varStatus="loop">
+                {
+                    label: "${fn:escapeXml(po.poCode)} - ${fn:escapeXml(po.purchaseRequestCode)} (${fn:escapeXml(po.createdByName)})",
+                    value: "${fn:escapeXml(po.poCode)}",
+                    id: "${po.poId}",
+                    poCode: "${fn:escapeXml(po.poCode)}",
+                    requestCode: "${fn:escapeXml(po.purchaseRequestCode)}",
+                    createdByName: "${fn:escapeXml(po.createdByName)}"
+                }${loop.last ? '' : ','}
+                </c:forEach>
+            ];
+            
+            var purchaseOrderNameInput = $("#purchaseOrderName");
+            if (purchaseOrderNameInput.length > 0) {
+                purchaseOrderNameInput.autocomplete({
+                    source: function(request, response) {
+                        var term = request.term.toLowerCase();
+                        var matches = purchaseOrdersData.filter(function(po) {
+                            return po.poCode.toLowerCase().includes(term) || 
+                                   po.requestCode.toLowerCase().includes(term) ||
+                                   po.createdByName.toLowerCase().includes(term);
+                        });
+                        response(matches);
+                    },
+                    select: function(event, ui) {
+                        $("#purchaseOrderId").val(ui.item.id);
+                        $("#purchaseOrderName").val(ui.item.poCode + " - " + ui.item.requestCode + " (" + ui.item.createdByName + ")");
+                        $("#purchaseOrderName").removeClass('is-invalid');
+                        $("#loadPoBtn").prop('disabled', false);
                     },
                     change: function(event, ui) {
-                    if (!ui.item) {
-                    var inputValue = $("#materialName").val().toLowerCase().trim();
-                            var selectedMaterial = materials.find(function(material) {
-                            return material.name.toLowerCase() === inputValue || material.code.toLowerCase() === inputValue;
+                        if (!ui.item) {
+                            var inputValue = $("#purchaseOrderName").val().toLowerCase().trim();
+                            var selectedPO = purchaseOrdersData.find(function(po) {
+                                return po.poCode.toLowerCase() === inputValue || 
+                                       po.requestCode.toLowerCase() === inputValue;
                             });
-                            if (selectedMaterial) {
-                    $("#materialId").val(selectedMaterial.id);
-                            $("#materialName").val(selectedMaterial.name);
-                            $("#materialName").removeClass('is-invalid');
-                    } else {
-                    $("#materialId").val('');
-                            $("#materialName").addClass('is-invalid');
-                    }
-                    }
+                            if (selectedPO) {
+                                $("#purchaseOrderId").val(selectedPO.id);
+                                $("#purchaseOrderName").val(selectedPO.poCode + " - " + selectedPO.requestCode + " (" + selectedPO.createdByName + ")");
+                                $("#purchaseOrderName").removeClass('is-invalid');
+                                $("#loadPoBtn").prop('disabled', false);
+                            } else {
+                                $("#purchaseOrderId").val('');
+                                $("#purchaseOrderName").addClass('is-invalid');
+                                $("#loadPoBtn").prop('disabled', true);
+                            }
+                        }
                     },
                     minLength: 1
-            });
-                    var supplierNameInput = document.getElementById('supplierName');
-                    var supplierIdInput = document.getElementById('supplierId');
-                    var supplierList = document.getElementById('supplierList');
-                    if (supplierNameInput && supplierIdInput && supplierList) {
-            supplierNameInput.addEventListener('input', function() {
-            var inputValue = supplierNameInput.value.toLowerCase().trim();
-                    var options = supplierList.querySelectorAll('option');
-                    var selectedOption = Array.from(options).find(function(option) {
-            return option.value.toLowerCase() === inputValue;
-            });
-                    supplierIdInput.value = selectedOption ? selectedOption.getAttribute('data-id') : '';
-                    if (!selectedOption) {
-            supplierNameInput.classList.add('is-invalid');
-            } else {
-            supplierNameInput.classList.remove('is-invalid');
+                });
             }
-            });
-            }
+            
+            // Purchase Order selection handling
+            $(document).ready(function() {
+                var purchaseOrderNameInput = $('#purchaseOrderName');
+                var loadPoBtn = $('#loadPoBtn');
+                
+                purchaseOrderNameInput.on('input', function() {
+                    var hasValue = $(this).val().trim() !== '';
+                    loadPoBtn.prop('disabled', !hasValue);
+                });
             });
         </script>
     </body>

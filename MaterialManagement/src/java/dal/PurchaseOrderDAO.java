@@ -421,6 +421,63 @@ public class PurchaseOrderDAO extends DBContext {
         }
     }
 
+    public List<PurchaseOrder> getPurchaseOrdersByStatus(String status) {
+        List<PurchaseOrder> orders = new ArrayList<>();
+        
+        Connection conn = getConnection();
+        if (conn == null) {
+            return orders;
+        }
+
+        String sql = "SELECT po.*, u1.full_name AS created_by_name, u2.full_name AS approved_by_name, "
+                + "pr.request_code AS purchase_request_code, "
+                + "COALESCE(SUM(pod.quantity * pod.unit_price), 0) AS total_amount "
+                + "FROM Purchase_Orders po "
+                + "JOIN Users u1 ON po.created_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON po.approved_by = u2.user_id "
+                + "JOIN Purchase_Requests pr ON po.purchase_request_id = pr.purchase_request_id "
+                + "LEFT JOIN Purchase_Order_Details pod ON po.po_id = pod.po_id "
+                + "WHERE po.disable = 0 AND po.status = ? "
+                + "GROUP BY po.po_id "
+                + "ORDER BY po.created_at DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                PurchaseOrder order = mapResultSetToPurchaseOrder(rs);
+                orders.add(order);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching purchase orders by status: " + e.getMessage(), e);
+        }
+        return orders;
+    }
+
+    public int getPurchaseOrderIdByCodeOrRequest(String searchTerm) {
+        int poId = 0;
+        Connection conn = getConnection();
+        if (conn == null) {
+            return poId;
+        }
+        String sql = "SELECT po.po_id FROM Purchase_Orders po "
+                + "JOIN Purchase_Requests pr ON po.purchase_request_id = pr.purchase_request_id "
+                + "WHERE po.disable = 0 AND po.status = 'sent_to_supplier' "
+                + "AND (po.po_code = ? OR pr.request_code = ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, searchTerm);
+            ps.setString(2, searchTerm);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                poId = rs.getInt("po_id");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching purchase order ID by code or request: " + e.getMessage(), e);
+        }
+        return poId;
+    }
+
     public java.sql.Connection getConnection() {
         return connection;
     }
