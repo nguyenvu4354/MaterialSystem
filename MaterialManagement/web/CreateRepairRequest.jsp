@@ -121,7 +121,7 @@
                                                     <c:if test="${not empty errors.supplierId}">
                                                         <div class="text-danger small mt-1">${errors.supplierId}</div>
                                                     </c:if>
-                                                </div>
+                                                    </div>
                                                 <div class="col-md-1 d-flex align-items-center">
                                                     <button type="button" class="btn btn-outline-danger remove-material">Remove</button>
                                                 </div>
