@@ -165,6 +165,10 @@
                             <option value="sent_to_supplier" ${status == 'sent_to_supplier' ? 'selected' : ''}>Sent to Supplier</option>
                             <option value="cancelled" ${status == 'cancelled' ? 'selected' : ''}>Cancelled</option>
                         </select>
+                        <select class="form-select" name="sortBy" style="max-width:150px;" onchange="this.form.submit()">
+                            <option value="" ${sortBy == null || sortBy == '' ? 'selected' : ''}>Newest First</option>
+                            <option value="oldest" ${sortBy == 'oldest' ? 'selected' : ''}>Oldest First</option>
+                        </select>
                         <input type="date" class="form-control" name="startDate" value="${startDate}" placeholder="Start Date" style="width:200px;">
                         <input type="date" class="form-control" name="endDate" value="${endDate}" placeholder="End Date" style="width:200px;">
                         <button type="submit" class="btn" style="background-color: #DEAD6F; border-color: #DEAD6F; color:white;">Filter</button>
@@ -244,19 +248,19 @@
                         <nav aria-label="Purchase Order pagination">
                             <ul class="pagination justify-content-center">
                                 <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage - 1}&status=${status}&poCode=${poCode}&sortBy=${sortBy}&startDate=${startDate}&endDate=${endDate}">
                                         Previous
                                     </a>
                                 </li>
                                 
                                 <c:forEach begin="1" end="${totalPages}" var="i">
                                     <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                        <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">${i}</a>
+                                        <a class="page-link" href="PurchaseOrderList?page=${i}&status=${status}&poCode=${poCode}&sortBy=${sortBy}&startDate=${startDate}&endDate=${endDate}">${i}</a>
                                     </li>
                                 </c:forEach>
                                 
                                 <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&startDate=${startDate}&endDate=${endDate}">
+                                    <a class="page-link" href="PurchaseOrderList?page=${currentPage + 1}&status=${status}&poCode=${poCode}&sortBy=${sortBy}&startDate=${startDate}&endDate=${endDate}">
                                         Next
                                     </a>
                                 </li>

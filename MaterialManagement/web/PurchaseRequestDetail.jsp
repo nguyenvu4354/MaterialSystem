@@ -152,8 +152,6 @@
                                 <th>Material ID</th>
                                 <th>Material Name</th>
                                 <th>Image</th>
-                                <th>Category</th>
-                                <th>Unit</th>
                                 <th>Quantity</th>
                                 <th>Notes</th>
                                 <th>Created</th>
@@ -172,8 +170,6 @@
                                             ${materialImages[detail.materialId]}
                                         </span>
                                     </td>
-                                    <td>${materialCategories[detail.materialId]}</td>
-                                    <td>${materialUnits[detail.materialId]}</td>
                                     <td>${detail.quantity}</td>
                                     <td>
                                         <c:choose>
