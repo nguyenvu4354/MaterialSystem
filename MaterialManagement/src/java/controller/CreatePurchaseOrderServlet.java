@@ -60,7 +60,9 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
         }
 
         try {
-            String poCode = "PO" + System.currentTimeMillis(); // Temporary code for display
+            // Generate proper PO code using DAO method
+            PurchaseOrderDAO purchaseOrderDAO = new PurchaseOrderDAO();
+            String poCode = purchaseOrderDAO.generateNextPOCode();
             List<PurchaseRequest> purchaseRequests = purchaseRequestDAO.getApprovedPurchaseRequests();
             List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
             List<Supplier> suppliers = supplierDAO.getAllSuppliers();
@@ -147,8 +149,8 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 List<Material> materials = materialDAO.searchMaterials(null, null, 1, 1000, "name_asc");
                 List<Supplier> suppliersList = supplierDAO.getAllSuppliers();
                 
-                // Always generate a new PO code for retry
-                String newPoCode = "PO" + System.currentTimeMillis(); // Temporary code for display
+                // Generate proper PO code using DAO method
+                String newPoCode = purchaseOrderDAO.generateNextPOCode();
                 
                 // Preserve form data for retry
                 request.setAttribute("poCode", newPoCode);
@@ -281,23 +283,22 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 createdOrders.addAll(purchaseOrdersToCreate);
                 
                 // Send notifications for all created orders
+                int poIndex = 0;
                 for (Map.Entry<Integer, List<entity.PurchaseOrderDetail>> entry : supplierGroups.entrySet()) {
                     int supplierId = entry.getKey();
                     List<entity.PurchaseOrderDetail> supplierDetails = entry.getValue();
                     
-                    // Find the corresponding purchase order
-                    entity.PurchaseOrder purchaseOrder = createdOrders.stream()
-                        .filter(po -> po.getPurchaseRequestId() == purchaseRequestId)
-                        .findFirst()
-                        .orElse(null);
-                    
-                    if (purchaseOrder != null) {
+                    // Get the corresponding purchase order by index
+                    if (poIndex < createdOrders.size()) {
+                        entity.PurchaseOrder purchaseOrder = createdOrders.get(poIndex);
+                        
                         try {
                             sendPurchaseOrderNotification(purchaseOrder, supplierDetails, purchaseRequest, currentUser);
                         } catch (Exception e) {
                             System.err.println("Error sending purchase order notification: " + e.getMessage());
                             e.printStackTrace();
                         }
+                        poIndex++;
                     }
                 }
             } else {
@@ -333,7 +334,15 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
                 }
             }
             
-            String subject = "[Notification] New Purchase Order Created";
+            // Get supplier information from first detail (all details have same supplier)
+            SupplierDAO supplierDAO = new SupplierDAO();
+            Supplier supplier = null;
+            if (!details.isEmpty()) {
+                supplier = supplierDAO.getSupplierByID(details.get(0).getSupplierId());
+            }
+            String supplierName = (supplier != null) ? supplier.getSupplierName() : "N/A";
+            
+            String subject = "[Purchase Order] " + purchaseOrder.getPoCode() + " - " + supplierName;
             StringBuilder content = new StringBuilder();
             content.append("<html><body style='margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;'>");
             
@@ -359,15 +368,9 @@ public class CreatePurchaseOrderServlet extends HttpServlet {
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Submitted:</td><td style='padding: 8px 0; color: #333333;'>").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date())).append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Email:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getEmail() != null ? creator.getEmail() : "N/A").append("</td></tr>");
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Phone:</td><td style='padding: 8px 0; color: #333333;'>").append(creator.getPhoneNumber() != null ? creator.getPhoneNumber() : "N/A").append("</td></tr>");
-            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Purchase Request:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseRequest.getRequestCode()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Purchase Order:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getPoCode()).append("</td></tr>");
+            content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Based on PR:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseRequest.getRequestCode()).append("</td></tr>");
             
-            // Get supplier information from first detail (all details have same supplier)
-            SupplierDAO supplierDAO = new SupplierDAO();
-            Supplier supplier = null;
-            if (!details.isEmpty()) {
-                supplier = supplierDAO.getSupplierByID(details.get(0).getSupplierId());
-            }
-            String supplierName = (supplier != null) ? supplier.getSupplierName() : "N/A";
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Supplier:</td><td style='padding: 8px 0; color: #333333;'>").append(supplierName).append("</td></tr>");
             
             content.append("<tr><td style='padding: 8px 0; color: #000000; font-weight: bold;'>Reason:</td><td style='padding: 8px 0; color: #333333;'>").append(purchaseOrder.getNote() != null && !purchaseOrder.getNote().trim().isEmpty() ? purchaseOrder.getNote() : "No additional notes").append("</td></tr>");

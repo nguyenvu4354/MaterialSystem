@@ -346,39 +346,38 @@ public class PurchaseOrderDAO extends DBContext {
             conn = getConnection();
             conn.setAutoCommit(false);
             
-            for (PurchaseOrder purchaseOrder : purchaseOrders) {
-                String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-                try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    if (purchaseOrder.getPoCode() == null || purchaseOrder.getPoCode().isEmpty()) {
-                        purchaseOrder.setPoCode(generateNextPOCode());
-                    }
-                    ps.setString(1, purchaseOrder.getPoCode());
-                    ps.setInt(2, purchaseOrder.getPurchaseRequestId());
-                    ps.setInt(3, purchaseOrder.getCreatedBy());
-                    ps.setString(4, purchaseOrder.getStatus());
-                    ps.setString(5, purchaseOrder.getNote());
-                    int rowsAffected = ps.executeUpdate();
-                    if (rowsAffected == 0) {
-                        throw new SQLException("Creating purchase order failed, no rows affected.");
-                    }
-                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                        if (generatedKeys.next()) {
-                            int poId = generatedKeys.getInt(1);
-                            purchaseOrder.setPoId(poId); // Set the generated ID
-                            
-                            // Find the corresponding details for this PO
-                            List<PurchaseOrderDetail> details = null;
-                            for (List<PurchaseOrderDetail> detailList : supplierGroups.values()) {
-                                if (!detailList.isEmpty() && detailList.get(0).getSupplierId() != null) {
-                                    details = detailList;
-                                    break;
-                                }
-                            }
-                            
-                            if (details != null) {
+            int poIndex = 0;
+            for (Map.Entry<Integer, List<PurchaseOrderDetail>> entry : supplierGroups.entrySet()) {
+                int supplierId = entry.getKey();
+                List<PurchaseOrderDetail> supplierDetails = entry.getValue();
+                
+                // Get the corresponding purchase order for this supplier
+                if (poIndex < purchaseOrders.size()) {
+                    PurchaseOrder purchaseOrder = purchaseOrders.get(poIndex);
+                    
+                    String insertPOSql = "INSERT INTO Purchase_Orders (po_code, purchase_request_id, created_by, status, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                    try (PreparedStatement ps = conn.prepareStatement(insertPOSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                        if (purchaseOrder.getPoCode() == null || purchaseOrder.getPoCode().isEmpty()) {
+                            purchaseOrder.setPoCode(generateNextPOCode());
+                        }
+                        ps.setString(1, purchaseOrder.getPoCode());
+                        ps.setInt(2, purchaseOrder.getPurchaseRequestId());
+                        ps.setInt(3, purchaseOrder.getCreatedBy());
+                        ps.setString(4, purchaseOrder.getStatus());
+                        ps.setString(5, purchaseOrder.getNote());
+                        int rowsAffected = ps.executeUpdate();
+                        if (rowsAffected == 0) {
+                            throw new SQLException("Creating purchase order failed, no rows affected.");
+                        }
+                        try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int poId = generatedKeys.getInt(1);
+                                purchaseOrder.setPoId(poId); // Set the generated ID
+                                
+                                // Insert details for this supplier
                                 String insertDetailSql = "INSERT INTO Purchase_Order_Details (po_id, material_id, category_id, quantity, unit_price, supplier_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
                                 try (PreparedStatement detailPs = conn.prepareStatement(insertDetailSql)) {
-                                    for (PurchaseOrderDetail detail : details) {
+                                    for (PurchaseOrderDetail detail : supplierDetails) {
                                         detailPs.setInt(1, poId);
                                         detailPs.setInt(2, detail.getMaterialId());
                                         detailPs.setInt(3, detail.getCategoryId());
@@ -395,11 +394,12 @@ public class PurchaseOrderDAO extends DBContext {
                                         }
                                     }
                                 }
+                            } else {
+                                throw new SQLException("Creating purchase order failed, no ID obtained.");
                             }
-                        } else {
-                            throw new SQLException("Creating purchase order failed, no ID obtained.");
                         }
                     }
+                    poIndex++;
                 }
             }
             
