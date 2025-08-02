@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PurchaseRequestDAO extends DBContext {
 
-    public int countPurchaseRequest(String keyword, String status, String startDate, String endDate) {
+    public int countPurchaseRequest(String keyword, String status) {
         int total = 0;
         try {
             StringBuilder sql = new StringBuilder();
@@ -32,16 +32,6 @@ public class PurchaseRequestDAO extends DBContext {
                 params.add(status);
             }
 
-            if (startDate != null && !startDate.isEmpty()) {
-                sql.append("AND DATE(pr.request_date) >= ? ");
-                params.add(startDate);
-            }
-
-            if (endDate != null && !endDate.isEmpty()) {
-                sql.append("AND DATE(pr.request_date) <= ? ");
-                params.add(endDate);
-            }
-
             PreparedStatement ps = connection.prepareStatement(sql.toString());
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
@@ -57,7 +47,7 @@ public class PurchaseRequestDAO extends DBContext {
         return total;
     }
 
-    public List<PurchaseRequest> searchPurchaseRequest(String keyword, String status, String startDate, String endDate, int pageIndex, int pageSize, String sortOption) {
+    public List<PurchaseRequest> searchPurchaseRequest(String keyword, String status, int pageIndex, int pageSize, String sortOption) {
         List<PurchaseRequest> list = new ArrayList<>();
         try {
             StringBuilder sql = new StringBuilder();
@@ -74,16 +64,6 @@ public class PurchaseRequestDAO extends DBContext {
             if (status != null && !status.isEmpty()) {
                 sql.append("AND status = ? ");
                 params.add(status);
-            }
-
-            if (startDate != null && !startDate.isEmpty()) {
-                sql.append("AND DATE(request_date) >= ? ");
-                params.add(startDate);
-            }
-
-            if (endDate != null && !endDate.isEmpty()) {
-                sql.append("AND DATE(request_date) <= ? ");
-                params.add(endDate);
             }
 
             String sortBy = "request_date";
@@ -126,21 +106,10 @@ public class PurchaseRequestDAO extends DBContext {
                 }
             }
 
-            // For code sorting, we'll sort in Java to handle numeric order properly
-            if (sortOption != null && (sortOption.equals("code_asc") || sortOption.equals("code_desc"))) {
-                sql.append(" ORDER BY request_date DESC "); // Get all data first
-                sql.append("LIMIT 1000 OFFSET 0 "); // Get more data for sorting
-            } else {
-                sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
-                sql.append("LIMIT ? OFFSET ? ");
-                params.add(pageSize);
-                params.add((pageIndex - 1) * pageSize);
-            }
-            
-            // Debug: Log the SQL query
-            System.out.println("=== DEBUG: SQL Query ===");
-            System.out.println("SQL: " + sql.toString());
-            System.out.println("Params: " + params);
+            sql.append(" ORDER BY ").append(sortBy).append(" ").append(sortOrder).append(" ");
+            sql.append("LIMIT ? OFFSET ? ");
+            params.add(pageSize);
+            params.add((pageIndex - 1) * pageSize);
 
             PreparedStatement ps = connection.prepareStatement(sql.toString());
 
@@ -156,14 +125,7 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUserId(rs.getInt("user_id"));
                 pr.setRequestDate(rs.getTimestamp("request_date"));
                 pr.setStatus(rs.getString("status"));
-                String reasonFromDB = rs.getString("reason");
-                pr.setReason(reasonFromDB);
-                
-                // Debug: Check what's being read from database
-                System.out.println("=== DEBUG: Reading from DB ===");
-                System.out.println("Request Code: " + pr.getRequestCode());
-                System.out.println("Reason from DB: '" + reasonFromDB + "'");
-                System.out.println("Reason length: " + (reasonFromDB != null ? reasonFromDB.length() : "null"));
+                pr.setReason(rs.getString("reason"));
                 pr.setApprovedBy(rs.getObject("approved_by") != null ? rs.getInt("approved_by") : null);
                 pr.setApprovalReason(rs.getString("approval_reason"));
                 pr.setApprovedAt(rs.getTimestamp("approved_at"));
@@ -172,40 +134,6 @@ public class PurchaseRequestDAO extends DBContext {
                 pr.setUpdatedAt(rs.getTimestamp("updated_at"));
                 pr.setDisable(rs.getBoolean("disable"));
                 list.add(pr);
-            }
-            
-            // Sort by code numerically if needed
-            if (sortOption != null && (sortOption.equals("code_asc") || sortOption.equals("code_desc"))) {
-                list.sort((pr1, pr2) -> {
-                    try {
-                        String code1 = pr1.getRequestCode();
-                        String code2 = pr2.getRequestCode();
-                        
-                        // Extract numbers from PR codes
-                        int num1 = Integer.parseInt(code1.replace("PR", ""));
-                        int num2 = Integer.parseInt(code2.replace("PR", ""));
-                        
-                        if (sortOption.equals("code_asc")) {
-                            return Integer.compare(num1, num2);
-                        } else {
-                            return Integer.compare(num2, num1);
-                        }
-                    } catch (NumberFormatException e) {
-                        // Fallback to string comparison
-                        return sortOption.equals("code_asc") ? 
-                            pr1.getRequestCode().compareTo(pr2.getRequestCode()) :
-                            pr2.getRequestCode().compareTo(pr1.getRequestCode());
-                    }
-                });
-                
-                // Apply pagination after sorting
-                int startIndex = (pageIndex - 1) * pageSize;
-                int endIndex = Math.min(startIndex + pageSize, list.size());
-                if (startIndex < list.size()) {
-                    list = list.subList(startIndex, endIndex);
-                } else {
-                    list.clear();
-                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -307,13 +235,6 @@ public class PurchaseRequestDAO extends DBContext {
             connection.setAutoCommit(false);
 
             try (PreparedStatement psRequest = connection.prepareStatement(insertRequestSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                System.out.println("=== DEBUG: Database Insert ===");
-                System.out.println("Request Code: " + request.getRequestCode());
-                System.out.println("User ID: " + request.getUserId());
-                System.out.println("Status: " + request.getStatus());
-                System.out.println("Reason: '" + request.getReason() + "'");
-                System.out.println("Reason length: " + (request.getReason() != null ? request.getReason().length() : "null"));
-                
                 psRequest.setString(1, request.getRequestCode());
                 psRequest.setInt(2, request.getUserId());
                 psRequest.setTimestamp(3, request.getRequestDate());
@@ -422,83 +343,5 @@ public class PurchaseRequestDAO extends DBContext {
             ex.printStackTrace();
         }
         return list;
-    }
-    
-    public String generateNextRequestCode() {
-        String prefix = "PR";
-        String sql = "SELECT request_code FROM purchase_requests WHERE request_code LIKE ?";
-        String likePattern = prefix + "%";
-        
-        System.out.println("=== DEBUG: Generate Next Request Code ===");
-        System.out.println("SQL: " + sql);
-        System.out.println("Like Pattern: " + likePattern);
-        
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, likePattern);
-            try (ResultSet rs = ps.executeQuery()) {
-                int nextSeq = 1;
-                List<String> allCodes = new ArrayList<>();
-                
-                // Collect all existing codes
-                while (rs.next()) {
-                    String code = rs.getString("request_code");
-                    allCodes.add(code);
-                }
-                
-                System.out.println("All existing codes: " + allCodes);
-                
-                if (!allCodes.isEmpty()) {
-                    // Sort codes numerically
-                    allCodes.sort((code1, code2) -> {
-                        try {
-                            int num1 = Integer.parseInt(code1.replace(prefix, ""));
-                            int num2 = Integer.parseInt(code2.replace(prefix, ""));
-                            return Integer.compare(num1, num2);
-                        } catch (NumberFormatException e) {
-                            return code1.compareTo(code2);
-                        }
-                    });
-                    
-                    // Get the highest number
-                    String lastCode = allCodes.get(allCodes.size() - 1);
-                    String numberPart = lastCode.replace(prefix, "");
-                    try {
-                        nextSeq = Integer.parseInt(numberPart) + 1;
-                        System.out.println("Last Code: " + lastCode);
-                        System.out.println("Number Part: " + numberPart);
-                        System.out.println("Next Sequence: " + nextSeq);
-                    } catch (NumberFormatException ignore) {
-                        System.out.println("NumberFormatException for: " + numberPart);
-                    }
-                } else {
-                    System.out.println("No existing codes found");
-                }
-                String result = prefix + nextSeq;
-                System.out.println("Generated Code: " + result);
-                return result;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return prefix + "1";
-        }
-    }
-    
-    // Debug method to see all request codes
-    public void debugAllRequestCodes() {
-        try {
-            String sql = "SELECT request_code, request_date, status FROM purchase_requests ORDER BY request_date DESC";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            
-            System.out.println("=== DEBUG: All Request Codes ===");
-            while (rs.next()) {
-                String code = rs.getString("request_code");
-                String date = rs.getString("request_date");
-                String status = rs.getString("status");
-                System.out.println("Code: " + code + " | Date: " + date + " | Status: " + status);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
