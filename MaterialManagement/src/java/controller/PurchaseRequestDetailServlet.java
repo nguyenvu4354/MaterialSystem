@@ -5,7 +5,6 @@ import dal.PurchaseRequestDetailDAO;
 import dal.RolePermissionDAO;
 import dal.UserDAO;
 import dal.MaterialDAO;
-import entity.Material;
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
 import entity.User;
@@ -99,26 +98,6 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
             
             // Lấy thông tin hình ảnh của materials
             Map<Integer, String> materialImages = materialDAO.getMaterialImages(materialIds);
-            
-            // Lấy thông tin category và unit của materials
-            Map<Integer, String> materialCategories = new java.util.HashMap<>();
-            Map<Integer, String> materialUnits = new java.util.HashMap<>();
-            
-            for (PurchaseRequestDetail detail : purchaseRequestDetailList) {
-                Material material = materialDAO.getInformation(detail.getMaterialId());
-                if (material != null) {
-                    // Lấy category name
-                    String categoryName = (material.getCategory() != null) ? material.getCategory().getCategory_name() : "N/A";
-                    materialCategories.put(detail.getMaterialId(), categoryName);
-                    
-                    // Lấy unit name
-                    String unitName = (material.getUnit() != null) ? material.getUnit().getUnitName() : "N/A";
-                    materialUnits.put(detail.getMaterialId(), unitName);
-                } else {
-                    materialCategories.put(detail.getMaterialId(), "N/A");
-                    materialUnits.put(detail.getMaterialId(), "N/A");
-                }
-            }
 
             User requester = userDAO.getUserById(purchaseRequest.getUserId());
             String requesterName = requester != null ? requester.getFullName() : "Không xác định";
@@ -130,8 +109,6 @@ public class PurchaseRequestDetailServlet extends HttpServlet {
             request.setAttribute("rolePermissionDAO", rolePermissionDAO);
             request.setAttribute("hasHandleRequestPermission", rolePermissionDAO.hasPermission(currentUser.getRoleId(), "HANDLE_REQUEST"));
             request.setAttribute("materialImages", materialImages); // Truyền thông tin hình ảnh vào JSP
-            request.setAttribute("materialCategories", materialCategories); // Truyền thông tin category vào JSP
-            request.setAttribute("materialUnits", materialUnits); // Truyền thông tin unit vào JSP
 
             request.getRequestDispatcher("PurchaseRequestDetail.jsp").forward(request, response);
 

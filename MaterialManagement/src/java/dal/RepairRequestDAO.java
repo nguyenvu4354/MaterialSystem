@@ -86,13 +86,11 @@ public class RepairRequestDAO extends DBContext {
             sql.append(" AND DATE(rr.request_date) <= ?");
         }
         if (sortByName != null && !sortByName.isEmpty()) {
-            if ("asc".equalsIgnoreCase(sortByName)) {
-                sql.append(" ORDER BY u.full_name ASC, rr.repair_request_id");
-            } else if ("desc".equalsIgnoreCase(sortByName)) {
-                sql.append(" ORDER BY u.full_name DESC, rr.repair_request_id");
+            if ("oldest".equalsIgnoreCase(sortByName)) {
+                sql.append(" ORDER BY rr.created_at ASC, rr.repair_request_id ASC");
             }
         } else {
-            sql.append(" ORDER BY rr.repair_request_id");
+            sql.append(" ORDER BY rr.created_at DESC, rr.repair_request_id DESC");
         }
         sql.append(" LIMIT ? OFFSET ?");
 
