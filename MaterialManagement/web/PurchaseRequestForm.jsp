@@ -135,10 +135,16 @@
                                                                 <label class="form-label text-muted">Material</label>
                                                                 <input type="text" class="form-control material-name-input" name="materialName" placeholder="Type material name or code" autocomplete="off">
                                                                 <input type="hidden" name="materialId" class="material-id-input">
+                                                                <c:if test="${not empty errors.material_0}">
+                                                                    <div class="text-danger small mt-1">${errors.material_0}</div>
+                                                                </c:if>
                                                             </div>
                                                             <div class="col-md-2">
                                                                 <label class="form-label text-muted">Quantity</label>
                                                                 <input type="number" class="form-control" name="quantity" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter quantity">
+                                                                <c:if test="${not empty errors['quantity_0']}">
+                                                                    <div class="text-danger small mt-1">${errors['quantity_0']}</div>
+                                                                </c:if>
                                                             </div>
                                                             <div class="col-md-2">
                                                                 <label class="form-label text-muted">Notes</label>

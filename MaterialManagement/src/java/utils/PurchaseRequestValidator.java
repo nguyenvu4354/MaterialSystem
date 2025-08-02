@@ -2,6 +2,8 @@ package utils;
 
 import entity.PurchaseRequest;
 import entity.PurchaseRequestDetail;
+import dal.MaterialDAO;
+import entity.Material;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ public class PurchaseRequestValidator {
         }
 
         boolean hasValidDetail = false;
+        MaterialDAO materialDAO = new MaterialDAO();
 
         for (int i = 0; i < materialNames.length; i++) {
             String materialName = materialNames[i];
@@ -52,20 +55,28 @@ public class PurchaseRequestValidator {
                 continue;
             }
 
+            // Check if material exists in database
+            String trimmedMaterialName = materialName.trim();
+            Material material = materialDAO.getMaterialByName(trimmedMaterialName);
+            if (material == null) {
+                errors.put("material_" + i, "Material '" + trimmedMaterialName + "' does not exist in inventory.");
+                continue;
+            }
+
             if (quantityStr == null || quantityStr.trim().isEmpty()) {
-                errors.put("quantity_" + i, "Quantity cannot be empty for material " + materialName + ".");
+                errors.put("quantity_" + i, "Quantity cannot be empty for material " + trimmedMaterialName + ".");
             } else {
                 String trimmedQuantity = quantityStr.trim();
                 if (trimmedQuantity.contains(".") || trimmedQuantity.contains(",")) {
-                    errors.put("quantity_" + i, "Quantity must be a whole number (no decimals) for material " + materialName + ".");
+                    errors.put("quantity_" + i, "Quantity must be a whole number (no decimals) for material " + trimmedMaterialName + ".");
                 } else {
                     try {
                         int quantity = Integer.parseInt(trimmedQuantity);
                         if (quantity <= 0) {
-                            errors.put("quantity_" + i, "Quantity must be greater than 0 for material " + materialName + ".");
+                            errors.put("quantity_" + i, "Quantity must be greater than 0 for material " + trimmedMaterialName + ".");
                         }
                     } catch (NumberFormatException e) {
-                        errors.put("quantity_" + i, "Invalid quantity format for material " + materialName + ".");
+                        errors.put("quantity_" + i, "Invalid quantity format for material " + trimmedMaterialName + ".");
                     }
                 }
             }
@@ -125,6 +136,34 @@ public class PurchaseRequestValidator {
                 } catch (NumberFormatException e) {
                     errors.put("quantity", "Invalid quantity format.");
                 }
+            }
+        }
+
+        return errors;
+    }
+
+    // New method to validate material names against database
+    public static Map<String, String> validateMaterialNames(String[] materialNames) {
+        Map<String, String> errors = new HashMap<>();
+        
+        if (materialNames == null) {
+            return errors;
+        }
+
+        MaterialDAO materialDAO = new MaterialDAO();
+        
+        for (int i = 0; i < materialNames.length; i++) {
+            String materialName = materialNames[i];
+            
+            if (materialName == null || materialName.trim().isEmpty()) {
+                continue;
+            }
+
+            String trimmedMaterialName = materialName.trim();
+            Material material = materialDAO.getMaterialByName(trimmedMaterialName);
+            
+            if (material == null) {
+                errors.put("material_" + i, "Material '" + trimmedMaterialName + "' does not exist in inventory.");
             }
         }
 
