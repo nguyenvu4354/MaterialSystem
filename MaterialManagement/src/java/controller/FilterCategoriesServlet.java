@@ -28,10 +28,8 @@ public class FilterCategoriesServlet extends HttpServlet {
 
         List<Category> categories = categoryDAO.getAllCategories();
 
-        request.setAttribute("productList", materials);
-        request.setAttribute("categories", categories);  // 🟡 QUAN TRỌNG!
-
-        request.getRequestDispatcher("HomePage.jsp").forward(request, response);
+        // Redirect to StaticInventory (category filter can be added later if needed)
+        response.sendRedirect("StaticInventory");
     }
 
     @Override
