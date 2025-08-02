@@ -22,7 +22,9 @@ public class RepairRequestDetail {
     private String supplierName;
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
+    private String materialName;
+    private String materialCode;
+    private String unitName;
     private Material material;
 
     public RepairRequestDetail() {
@@ -67,7 +69,6 @@ public class RepairRequestDetail {
         this.supplierName = supplierName;
     }
 
-    
     public void setDetailId(int detailId) {
         this.detailId = detailId;
     }
@@ -126,6 +127,30 @@ public class RepairRequestDetail {
 
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getMaterialName() {
+        return materialName;
+    }
+
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
+    }
+
+    public String getMaterialCode() {
+        return materialCode;
+    }
+
+    public void setMaterialCode(String materialCode) {
+        this.materialCode = materialCode;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     @Override

@@ -192,7 +192,6 @@
                 <c:if test="${requestType == 'Purchase'}">
                 </c:if>
                 <c:if test="${requestType == 'Repair'}">
-                    <!-- Đã loại bỏ hiển thị Estimated Return Date -->
                 </c:if>
 
                 <h3>Details</h3>
@@ -242,6 +241,7 @@
                                     <th>Material Name</th>
                                     <th>Material Code</th>
                                     <th>Quantity</th>
+                                    <th>Unit</th>
                                     <th>Notes</th>
                                     <th>Image</th>
                                 </tr>
@@ -251,14 +251,9 @@
                                     <tr>
                                         <td>${detail.materialId}</td>
                                         <td>${detail.materialName}</td>
-                                        <td>
-                                            <c:forEach var="material" items="${materials}">
-                                                <c:if test="${material.materialId == detail.materialId}">
-                                                    ${material.materialCode}
-                                                </c:if>
-                                            </c:forEach>
-                                        </td>
+                                        <td>${detail.materialCode}</td>
                                         <td>${detail.quantity}</td>
+                                        <td>${detail.unitName}</td>
                                         <td>${detail.notes != null ? detail.notes : "N/A"}</td>
                                         <td>
                                             <c:forEach var="material" items="${materials}">
@@ -284,7 +279,10 @@
                             <thead>
                                 <tr>
                                     <th>Material ID</th>
+                                    <th>Material Name</th>
+                                    <th>Material Code</th>
                                     <th>Quantity</th>
+                                    <th>Unit</th>
                                     <th>Damage Description</th>
                                     <th>Repair Cost</th>
                                     <th>Image</th>
@@ -294,7 +292,10 @@
                                 <c:forEach var="detail" items="${details}">
                                     <tr>
                                         <td>${detail.materialId}</td>
+                                        <td>${detail.materialName}</td>
+                                        <td>${detail.materialCode}</td>
                                         <td>${detail.quantity}</td>
+                                        <td>${detail.unitName}</td>
                                         <td>${detail.damageDescription != null ? detail.damageDescription : "N/A"}</td>
                                         <td>${detail.repairCost != null ? detail.repairCost : "N/A"}</td>
                                         <td>
@@ -302,7 +303,7 @@
                                                 <c:if test="${material.materialId == detail.materialId}">
                                                     <c:choose>
                                                         <c:when test="${not empty material.materialsUrl}">
-                                                            <img src="${pageContext.request.contextPath}/images/material/${material.materialsUrl}" alt="Material Image" />
+                                                            <img src="${pageContext.request.contextPath}/images/material/${material.materialsUrl}" alt="${detail.materialName}" />
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span>No image available</span>
@@ -323,6 +324,7 @@
                                     <th>Material Name</th>
                                     <th>Category</th>
                                     <th>Quantity</th>
+                                    <th>Unit</th>
                                     <th>Unit Price</th>
                                     <th>Total Price</th>
                                     <th>Supplier</th>
@@ -335,6 +337,7 @@
                                         <td>${detail.materialName}</td>
                                         <td>${detail.categoryName}</td>
                                         <td>${detail.quantity}</td>
+                                        <td>${detail.unitName}</td>
                                         <td><fmt:formatNumber value="${detail.unitPrice}" type="currency" currencySymbol="$" /></td>
                                         <td><fmt:formatNumber value="${detail.quantity * detail.unitPrice}" type="currency" currencySymbol="$" /></td>
                                         <td>${detail.supplierName != null ? detail.supplierName : "N/A"}</td>

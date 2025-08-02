@@ -3,6 +3,7 @@ package entity;
 import java.util.Date;
 
 public class ExportRequestDetail {
+
     private int detailId;
     private int exportRequestId;
     private int materialId;
@@ -14,11 +15,11 @@ public class ExportRequestDetail {
     private String materialImageUrl;
     private Date createdAt;
     private Date updatedAt;
-    
+    private String unitName;
+
     public ExportRequestDetail() {
     }
 
-    // Getters and Setters
     public int getDetailId() {
         return detailId;
     }
@@ -106,4 +107,12 @@ public class ExportRequestDetail {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-} 
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+}
