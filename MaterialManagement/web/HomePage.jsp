@@ -1,849 +1,894 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
-uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html lang="en">
-  <head>
-    <title>Internal Material Management System</title>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head>
+        <title>Material Management - Professional Inventory System</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="author" content="">
+        <meta name="keywords" content="inventory, material management, stock control, accessories">
+        <meta name="description" content="A professional material management system for tracking and managing computer accessories and inventory.">
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-      body {
-        background-color: #f8f9fa;
-        font-family: "Roboto", sans-serif;
-      }
-
-      .section-card {
-        background: white;
-        border: 2px solid #dead6f;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 12px rgba(222, 173, 111, 0.15);
-      }
-
-      .section-header {
-        background: linear-gradient(135deg, #dead6f 0%, #cfa856 100%);
-        color: white;
-        border-radius: 13px 13px 0 0;
-        padding: 20px;
-      }
-
-      .section-body {
-        padding: 30px;
-        background: white;
-        border-radius: 0 0 13px 13px;
-      }
-
-      .alert-custom {
-        border: none;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-      }
-
-      .alert-warning-custom {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        border-left: 4px solid #ffc107;
-      }
-
-      .alert-danger-custom {
-        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-        border-left: 4px solid #dc3545;
-      }
-
-      .alert-info-custom {
-        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-        border-left: 4px solid #17a2b8;
-      }
-
-      .alert-primary-custom {
-        background: linear-gradient(135deg, #cce7ff 0%, #b3d9ff 100%);
-        border-left: 4px solid #007bff;
-      }
-
-      .quick-action-btn {
-        background: white;
-        border: 2px solid #dead6f;
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        color: #333;
-        min-height: 120px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .quick-action-btn:hover {
-        background: #dead6f;
-        color: white;
-        transform: translateY(-3px);
-        text-decoration: none;
-      }
-
-      .quick-action-btn i {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-      }
-
-      .activity-card {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        border: 1px solid #dee2e6;
-      }
-
-      .activity-card i {
-        font-size: 2rem;
-        margin-bottom: 10px;
-      }
-
-      .activity-card h4 {
-        font-weight: 700;
-        margin-bottom: 5px;
-      }
-
-      .activity-card small {
-        color: #6c757d;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Header -->
-    <jsp:include page="Header.jsp" />
-
-    <!-- Main Content -->
-    <div class="container-fluid my-4">
-      <div class="row">
-        <!-- Main Content Area -->
-        <div class="col-12">
-          <!-- CRITICAL ALERTS SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <h4 class="mb-0">
-                <i class="fas fa-exclamation-triangle me-2"></i>Critical Alerts
-              </h4>
-            </div>
-            <div class="section-body">
-              <div class="row">
-                <!-- Low Stock Alert -->
-                <c:if test="${lowStockCount > 0}">
-                  <div class="col-md-6 mb-3">
-                    <div class="alert-custom alert-warning-custom">
-                      <div class="d-flex align-items-center">
-                        <i
-                          class="fas fa-exclamation-triangle fa-2x me-3"
-                          style="color: #856404"
-                        ></i>
-                        <div>
-                          <h5 class="alert-heading mb-1">Low Stock</h5>
-                          <p class="mb-2">
-                            ${lowStockCount} materials are low on stock
-                          </p>
-                          <a
-                            href="StaticInventory?stockFilter=low"
-                            class="btn btn-warning btn-sm"
-                          >
-                            <i class="fas fa-eye me-1"></i>View Details
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </c:if>
-
-                <!-- Out of Stock Alert -->
-                <c:if test="${outOfStockCount > 0}">
-                  <div class="col-md-6 mb-3">
-                    <div class="alert-custom alert-danger-custom">
-                      <div class="d-flex align-items-center">
-                        <i
-                          class="fas fa-times-circle fa-2x me-3"
-                          style="color: #721c24"
-                        ></i>
-                        <div>
-                          <h5 class="alert-heading mb-1">Out of Stock</h5>
-                          <p class="mb-2">
-                            ${outOfStockCount} materials are out of stock
-                          </p>
-                          <a
-                            href="StaticInventory?stockFilter=zero"
-                            class="btn btn-danger btn-sm"
-                          >
-                            <i class="fas fa-eye me-1"></i>View Details
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </c:if>
-
-                <!-- Damaged Materials Alert (Admin/Director/Warehouse Staff) -->
-                <c:if
-                  test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}"
-                >
-                  <c:if test="${damagedMaterialsCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div
-                        class="alert-custom"
-                        style="
-                          background: linear-gradient(
-                            135deg,
-                            #fff3cd 0%,
-                            #ffeaa7 100%
-                          );
-                          border-left: 4px solid #ffc107;
-                        "
-                      >
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-exclamation-triangle fa-2x me-3"
-                            style="color: #856404"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              Damaged Materials
-                            </h5>
-                            <p class="mb-2">
-                              ${damagedMaterialsCount} materials are damaged
-                            </p>
-                            <a
-                              href="StaticInventory?status=damaged"
-                              class="btn btn-warning btn-sm"
-                            >
-                              <i class="fas fa-eye me-1"></i>View Details
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-                </c:if>
-
-                <!-- Pending Requests Alerts (Admin/Director/Warehouse Staff) -->
-                <c:if
-                  test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}"
-                >
-                  <c:if test="${pendingExportRequestCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div class="alert-custom alert-info-custom">
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-file-signature fa-2x me-3"
-                            style="color: #0c5460"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Export Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingExportRequestCount} requests waiting for
-                              approval
-                            </p>
-                            <a
-                              href="ExportRequestList"
-                              class="btn btn-info btn-sm"
-                            >
-                              <i class="fas fa-eye me-1"></i>Review Requests
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-
-                  <c:if test="${pendingPurchaseRequestCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div class="alert-custom alert-primary-custom">
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-shopping-cart fa-2x me-3"
-                            style="color: #004085"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Purchase Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingPurchaseRequestCount} requests waiting
-                              for approval
-                            </p>
-                            <a
-                              href="ListPurchaseRequests"
-                              class="btn btn-primary btn-sm"
-                            >
-                              <i class="fas fa-eye me-1"></i>Review Requests
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-
-                  <c:if test="${pendingRepairRequestCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div
-                        class="alert-custom"
-                        style="
-                          background: linear-gradient(
-                            135deg,
-                            #e2e3e5 0%,
-                            #d6d8db 100%
-                          );
-                          border-left: 4px solid #6c757d;
-                        "
-                      >
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-tools fa-2x me-3"
-                            style="color: #495057"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              Pending Repair Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${pendingRepairRequestCount} requests waiting for
-                              approval
-                            </p>
-                            <a
-                              href="repairrequestlist"
-                              class="btn btn-secondary btn-sm"
-                            >
-                              <i class="fas fa-eye me-1"></i>Review Requests
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-                </c:if>
-
-                <!-- Employee Specific Alerts -->
-                <c:if test="${sessionScope.user.roleId == 4}">
-                  <!-- My Pending Requests Alert -->
-                  <c:if test="${myPendingRequestCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div class="alert-custom alert-info-custom">
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-clock fa-2x me-3"
-                            style="color: #17a2b8"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              My Pending Requests
-                            </h5>
-                            <p class="mb-2">
-                              You have ${myPendingRequestCount} requests waiting
-                              for approval
-                            </p>
-                            <a href="ViewRequests" class="btn btn-info btn-sm">
-                              <i class="fas fa-eye me-1"></i>View My Requests
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-
-                  <!-- My Approved Requests Alert -->
-                  <c:if test="${myApprovedRequestCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div class="alert-custom alert-success-custom">
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-check-circle fa-2x me-3"
-                            style="color: #28a745"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              My Approved Requests
-                            </h5>
-                            <p class="mb-2">
-                              ${myApprovedRequestCount} of your requests have
-                              been approved
-                            </p>
-                            <a
-                              href="ViewRequests"
-                              class="btn btn-success btn-sm"
-                            >
-                              <i class="fas fa-eye me-1"></i>View Details
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-
-                  <!-- Available Materials Alert -->
-                  <c:if test="${availableMaterialsCount > 0}">
-                    <div class="col-md-6 mb-3">
-                      <div class="alert-custom alert-primary-custom">
-                        <div class="d-flex align-items-center">
-                          <i
-                            class="fas fa-boxes fa-2x me-3"
-                            style="color: #007bff"
-                          ></i>
-                          <div>
-                            <h5 class="alert-heading mb-1">
-                              Available Materials
-                            </h5>
-                            <p class="mb-2">
-                              ${availableMaterialsCount} materials are available
-                              for request
-                            </p>
-                            <a
-                              href="StaticInventory"
-                              class="btn btn-primary btn-sm"
-                            >
-                              <i class="fas fa-search me-1"></i>Browse Materials
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </c:if>
-                </c:if>
-              </div>
-            </div>
-          </div>
-
-          <!-- QUICK ACTIONS SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <h4 class="mb-0">
-                <i class="fas fa-bolt me-2"></i>Quick Actions
-              </h4>
-            </div>
-            <div class="section-body">
-              <div class="row">
-                <!-- Admin - All Operations -->
-                <c:if test="${sessionScope.user.roleId == 1}">
-                  <div class="col-md-2 mb-3">
-                    <a href="ImportMaterial" class="quick-action-btn">
-                      <i class="fas fa-plus-circle" style="color: #28a745"></i>
-                      <h6 class="mb-1">Import Materials</h6>
-                      <small>Add new stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="ExportMaterial" class="quick-action-btn">
-                      <i class="fas fa-minus-circle" style="color: #ffc107"></i>
-                      <h6 class="mb-1">Export Materials</h6>
-                      <small>Remove stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="AddMaterial" class="quick-action-btn">
-                      <i class="fas fa-box" style="color: #007bff"></i>
-                      <h6 class="mb-1">Add New Material</h6>
-                      <small>Create new item</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="StaticInventory" class="quick-action-btn">
-                      <i
-                        class="fas fa-clipboard-list"
-                        style="color: #17a2b8"
-                      ></i>
-                      <h6 class="mb-1">Inventory Report</h6>
-                      <small>View all stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="UserList" class="quick-action-btn">
-                      <i class="fas fa-users" style="color: #343a40"></i>
-                      <h6 class="mb-1">User Management</h6>
-                      <small>Manage users</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="ExportRequestList" class="quick-action-btn">
-                      <i class="fas fa-eye" style="color: #17a2b8"></i>
-                      <h6 class="mb-1">View Requests</h6>
-                      <small>View all requests</small>
-                    </a>
-                  </div>
-                </c:if>
-
-                <!-- Warehouse Staff Operations -->
-                <c:if test="${sessionScope.user.roleId == 3}">
-                  <div class="col-md-2 mb-3">
-                    <a href="ImportMaterial" class="quick-action-btn">
-                      <i class="fas fa-plus-circle" style="color: #28a745"></i>
-                      <h6 class="mb-1">Import Materials</h6>
-                      <small>Add new stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="ExportMaterial" class="quick-action-btn">
-                      <i class="fas fa-minus-circle" style="color: #ffc107"></i>
-                      <h6 class="mb-1">Export Materials</h6>
-                      <small>Remove stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="AddMaterial" class="quick-action-btn">
-                      <i class="fas fa-box" style="color: #007bff"></i>
-                      <h6 class="mb-1">Add New Material</h6>
-                      <small>Create new item</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="StaticInventory" class="quick-action-btn">
-                      <i
-                        class="fas fa-clipboard-list"
-                        style="color: #17a2b8"
-                      ></i>
-                      <h6 class="mb-1">Inventory Report</h6>
-                      <small>View all stock</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="CreateExportRequest" class="quick-action-btn">
-                      <i class="fas fa-plus" style="color: #20c997"></i>
-                      <h6 class="mb-1">Create Request</h6>
-                      <small>Create export request</small>
-                    </a>
-                  </div>
-                  <div class="col-md-2 mb-3">
-                    <a href="ExportRequestList" class="quick-action-btn">
-                      <i class="fas fa-eye" style="color: #17a2b8"></i>
-                      <h6 class="mb-1">View Requests</h6>
-                      <small>View all requests</small>
-                    </a>
-                  </div>
-                </c:if>
-
-                <!-- Employee Actions -->
-                <c:if test="${sessionScope.user.roleId == 4}">
-                  <div class="col-md-4 mb-3">
-                    <a href="CreateExportRequest" class="quick-action-btn">
-                      <i class="fas fa-plus" style="color: #20c997"></i>
-                      <h6 class="mb-1">Create Request</h6>
-                      <small>Create export request</small>
-                    </a>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <a href="ViewRequests" class="quick-action-btn">
-                      <i class="fas fa-eye" style="color: #17a2b8"></i>
-                      <h6 class="mb-1">View Requests</h6>
-                      <small>View my requests</small>
-                    </a>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <a href="StaticInventory" class="quick-action-btn">
-                      <i class="fas fa-search" style="color: #6f42c1"></i>
-                      <h6 class="mb-1">Browse Materials</h6>
-                      <small>Search available items</small>
-                    </a>
-                  </div>
-                </c:if>
-
-                <!-- Director Actions -->
-                <c:if test="${sessionScope.user.roleId == 2}">
-                  <div class="col-md-4 mb-3">
-                    <a href="ExportRequestList" class="quick-action-btn">
-                      <i class="fas fa-eye" style="color: #17a2b8"></i>
-                      <h6 class="mb-1">View Requests</h6>
-                      <small>Monitor & approve requests</small>
-                    </a>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <a href="StaticInventory" class="quick-action-btn">
-                      <i class="fas fa-chart-bar" style="color: #6f42c1"></i>
-                      <h6 class="mb-1">Inventory Overview</h6>
-                      <small>View stock reports</small>
-                    </a>
-                  </div>
-                </c:if>
-              </div>
-            </div>
-          </div>
-
-          <!-- ANALYTICS & REPORTS SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">
-                  <i class="fas fa-chart-bar me-2"></i>Analytics & Reports
-                </h4>
-                <button
-                  id="toggleReportsBtn"
-                  class="btn btn-outline-light btn-sm"
-                  style="border-radius: 20px"
-                >
-                  <i class="fas fa-eye-slash me-1"></i> Hide Reports
-                </button>
-              </div>
-            </div>
-            <div id="reportsSection" class="section-body">
-              <!-- Charts Row -->
-              <div class="row">
-                <div class="col-md-6 mb-4">
-                  <div
-                    class="card"
-                    style="border: 1px solid #dead6f; border-radius: 12px"
-                  >
-                    <div
-                      class="card-header"
-                      style="
-                        background: #f8f9fa;
-                        border-bottom: 1px solid #dead6f;
-                      "
-                    >
-                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
-                        <i class="fas fa-chart-pie me-2"></i>Inventory Overview
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <canvas id="pieChart" style="max-height: 300px"></canvas>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div
-                    class="card"
-                    style="border: 1px solid #dead6f; border-radius: 12px"
-                  >
-                    <div
-                      class="card-header"
-                      style="
-                        background: #f8f9fa;
-                        border-bottom: 1px solid #dead6f;
-                      "
-                    >
-                      <h6 class="mb-0" style="color: #dead6f; font-weight: 600">
-                        <i class="fas fa-chart-line me-2"></i>Stock Level
-                        Distribution
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <canvas id="barChart" style="max-height: 300px"></canvas>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ACTIVITY SUMMARY SECTION -->
-          <div class="section-card">
-            <div class="section-header">
-              <h4 class="mb-0">
-                <i class="fas fa-clock me-2"></i>Activity Summary
-              </h4>
-            </div>
-            <div class="section-body">
-              <div class="row text-center">
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-arrow-down" style="color: #28a745"></i>
-                    <h4 class="mb-1">${totalImported}</h4>
-                    <small class="text-muted">Total Imported</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-arrow-up" style="color: #fd7e14"></i>
-                    <h4 class="mb-1">${totalExported}</h4>
-                    <small class="text-muted">Total Exported</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-boxes" style="color: #007bff"></i>
-                    <h4 class="mb-1">${materialCount}</h4>
-                    <small class="text-muted">Total Materials</small>
-                  </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                  <div class="activity-card">
-                    <i class="fas fa-warehouse" style="color: #6f42c1"></i>
-                    <h4 class="mb-1">${totalStock}</h4>
-                    <small class="text-muted">Current Stock</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <jsp:include page="Footer.jsp" />
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Reports Toggle Script -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggleBtn = document.getElementById("toggleReportsBtn");
-        const reportsSection = document.getElementById("reportsSection");
-        let chartsRendered = false;
-
-        // Render charts immediately when page loads
-        if (reportsSection) {
-          renderCharts();
-          chartsRendered = true;
-        }
-
-        if (toggleBtn && reportsSection) {
-          toggleBtn.addEventListener("click", function () {
-            const isVisible = reportsSection.style.display !== "none";
-
-            if (isVisible) {
-              reportsSection.style.display = "none";
-              toggleBtn.innerHTML =
-                '<i class="fas fa-eye me-1"></i> Show Reports';
-            } else {
-              reportsSection.style.display = "block";
-              toggleBtn.innerHTML =
-                '<i class="fas fa-eye-slash me-1"></i> Hide Reports';
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #faf4ee;
+                color: #222;
+                font-size: 16px;
+                line-height: 1.6;
             }
-          });
-        }
+            .top-bar {
+                background: #DEAD6F;
+                color: #fff;
+                font-size: 16px;
+                letter-spacing: 0.5px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
+            }
+            .top-bar .contact-info span {
+                margin-right: 18px;
+            }
+            .login-buttons .btn {
+                border-radius: 20px;
+                border: 2px solid #fff;
+                color: #fff;
+                background: transparent;
+                transition: background 0.3s, color 0.3s;
+            }
+            .login-buttons .btn:hover {
+                background: #fff;
+                color: #DEAD6F;
+            }
+            .header-main {
+                box-shadow: 0 6px 24px rgba(222,173,111,0.10);
+                border-radius: 0 0 24px 24px;
+                background: #fff;
+                min-height: 80px;
+            }
+            .header-main .navbar-nav .nav-link {
+                font-weight: 700;
+                color: #DEAD6F;
+                border-radius: 12px;
+                font-size: 17px;
+                transition: background 0.2s, color 0.2s;
+                padding: 10px 22px !important;
+                margin: 0 2px;
+            }
+            .header-main .navbar-nav .nav-link:hover, .header-main .navbar-nav .nav-link.active {
+                background: #DEAD6F;
+                color: #fff;
+            }
+            .header-main .btn-main {
+                font-size: 18px;
+                border-radius: 22px;
+                padding: 12px 32px;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+            }
+            .header-main .btn-main:hover {
+                background: #cfa856;
+                color: #fff !important;
+                transform: scale(1.04);
+            }
+            .main-logo img {
+                height: 54px;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.10);
+            }
+            .navbar-nav .nav-link {
+                color: #DEAD6F;
+                font-weight: 700;
+                margin: 0 10px;
+                border-radius: 8px;
+                transition: background 0.2s, color 0.2s;
+                font-size: 16px;
+            }
+            .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+                background: #DEAD6F;
+                color: #fff;
+            }
+            .offcanvas-body .btn {
+                background: #DEAD6F;
+                border: none;
+                color: #fff;
+                font-weight: 600;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
+                transition: background 0.2s, transform 0.2s;
+            }
+            .offcanvas-body .btn:hover {
+                background: #cfa856;
+                transform: translateY(-2px) scale(1.04);
+            }
+            /* Sidebar */
+            .sidebar {
+                background: #fff;
+                border: 1.5px solid #DEAD6F;
+                border-radius: 16px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.07);
+                padding: 0;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .sidebar .sidebar-header {
+                background: #DEAD6F;
+                color: #fff;
+                padding: 10px 18px;
+                border-radius: 14px 14px 0 0;
+                font-weight: 800;
+                font-size: 20px;
+                letter-spacing: 1px;
+                position: relative;
+                margin-bottom: 0;
+            }
+            .sidebar .sidebar-header::after {
+                content: '▲';
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            .sidebar-item {
+                background: #fff;
+                color: #DEAD6F;
+                border: 1px solid #DEAD6F;
+                border-radius: 12px;
+                margin: 10px 10px 0;
+                padding: 12px 18px;
+                font-weight: 700;
+                transition: background 0.2s, color 0.2s;
+                font-size: 16px;
+                text-align: left;
+                display: block;
+            }
+            .sidebar-item.active {
+                background: #DEAD6F;
+                color: #fff !important;
+                border: 1.5px solid #cfa856;
+            }
+            .sidebar-item:hover {
+                background: #cfa856;
+                color: #fff !important;
+                border: 1.5px solid #cfa856;
+            }
+            .sidebar-item:hover .category-icon {
+                color: #fff;
+                transform: scale(1.15);
+            }
+            .category-icon {
+                font-size: 1.5rem;
+                color: #DEAD6F;
+                transition: color 0.2s, transform 0.2s;
+                min-width: 28px;
+                text-align: center;
+            }
+            .sidebar-item h5 {
+                color: inherit;
+                font-weight: 700;
+                margin: 0;
+                font-size: 17px;
+                letter-spacing: 0.5px;
+                display: inline;
+            }
+            .card-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 28px;
+                justify-content: flex-start;
+            }
+            /* Card */
+            .product-card {
+                width: 270px;
+                min-height: 420px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background: #fff;
+                border: 1.5px solid #DEAD6F;
+                border-radius: 18px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.07);
+                transition: box-shadow 0.2s, transform 0.2s;
+            }
+            .product-card:hover {
+                box-shadow: 0 6px 24px rgba(222,173,111,0.13);
+                transform: scale(1.03);
+            }
+            .product-card img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                border-bottom: 1px solid #f9f5f0;
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.06);
+            }
+            .card-content {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 180px;
+            }
+            .card-content h5 {
+                min-height: 48px;
+                max-height: 48px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                color: #DEAD6F;
+                font-weight: 700;
+            }
+            .card-content .info-label {
+                color: #6c757d;
+                font-size: 14px;
+            }
+            .card-content .status-new {
+                color: #DEAD6F;
+                font-weight: 700;
+            }
+            .card-content .status-used {
+                color: #cfa856;
+                font-weight: 700;
+            }
+            .card-content .status-damaged {
+                color: #e74c3c;
+                font-weight: 700;
+            }
+            .card-content .stock-zero {
+                color: #e74c3c;
+                font-weight: 700;
+            }
+            .card-content b {
+                color: #DEAD6F;
+            }
+            .card-content p {
+                margin: 0 0 14px 0;
+                font-size: 1.08rem;
+                color: #DEAD6F;
+                font-weight: 700;
+            }
+            /* Button */
+            .btn-main {
+                background: #DEAD6F;
+                color: #fff !important;
+                border-radius: 24px;
+                font-weight: 700;
+                transition: background 0.2s, color 0.2s;
+            }
+            .btn-main:hover, .btn-main:focus {
+                background: #cfa856;
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
+                transform: scale(1.05);
+            }
+            .btn-outline-main {
+                background: #fff;
+                color: #DEAD6F !important;
+                border: 2px solid #DEAD6F;
+                border-radius: 24px;
+                font-weight: 700;
+                padding: 9px 28px;
+                transition: background 0.2s, color 0.2s, border 0.2s;
+                font-size: 16px;
+            }
+            .btn-outline-main:hover, .btn-outline-main:focus {
+                background: #DEAD6F;
+                color: #fff !important;
+                border: 2px solid #cfa856;
+            }
+            .btn-action {
+                background: #DEAD6F;
+                color: #fff !important;
+                border: none;
+                border-radius: 20px;
+                font-weight: 600;
+                padding: 8px 20px;
+                transition: background 0.2s, transform 0.2s;
+                font-size: 16px;
+            }
+            .btn-action:hover, .btn-action:focus {
+                background: #cfa856;
+                color: #fff !important;
+                transform: scale(1.05);
+            }
+            /* Nút View Detail */
+            .btn-detail {
+                background: #DEAD6F;
+                color: #fff !important;
+                border: none;
+                border-radius: 18px;
+                font-weight: 600;
+                padding: 8px 20px;
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.07);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 15px;
+            }
+            .btn-detail:hover {
+                background: #cfa856;
+                color: #fff !important;
+                transform: scale(1.05);
+            }
+            .btn-contact-info {
+                border-radius: 24px;
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                font-weight: 600;
+                padding: 8px 22px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: background 0.2s, color 0.2s, transform 0.2s;
+                font-size: 16px;
+            }
+            .btn-contact-info:hover {
+                background: #DEAD6F;
+                color: #fff !important;
+                transform: scale(1.05);
+            }
+            .btn-login {
+                border-radius: 50%;
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                font-weight: 700;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                box-shadow: 0 2px 12px rgba(222,173,111,0.13);
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                padding: 0;
+            }
+            .btn-login:hover, .btn-login:focus {
+                background: #DEAD6F;
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
+            }
+            .section-header h2 {
+                color: #DEAD6F;
+                font-weight: 800;
+                border-bottom: 2px solid #f9f5f0;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                letter-spacing: 1px;
+            }
+            .pagination .page-link {
+                color: #DEAD6F;
+                border-radius: 8px;
+                margin: 0 6px;
+                font-weight: 600;
+                transition: background 0.2s, color 0.2s;
+                font-size: 16px;
+                border: none;
+            }
+            .pagination .page-link:hover, .pagination .page-item.active .page-link {
+                background: #DEAD6F;
+                color: #fff;
+            }
+            footer {
+                background: #fff;
+                color: #222;
+                border-radius: 18px;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.08);
+            }
+            .footer-menu h3 {
+                color: #DEAD6F;
+                font-weight: 800;
+                margin-bottom: 18px;
+                font-size: 18px;
+            }
+            .footer-menu a {
+                color: #DEAD6F;
+                font-weight: 600;
+                transition: color 0.2s;
+                font-size: 16px;
+            }
+            .footer-menu a:hover {
+                color: #cfa856;
+            }
+            .footer-menu ul {
+                padding-left: 0;
+            }
+            .footer-menu li {
+                margin-bottom: 10px;
+                font-size: 16px;
+            }
+            .footer-menu img {
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.12);
+            }
+            .social-links ul {
+                gap: 10px;
+            }
+            .social-icon {
+                font-size: 24px;
+                color: #DEAD6F;
+                transition: color 0.2s;
+            }
+            .social-icon:hover {
+                color: #cfa856;
+            }
+            @media (max-width: 991px) {
+                .sidebar {
+                    margin-bottom: 32px;
+                }
+                .card-container {
+                    justify-content: center;
+                }
+                .header-main .navbar-nav {
+                    flex-direction: column !important;
+                    gap: 0 !important;
+                }
+                .header-main .navbar-nav .nav-link {
+                    margin-bottom: 8px;
+                }
+                .header-main .btn-main {
+                    width: 100%;
+                    margin-bottom: 8px;
+                }
+            }
+            @media (max-width: 767px) {
+                .header-main, .footer {
+                    border-radius: 0;
+                }
+                .main-logo img {
+                    height: 44px;
+                }
+                .product-card {
+                    width: 100%;
+                    min-width: 220px;
+                }
+            }
+            .search-bar-center {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .search-icon {
+                pointer-events: none;
+            }
+            .dropdown-menu .dropdown-item {
+                font-size: 16px;
+                font-weight: 500;
+                border-radius: 8px;
+                transition: background 0.2s, color 0.2s;
+                padding: 10px 18px;
+                color: #cfa856;
+            }
+            .dropdown-menu .dropdown-item:hover {
+                background: #f9f5f0;
+                color: #fff;
+            }
+            .dropdown-menu .dropdown-item i {
+                color: #DEAD6F;
+                min-width: 22px;
+                text-align: center;
+            }
+            @media (max-width: 991px) {
+                .search-bar-center {
+                    position: static !important;
+                    transform: none !important;
+                    margin: 12px 0 0 0;
+                    width: 100%;
+                }
+                .dropdown {
+                    margin-left: 0 !important;
+                }
+            }
+            .footer-mms {
+                background: #23272f;
+                color: #f1f5f9;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 2px 12px rgba(222,173,111,0.08);
+                font-size: 15px;
+            }
+            .footer-mms .footer-title {
+                color: #DEAD6F;
+                font-weight: 700;
+                margin-bottom: 16px;
+                font-size: 17px;
+                display: flex;
+                align-items: center;
+            }
+            .footer-mms .footer-desc {
+                color: #e5e7eb;
+                font-size: 15px;
+            }
+            .footer-mms .footer-list {
+                list-style: none;
+                padding-left: 0;
+                margin-bottom: 0;
+            }
+            .footer-mms .footer-list li {
+                margin-bottom: 10px;
+                color: #e5e7eb;
+                display: flex;
+                align-items: center;
+            }
+            .footer-mms .footer-list a {
+                color: #e5e7eb;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .footer-mms .footer-list a:hover {
+                color: #f9f5f0;
+            }
+            .footer-mms .footer-list i {
+                color: #f9f0;
+                min-width: 20px;
+                text-align: center;
+            }
+            @media (max-width: 991px) {
+                .footer-mms .row > div {
+                    margin-bottom: 24px;
+                }
+            }
+            .btn-topbar {
+                background: #23272f;
+                color: #fff !important;
+                border: none;
+                border-radius: 50%;
+                width: 44px;
+                height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 12px rgba(222,173,111,0.13);
+                font-size: 20px;
+                transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                padding: 0;
+            }
+            .btn-topbar:hover, .btn-topbar:focus {
+                background: #DEAD6F;
+                color: #fff !important;
+                box-shadow: 0 4px 18px rgba(222,173,111,0.18);
+            }
+            .dashboard-card {
+                min-height: 170px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                background: #fff;
+                border: 2px solid #DEAD6F;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(222,173,111,0.08);
+                margin-bottom: 16px;
+                transition: box-shadow 0.2s, transform 0.2s;
+            }
+            .dashboard-card:hover {
+                box-shadow: 0 6px 24px rgba(222,173,111,0.18);
+                transform: scale(1.03);
+            }
+            .dashboard-card .card-title {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 8px;
+                color: #DEAD6F;
+            }
+            .dashboard-card .card-text {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #DEAD6F;
+            }
+            .dashboard-row-scroll {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                gap: 24px;
+                padding-bottom: 8px;
+                margin-left: -8px;
+                margin-right: -8px;
+            }
+            .dashboard-row-scroll .dashboard-card {
+                min-width: 240px;
+                max-width: 260px;
+                flex: 0 0 auto;
+            }
+        </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+       
+        <div class="top-bar py-2">
+            <div class="container d-flex justify-content-center align-items-center position-relative">
+            </div>
+        </div>
+        <jsp:include page="Header.jsp" />
 
-        function renderCharts() {
-          // Pie Chart - Inventory Overview
-          const pieCtx = document.getElementById("pieChart");
-          if (pieCtx) {
-            const totalImported = parseInt("${totalImported}", 10) || 0;
-            const totalExported = parseInt("${totalExported}", 10) || 0;
-            const totalStock = parseInt("${totalStock}", 10) || 0;
+        <!-- DASHBOARD OVERVIEW (clickable cards) -->
+        <div class="container my-4">
+            <div class="dashboard-row-scroll mb-4">
+                <!-- Nhóm 1: Quản lý vật tư/kho (mọi role đều thấy) -->
+                <a href="dashboardmaterial" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-boxes fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title">Total Materials</h5>
+                        <p class="card-text">${materialCount}</p>
+                    </div>
+                </a>
+                <a href="StaticInventory" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-warehouse fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title">Total Inventory</h5>
+                        <p class="card-text">${totalStock}</p>
+                    </div>
+                </a>
+                <a href="StaticInventory?stockFilter=low" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title">Low Stock Materials</h5>
+                        <p class="card-text">${lowStockCount}</p>
+                    </div>
+                </a>
+                <a href="StaticInventory?stockFilter=zero" style="text-decoration:none;">
+                    <div class="dashboard-card text-center">
+                        <i class="fas fa-times-circle fa-2x mb-2" style="color:#DEAD6F;"></i>
+                        <h5 class="card-title">Out of Stock</h5>
+                        <p class="card-text">${outOfStockCount}</p>
+                    </div>
+                </a>
 
-            new Chart(pieCtx, {
-              type: "pie",
-              data: {
-                labels: ["Current Stock", "Total Imported", "Total Exported"],
-                datasets: [
-                  {
-                    data: [totalStock, totalImported, totalExported],
-                    backgroundColor: [
-                      "rgba(40, 167, 69, 0.8)",
-                      "rgba(0, 123, 255, 0.8)",
-                      "rgba(253, 126, 20, 0.8)",
-                    ],
-                    borderColor: [
-                      "rgba(40, 167, 69, 1)",
-                      "rgba(0, 123, 255, 1)",
-                      "rgba(253, 126, 20, 1)",
-                    ],
-                    borderWidth: 2,
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    position: "bottom",
-                    labels: {
-                      padding: 20,
-                      usePointStyle: true,
-                      font: { size: 12 },
-                    },
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.parsed;
-                        const total = context.dataset.data.reduce(
-                          (a, b) => a + b,
-                          0
-                        );
-                        const percent =
-                          total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                        return (
-                          context.label + ": " + value + " (" + percent + "%)"
-                        );
-                      },
-                    },
-                  },
-                },
-              },
+                <!-- Nhóm 2: Quản lý yêu cầu (Admin, Warehouse, Director) -->
+                <c:if test="${sessionScope.user.roleId == 1 || sessionScope.user.roleId == 2 || sessionScope.user.roleId == 3}">
+                    <a href="ExportRequestList" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-file-signature fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">Pending Export Requests</h5>
+                            <p class="card-text">${pendingExportRequestCount}</p>
+                        </div>
+                    </a>
+                    <a href="ListPurchaseRequests" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-shopping-cart fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">Pending Purchase Requests</h5>
+                            <p class="card-text">${pendingPurchaseRequestCount}</p>
+                        </div>
+                    </a>
+                    <a href="repairrequestlist" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-tools fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">Pending Repair Requests</h5>
+                            <p class="card-text">${pendingRepairRequestCount}</p>
+                        </div>
+                    </a>
+                </c:if>
+
+                <!-- Nhóm 2: My Requests (Employee) -->
+                <c:if test="${sessionScope.user.roleId == 4}">
+                    <a href="ListPurchaseRequests" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-user-check fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">My Requests</h5>
+                            <p class="card-text fs-5 fw-bold">
+                                Purchase: ${myPurchaseRequestCount}<br/>
+                                Repair: ${myRepairRequestCount}
+                            </p>
+                        </div>
+                    </a>
+                </c:if>
+
+                <!-- Nhóm 3: Quản trị hệ thống (Admin) -->
+                <c:if test="${sessionScope.user.roleId == 1}">
+                    <a href="UserList" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-users fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">Total Users</h5>
+                            <p class="card-text">${totalUserCount}</p>
+                        </div>
+                    </a>
+                    <a href="RolePermission" style="text-decoration:none;">
+                        <div class="dashboard-card text-center">
+                            <i class="fas fa-key fa-2x mb-2" style="color:#DEAD6F;"></i>
+                            <h5 class="card-title">Total Permissions</h5>
+                            <p class="card-text">${totalPermissionCount}</p>
+                        </div>
+                    </a>
+                </c:if>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS (if any) -->
+        <div class="container my-3">
+            <c:if test="${not empty notifications}">
+                <div class="alert alert-info" style="background:#fffbe9; border:1.5px solid #DEAD6F; color:#DEAD6F;">
+                    <i class="fas fa-info-circle"></i>
+                    <c:forEach var="noti" items="${notifications}">
+                        <div>${noti.message}</div>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </div>
+
+        <div class="container-fluid my-5">
+            <div class="row">
+                <div class="col-md-2 sidebar-col mt-5">
+                    <div class="sidebar">
+                        <div class="sidebar-header">Categories</div>
+                        <ul class="list-unstyled">
+                            <c:forEach var="c" items="${categories}">
+                                <li>
+                                    <a href="filter?categoryId=${c.category_id}" class="sidebar-item <c:if test='${param.categoryId == c.category_id}'>active</c:if>" data-category-id="${c.category_id}" >
+                                        <h5 style="display:inline;">${c.category_name}</h5>
+                                    </a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-10 mb-1">
+                    <div class="content">
+                        <section id="clothing" class="my-5 overflow-hidden">
+                            <div class="container pb-5">
+                                <div class="section-header d-md-flex justify-content-between align-items-center mb-4">
+                                    <h2 class="display-6 fw-semibold"><i class="fas fa-warehouse me-2"></i>Material List</h2>
+                                </div>
+                                <div class="card-container">
+                                    <c:forEach var="product" items="${productList}">
+                                        <div class="product-card">
+                                            <img src="images/material/${product.materialsUrl}" alt="${product.materialName}" width="200">
+                                            <div class="card-content">
+                                                <h5>${product.materialName}</h5>
+                                                <div class="info-label">Code: <b>${product.materialCode}</b></div>
+                                                <div class="info-label">
+                                                    Status: <b class="status-${product.materialStatus}">${product.materialStatus}</b>
+                                                </div>
+                                                <div class="info-label">Unit: <b>${product.unit.unitName}</b></div>
+                                                <div class="info-label">
+                                                    Stock: 
+                                                    <b class="${product.quantity == 0 ? 'stock-zero' : ''}">${product.quantity}</b>
+                                                    <c:if test="${product.quantity == 0}">
+                                                        <i class="fas fa-exclamation-circle" style="color:#e74c3c;" title="Out of stock"></i>
+                                                    </c:if>
+                                                    <c:if test="${product.quantity > 0 && product.quantity < 10}">
+                                                        <span class="badge bg-warning text-dark" style="margin-left:6px;">
+                                                            <i class="fas fa-exclamation-triangle"></i>
+                                                        </span>
+                                                    </c:if>
+                                                </div>
+                                                <a href="ProductDetail?id=${product.materialId}" class="btn-detail">
+                                                    <i class="fas fa-eye me-1"></i> View Detail
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                                <!-- Pagination cố định ở cuối -->
+                                <div class="d-flex justify-content-center mt-4 mb-5">
+                                    <nav aria-label="Material pagination">
+                                        <ul class="pagination">
+                                            <c:forEach var="i" begin="1" end="${totalPages}">
+                                                <li class="page-item <c:if test='${i == currentPage}'>active</c:if>">
+                                                    <a class="page-link" href="home?page=${i}">${i}</a>
+                                                </li>
+                                            </c:forEach>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <jsp:include page="Footer.jsp" />
+        <script src="js/jquery-1.11.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/script.js"></script>
+        <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+        <script>
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
             });
-          }
-
-          // Bar Chart - Stock Level Distribution
-          const barCtx = document.getElementById("barChart");
-          if (barCtx) {
-            const lowStockCount = parseInt("${lowStockCount}", 10) || 0;
-            const outOfStockCount = parseInt("${outOfStockCount}", 10) || 0;
-            const totalMaterials = parseInt("${materialCount}", 10) || 0;
-            const normalStockCount =
-              totalMaterials - lowStockCount - outOfStockCount;
-
-            new Chart(barCtx, {
-              type: "bar",
-              data: {
-                labels: ["Normal Stock", "Low Stock", "Out of Stock"],
-                datasets: [
-                  {
-                    label: "Number of Materials",
-                    data: [normalStockCount, lowStockCount, outOfStockCount],
-                    backgroundColor: [
-                      "rgba(40, 167, 69, 0.8)",
-                      "rgba(255, 193, 7, 0.8)",
-                      "rgba(220, 53, 69, 0.8)",
-                    ],
-                    borderColor: [
-                      "rgba(40, 167, 69, 1)",
-                      "rgba(255, 193, 7, 1)",
-                      "rgba(220, 53, 69, 1)",
-                    ],
-                    borderWidth: 2,
-                    borderRadius: 8,
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 },
-                  },
-                },
-                plugins: {
-                  legend: { display: false },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        return context.parsed.y + " materials";
-                      },
-                    },
-                  },
-                },
-              },
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var showBtn = document.getElementById('showSearchBtn');
+                var overlay = document.getElementById('searchOverlay');
+                var input = overlay.querySelector('input');
+                showBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    overlay.classList.toggle('d-none');
+                    if (!overlay.classList.contains('d-none')) {
+                        setTimeout(function () {
+                            input.focus();
+                        }, 100);
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!overlay.classList.contains('d-none') && !overlay.contains(e.target) && e.target !== showBtn) {
+                        overlay.classList.add('d-none');
+                    }
+                });
+                overlay.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
             });
-          }
-        }
-      });
-    </script>
-  </body>
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const products = document.querySelectorAll('.product-card');
+                const productsPerPage = 8;
+                const pagination = document.getElementById('pagination');
+                let currentPage = 1;
+                const totalPages = Math.ceil(products.length / productsPerPage);
+                function showPage(page) {
+                    currentPage = page;
+                    products.forEach((product, idx) => {
+                        if (idx >= (page - 1) * productsPerPage && idx < page * productsPerPage) {
+                            product.style.display = '';
+                        } else {
+                            product.style.display = 'none';
+                        }
+                    });
+                    document.querySelectorAll('#pagination .page-item').forEach((li, i) => {
+                        if (i === page - 1) {
+                            li.classList.add('active');
+                        } else {
+                            li.classList.remove('active');
+                        }
+                    });
+                }
+                if (pagination) {
+                    pagination.querySelectorAll('.page-link').forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const page = parseInt(this.getAttribute('data-page'));
+                            showPage(page);
+                        });
+                    });
+                    showPage(1);
+                }
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var showBtn = document.getElementById('showSearchBtn');
+                var overlay = document.getElementById('searchOverlay');
+                var input = overlay.querySelector('input');
+                showBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    overlay.classList.toggle('d-none');
+                    if (!overlay.classList.contains('d-none')) {
+                        setTimeout(function () {
+                            input.focus();
+                        }, 100);
+                    }
+                });
+                document.addEventListener('click', function (e) {
+                    if (!overlay.classList.contains('d-none') && !overlay.contains(e.target) && e.target !== showBtn) {
+                        overlay.classList.add('d-none');
+                    }
+                });
+                overlay.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            });
+        </script>
+    </body>
 </html>
