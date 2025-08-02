@@ -320,11 +320,11 @@ public class CreateExportRequestServlet extends HttpServlet {
                         nextSeq = Integer.parseInt(numberPart) + 1;
                     } catch (NumberFormatException ignore) {}
                 }
-                return prefix + String.format("%03d", nextSeq);
+                return prefix + nextSeq;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return prefix + "001";
+            return prefix + "1";
         }
     }
 }
