@@ -79,9 +79,12 @@ public class HomeServlet extends HttpServlet {
         
         // Kiểm tra đăng nhập - nếu chưa đăng nhập thì redirect về trang login
         if (user == null) {
+            System.out.println("DEBUG - User not logged in, redirecting to Login.jsp");
             response.sendRedirect("Login.jsp");
             return;
         }
+        
+        System.out.println("DEBUG - User logged in: " + user.getUsername() + ", role: " + user.getRoleId());
         
         MaterialDAO dao = new MaterialDAO();
         int page = 1;
@@ -178,6 +181,7 @@ public class HomeServlet extends HttpServlet {
 
         // TODO: Lấy thêm các số liệu dashboard khác nếu cần (yêu cầu mua, sửa chữa, ...)
 
+        System.out.println("DEBUG - Forwarding to HomePage.jsp");
         request.getRequestDispatcher("HomePage.jsp").forward(request, response);
     }
 
