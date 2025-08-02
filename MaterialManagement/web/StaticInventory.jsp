@@ -124,7 +124,38 @@
       .search-section {
         margin-bottom: 25px;
       }
-
+      .report-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+        margin: 20px 0;
+      }
+      .btn-report {
+        background: #deb887;
+        color: #fff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s, color 0.3s;
+      }
+      .btn-report:hover {
+        background: #cfa06c;
+        color: #fff;
+      }
+      .btn-report i {
+        color: #fff;
+      }
       .material-name {
         font-weight: 500;
         color: #495057;
@@ -162,7 +193,22 @@
       .pagination .page-item.disabled .page-link {
         color: #6c757d;
       }
-
+      .stat-card.stat-stock {
+        background: #388e3c;
+        color: #fff;
+      }
+      .stat-card.stat-imported {
+        background: #1565c0;
+        color: #fff;
+      }
+      .stat-card.stat-exported {
+        background: #ef6c00;
+        color: #fff;
+      }
+      .stat-card.stat-out {
+        background: #b71c1c;
+        color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -189,12 +235,61 @@
               <h2 class="text-primary fw-bold display-6 border-bottom pb-2">
                 <i class="fas fa-chart-bar me-2"></i>Inventory Statistics
               </h2>
-
+              <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+                <button id="viewReportBtn" class="btn-report">
+                  <i class="fas fa-chart-pie me-2"></i> View Reports
+                </button>
+              </c:if>
             </div>
             <c:if test="${not empty error}">
               <div class="alert alert-danger">${error}</div>
             </c:if>
-
+            <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+              <div id="reportSection" class="report-section">
+                <h4 class="mb-4">
+                  <i class="fas fa-chart-line me-2"></i>Inventory Analytics
+                </h4>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="chart-container">
+                      <canvas id="pieChart"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-stock text-center">
+                          <i class="fas fa-boxes stat-icon"></i>
+                          <h3>${totalStock}</h3>
+                          <p>Total Stock</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-imported text-center">
+                          <i class="fas fa-arrow-down stat-icon"></i>
+                          <h3>${totalImported}</h3>
+                          <p>Total Imported</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-exported text-center">
+                          <i class="fas fa-arrow-up stat-icon"></i>
+                          <h3>${totalExported}</h3>
+                          <p>Total Exported</p>
+                        </div>
+                      </div>
+                      <div class="col-6 mb-3">
+                        <div class="stat-card stat-out text-center">
+                          <i class="fas fa-exclamation-triangle stat-icon"></i>
+                          <h3>${lowStockCount}</h3>
+                          <p>Low Stock Items</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </c:if>
             <div class="row search-section">
               <div class="col-md-12">
                 <form method="GET" action="StaticInventory" class="d-flex gap-2 align-items-center">
@@ -289,8 +384,87 @@
     <jsp:include page="Footer.jsp" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-
+      let chartRendered = false;
+      <c:if test="${rolePermissionDAO.hasPermission(roleId, 'VIEW_REPORT')}">
+        document.getElementById('viewReportBtn').addEventListener('click', function() {
+          const section = document.getElementById('reportSection');
+          if (section.style.display === 'none') {
+            section.style.display = 'block';
+            if (!chartRendered) {
+              renderCharts();
+              chartRendered = true;
+            }
+          } else {
+            section.style.display = 'none';
+          }
+        });
+      </c:if>
+      function renderCharts() {
+        var totalImported = parseInt('${totalImported}', 10) || 0;
+        var totalExported = parseInt('${totalExported}', 10) || 0;
+        var totalStock = parseInt('${totalStock}', 10) || 0;
+        var total = totalImported + totalExported + totalStock;
+        var data = [totalImported, totalExported, totalStock];
+        var labels = ['Imported', 'Exported', 'Current Stock'];
+        var backgroundColors = [
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(40, 167, 69, 0.7)'
+        ];
+        var pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: backgroundColors
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  generateLabels: function(chart) {
+                    var dataset = chart.data.datasets[0];
+                    var total = dataset.data.reduce((a, b) => a + b, 0);
+                    return chart.data.labels.map(function(label, i) {
+                      var value = dataset.data[i];
+                      var percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                      return {
+                        text: label + ' (' + value + ', ' + percent + '%)',
+                        fillStyle: dataset.backgroundColor[i],
+                        strokeStyle: dataset.backgroundColor[i],
+                        lineWidth: 1,
+                        hidden: isNaN(dataset.data[i]) || chart.getDataVisibility(i) === false,
+                        index: i
+                      };
+                    });
+                  }
+                }
+              },
+              title: {
+                display: true,
+                text: 'Inventory Overview'
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    var value = context.parsed;
+                    var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    var percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                    return context.label + ': ' + value + ' (' + percent + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
     </script>
   </body>
 </html>

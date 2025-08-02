@@ -65,8 +65,8 @@
                 font-size: 1rem;
             }
             .material-form .form-control:focus {
-                border-color: #DEAD6F;
-                box-shadow: 0 0 0 0.25rem rgba(222, 173, 111, 0.25);
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
                 outline: 0;
             }
             .material-form .form-control.is-invalid {
@@ -82,7 +82,7 @@
                 border: 1px solid #ced4da;
                 border-radius: 0.25rem;
                 background-color: #fff;
-                box-shadow: 0 0 0 0.25rem rgba(222, 173, 111, 0.25);
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
                 z-index: 1000;
             }
             .ui-menu-item {
@@ -101,26 +101,22 @@
             .pagination a {
                 margin: 0 5px;
                 padding: 8px 12px;
-                border: 1px solid #DEAD6F;
+                border: 1px solid #ced4da;
                 border-radius: 0.25rem;
                 background-color: #fff;
-                color: #DEAD6F;
+                color: #0d6efd;
                 text-decoration: none;
                 font-size: 1rem;
             }
             .pagination a.active {
-                background-color: #DEAD6F;
+                background-color: #0d6efd;
                 color: #fff;
-                border-color: #DEAD6F;
+                border-color: #0d6efd;
             }
             .pagination a.disabled {
                 color: #6c757d;
                 cursor: not-allowed;
                 opacity: 0.5;
-            }
-            .pagination a:hover:not(.disabled) {
-                background-color: #f8f9fa;
-                color: #DEAD6F;
             }
         </style>
     </head>
@@ -148,25 +144,25 @@
                                 <div class="alert alert-danger">${error}</div>
                             </c:if>
 
-                            <h3 class="fw-normal mb-3">Load Request</h3>
-                            <form action="ExportMaterial" method="post" class="mb-5" onsubmit="return validateLoadForm()">
+                            <h3 class="fw-normal mb-3">Add Material to Export List</h3>
+                            <form action="ExportMaterial" method="post" class="mb-5" onsubmit="return validateAddForm()">
+                                <input type="hidden" name="action" value="add">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="requestType" class="form-label text-muted">Request Type</label>
-                                        <select id="requestType" name="action" class="form-control" required>
-                                            <option value="loadExportRequest">Export Request</option>
-                                            <option value="loadRepairRequest">Repair Request</option>
-                                        </select>
+                                        <label for="materialName" class="form-label text-muted">Material</label>
+                                        <input type="text" id="materialName" name="materialName" class="form-control" required
+                                               placeholder="Type material name or code">
+                                        <input type="hidden" name="materialId" id="materialId">
+                                        <div class="invalid-feedback">Please enter a valid material name or code.</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="requestCode" class="form-label text-muted">Request Code</label>
-                                        <input type="text" id="requestCode" name="requestCode" class="form-control" required
-                                               placeholder="Enter request code">
-                                        <div class="invalid-feedback">Please enter a valid request code.</div>
+                                        <label for="quantity" class="form-label text-muted">Quantity</label>
+                                        <input type="number" name="quantity" id="quantity" min="1" class="form-control" required>
+                                        <div class="invalid-feedback">Please enter a quantity greater than 0.</div>
                                     </div>
                                     <div class="col-12 mt-4">
                                         <button type="submit" class="btn btn-dark btn-lg rounded-1 w-100">
-                                            <i class="fas fa-plus-circle me-2"></i>Load Material List
+                                            <i class="fas fa-plus-circle me-2"></i>Add to Export List
                                         </button>
                                     </div>
                                 </div>
@@ -180,7 +176,7 @@
                                             <tr>
                                                 <th>Image</th>
                                                 <th>Material</th>
-                                                <th>Material Code</th>
+                                                <th>Code</th>
                                                 <th>Quantity</th>
                                                 <th>Available Stock</th>
                                                 <th>Action</th>
@@ -268,7 +264,7 @@
                                     <div class="col-md-6">
                                         <label for="recipientName" class="form-label text-muted">Recipient</label>
                                         <input type="text" list="recipientList" id="recipientName" class="form-control" required
-                                               oninput="updateRecipientId(this)" placeholder="Enter recipient name or department">
+                                               oninput="updateRecipientId(this)" placeholder="Type recipient name or department">
                                         <input type="hidden" name="recipientUserId" id="recipientUserId">
                                         <datalist id="recipientList">
                                             <c:forEach var="user" items="${users}">
@@ -324,6 +320,52 @@
                     }, 3000);
                 });
 
+                const materials = [
+                    <c:forEach var="material" items="${materials}" varStatus="loop">
+                        {
+                            label: "${fn:escapeXml(material.materialName)} (${fn:escapeXml(material.materialCode)})",
+                            value: "${fn:escapeXml(material.materialName)}",
+                            id: "${material.materialId}",
+                            name: "${fn:escapeXml(material.materialName)}",
+                            code: "${fn:escapeXml(material.materialCode)}"
+                        }${loop.last ? '' : ','}
+                    </c:forEach>
+                ];
+
+                $("#materialName").autocomplete({
+                    source: function(request, response) {
+                        const term = request.term.toLowerCase();
+                        const matches = materials.filter(material => 
+                            material.name.toLowerCase().includes(term) || 
+                            material.code.toLowerCase().includes(term)
+                        );
+                        response(matches);
+                    },
+                    select: function(event, ui) {
+                        document.getElementById('materialId').value = ui.item.id;
+                        document.getElementById('materialName').value = ui.item.name;
+                        document.getElementById('materialName').classList.remove('is-invalid');
+                    },
+                    change: function(event, ui) {
+                        if (!ui.item) {
+                            const inputValue = document.getElementById('materialName').value.toLowerCase().trim();
+                            const selectedMaterial = materials.find(material => 
+                                material.name.toLowerCase() === inputValue || 
+                                material.code.toLowerCase() === inputValue
+                            );
+                            if (selectedMaterial) {
+                                document.getElementById('materialId').value = selectedMaterial.id;
+                                document.getElementById('materialName').value = selectedMaterial.name;
+                                document.getElementById('materialName').classList.remove('is-invalid');
+                            } else {
+                                document.getElementById('materialId').value = '';
+                                document.getElementById('materialName').classList.add('is-invalid');
+                            }
+                        }
+                    },
+                    minLength: 1
+                });
+
                 function debounce(func, wait) {
                     let timeout;
                     return function executedFunction(...args) {
@@ -358,24 +400,25 @@
                     updateRecipientId(document.getElementById('recipientName'));
                 }, 100));
 
-                function validateLoadForm() {
+                function validateAddForm() {
                     const form = document.querySelector('form[action="ExportMaterial"]');
                     let isValid = true;
-                    const requestCode = form.querySelector('#requestCode');
-                    const requestType = form.querySelector('#requestType');
+                    const materialId = form.querySelector('#materialId');
+                    const materialName = form.querySelector('#materialName');
+                    const quantity = form.querySelector('#quantity');
 
-                    if (!requestCode.value.trim()) {
-                        requestCode.classList.add('is-invalid');
+                    if (!materialId.value) {
+                        materialName.classList.add('is-invalid');
                         isValid = false;
                     } else {
-                        requestCode.classList.remove('is-invalid');
+                        materialName.classList.remove('is-invalid');
                     }
 
-                    if (!requestType.value) {
-                        requestType.classList.add('is-invalid');
+                    if (!quantity.value || quantity.value <= 0) {
+                        quantity.classList.add('is-invalid');
                         isValid = false;
                     } else {
-                        requestType.classList.remove('is-invalid');
+                        quantity.classList.remove('is-invalid');
                     }
 
                     return isValid;

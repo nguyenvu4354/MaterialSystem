@@ -7,10 +7,6 @@ import dal.RolePermissionDAO;
 import entity.Department;
 import entity.Export;
 import entity.ExportDetail;
-import entity.ExportRequest;
-import entity.ExportRequestDetail;
-import entity.RepairRequest;
-import entity.RepairRequestDetail;
 import entity.Material;
 import entity.User;
 import jakarta.servlet.ServletException;
@@ -96,10 +92,8 @@ public class ExportMaterialServlet extends HttpServlet {
         int currentPage = getCurrentPage(request);
         String action = request.getParameter("action");
         try {
-            if ("loadExportRequest".equals(action)) {
-                handleLoadExportRequest(request, response, session, currentPage);
-            } else if ("loadRepairRequest".equals(action)) {
-                handleLoadRepairRequest(request, response, session, currentPage);
+            if ("add".equals(action)) {
+                handleAddMaterial(request, response, session, user, currentPage);
             } else if ("export".equals(action)) {
                 handleExport(request, response, session, user, currentPage);
             } else if ("remove".equals(action)) {
@@ -135,129 +129,78 @@ public class ExportMaterialServlet extends HttpServlet {
         return currentPage;
     }
 
-    private void handleLoadExportRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session, int currentPage)
+    private void handleAddMaterial(HttpServletRequest request, HttpServletResponse response, HttpSession session, User user, int currentPage)
             throws ServletException, IOException, SQLException {
-        String requestCode = request.getParameter("requestCode");
-        if (requestCode == null || requestCode.isEmpty()) {
-            request.setAttribute("error", "Please enter an export request code.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
-
-        ExportRequest exportRequest = exportDAO.getExportRequestByCode(requestCode);
-        if (exportRequest == null || !"approved".equalsIgnoreCase(exportRequest.getStatus())) {
-            request.setAttribute("error", "Invalid, unapproved, or already used export request code.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
-
-        List<ExportRequestDetail> requestDetails = exportDAO.getExportRequestDetails(exportRequest.getExportRequestId());
-        if (requestDetails.isEmpty()) {
-            request.setAttribute("error", "Export request has no material details.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
-
+        String materialIdStr = request.getParameter("materialId");
+        String quantityStr = request.getParameter("quantity");
         List<ExportDetail> detailsToAdd = new ArrayList<>();
-        for (ExportRequestDetail reqDetail : requestDetails) {
-            int currentStock = inventoryDAO.getStockByMaterialId(reqDetail.getMaterialId());
-            if (currentStock < reqDetail.getQuantity()) {
-                request.setAttribute("error", "Insufficient stock for material ID: " + reqDetail.getMaterialId() + ". Available: " + currentStock);
-                loadDataAndForward(request, response, currentPage);
-                return;
-            }
-
-            ExportDetail detail = new ExportDetail();
-            detail.setMaterialId(reqDetail.getMaterialId());
-            detail.setQuantity(reqDetail.getQuantity());
-            detail.setStatus("draft");
-            detail.setCreatedAt(LocalDateTime.now());
-            detail.setUpdatedAt(LocalDateTime.now());
-            detailsToAdd.add(detail);
+        List<Material> materials = departmentDAO.getMaterials();
+        Map<Integer, Material> materialMap = new HashMap<>();
+        for (Material material : materials) {
+            materialMap.put(material.getMaterialId(), material);
         }
+
+        if (materialIdStr == null || materialIdStr.isEmpty() || 
+            quantityStr == null || quantityStr.isEmpty()) {
+            request.setAttribute("error", "Please fill in all fields.");
+            loadDataAndForward(request, response, currentPage);
+            return;
+        }
+
+        int materialId = Integer.parseInt(materialIdStr);
+        int quantity = Integer.parseInt(quantityStr);
+
+        if (quantity <= 0) {
+            request.setAttribute("error", "Quantity must be greater than 0.");
+            loadDataAndForward(request, response, currentPage);
+            return;
+        }
+
+        int currentStock = inventoryDAO.getStockByMaterialId(materialId);
+        if (currentStock < quantity) {
+            request.setAttribute("error", "Insufficient stock for material ID: " + materialId + ". Available: " + currentStock);
+            loadDataAndForward(request, response, currentPage);
+            return;
+        }
+
+        if (!materialMap.containsKey(materialId)) {
+            request.setAttribute("error", "Selected material is invalid.");
+            loadDataAndForward(request, response, currentPage);
+            return;
+        }
+
+        ExportDetail detail = new ExportDetail();
+        detail.setMaterialId(materialId);
+        detail.setQuantity(quantity);
+        detail.setStatus("draft");
+        detail.setCreatedAt(LocalDateTime.now());
+        detail.setUpdatedAt(LocalDateTime.now());
+        detailsToAdd.add(detail);
 
         Integer tempExportId = (Integer) session.getAttribute("tempExportId");
         if (tempExportId == null) {
             Export export = new Export();
             export.setExportDate(LocalDateTime.now());
-            export.setExportedBy(exportRequest.getUserId());
-            export.setRecipientUserId(exportRequest.getRecipientId());
+            export.setExportedBy(user.getUserId());
+            export.setRecipientUserId(user.getUserId());
             export.setCreatedAt(LocalDateTime.now());
             export.setUpdatedAt(LocalDateTime.now());
             tempExportId = exportDAO.createExport(export);
             session.setAttribute("tempExportId", tempExportId);
-            session.setAttribute("exportRequestId", exportRequest.getExportRequestId());
-            session.setAttribute("requestType", "export");
         }
 
-        for (ExportDetail detail : detailsToAdd) {
-            detail.setExportId(tempExportId);
+        for (ExportDetail detailToAdd : detailsToAdd) {
+            detailToAdd.setExportId(tempExportId);
         }
         exportDAO.createExportDetails(detailsToAdd);
-        request.setAttribute("success", "Materials loaded from export request: " + requestCode);
-        loadDataAndForward(request, response, currentPage);
-    }
+        request.setAttribute("success", "Material added to export list.");
 
-    private void handleLoadRepairRequest(HttpServletRequest request, HttpServletResponse response, HttpSession session, int currentPage)
-            throws ServletException, IOException, SQLException {
-        String requestCode = request.getParameter("requestCode");
-        if (requestCode == null || requestCode.isEmpty()) {
-            request.setAttribute("error", "Please enter a repair request code.");
-            loadDataAndForward(request, response, currentPage);
-            return;
+        List<ExportDetail> fullExportDetails = exportDAO.getDraftExportDetails(tempExportId);
+        int totalItems = fullExportDetails.size();
+        int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
         }
-
-        RepairRequest repairRequest = exportDAO.getRepairRequestByCode(requestCode);
-        if (repairRequest == null || !"approved".equalsIgnoreCase(repairRequest.getStatus())) {
-            request.setAttribute("error", "Invalid, unapproved, or already used repair request code.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
-
-        List<RepairRequestDetail> requestDetails = exportDAO.getRepairRequestDetails(repairRequest.getRepairRequestId());
-        if (requestDetails.isEmpty()) {
-            request.setAttribute("error", "Repair request has no material details.");
-            loadDataAndForward(request, response, currentPage);
-            return;
-        }
-
-        List<ExportDetail> detailsToAdd = new ArrayList<>();
-        for (RepairRequestDetail reqDetail : requestDetails) {
-            int currentStock = inventoryDAO.getStockByMaterialId(reqDetail.getMaterialId());
-            if (currentStock < reqDetail.getQuantity()) {
-                request.setAttribute("error", "Insufficient stock for material ID: " + reqDetail.getMaterialId() + ". Available: " + currentStock);
-                loadDataAndForward(request, response, currentPage);
-                return;
-            }
-
-            ExportDetail detail = new ExportDetail();
-            detail.setMaterialId(reqDetail.getMaterialId());
-            detail.setQuantity(reqDetail.getQuantity());
-            detail.setStatus("draft");
-            detail.setCreatedAt(LocalDateTime.now());
-            detail.setUpdatedAt(LocalDateTime.now());
-            detailsToAdd.add(detail);
-        }
-
-        Integer tempExportId = (Integer) session.getAttribute("tempExportId");
-        if (tempExportId == null) {
-            Export export = new Export();
-            export.setExportDate(LocalDateTime.now());
-            export.setExportedBy(repairRequest.getUserId());
-            export.setRecipientUserId(repairRequest.getUserId()); // Use user_id as recipient for repair requests
-            export.setCreatedAt(LocalDateTime.now());
-            export.setUpdatedAt(LocalDateTime.now());
-            tempExportId = exportDAO.createExport(export);
-            session.setAttribute("tempExportId", tempExportId);
-            session.setAttribute("repairRequestId", repairRequest.getRepairRequestId());
-            session.setAttribute("requestType", "repair");
-        }
-
-        for (ExportDetail detail : detailsToAdd) {
-            detail.setExportId(tempExportId);
-        }
-        exportDAO.createExportDetails(detailsToAdd);
-        request.setAttribute("success", "Materials loaded from repair request: " + requestCode);
         loadDataAndForward(request, response, currentPage);
     }
 
@@ -274,6 +217,7 @@ public class ExportMaterialServlet extends HttpServlet {
 
         exportDAO.removeExportDetail(tempExportId, materialId, quantity);
         request.setAttribute("success", "Material removed from export list.");
+
         List<ExportDetail> fullExportDetails = exportDAO.getDraftExportDetails(tempExportId);
         int totalItems = fullExportDetails.size();
         int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
@@ -383,24 +327,8 @@ public class ExportMaterialServlet extends HttpServlet {
             exportDAO.confirmExport(tempExportId);
             exportDAO.updateInventoryByExportId(tempExportId, user.getUserId());
 
-            String requestType = (String) session.getAttribute("requestType");
-            if ("export".equals(requestType)) {
-                Integer exportRequestId = (Integer) session.getAttribute("exportRequestId");
-                if (exportRequestId != null) {
-                    exportDAO.markExportRequestAsUsed(exportRequestId);
-                }
-            } else if ("repair".equals(requestType)) {
-                Integer repairRequestId = (Integer) session.getAttribute("repairRequestId");
-                if (repairRequestId != null) {
-                    exportDAO.markRepairRequestAsUsed(repairRequestId);
-                }
-            }
-
             String exportCode = exportDAO.getExportCode(tempExportId);
             session.setAttribute("tempExportId", null);
-            session.setAttribute("exportRequestId", null);
-            session.setAttribute("repairRequestId", null);
-            session.setAttribute("requestType", null);
             request.setAttribute("success", "Export completed successfully with code: " + exportCode);
             currentPage = 1;
         } catch (SQLException e) {
