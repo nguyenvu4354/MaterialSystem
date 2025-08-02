@@ -61,14 +61,21 @@
             .custom-table th,
             .custom-table td {
                 vertical-align: middle;
-                min-height: 48px;
+                padding: 12px 8px;
+            }
+            .img-cell {
+                width: 60px;
+                height: 60px;
+                text-align: center;
             }
             .material-img {
-                width: 50px;
-                height: 50px;
-                object-fit: cover;
-                border-radius: 5px;
-            }
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+    background-color: #eee;
+}
         </style>
     </head>
     <body>
@@ -121,15 +128,12 @@
                                 <c:forEach var="detail" items="${importDetails}" varStatus="loop">
                                     <tr>
                                         <td>${loop.index + 1}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${not empty detail.materialsUrl}">
-                                                    <img src="${pageContext.request.contextPath}/images/material/${detail.materialsUrl}" alt="${detail.materialName}" class="material-img" onerror="this.src='${pageContext.request.contextPath}/images/default-material.png'">
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <img src="${pageContext.request.contextPath}/images/default-material.png" alt="No Image" class="material-img">
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <td class="img-cell">
+                                            <img 
+                                                src="${pageContext.request.contextPath}/images/material/${detail.materialsUrl}" 
+                                                alt="${detail.materialName}" 
+                                                class="material-img" 
+                                                data-fallback="${pageContext.request.contextPath}/images/default-material.png">
                                         </td>
                                         <td>${detail.materialName}</td>
                                         <td>${detail.quantity}</td>
